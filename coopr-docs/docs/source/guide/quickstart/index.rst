@@ -90,13 +90,14 @@ the superadmin tenant by clicking on it, which will bring you to the edit tenant
 On this screen, assign 10 workers (all available workers) to the tenant and enter some reasonable maximums for the number of clusters
 and nodes that can be live at any given time within the tenant. Once you are done, click submit.
 
+
 Configuring a Provider
 =========================
 
 To start provisioning machines, you must first specify an IaaS provider on which the clusters will be created. Click on the 
-'Providers' tab at the top of the screen. Several defaults are available on this page. There are providers for Amazon, Google,
-Joyent, Openstack, and Rackspace. Choose the provider you want to use for this tutorial, then click on it's name to navigate to 
-it's edit screen.
+'Providers' tab at the top of the screen. Several defaults are available on this page. There are providers for Amazon, DigitalOcean,
+Google, Joyent, Openstack, and Rackspace. Choose the provider you want to use for this tutorial, then click on it's name to navigate 
+to it's edit screen.
 
 Each provider type has fields specific to your own provider and account.
 These inputs may include settings such as username and API key, and can be obtained through the provider's own 
@@ -150,6 +151,38 @@ you would enter 'ec2-east-1'.
 
 Once you are finished, click on 'Submit' to save your changes.
 
+
+DigitalOcean
+^^^^^^^^^^^^
+
+DigitalOcean requires a client ID, API key and ssh key. For the ssh key, you will also need to enter an ssh key name.
+Note: ssh key name is the name under which you uploaded your key in the DigitalOcean portal.
+
+Enter values for all those fields.  If applicable, change the region from the default (currently nyc2).
+
+.. figure:: /_images/quickstart/providers_digitalocean.png
+    :align: center
+    :width: 800px
+    :alt: Configuring a DigitalOcean provider
+    :figclass: align-center
+
+Your DigitalOcean ssh key is a plugin resource, and must be uploaded to the Coopr server before it can be used by workers. 
+Coopr will take care of distributing the key to workers that need it. A UI for managing resources is coming in the next release. 
+Until then, you must use the REST API directly (see :doc:`Plugin Resource API </rest/plugins>`), or use the data upload tool included 
+in the provisioner package.
+
+For example, assume your key is located at '/keys/digitalocean/id_rsa' and you want to add it as a resource named 'coopr'.
+Enter 'coopr' into the ``SSH Key Resource Name``, then upload the resource.
+If you are using Coopr Standalone, run the following command from the unzipped standalone directory:
+
+.. code-block:: bash
+
+ $ ruby provisioner/bin/data-uploader.rb sync /keys/digitalocean/id_rsa providertypes/digitalocean/ssh_keys/coopr -u http://<server>:<port>
+ upload successful for ...
+ stage successful for ...
+ sync successful
+
+
 Google
 ^^^^^^
 The google provider requires a p12 API key, a service account email address, some default data disk size, a project id,
@@ -202,18 +235,6 @@ use these keys in any other google provider you manage. Similarly, you may uploa
 
 Once you are finished, click 'Submit' to save your changes.
 
-Rackspace
-^^^^^^^^^
-An API key, username, and region are required for using Rackspace (for more information on how to obtain your personalized API key, see
-`this page <http://www.rackspace.com/knowledge_center/article/rackspace-cloud-essentials-1-generating-your-api-key>`_ ).
-
-.. figure:: /_images/quickstart/providers_rackspace.png
-    :align: center
-    :width: 800px
-    :alt: Configuring a Rackspace provider
-    :figclass: align-center
-
-Enter the necessary fields and click on 'Submit' to save your changes.
 
 Joyent
 ^^^^^^
@@ -256,6 +277,7 @@ This will upload your key to the server, then sync it to make it available for u
 use this key in any joyent provider by referring to it as 'coopr'. Similarly, you may upload other keys you may want to use.
 For example, you could upload the another key and name it 'joyentuser'. Then in the ``SSH Key Resource Name`` field,
 you would enter 'joyentuser'.
+
 
 OpenStack
 ^^^^^^^^^
@@ -326,6 +348,20 @@ contact your OpenStack administrator to get this information.
     :width: 800px
     :alt: Configuring an OpenStack image type
     :figclass: align-center
+
+
+Rackspace
+^^^^^^^^^
+An API key, username, and region are required for using Rackspace (for more information on how to obtain your personalized API key, see
+`this page <http://www.rackspace.com/knowledge_center/article/rackspace-cloud-essentials-1-generating-your-api-key>`_ ).
+
+.. figure:: /_images/quickstart/providers_rackspace.png
+    :align: center
+    :width: 800px
+    :alt: Configuring a Rackspace provider
+    :figclass: align-center
+
+Enter the necessary fields and click on 'Submit' to save your changes.
 
 
 Provisioning your First Cluster

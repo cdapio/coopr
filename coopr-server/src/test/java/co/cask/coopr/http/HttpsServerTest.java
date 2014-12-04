@@ -49,19 +49,19 @@ public class HttpsServerTest extends ServiceTestBase {
 
   @Before
   public void startServer() {
-    handlerServer = injector.getInstance(HandlerServer.class);
-    handlerServer.startAndWait();
+    externalHandlerServer = injector.getInstance(ExternalHandlerServer.class);
+    externalHandlerServer.startAndWait();
   }
 
   @After
   public void stopServer() {
-    handlerServer.stopAndWait();
+    externalHandlerServer.stopAndWait();
   }
 
   @Test
   public void testStatus() throws Exception {
     HttpResponse response = doSecureGet(String.format("https://%s:%d/status", HOSTNAME,
-                                                handlerServer.getBindAddress().getPort()));
+                                                externalHandlerServer.getBindAddress().getPort()));
     Assert.assertEquals(200, response.getStatusLine().getStatusCode());
     Assert.assertEquals("OK\n", EntityUtils.toString(response.getEntity()));
   }
@@ -71,7 +71,7 @@ public class HttpsServerTest extends ServiceTestBase {
     Future<HttpResponse> future = Executors.newSingleThreadExecutor().submit(new Callable<HttpResponse>() {
       public HttpResponse call() throws Exception {
         return doSecureGet(String.format("http://%s:%d/status", HOSTNAME,
-                                   handlerServer.getBindAddress().getPort()));
+                                         externalHandlerServer.getBindAddress().getPort()));
       }
     });
     future.get(5000, TimeUnit.MILLISECONDS);

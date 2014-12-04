@@ -110,6 +110,8 @@ your local filesystem and upload it to the server. You can see usage information
     -t, --tenant TENANT              Tenant, defaults to ENV['COOPR_TENANT'] else "superadmin"
     -U, --user USER                  User, defaults to ENV['COOPR_API_USER'] else "admin"
     -q, --quiet                      Suppress all non-error output
+    --cert-path CERTPATH             Trust certificate path
+    --cert-pass CERTPASS             Trust certificate password
 
  Required Arguments:
          <action>: one of upload, stage, or sync:

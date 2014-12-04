@@ -176,7 +176,8 @@ public class ClusterScheduler implements Runnable {
         }
 
         TaskId taskId = idService.getNewTaskId(JobId.fromString(job.getJobId()));
-        ClusterTask task = new ClusterTask(action, taskId, taskNode.getHostId(), taskNode.getService(), clusterAction);
+        ClusterTask task = new ClusterTask(action, taskId, taskNode.getHostId(), taskNode.getService(), clusterAction,
+                                           cluster.getClusterTemplate().getName(), cluster.getAccount());
         clusterStore.writeClusterTask(task);
         stageTasks.add(task);
       }

@@ -55,9 +55,9 @@ public class ServiceConstraintCodec extends AbstractCodec<ServiceConstraint> {
     Integer min = context.deserialize(quantities.get("min"), Integer.class);
     Integer max = context.deserialize(quantities.get("max"), Integer.class);
     Set<String> requiredHardwareTypes = context.deserialize(jsonObj.get("hardwaretypes"),
-                                                            new TypeToken<Set<String>>() {}.getType());
+                                                            new TypeToken<Set<String>>() { }.getType());
     Set<String> requiredImageTypes = context.deserialize(jsonObj.get("imagetypes"),
-                                                         new TypeToken<Set<String>>() {}.getType());
+                                                         new TypeToken<Set<String>>() { }.getType());
 
 
     return new ServiceConstraint(requiredHardwareTypes, requiredImageTypes, min, max);

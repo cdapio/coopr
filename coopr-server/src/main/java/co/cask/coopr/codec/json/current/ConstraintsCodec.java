@@ -54,7 +54,7 @@ public class ConstraintsCodec extends AbstractCodec<Constraints> {
     LayoutConstraint layoutConstraint = context.deserialize(jsonObj.get("layout"), LayoutConstraint.class);
     Map<String, ServiceConstraint> serviceConstraints =
       context.deserialize(jsonObj.get("services"),
-                          new TypeToken<Map<String, ServiceConstraint>>() {}.getType());
+                          new TypeToken<Map<String, ServiceConstraint>>() { }.getType());
     SizeConstraint sizeConstraint = context.deserialize(jsonObj.get("size"), SizeConstraint.class);
 
     return new Constraints(serviceConstraints, layoutConstraint, sizeConstraint);

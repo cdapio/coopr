@@ -29,7 +29,7 @@ import java.util.Map;
  * Codec for serializing/deserializing a {@link ImageType}.
  */
 public class ImageTypeCodec extends AbstractBaseEntityCodec<ImageType> {
-  private static final Type PROVIDERMAP_TYPE = new TypeToken<Map<String, Map<String, String>>>() {}.getType();
+  private static final Type PROVIDERMAP_TYPE = new TypeToken<Map<String, Map<String, String>>>() { }.getType();
 
   @Override
   protected void addChildFields(ImageType imageType, JsonObject jsonObj, JsonSerializationContext context) {

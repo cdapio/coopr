@@ -1,0 +1,275 @@
+<ul class="list-unstyled coopr-list-striped" ng-show="model">
+
+
+  <li><div class="row">
+    <div class="col-xs-3">
+      <label>Name</label>
+    </div>
+    <div class="col-xs-9">
+      <div class="pull-right" ng-show="model.status!='terminated'">
+        <a ui-sref="^.edit({id: model.id})"
+          class="btn btn-default btn-xs">
+            <span class="fa fa-edit"></span>
+            Reconfigure
+        </a>
+        <a href="" ng-click="caskConfirm()" cask-confirmable="doDelete(model)" 
+          data-confirmable-title="Delete cluster '{{model.name}}'"
+          data-confirmable-content="This action is not reversible, do you really want to proceed?"
+          class="btn btn-danger btn-xs">
+            <span class="fa fa-trash"></span>
+            Delete
+        </a>
+      </div>
+
+      <strong class="lead">
+        {{model.name}}
+      </strong>
+      <small class="text-muted">
+        created
+        <span class="text-info"
+          am-time-ago="model.createTime"
+          bs-tooltip="model.createTime | amDateFormat:'LLL'"
+        ></span>
+        by
+        <span class="text-info"
+          bs-tooltip="model.account.userId + '/' + model.account.tenantId"
+          ng-bind="model.account.userId"
+        ></span>
+      </small>
+    </div>
+  </div></li>
+
+  <li><div class="row">
+    <div class="col-xs-3">
+      <label>Status</label>
+    </div>
+    <div class="col-xs-9">
+      <my-status-label data-value="model.status"></my-status-label>
+    </div>
+  </div></li>
+
+  <li ng-if="model.status == 'active'"><div class="row">
+    <div class="col-xs-3">
+      <label>Expiry time</label>
+    </div>
+    <div class="col-xs-9">
+      <div class="row" ng-show="model.expireTime">
+        <div class="col-xs-9">
+          <p>
+            <span ng-hide="leaseExtendMs">
+              {{model.expireTime | date:'short'}}
+              <small am-time-ago="model.expireTime"></small>
+            </span>
+
+            <span ng-show="leaseExtendMs">
+              <em class="pull-right text-muted">
+                + {{leaseExtendHumanized}}
+              </em>
+              {{leaseExtendDate | date:'short'}}
+              <small am-time-ago="leaseExtendDate"></small>
+            </span>
+            &nbsp;
+          </p>
+          <p>
+            <input type="range"
+              min="0"
+              step="60000"
+              max="{{leaseMaxMs}}"
+              ng-model="leaseExtendMs" />
+          </p>
+        </div>
+        <div class="col-xs-3">
+          <p ng-show="leaseExtendMs" class="am-fade-and-slide-bottom">
+            <a class="btn btn-primary btn-block" href=""
+                ng-click="doLeaseExtend()">
+              <span class="fa fa-clock-o"></span> extend lease
+            </a>
+          </p>
+        </div>
+      </div>
+      <div ng-hide="model.expireTime">
+        <em>never</em>
+      </div>
+    </div>
+  </div></li>
+
+
+  <li><div class="row">
+    <div class="col-xs-3">
+      <label>Last Action</label>
+    </div>
+    <div class="col-xs-7">
+      <code>{{model.progress.action}}</code>
+      <my-status-label data-value="model.progress.actionstatus"></my-status-label>
+      <small ng-show="model.message">
+        <br><br><mark>{{model.message}}</mark>
+      </small>
+    </div>
+    <div class="col-xs-2 text-right">
+
+      <a class="btn btn-sm btn-default"
+        ng-click="doPauseDeploy()"
+        ng-show="model.progress.actionstatus==='running'"
+      >
+        <span class="fa fa-pause"></span>
+        <span class="hidden-xs hidden-sm">Pause Deploy</span>
+      </a>
+
+      <a class="btn btn-sm btn-default"
+        ng-click="doResumeDeploy()"
+        ng-show="model.progress.actionstatus==='paused'"
+      >
+        <span class="fa fa-play"></span>
+        <span class="hidden-xs hidden-sm">Resume Deploy</span>
+      </a>
+
+    </div>
+
+  </div></li>
+
+  <li ng-if="model.status!='terminated'"><div class="row">
+    <div class="col-xs-3">
+      <label>Progress</label>
+    </div>
+    <div class="col-xs-9">
+      <cask-progress
+        data-type="bar"
+        data-add-cls="{{{
+          'active': 'info',
+          'pending': 'success striped',
+          'incomplete': 'danger'
+        }[model.status]}}"
+        data-value="model.progress.stepscompleted"
+        data-max="model.progress.stepstotal"
+      ></cask-progress>
+    </div>
+  </div></li>
+
+  <li><div class="row">
+    <div class="col-xs-3">
+      <label>Provider</label>
+    </div>
+    <div class="col-xs-9">
+      {{model.provider.description || model.provider.name}}
+    </div>
+  </div></li>
+
+  <li><div class="row">
+    <div class="col-xs-3">
+      <label>Template</label>
+    </div>
+    <div class="col-xs-9">
+      {{model.clusterTemplate.description || model.clusterTemplate.name}}
+    </div>
+  </div></li>
+
+  <li ng-if="model.status!='terminated'"><div class="row">
+    <div class="col-xs-3">
+      <label>Services</label>
+    </div>
+    <div class="col-xs-9">
+      <my-service-picker
+        data-model="model.services"
+        data-cluster-id="model.id"
+      ></my-service-picker>
+    </div>
+  </div>
+  <div class="row" ng-show="availableServices.length">
+    <div class="col-xs-9 col-xs-offset-3">
+      <hr>
+      <p>
+        <my-service-picker
+          data-model="additionalServices"
+          data-available="availableServices"
+          data-allow-rm="'true'"
+        ></my-service-picker>
+      </p>
+      <p ng-show="additionalServices.length" class="am-fade-and-slide-top">
+        <a class="btn btn-primary" href="" ng-click="doSubmitServices(additionalServices)">
+          <span class="fa fa-save"></span> submit additional services
+        </a>
+      </p>
+    </div>
+  </div></li>
+
+</ul>
+
+<div ng-show="model.nodes.length">
+  <hr />
+  <h4>Service Sets</h4>
+
+  <ol class="list-unstyled panel-group" bs-collapse>
+    <li class="panel panel-default" ng-repeat="set in serviceSets">
+      <div class="panel-heading">
+        <div class="panel-title row">
+          <div class="col-xs-3">
+            <a href="" bs-collapse-toggle>
+              <span class="label label-success"
+                  ng-bind="set.nodes.length"></span>
+              <small>
+                <ng-pluralize count="set.nodes.length"
+                    when="{'one': 'node', 'other': 'nodes'}">
+                </ng-pluralize>
+                <ng-pluralize count="set.services.length"
+                    when="{'one': 'with one service', 'other': 'with {} services'}">
+                </ng-pluralize>
+                <span ng-show="set.nodes.length>1">each</span>
+              </small>
+            </a>
+          </div>
+          <div class="col-xs-9">
+            <my-service-picker
+              data-model="set.services"
+            ></my-service-picker>
+          </div>
+        </div>
+      </div>
+      <div class="panel-collapse" bs-collapse-target>
+        <div class="panel-body">
+
+          <div class="table-responsive">
+            <table class="table table-striped" cask-sortable>
+              <thead>
+                <tr ng-class="{'sort-enabled': set.nodes.length>1}">
+                  <th data-predicate="properties.hostname">hostname</th>
+                  <th data-predicate="properties.ipaddresses.access_v4">IP address</th>
+                  <th data-predicate="provisionerResults['ssh-auth'].user" colspan="3">
+                    credentials
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr ng-repeat="item in set.nodes | orderBy:sortable.predicate:sortable.reverse">
+                  <td>
+                    <tt>{{item.properties.hostname}}</tt>
+                  </td>
+                  <td>
+                    <small>{{item.properties.ipaddresses.access_v4}}</small>
+                  </td>
+                  <td width="10">
+                    <code>{{item.provisionerResults['ssh-auth'].user}}</code>
+                  </td>
+                  <td width="150">
+                    <cask-password
+                      data-value="item.provisionerResults['ssh-auth'].password"
+                    ></cask-password>
+                  </td>
+                  <td class="text-right">
+                    <a href="" ng-click="doActionsModal(item.id)"
+                      class="btn btn-default btn-sm">
+                        <span class="fa fa-gears"></span>
+                        Show Actions
+                    </a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+      </div>
+
+    </li>
+  </ol>
+
+</div>

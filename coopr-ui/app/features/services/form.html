@@ -1,0 +1,210 @@
+<div class="row">
+  <div class="col-xs-4 am-fade-and-slide-left" ng-show="debugJson.visible">
+    <pre>{{model | json}}</pre>
+  </div>
+  <div ng-class="{'col-xs-8': debugJson.visible}">
+
+
+<form name="serviceForm" class="form-horizontal" role="form" ng-submit="doSubmit(model)" novalidate>
+
+  <div class="form-group">
+    <label for="inputServiceName" class="col-xs-2 control-label">Name</label>
+    <div class="col-xs-10">
+      <input id="inputServiceName" type="text" name="name" class="form-control"
+        placeholder="Name"
+        cask-focus="inputServiceName"
+        ng-disabled="editing"
+        ng-pattern="/^[\w\.\-]+$/"
+        maxlength="255"
+        ng-model="model.name" required/>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="inputServiceDescription" class="col-xs-2 control-label">Description</label>
+    <div class="col-xs-10">
+      <textarea id="inputServiceDescription"
+        class="form-control" rows="4"
+        ng-model="model.description"
+      ></textarea>
+    </div>
+  </div>
+
+
+  <div class="form-group">
+    <label class="col-xs-2 control-label">
+      Provides
+    </label>
+    <div class="col-xs-10">
+
+      <my-thing-picker
+        data-model="model.dependencies.provides"
+        data-allow-rm="true"
+        data-thing-name="feature"
+        data-list-inline="true"
+        data-freetext-mode="true"
+      ></my-thing-picker>
+
+    </div>
+  </div>
+
+
+  <div class="form-group">
+    <label class="col-xs-2 control-label">
+      Conflicts
+    </label>
+    <div class="col-xs-10">
+      <my-service-picker
+        data-model="model.dependencies.conflicts"
+        data-allow-rm="true"
+        data-available="availableServices"
+      ></my-service-picker>
+    </div>
+  </div>
+
+  <hr />
+
+  <div class="form-group">
+    <label class="col-xs-2 control-label">
+      Install Requires
+    </label>
+    <div class="col-xs-10">
+      <my-service-picker
+        data-model="model.dependencies.install.requires"
+        data-allow-rm="true"
+        data-available="availableServices"
+      ></my-service-picker>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label class="col-xs-2 control-label">
+      Install Uses
+    </label>
+    <div class="col-xs-10">
+      <my-service-picker
+        data-model="model.dependencies.install.uses"
+        data-allow-rm="true"
+        data-available="availableServices"
+      ></my-service-picker>
+    </div>
+  </div>
+
+  <hr />
+
+  <div class="form-group">
+    <label class="col-xs-2 control-label">
+      Runtime Requires
+    </label>
+    <div class="col-xs-10">
+      <my-service-picker
+        data-model="model.dependencies.runtime.requires"
+        data-allow-rm="true"
+        data-available="availableServices"
+      ></my-service-picker>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label class="col-xs-2 control-label">
+      Runtime Uses
+    </label>
+    <div class="col-xs-10">
+      <my-service-picker
+        data-model="model.dependencies.runtime.uses"
+        data-allow-rm="true"
+        data-available="availableServices"
+      ></my-service-picker>
+    </div>
+  </div>
+
+
+  <hr />
+
+
+  <div class="form-group am-fade-and-slide-right"
+    ng-repeat="(category, action) in model.provisioner.actions">
+
+    <label class="col-xs-2 control-label" for="inputServiceAutomator-{{category}}">
+      <span class="label label-default">{{category}}</span>
+      <br />Automator
+    </label>
+
+    <div class="col-xs-10">
+      <div class="coopr-control-group">
+
+        <p class="remove">
+          <a href="" class="btn btn-danger btn-xs"
+            ng-click="rmAction(category)"
+          >
+            <span class="fa fa-trash"></span>
+            <span class="sr-only">remove</span>
+          </a>
+        </p>
+
+        <div class="row">
+          <div class="col-xs-2">
+            <select class="form-control"
+              id="inputServiceAutomator-{{category}}"
+              cask-focus="inputServiceAutomator_{{category}}"
+              ng-model="action.type"
+              ng-options="item.name as item.name for item in availableAutomators"
+            ></select>
+          </div>
+          <div class="col-xs-10">
+            <my-configtoformfields
+              config="automatorConfig[action.type]"
+              model="action.fields"
+            ></my-configtoformfields>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <div class="row">
+    <div class="col-xs-offset-2 col-xs-10">
+      <p class="form-control-static">
+        <a href="" class="btn btn-info btn-xs"
+          ng-disabled="!actionDropdown.length"
+          bs-dropdown="actionDropdown"
+        >
+          <span class="fa fa-plus"></span>
+          add automator action
+        </a>
+      </p>
+    </div>
+  </div>
+
+  <hr />
+
+
+  <div class="form-group">
+    <div class="col-xs-2">
+      <p class="form-control-static" ng-hide="debugJson.visible">
+        <a href="" ng-click="debugJson.visible = true">
+          <small>
+            <span class="fa fa-fw fa-toggle-left"></span>
+            json preview
+          </small>
+        </a>
+      </p>
+    </div>
+    <div class="col-xs-10">
+      <button type="submit" class="btn btn-primary"
+        ng-disabled="submitting || serviceForm.$invalid">
+        <span class="fa fa-save"></span>
+        <span ng-show="editing">Update</span>
+        <span ng-hide="editing">Create</span>
+      </button>
+    </div>
+  </div>
+
+</form>
+
+
+
+  </div>
+</div>

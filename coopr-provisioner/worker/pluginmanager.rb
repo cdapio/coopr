@@ -19,6 +19,7 @@ require 'rest_client'
 require_relative 'automator'
 require_relative 'provider'
 require_relative 'utils'
+require_relative '../master/lib/provisioner/rest-helper'
 
 class PluginManager
   attr_accessor :providermap, :automatormap, :tasks, :load_errors, :register_errors
@@ -39,8 +40,13 @@ class PluginManager
 
   # scan plugins directory for json plugin definitions, load plugins 
   def scan_plugins
-    # enforces directory structure from top-level: ./plugins/['providers']/[plugin-name]/*.json
-    Dir["#{File.expand_path(File.dirname(__FILE__))}/plugins/*/*/*.json"].each do |jsonfile| 
+    # Allow both the old and new directory layouts
+    # old: ./plugins/['providers']/[plugin-name]/*.json new: ./plugins/[plugin-name]/*.json
+    (Dir["#{File.expand_path(File.dirname(__FILE__))}/plugins/*/*/*.json"] +
+     Dir["#{File.expand_path(File.dirname(__FILE__))}/plugins/*/*.json"] # +
+    # Add this back once we figure out how to pass the work_dir to PluginManager
+    # Dir["#{@plugin_env[:work_dir]}/plugins/*/*.json"]
+    ).each do |jsonfile|
       begin
         log.debug "pluginmanager scanning #{jsonfile}"
         jsondata =  JSON.parse( IO.read(jsonfile) )
@@ -59,7 +65,7 @@ class PluginManager
 
           raise "providertype \"#{providertype}\" does not define an implementor classname" unless jsondata[providertype].key?('classname')
           # require every .rb file in the plugin top-level directory
-          Dir["#{File.dirname(jsonfile)}/*.rb"].each {|file| require file }
+          Dir["#{File.dirname(jsonfile)}/*.rb"].each { |file| require file }
           # check ancestor to determine plugin type
           klass = Object.const_get(jsondata[providertype]['classname'])
           if klass.ancestors.include? Object.const_get('Provider')
@@ -76,7 +82,7 @@ class PluginManager
 
           raise "automatortype \"#{automatortype}\" does not define an implentor classname" unless jsondata[automatortype].key?('classname')
           # require every .rb file in the plugin top-level directory
-          Dir["#{File.dirname(jsonfile)}/*.rb"].each {|file| require file }
+          Dir["#{File.dirname(jsonfile)}/*.rb"].each { |file| require file }
           # check ancestor to determine plugin type
           klass = Object.const_get(jsondata[automatortype]['classname'])
           if klass.ancestors.include? Object.const_get('Automator')
@@ -115,7 +121,7 @@ class PluginManager
     begin
       log.debug "registering provider/automator type: #{name}"
       json = JSON.generate(json_obj)
-      resp = RestClient.put("#{uri}", json, :'Coopr-UserID' => "admin", :'Coopr-TenantID' => "superadmin")
+      resp = Coopr::RestHelper.put("#{uri}", json, :'Coopr-UserID' => "admin", :'Coopr-TenantID' => "superadmin")
       if(resp.code == 200)
         log.info "Successfully registered #{name}"
       else

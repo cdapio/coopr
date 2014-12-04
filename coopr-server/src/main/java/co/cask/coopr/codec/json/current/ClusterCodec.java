@@ -35,7 +35,7 @@ import java.util.Set;
  */
 public class ClusterCodec extends AbstractCodec<Cluster> {
 
-  private static final Type SET_STRING_TYPE = new TypeToken<Set<String>>() {}.getType();
+  private static final Type SET_STRING_TYPE = new TypeToken<Set<String>>() { }.getType();
 
   private static final String ID_KEY = "id";
   private static final String NAME_KEY = "name";

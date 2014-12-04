@@ -18,12 +18,14 @@ package co.cask.coopr.shell;
 
 import co.cask.coopr.client.rest.RestClientManager;
 import co.cask.coopr.codec.json.guice.CodecModules;
+import co.cask.coopr.common.conf.Constants;
 import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 
@@ -44,7 +46,9 @@ public class CLIConfig {
 
   private RestClientManager clientManager;
   private String host;
-  private List<HostnameChangeListener> hostnameChangeListeners;
+  private String userId;
+  private String tenantId;
+  private List<ReconnectListener> reconnectListeners;
   private int port;
   private int sslPort;
   private URI uri;
@@ -59,19 +63,29 @@ public class CLIConfig {
   public CLIConfig(String host, Integer port, String userId, String tenantId) {
     this.host = Objects.firstNonNull(host, "localhost");
     this.port = Objects.firstNonNull(port, DEFAULT_PORT);
+    this.userId = Objects.firstNonNull(userId, DEFAULT_USER_ID);
+    this.tenantId = Objects.firstNonNull(tenantId, DEFAULT_TENANT_ID);
     this.uri = URI.create(String.format("http://%s:%d", this.host, this.port));
     this.sslPort = DEFAULT_SSL_PORT;
     RestClientManager.Builder builder = RestClientManager.builder(this.host, this.port);
     builder.ssl(DEFAULT_SSL);
-    builder.userId(Objects.firstNonNull(userId, DEFAULT_USER_ID));
-    builder.tenantId(Objects.firstNonNull(tenantId, DEFAULT_TENANT_ID));
+    builder.userId(this.userId);
+    builder.tenantId(this.tenantId);
     builder.gson(injector.getInstance(Gson.class));
     this.clientManager = builder.build();
-    this.hostnameChangeListeners = Lists.newArrayList();
+    this.reconnectListeners = Lists.newArrayList();
   }
 
   public String getHost() {
     return host;
+  }
+
+  public String getUserId() {
+    return userId;
+  }
+
+  public String getTenantId() {
+    return tenantId;
   }
 
   public int getPort() {
@@ -82,11 +96,19 @@ public class CLIConfig {
     return sslPort;
   }
 
+  public boolean isAdmin() {
+    return Constants.ADMIN_USER.equals(userId);
+  }
+
+  public boolean isSuperadmin() {
+    return Constants.ADMIN_USER.equals(userId) && Constants.SUPERADMIN_TENANT.equals(tenantId);
+  }
+
   public RestClientManager getClientManager() {
     return clientManager;
   }
 
-  public void setConnection(String host, int port, boolean ssl, String userId, String tenantId) {
+  public void setConnection(String host, int port, boolean ssl, String userId, String tenantId) throws IOException {
     this.host = host;
     if (ssl) {
       this.sslPort = port;
@@ -96,17 +118,19 @@ public class CLIConfig {
     this.uri = URI.create(String.format("%s://%s:%d", ssl ? "https" : "http", host, port));
     RestClientManager.Builder builder = RestClientManager.builder(host, port);
     builder.ssl(DEFAULT_SSL);
+    this.userId = userId;
+    this.tenantId = tenantId;
     builder.userId(userId);
     builder.tenantId(tenantId);
     builder.gson(injector.getInstance(Gson.class));
     this.clientManager = builder.build();
-    for (HostnameChangeListener listener : hostnameChangeListeners) {
-      listener.onHostnameChanged(host);
+    for (ReconnectListener listener : reconnectListeners) {
+      listener.onReconnect();
     }
   }
 
-  public void addHostnameChangeListener(HostnameChangeListener listener) {
-    this.hostnameChangeListeners.add(listener);
+  public void addReconnectListener(ReconnectListener listener) {
+    this.reconnectListeners.add(listener);
   }
 
   public URI getURI() {
@@ -114,9 +138,9 @@ public class CLIConfig {
   }
 
   /**
-   * Listener for hostname changes.
+   * Listener to reconnect to a Coopr instance.
    */
-  public interface HostnameChangeListener {
-    void onHostnameChanged(String newHost);
+  public interface ReconnectListener {
+    void onReconnect() throws IOException;
   }
 }

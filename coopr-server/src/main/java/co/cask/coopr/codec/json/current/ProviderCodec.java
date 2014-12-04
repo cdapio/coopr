@@ -29,7 +29,7 @@ import java.util.Map;
  * Codec for serializing/deserializing a {@link Provider}.
  */
 public class ProviderCodec extends AbstractBaseEntityCodec<Provider> {
-  private static final Type PROVISIONER_FIELDS_TYPE = new TypeToken<Map<String, Object>>() {}.getType();
+  private static final Type PROVISIONER_FIELDS_TYPE = new TypeToken<Map<String, Object>>() { }.getType();
 
   @Override
   protected void addChildFields(Provider provider, JsonObject jsonObj, JsonSerializationContext context) {

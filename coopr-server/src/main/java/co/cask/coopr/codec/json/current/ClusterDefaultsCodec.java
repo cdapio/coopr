@@ -52,7 +52,7 @@ public class ClusterDefaultsCodec extends AbstractCodec<ClusterDefaults> {
     JsonObject jsonObj = json.getAsJsonObject();
 
     Set<String> services = context.deserialize(jsonObj.get("services"),
-                                               new TypeToken<Set<String>>() {}.getType());
+                                               new TypeToken<Set<String>>() { }.getType());
 
     return ClusterDefaults.builder()
       .setServices(services)

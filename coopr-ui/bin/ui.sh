@@ -15,10 +15,13 @@
 # limitations under the License.
 #
 
+export COOPR_HOME=${COOPR_HOME:-/opt/coopr}
 export COOPR_SERVER_URI=${COOPR_SERVER_URI:-http://localhost:55054}
 export COOPR_LOG_DIR=${COOPR_LOG_DIR:-/var/log/coopr}
 export COOPR_UI_PORT=${COOPR_UI_PORT:-8100}
-export COOPR_HOME=${COOPR_HOME:-/opt/coopr}
+export COOPR_UI_SSL_PORT=${COOPR_UI_SSL_PORT:-8443}
+export COOPR_UI_KEY_FILE=${COOPR_UI_KEY_FILE:-${COOPR_HOME}/cert/server.key}
+export COOPR_UI_CERT_FILE=${COOPR_UI_CERT_FILE:-${COOPR_HOME}/cert/server.crt}
 
 die ( ) { echo; echo "ERROR: ${*}"; echo; exit 1; }
 
@@ -27,15 +30,14 @@ UI_PATH=${UI_PATH:-${COOPR_HOME}/ui}
 ENVIRONMENT=${ENVIRONMENT:-production}
 
 COOPR_NODE=${COOPR_NODE:-${COOPR_HOME}/ui/embedded/bin/node}
+COOPR_NPM=${COOPR_NPM:-${COOPR_HOME}/ui/embedded/bin/npm}
 APP_NAME="coopr-ui"
 PID_DIR=${PID_DIR:-/var/run/coopr}
 pid="${PID_DIR}/${APP_NAME}.pid"
 
-COOPR_REJECT_UNAUTH=${COOPR_REJECT_UNAUTH:-false}
-
 check_before_start() {
   [ -d ${PID_DIR} ] || mkdir -p ${PID_DIR}
-  if [ -f ${pid} ] ; then
+  if [ -f ${pid} ]; then
     if kill -0 `cat ${pid}` > /dev/null 2>&1; then
       echo "${0} running as process `cat ${pid}`. Stop it first or use the restart function."
       exit 0
@@ -43,21 +45,28 @@ check_before_start() {
   fi
 }
 
+create_dist() {
+  [ -d dist ] || {
+    echo "- Installing Coopr UI dependencies ..."
+    ${COOPR_NPM} install -g bower gulp && ${COOPR_NPM} run build && gulp distribute && ${COOPR_NPM} install --production
+  }
+}
+
 start ( ) {
   cd ${UI_PATH}
   check_before_start
 
-  echo "Starting UI ..."
-  nohup nice -1 ${COOPR_NODE} ${UI_PATH}/server.js --env=${ENVIRONMENT} \
-    --cooprhost=${COOPR_SERVER_URI} --port=${COOPR_UI_PORT} \
-    --rejectUnauth=${COOPR_REJECT_UNAUTH} \
+  echo "Starting Coopr UI ..."
+  create_dist
+
+  nohup nice -1 ${COOPR_NODE} ${UI_PATH}/server.js \
     >> ${COOPR_LOG_DIR}/${APP_NAME}.log 2>&1 < /dev/null &
   echo ${!} > ${pid}
 }
 
 stop ( ) {
-  echo "Stopping UI ..."
-  if [ -f ${pid} ] ; then
+  echo -n "Stopping Coopr UI ..."
+  if [ -f ${pid} ]; then
     pidToKill=`cat ${pid}`
     # kill -0 == see if the PID exists
     if kill -0 ${pidToKill} > /dev/null 2>&1; then
@@ -72,7 +81,7 @@ stop ( ) {
       ret=${?}
     fi
     echo
-    if [ ${ret} -eq 0 ] ; then
+    if [ ${ret} -eq 0 ]; then
       echo "Stopped successfully ..."
     else
       echo "ERROR: Failed stopping!"

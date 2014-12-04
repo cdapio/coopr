@@ -1,0 +1,90 @@
+<div class="form-group">
+  <label for="inputTemplateDefaultProvider" class="col-xs-2 control-label">
+    Provider
+  </label>
+  <div class="col-xs-10">
+
+    <select id="inputTemplateDefaultProvider" class="form-control"
+      ng-model="model.defaults.provider"
+      ng-options="provider.name as provider.name for provider in availableProviders">
+      <option value=""></option>
+    </select>
+
+  </div>
+</div>
+
+
+<div class="form-group">
+  <label for="inputTemplateDefaultHardware" class="col-xs-2 control-label">
+    Hardware type
+  </label>
+  <div class="col-xs-10">
+
+    <select id="inputTemplateDefaultHardware" class="form-control"
+      ng-model="model.defaults.hardwaretype"
+      ng-options="hrdwr for hrdwr in model.compatibility.hardwaretypes">
+      <option value=""></option>
+    </select>
+
+  </div>
+</div>
+
+
+<div class="form-group">
+  <label for="inputTemplateDefaultImage" class="col-xs-2 control-label">
+    Image type
+  </label>
+  <div class="col-xs-10">
+
+    <select id="inputTemplateDefaultImage" class="form-control"
+      ng-model="model.defaults.imagetype"
+      ng-options="img for img in model.compatibility.imagetypes">
+      <option value=""></option>
+    </select>
+
+  </div>
+</div>
+
+<hr />
+
+<div class="form-group">
+  <label for="inputTemplateDefaultDns" class="col-xs-2 control-label">
+    DNS Suffix
+  </label>
+  <div class="col-xs-10">
+
+    <input id="inputTemplateDefaultDns" type="text" class="form-control"
+      placeholder="DNS Suffix"
+      cask-focus="inputTemplateDns"
+      ng-model="model.defaults.dnsSuffix" />
+
+  </div>
+</div>
+
+<div class="form-group">
+  <label for="inputTemplateDefaultConfig" class="col-xs-2 control-label">
+    Config
+  </label>
+  <div class="col-xs-10">
+
+    <textarea id="inputTemplateDefaultConfig" class="form-control" rows="10"
+      cask-json-edit="model.defaults.config"
+      ></textarea>
+
+  </div>
+</div>
+
+<hr />
+
+<div class="form-group">
+  <label class="col-xs-2 control-label">
+    Services
+  </label>
+  <div class="col-xs-10">
+    <my-service-picker
+      data-model="model.defaults.services"
+      data-allow-rm="true"
+      data-available="model.compatibility.services"
+    ></my-service-picker>
+  </div>
+</div>

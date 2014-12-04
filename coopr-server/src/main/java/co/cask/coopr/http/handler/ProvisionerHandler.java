@@ -24,6 +24,9 @@ import co.cask.coopr.provisioner.plugin.PluginType;
 import co.cask.coopr.provisioner.plugin.ResourceService;
 import co.cask.coopr.provisioner.plugin.ResourceType;
 import co.cask.coopr.scheduler.task.MissingEntityException;
+import co.cask.coopr.spec.plugin.AutomatorType;
+import co.cask.coopr.spec.plugin.ProviderType;
+import co.cask.coopr.store.entity.EntityStoreService;
 import co.cask.coopr.store.tenant.TenantStore;
 import co.cask.http.ChunkResponder;
 import co.cask.http.HttpResponder;
@@ -42,6 +45,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.lang.reflect.Type;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -60,16 +64,19 @@ public final class ProvisionerHandler extends AbstractAuthHandler {
   private final Gson gson;
   private final ResourceService resourceService;
   private final TenantProvisionerService tenantProvisionerService;
+  private final EntityStoreService entityStoreService;
 
   @Inject
   private ProvisionerHandler(TenantStore tenantStore,
                              TenantProvisionerService tenantProvisionerService,
+                             EntityStoreService entityStoreService,
                              ResourceService resourceService,
                              Gson gson) {
     super(tenantStore);
     this.gson = gson;
     this.resourceService = resourceService;
     this.tenantProvisionerService = tenantProvisionerService;
+    this.entityStoreService = entityStoreService;
   }
 
   /**
@@ -229,6 +236,91 @@ public final class ProvisionerHandler extends AbstractAuthHandler {
     sendResourceInChunks(responder, account, resourceTypeObj, name, version);
   }
 
+  /**
+   * Writes a {@link co.cask.coopr.spec.plugin.ProviderType}. User must be admin or a 403 is returned.
+   * If the name in the path does not match the name in the put body, a 400 is returned.
+   *
+   * @param request Request to write provider type.
+   * @param responder Responder to send response.
+   * @param providertypeId Id of the provider type to write.
+   */
+  @PUT
+  @Path("/plugins/providertypes/{providertype-id}")
+  public void putProviderType(HttpRequest request, HttpResponder responder,
+                              @PathParam("providertype-id") String providertypeId) {
+    ProviderType providerType = getEntityFromRequest(request, responder, ProviderType.class);
+    if (providerType == null) {
+      // getEntityFromRequest writes to the responder if there was an issue.
+      return;
+    } else if (!providerType.getName().equals(providertypeId)) {
+      responder.sendError(HttpResponseStatus.BAD_REQUEST, "mismatch between provider type name and name in path.");
+      return;
+    }
+
+    try {
+      entityStoreService.getView(Account.SUPERADMIN).writeProviderType(providerType);
+      responder.sendStatus(HttpResponseStatus.OK);
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR,
+                          "Exception writing provider type " + providertypeId);
+    } catch (IllegalAccessException e) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized to write provider type.");
+    }
+  }
+
+  /**
+   * Writes a {@link co.cask.coopr.spec.plugin.AutomatorType}. User must be admin or a 403 is returned.
+   * If the name in the path does not match the name in the put body, a 400 is returned.
+   *
+   * @param request Request to write provider type.
+   * @param responder Responder to send response.
+   * @param automatortypeId Id of the provider type to write.
+   */
+  @PUT
+  @Path("/plugins/automatortypes/{automatortype-id}")
+  public void putAutomatorType(HttpRequest request, HttpResponder responder,
+                               @PathParam("automatortype-id") String automatortypeId) {
+    AutomatorType automatorType = getEntityFromRequest(request, responder, AutomatorType.class);
+    if (automatorType == null) {
+      // getEntityFromRequest writes to the responder if there was an issue.
+      return;
+    } else if (!automatorType.getName().equals(automatortypeId)) {
+      responder.sendError(HttpResponseStatus.BAD_REQUEST, "mismatch between automator type name and name in path.");
+      return;
+    }
+
+    try {
+      entityStoreService.getView(Account.SUPERADMIN).writeAutomatorType(automatorType);
+      responder.sendStatus(HttpResponseStatus.OK);
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR,
+                          "Exception writing automator type " + automatortypeId);
+    } catch (IllegalAccessException e) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized to write automator type.");
+    }
+  }
+
+  private <T> T getEntityFromRequest(HttpRequest request, HttpResponder responder, Type tClass) {
+    T result = null;
+    try {
+      Reader reader = new InputStreamReader(new ChannelBufferInputStream(request.getContent()), Charsets.UTF_8);
+      try {
+        result = gson.fromJson(reader, tClass);
+      } finally {
+        try {
+          reader.close();
+        } catch (IOException e) {
+          LOG.warn("Exception while closing request reader", e);
+        }
+      }
+    } catch (IllegalArgumentException e) {
+      responder.sendError(HttpResponseStatus.BAD_REQUEST, "invalid input: " + e.getMessage());
+    } catch (Exception e) {
+      responder.sendError(HttpResponseStatus.BAD_REQUEST, "invalid input");
+    }
+    return result;
+  }
+
   private void sendResourceInChunks(HttpResponder responder, Account account,
                                     ResourceType resourceType, String name, String versionStr) {
     try {
@@ -241,7 +333,8 @@ public final class ProvisionerHandler extends AbstractAuthHandler {
         responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error getting resource.");
       }
       try {
-        ChunkResponder chunkResponder = responder.sendChunkStart(HttpResponseStatus.OK, ImmutableMultimap.<String, String>of());
+        ChunkResponder chunkResponder = responder.sendChunkStart(
+          HttpResponseStatus.OK, ImmutableMultimap.<String, String>of());
         while (true) {
           byte[] chunkBytes = new byte[Constants.PLUGIN_RESOURCE_CHUNK_SIZE];
           int bytesRead = inputStream.read(chunkBytes, 0, Constants.PLUGIN_RESOURCE_CHUNK_SIZE);

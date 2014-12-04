@@ -38,15 +38,15 @@ import org.jboss.netty.handler.codec.http.QueryStringDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Handler for plugin resource related operations, such as uploading resources, staging, and recalling resources,
@@ -591,7 +591,7 @@ public class PluginHandler extends AbstractAuthHandler {
       ResourceStatus statusFilter = getStatusParam(request);
       responder.sendJson(HttpResponseStatus.OK,
                          resourceService.getAll(account, pluginResourceType, statusFilter),
-                         new TypeToken<Map<String, Set<ResourceMeta>>>() {}.getType(),
+                         new TypeToken<Map<String, Set<ResourceMeta>>>() { }.getType(),
                          gson);
     } catch (IllegalArgumentException e) {
       responder.sendError(HttpResponseStatus.BAD_REQUEST, "invalid status filter.");
@@ -611,7 +611,7 @@ public class PluginHandler extends AbstractAuthHandler {
       ResourceStatus statusFilter = getStatusParam(request);
       responder.sendJson(HttpResponseStatus.OK,
                          resourceService.getAll(account, pluginResourceType, resourceName, statusFilter),
-                         new TypeToken<Set<ResourceMeta>>() {}.getType(),
+                         new TypeToken<Set<ResourceMeta>>() { }.getType(),
                          gson);
     } catch (IllegalArgumentException e) {
       responder.sendError(HttpResponseStatus.BAD_REQUEST, "invalid status filter.");

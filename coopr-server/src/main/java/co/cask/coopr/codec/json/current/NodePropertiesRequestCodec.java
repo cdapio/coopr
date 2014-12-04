@@ -22,9 +22,9 @@ public class NodePropertiesRequestCodec implements JsonDeserializer<NodeProperti
     JsonObject jsonObj = json.getAsJsonObject();
     String clusterId = context.deserialize(jsonObj.get("clusterId"), String.class);
     Set<String> properties = context.deserialize(jsonObj.get("properties"),
-                                                 new TypeToken<Set<String>>() {}.getType());
+                                                 new TypeToken<Set<String>>() { }.getType());
     Set<String> services = context.deserialize(jsonObj.get("services"),
-                                               new TypeToken<Set<String>>() {}.getType());
+                                               new TypeToken<Set<String>>() { }.getType());
     return new NodePropertiesRequest(clusterId, properties, services);
   }
 }

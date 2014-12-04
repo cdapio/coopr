@@ -47,6 +47,16 @@
       <artifactId>coopr-rest-client</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>1.7.6</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-nop</artifactId>
+      <version>1.7.6</version>
+    </dependency>
   </dependencies>
 
   <build>
@@ -116,6 +126,16 @@
               <mainClass>${main.class}</mainClass>
             </transformer>
           </transformers>
+          <filters>
+            <filter>
+              <artifact>*:*</artifact>
+              <excludes>
+                <exclude>META-INF/*.SF</exclude>
+                <exclude>META-INF/*.DSA</exclude>
+                <exclude>META-INF/*.RSA</exclude>
+              </excludes>
+            </filter>
+          </filters>
         </configuration>
         <executions>
           <execution>

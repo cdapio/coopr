@@ -1,0 +1,62 @@
+<div class="row">
+  <div class="col-xs-4 am-fade-and-slide-left" ng-show="debugJson.visible">
+    <pre>{{model | json}}</pre>
+  </div>
+  <div ng-class="{'col-xs-8': debugJson.visible}">
+
+
+<form name="templateForm" class="form-horizontal" role="form" ng-submit="doSubmit(model)" novalidate>
+
+  <div ng-model="tabs.activeTab" bs-tabs>
+
+    <fieldset data-title="{{tab.title}}" ng-repeat="tab in tabs" bs-pane>
+
+      <div
+        ng-include="tab.partial"
+        onload="onTabLoaded($index)"
+      ></div>
+
+      <hr />
+
+      <div class="form-group">
+        <div class="col-xs-2">
+          <p class="form-control-static" ng-hide="debugJson.visible">
+            <a href="" ng-click="debugJson.visible = true">
+              <small>
+                <span class="fa fa-fw fa-toggle-left"></span>
+                json preview
+              </small>
+            </a>
+          </p>
+        </div>
+        <div class="col-xs-10">
+
+          <button type="button" class="btn btn-sm btn-default pull-right"
+            ng-disabled="templateForm.$invalid"
+            ng-hide="$last"
+            ng-click="nextTab()">
+              Next
+              <span class="fa fa-long-arrow-right"></span>
+          </button>
+
+          <button type="submit" class="btn btn-primary"
+            ng-show="$last"
+            ng-disabled="submitting || templateForm.$invalid">
+              <span class="fa fa-save"></span>
+              <span ng-show="editing">Update</span>
+              <span ng-hide="editing">Create</span>
+          </button>
+
+        </div>
+      </div>
+
+    </fieldset>
+
+  </div>
+
+</form>
+
+
+
+  </div>
+</div>

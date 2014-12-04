@@ -41,10 +41,10 @@ public class NodeCodec implements JsonDeserializer<Node> {
     String id = context.deserialize(jsonObj.get("id"), String.class);
     String clusterId = context.deserialize(jsonObj.get("clusterId"), String.class);
     HashSet<Service> services = context.deserialize(jsonObj.get("services"),
-                                                    new TypeToken<Set<Service>>() {}.getType());
+                                                    new TypeToken<Set<Service>>() { }.getType());
     NodeProperties properties = context.deserialize(jsonObj.get("properties"), NodeProperties.class);
     List<Node.Action> actions = context.deserialize(jsonObj.get("actions"),
-                                                    new TypeToken<List<Node.Action>>() {}.getType());
+                                                    new TypeToken<List<Node.Action>>() { }.getType());
     JsonObject provisionerResults = jsonObj.getAsJsonObject("provisionerResults");
 
     return new Node(id, clusterId, services, properties, actions, provisionerResults);

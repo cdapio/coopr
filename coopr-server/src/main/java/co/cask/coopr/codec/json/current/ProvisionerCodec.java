@@ -41,9 +41,9 @@ public class ProvisionerCodec implements JsonDeserializer<Provisioner> {
     Integer port = context.deserialize(jsonObj.get("port"), Integer.class);
     Integer capacityTotal = context.deserialize(jsonObj.get("capacityTotal"), Integer.class);
     Map<String, Integer> usage =
-      context.deserialize(jsonObj.get("usage"), new TypeToken<Map<String, Integer>>() {}.getType());
+      context.deserialize(jsonObj.get("usage"), new TypeToken<Map<String, Integer>>() { }.getType());
     Map<String, Integer> assignments =
-      context.deserialize(jsonObj.get("assignments"), new TypeToken<Map<String, Integer>>() {}.getType());
+      context.deserialize(jsonObj.get("assignments"), new TypeToken<Map<String, Integer>>() { }.getType());
 
     return new Provisioner(id, host, port, capacityTotal, usage, assignments);
   }

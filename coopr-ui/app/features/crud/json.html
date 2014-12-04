@@ -1,0 +1,30 @@
+<ul ng-hide="model">
+  <li ng-repeat="item in list">
+    <code><a ui-sref="^.edit(item)">{{item.name || item.id}}</a></code>
+  </li>
+</ul>
+
+
+<form ng-show="model" name="jsonForm" class="form" role="form" ng-submit="doSubmit(model)" novalidate>
+
+  <div class="form-group">
+    <textarea class="form-control" name="json" rows="20"
+      cask-json-edit="model"
+      ></textarea>
+  </div>
+
+  <div class="form-group clearfix">
+    <button type="button" ng-click="caskConfirm()" cask-confirmable="doDelete(model)" 
+      ng-hide="$state.includes('*.create')"
+      class="btn btn-danger pull-right">
+        <span class="fa fa-trash"></span>
+        Delete
+    </button>
+    <button type="submit" class="btn btn-primary" ng-disabled="submitting || jsonForm.$invalid">
+      <span class="fa fa-save"></span>
+      <span ng-show="$state.includes('*.edit')">Save</span>
+      <span ng-show="$state.includes('*.create')">Create</span>
+    </button>
+  </div>
+
+</form>

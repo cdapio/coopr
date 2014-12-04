@@ -48,9 +48,9 @@ public class LayoutConstraintCodec extends AbstractCodec<LayoutConstraint> {
     JsonObject jsonObj = json.getAsJsonObject();
 
     Set<Set<String>> servicesThatMustCoexist =
-      context.deserialize(jsonObj.get("mustcoexist"), new TypeToken<Set<Set<String>>>() {}.getType());
+      context.deserialize(jsonObj.get("mustcoexist"), new TypeToken<Set<Set<String>>>() { }.getType());
     Set<Set<String>> servicesThatMustNotCoexist =
-      context.deserialize(jsonObj.get("cantcoexist"), new TypeToken<Set<Set<String>>>() {}.getType());
+      context.deserialize(jsonObj.get("cantcoexist"), new TypeToken<Set<Set<String>>>() { }.getType());
 
     return new LayoutConstraint(servicesThatMustCoexist, servicesThatMustNotCoexist);
   }

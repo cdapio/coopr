@@ -1,0 +1,66 @@
+<div class="coopr-ticker row">
+  <div class="col-sm-3">
+    <p class="well">
+      Total # of workers
+      <em>{{workersTotal}}</em>
+    </p>
+  </div>
+  <div class="col-sm-3">
+    <p class="well">
+      Available workers
+      <em>{{workersAvailable}}</em>
+    </p>
+  </div>
+  <div class="col-sm-3">
+    <p class="well">
+      Tasks in progress
+      <em>{{tasksInProgress}}</em>
+    </p>
+  </div>
+  <div class="col-sm-3">
+    <p class="well">
+      Queued tasks
+      <em>{{tasksQueued}}</em>
+    </p>
+  </div>
+</div>
+
+
+<div class="table-responsive">
+<table class="table table-striped" cask-sortable>
+  <thead>
+    <tr ng-class="{'sort-enabled': list.length>1}">
+      <th>name</th>
+      <th colspan="2">description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr ng-repeat="item in list | orderBy:sortable.predicate:sortable.reverse">
+
+      <td width="1"><a ui-sref="^.edit({name: item.name})">{{item.name}}</a></td>
+
+      <td width="1">{{item.description}}</td>
+
+      <td width="10" class="text-right">
+        <a ui-sref="^.edit({name: item.name})"
+          class="btn btn-default btn-xs">
+            <span class="fa fa-edit"></span>
+            Edit
+        </a>
+        <a href="" ng-click="caskConfirm()" cask-confirmable="doDelete(item)" 
+          data-confirmable-title="Delete '{{item.name}}'"
+          data-confirmable-content="This action is not reversible, do you really want to proceed?"
+          class="btn btn-danger btn-xs">
+            <span class="fa fa-trash"></span>
+            <span class="sr-only">Delete</span>
+        </a>
+      </td>
+
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div ng-hide="(list.$promise && !list.$resolved) || list.length" class="well text-center">
+  <p>Empty list!</p>
+</div>

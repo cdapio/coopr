@@ -150,7 +150,7 @@ public class SQLUserStore extends AbstractIdleService implements UserStore {
     @Override
     public PreparedStatement createUpdateStatement(Connection conn) throws SQLException {
       PreparedStatement statement = conn.prepareStatement("UPDATE users SET profile=? WHERE user_id=? AND tenant_id=?");
-      statement.setBytes(1, dbQueryExecutor.toBytes(profile, new TypeToken<Map<String, Object>>() {}.getType()));
+      statement.setBytes(1, dbQueryExecutor.toBytes(profile, new TypeToken<Map<String, Object>>() { }.getType()));
       statement.setString(2, account.getUserId());
       statement.setString(3, account.getTenantId());
       return statement;
@@ -162,7 +162,7 @@ public class SQLUserStore extends AbstractIdleService implements UserStore {
         "INSERT INTO users (user_id, tenant_id, profile) VALUES (?, ?, ?)");
       statement.setString(1, account.getUserId());
       statement.setString(2, account.getTenantId());
-      statement.setBytes(3, dbQueryExecutor.toBytes(profile, new TypeToken<Map<String, Object>>() {}.getType()));
+      statement.setBytes(3, dbQueryExecutor.toBytes(profile, new TypeToken<Map<String, Object>>() { }.getType()));
       return statement;
     }
   }

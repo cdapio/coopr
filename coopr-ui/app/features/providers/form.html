@@ -1,0 +1,54 @@
+<form name="providerForm" class="form-horizontal" role="form" ng-submit="doSubmit(model)" novalidate>
+
+  <div class="form-group">
+    <label for="inputProviderName" class="col-xs-2 control-label">Name</label>
+    <div class="col-xs-10">
+      <input id="inputProviderName" type="text" name="name" class="form-control"
+        placeholder="Name"
+        cask-focus="inputProviderName"
+        ng-readonly="editing"
+        ng-pattern="/^[\w\.\-]+$/"
+        ng-model="model.name" required/>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="inputProviderDescription" class="col-xs-2 control-label">Description</label>
+    <div class="col-xs-10">
+      <textarea id="inputProviderDescription"
+        class="form-control"
+        name="config" rows="4"
+        ng-model="model.description"
+      ></textarea>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="inputProviderType" class="col-xs-2 control-label">Provider type</label>
+    <div class="col-xs-6">
+      <select id="inputProviderType"
+        class="form-control"
+        ng-model="model.providertype"
+        ng-options="pType.name as pType.name for pType in providerTypes track by pType.name"
+        ng-disabled="editing"
+      ></select>
+    </div>
+  </div>
+
+  <my-configtoformfields
+    config="selectedProvider.parameters.admin"
+    model="model.provisioner"
+  ></my-configtoformfields>
+
+  <div class="form-group">
+    <div class="col-xs-10 col-xs-offset-2">
+      <button type="submit" class="btn btn-primary"
+        ng-disabled="submitting || providerForm.$invalid">
+        <span class="fa fa-save"></span>
+        <span ng-show="editing">Update</span>
+        <span ng-hide="editing">Create</span>
+      </button>
+    </div>
+  </div>
+
+</form>

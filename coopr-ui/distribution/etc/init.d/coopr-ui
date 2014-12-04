@@ -20,7 +20,7 @@
 # 
 ### BEGIN INIT INFO
 # Provides:          coopr-ui
-# Short-Description: Coopr ui
+# Short-Description: Coopr UI
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
 # Required-Start:    $network

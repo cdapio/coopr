@@ -1,0 +1,49 @@
+<form name="imageForm" class="form-horizontal" role="form" ng-submit="doSubmit(model)" novalidate>
+
+    <div class="form-group">
+        <label for="inputImageName" class="col-xs-2 control-label">Name</label>
+        <div class="col-xs-10">
+            <input id="inputImageName" type="text" name="name" class="form-control"
+                   placeholder="Name"
+                   cask-focus="inputImageName"
+                   ng-readonly="editing"
+                   ng-pattern="/^[\w\.\-]+$/"
+                   ng-model="model.name" required/>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="inputImageDescription" class="col-xs-2 control-label">Description</label>
+        <div class="col-xs-10">
+            <textarea id="inputImageDescription" class="form-control" name="config" rows="4"
+                      ng-model="model.description"
+                    ></textarea>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-xs-2 control-label">Providers</label>
+        <div class="col-xs-10">
+
+          <cask-dropdown-text-combo
+              data-model="model.providermap"
+              data-dropdown-list="allProviders"
+              data-text-fields="textFields"
+              data-asset-label="Provider"
+          ></cask-dropdown-text-combo>
+
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-xs-2"></label>
+        <div class="col-xs-10">
+            <button type="submit" class="btn btn-primary"
+                ng-disabled="submitting || imageForm.$invalid">
+            <span class="fa fa-save"></span>
+            <span ng-show="editing">Update</span>
+            <span ng-hide="editing">Create</span>
+        </button>
+        </div>
+    </div>
+
+</form>

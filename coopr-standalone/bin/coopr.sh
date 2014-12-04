@@ -14,13 +14,13 @@ export COOPR_JAVA_OPTS="-XX:+UseConcMarkSweepGC -Dderby.stream.error.field=Derby
 export ENVIRONMENT=local
 export COOPR_NODE=${COOPR_NODE:-node}
 export COOPR_NPM=${COOPR_NPM:-npm}
-export COOPR_USE_NGUI=${COOPR_USE_NGUI:-false}
 export COOPR_DISABLE_UI=${COOPR_DISABLE_UI:-false}
 
 # Provisioner environment
 export COOPR_RUBY=${COOPR_RUBY:-ruby}
 export COOPR_USE_DUMMY_PROVISIONER=${COOPR_USE_DUMMY_PROVISIONER:-false}
 export COOPR_API_USER=${COOPR_API_USER:-admin}
+export COOPR_API_USER_PASS=${COOPR_API_USER_PASS:-password}
 export COOPR_TENANT=${COOPR_TENANT:-superadmin}
 export COOPR_NUM_WORKERS=${COOPR_NUM_WORKERS:-5}
 
@@ -133,24 +133,66 @@ elif [ ${RUBY_VERSION_MAJOR} -eq 1 ] && [ ${RUBY_VERSION_MINOR} -lt 9 ]; then
   die "Ruby version is not supported! The minimum version supported is v1.9.0p0"
 fi
 
+# $1 - Property name to read
+# $2 - Config file name to read from
+#
+# Returns: value of a property as a string
+#
+# Usage: variable_to_store_value=`read_property property_name /path/to/config/file`
+#
+read_property () {
+  case `uname -s` in
+    "Darwin") sed_params="-nE" ;;
+    "Linux") sed_params="-nr" ;;
+  esac
+
+  echo `grep -A 1 $1 $2 | sed $sed_params 's|.*<value>(.*)</value>.*|\1|p'`
+}
+
 # Setup coopr configuration
 COOPR_PROTOCOL=http
-line=`awk '/server.ssl.enable/{print NR; exit}' ${COOPR_SERVER_CONF}/coopr-site.xml`
-let "line++"
-export COOPR_SSL=`sed -n "${line}p" ${COOPR_SERVER_CONF}/coopr-site.xml | awk -F"<|>" '{print $3}'`
-if [ ! -z ${COOPR_SSL} ] && [ ${COOPR_SSL} = "true" ]; then
+export COOPR_SSL=`read_property server.ssl.enabled ${COOPR_SERVER_CONF}/coopr-site.xml`
+if [ "${COOPR_SSL}" == "true" ]; then
   COOPR_PROTOCOL=https
-fi
-export COOPR_SERVER_URI=${COOPR_PROTOCOL}://localhost:55054
 
-if [ ! -z ${TRUST_CERT_PATH} ] && [ ! -z ${TRUST_CERT_PASSWORD} ]; then
+  COOPR_NODEJS_SSL_PATH=`read_property server.nodejs.ssl.path ${COOPR_SERVER_CONF}/coopr-security.xml`
+  COOPR_NODEJS_SSL_KEY_FILENAME=`read_property server.nodejs.ssl.key ${COOPR_SERVER_CONF}/coopr-security.xml`
+  export COOPR_NODEJS_SSL_KEY=$COOPR_NODEJS_SSL_PATH/$COOPR_NODEJS_SSL_KEY_FILENAME
+  COOPR_NODEJS_SSL_CRT_FILENAME=`read_property server.nodejs.ssl.crt ${COOPR_SERVER_CONF}/coopr-security.xml`
+  export COOPR_NODEJS_SSL_CRT=$COOPR_NODEJS_SSL_PATH/$COOPR_NODEJS_SSL_CRT_FILENAME
+fi
+
+export SECURITY_ENABLED=`read_property security.enabled ${COOPR_SERVER_CONF}/coopr-site.xml`
+export COOPR_SERVER_URI=${COOPR_SERVER_URI:-${COOPR_PROTOCOL}://127.0.0.1:55054}
+export TRUST_CERT_PATH=`read_property server.ssl.trust.cert.path ${COOPR_SERVER_CONF}/coopr-security.xml`
+export TRUST_CERT_PASSWORD=`read_property server.ssl.trust.cert.password ${COOPR_SERVER_CONF}/coopr-security.xml`
+
+if [ -n TRUST_CERT_PATH ] && [ -n TRUST_CERT_PASSWORD ]; then
   export CERT_PARAMETER="--cert ${TRUST_CERT_PATH}:${TRUST_CERT_PASSWORD}"
 fi
 
-if [ ${COOPR_PROTOCOL} = "https" ]; then
+if [ "${COOPR_PROTOCOL}" == "https" ]; then
   export CURL_PARAMETER="--insecure"
   export COOPR_REJECT_UNAUTH=false
 fi
+
+export keystore_path=`read_property server.ssl.trust.keystore.path ${COOPR_SERVER_CONF}/coopr-security.xml`
+export keystore_password=`read_property server.ssl.trust.keystore.password ${COOPR_SERVER_CONF}/coopr-security.xml`
+
+COOPR_NODE_TLS_ENABLED="false"
+if [ -n keystore_path ] && [ -n keystore_password ]; then
+  COOPR_NODE_TLS_ENABLED="true"
+
+  nodejs_tls_path=`read_property server.nodejs.tls.cert.path ${COOPR_SERVER_CONF}/coopr-security.xml`
+  nodejs_tls_key=`read_property server.nodejs.tls.key ${COOPR_SERVER_CONF}/coopr-security.xml`
+  nodejs_tls_crt=`read_property server.nodejs.tls.crt ${COOPR_SERVER_CONF}/coopr-security.xml`
+  nodejs_tls_ca=`read_property server.nodejs.tls.ca ${COOPR_SERVER_CONF}/coopr-security.xml`
+  export COOPR_NODE_TLS_PASSWORD=`read_property server.nodejs.tls.password ${COOPR_SERVER_CONF}/coopr-security.xml`
+  export COOPR_NODE_TLS_KEY=$nodejs_tls_path/$nodejs_tls_key
+  export COOPR_NODE_TLS_CRT=$nodejs_tls_path/$nodejs_tls_crt
+  export COOPR_NODE_TLS_CA=$nodejs_tls_path/$nodejs_tls_ca
+fi
+export COOPR_NODE_TLS_ENABLED
 
 # Load default configuration
 load_defaults () {
@@ -193,6 +235,7 @@ sync_default_data () {
   curl ${CURL_PARAMETER} --silent --request POST \
     --header "Coopr-UserID:${COOPR_API_USER}" \
     --header "Coopr-TenantID:${COOPR_TENANT}" \
+    --header "Authorization:Bearer ${ACCESS_TOKEN}" \
     --connect-timeout 5 \
     ${COOPR_SERVER_URI}/v2/plugins/sync ${CERT_PARAMETER}
 }
@@ -205,19 +248,25 @@ request_superadmin_workers () {
     --header "Content-Type:application/json" \
     --header "Coopr-UserID:${COOPR_API_USER}" \
     --header "Coopr-TenantID:${COOPR_TENANT}" \
+    --header "Authorization:Bearer ${ACCESS_TOKEN}" \
     --connect-timeout 5 --data "{ \"tenant\":{\"workers\":${COOPR_NUM_WORKERS}, \"name\":\"superadmin\"} }" \
     ${COOPR_SERVER_URI}/v2/tenants/superadmin ${CERT_PARAMETER}
 }
 
 wait_for_server () {
   RETRIES=0
-  until [[ $(curl ${CURL_PARAMETER} ${COOPR_SERVER_URI}/status ${CERT_PARAMETER} 2> /dev/null | grep OK) || ${RETRIES} -gt 60 ]]; do
+  until [[ $(curl ${CURL_PARAMETER} ${COOPR_SERVER_URI}/status ${CERT_PARAMETER} 2> /dev/null | grep 'OK\|auth_uri') || ${RETRIES} -gt 60 ]]; do
       sleep 2
       let "RETRIES++"
   done
 
   if [ ${RETRIES} -gt 60 ]; then
       die "Server did not successfully start"
+  fi
+
+  if [ "${SECURITY_ENABLED}" == "true" ]; then
+    AUTH_SERVER_URI=${COOPR_PROTOCOL}://127.0.0.1:55059
+    export ACCESS_TOKEN=$(curl -u ${COOPR_API_USER}:${COOPR_API_USER_PASS} ${AUTH_SERVER_URI}/token 2> /dev/null | sed '1s/.*access_token":"\([^"]*\).*/\1/')
   fi
 }
 
@@ -227,6 +276,7 @@ wait_for_plugin_registration () {
     --output /dev/null --write-out "%{http_code}" \
     --header "Coopr-UserID:${COOPR_API_USER}" \
     --header "Coopr-TenantID:${COOPR_TENANT}" \
+    --header "Authorization:Bearer ${ACCESS_TOKEN}" \
     ${COOPR_SERVER_URI}/v2/plugins/automatortypes/chef-solo ${CERT_PARAMETER} 2> /dev/null) -eq 200 || ${RETRIES} -gt 60 ]]; do
     sleep 2
     let "RETRIES++"
@@ -239,7 +289,7 @@ wait_for_plugin_registration () {
 
 wait_for_provisioner () {
   RETRIES=0
-  until [[ $(curl http://localhost:55056/status 2> /dev/null | grep OK) || ${RETRIES} -gt 60 ]]; do
+  until [[ $(curl http://127.0.0.1:55056/status 2> /dev/null | grep OK) || ${RETRIES} -gt 60 ]]; do
     sleep 2
     let "RETRIES++"
   done
@@ -271,17 +321,17 @@ ui () {
     echo "UI disabled... skipping..."
     return 0
   fi
-  if [ "${COOPR_USE_NGUI}" == "true" ]; then
-    ${COOPR_HOME}/ngui/bin/ngui.sh ${1}
-  else
-    ${COOPR_HOME}/ui/bin/ui.sh ${1}
-  fi
+  ${COOPR_HOME}/ui/bin/ui.sh ${1}
 }
 
 greeting () {
   [ "${COOPR_DISABLE_UI}" == "true" ] && return 0
   echo
-  echo "Go to ${COOPR_PROTOCOL}://localhost:8100. Have fun creating clusters!"
+  if [ "${COOPR_SSL}" == "true" ]; then
+    echo "Go to ${COOPR_PROTOCOL}://127.0.0.1:8443. Have fun creating clusters!"
+  else
+    echo "Go to ${COOPR_PROTOCOL}://127.0.0.1:8100. Have fun creating clusters!"
+  fi
 }
 
 stop () { provisioner stop; server stop; ui stop; }

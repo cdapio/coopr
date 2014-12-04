@@ -37,16 +37,16 @@ import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.lang.reflect.Type;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.lang.reflect.Type;
 
 /**
  * Handler for performing tenant operations.
@@ -375,88 +375,6 @@ public class SuperadminHandler extends AbstractAuthHandler {
                           "Exception deleting automator type " + automatortypeId);
     } catch (IllegalAccessException e) {
       responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized to delete automator type.");
-    }
-  }
-
-  /**
-   * Writes a {@link co.cask.coopr.spec.plugin.ProviderType}. User must be admin or a 403 is returned.
-   * If the name in the path does not match the name in the put body, a 400 is returned.
-   *
-   * @param request Request to write provider type.
-   * @param responder Responder to send response.
-   * @param providertypeId Id of the provider type to write.
-   */
-  @PUT
-  @Path("/plugins/providertypes/{providertype-id}")
-  public void putProviderType(HttpRequest request, HttpResponder responder,
-                              @PathParam("providertype-id") String providertypeId) {
-    Account account = getAndAuthenticateAccount(request, responder);
-    if (account == null) {
-      return;
-    }
-    if (!account.isSuperadmin()) {
-      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized, must be superadmin.");
-      return;
-    }
-
-    ProviderType providerType = getEntityFromRequest(request, responder, ProviderType.class);
-    if (providerType == null) {
-      // getEntityFromRequest writes to the responder if there was an issue.
-      return;
-    } else if (!providerType.getName().equals(providertypeId)) {
-      responder.sendError(HttpResponseStatus.BAD_REQUEST, "mismatch between provider type name and name in path.");
-      return;
-    }
-
-    try {
-      entityStoreService.getView(account).writeProviderType(providerType);
-      responder.sendStatus(HttpResponseStatus.OK);
-    } catch (IOException e) {
-      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR,
-                          "Exception writing provider type " + providertypeId);
-    } catch (IllegalAccessException e) {
-      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized to write provider type.");
-    }
-  }
-
-  /**
-   * Writes a {@link co.cask.coopr.spec.plugin.AutomatorType}. User must be admin or a 403 is returned.
-   * If the name in the path does not match the name in the put body, a 400 is returned.
-   *
-   * @param request Request to write provider type.
-   * @param responder Responder to send response.
-   * @param automatortypeId Id of the provider type to write.
-   */
-  @PUT
-  @Path("/plugins/automatortypes/{automatortype-id}")
-  public void putAutomatorType(HttpRequest request, HttpResponder responder,
-                               @PathParam("automatortype-id") String automatortypeId) {
-    Account account = getAndAuthenticateAccount(request, responder);
-    if (account == null) {
-      return;
-    }
-    if (!account.isSuperadmin()) {
-      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized, must be superadmin.");
-      return;
-    }
-
-    AutomatorType automatorType = getEntityFromRequest(request, responder, AutomatorType.class);
-    if (automatorType == null) {
-      // getEntityFromRequest writes to the responder if there was an issue.
-      return;
-    } else if (!automatorType.getName().equals(automatortypeId)) {
-      responder.sendError(HttpResponseStatus.BAD_REQUEST, "mismatch between automator type name and name in path.");
-      return;
-    }
-
-    try {
-      entityStoreService.getView(account).writeAutomatorType(automatorType);
-      responder.sendStatus(HttpResponseStatus.OK);
-    } catch (IOException e) {
-      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR,
-                          "Exception writing automator type " + automatortypeId);
-    } catch (IllegalAccessException e) {
-      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized to write automator type.");
     }
   }
 

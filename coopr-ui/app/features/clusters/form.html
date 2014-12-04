@@ -1,0 +1,71 @@
+<form name="clusterForm" class="form-horizontal" role="form" ng-submit="doSubmit(model)" novalidate>
+
+  <div class="form-group">
+    <label for="inputClusterName" class="col-xs-2 control-label">Name</label>
+    <div class="col-xs-10">
+      <input id="inputClusterName" type="text" name="name" class="form-control"
+        placeholder="Name"
+        cask-focus="inputClusterName"
+        ng-disabled="editing"
+        ng-pattern="/^[\w\.\-]+$/"
+        maxlength="255"
+        ng-model="model.name" required/>
+    </div>
+  </div>
+
+  <div class="form-group">
+
+    <label for="inputClusterTemplate" class="col-xs-2 control-label">Template</label>
+    <div class="col-xs-5">
+      <select id="inputClusterTemplate" name="template" class="form-control"
+        ng-disabled="editing"
+        ng-model="model.clusterTemplate"
+        ng-options="ctpl.name as ctpl.description for ctpl in availableTemplates" required>
+      </select>
+    </div>
+
+    <label for="inputClusterNumMachines" class="col-xs-2 control-label"># of nodes</label>
+    <div class="col-xs-3">
+      <input id="inputClusterNumMachines" type="number" name="numMachines" class="form-control"
+        ng-disabled="editing"
+        ng-model="model.numMachines"
+        ng-pattern="/^\d+$/"
+        min="{{chosenTemplate.constraints.size.min}}"
+        max="{{chosenTemplate.constraints.size.max}}"
+        required/>
+
+    </div>
+
+  </div>
+
+  <div ng-include="'/assets/features/clusters/form-advanced.html'" ng-show="showAdvanced" class="am-fade-and-slide-right"></div>
+
+  <div class="form-group" ng-show="showConfig">
+    <label for="inputClusterConfig" class="col-xs-2 control-label">Config</label>
+    <div class="col-xs-10">
+      <textarea id="inputClusterConfig" class="form-control" name="config" rows="10"
+        cask-focus="inputClusterConfig"
+        cask-json-edit="model.config"
+        ></textarea>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <div class="col-xs-2 text-right">
+      <p class="form-control-static">
+        <a href="" ng-click="showAdvanced = true; showConfig = true" ng-hide="showAdvanced">
+          <small>advanced<span class="fa fa-toggle-right fa-fw"></span></small>
+        </a>
+      </p>
+    </div>
+    <div class="col-xs-10">
+      <button type="submit" class="btn btn-primary"
+        ng-disabled="submitting || clusterForm.$invalid">
+        <span class="fa fa-save"></span>
+        <span ng-show="editing">Update</span>
+        <span ng-hide="editing">Create</span>
+      </button>
+    </div>
+  </div>
+
+</form>

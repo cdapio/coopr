@@ -399,7 +399,7 @@ public class TenantProvisionerService {
   public void timeoutProvisioners(long timeoutTs) throws IOException {
     tenantLock.acquire();
     try {
-      Set <String> affectedTenants = Sets.newHashSet();
+      Set<String> affectedTenants = Sets.newHashSet();
       for (Provisioner provisioner : provisionerStore.getTimedOutProvisioners(timeoutTs)) {
         String provisionerId = provisioner.getId();
         LOG.error("provisioner {} has not sent a heartbeat in over {} seconds, deleting it...",

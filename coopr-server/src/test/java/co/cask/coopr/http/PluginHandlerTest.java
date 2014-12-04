@@ -60,14 +60,14 @@ public class PluginHandlerTest extends ServiceTestBase {
     ResourceType type1 = new ResourceType(PluginType.PROVIDER, "joyent", "keys");
     ResourceType type2 = new ResourceType(PluginType.AUTOMATOR, "shell", "script");
     ResourceMeta meta = new ResourceMeta("name", 1);
-    assertResponseStatus(doPost(getNamePath(type1, "name"), "contents", USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
-    assertResponseStatus(doPost(getNamePath(type2, "name"), "contents", USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
-    assertResponseStatus(doDelete(getVersionedPath(type1, meta), USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
-    assertResponseStatus(doDelete(getVersionedPath(type2, meta), USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
-    assertResponseStatus(doGet(getNamePath(type1, "name"), USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
-    assertResponseStatus(doGet(getNamePath(type2, "name"), USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
-    assertResponseStatus(doGet(getTypePath(type1), USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
-    assertResponseStatus(doGet(getTypePath(type2), USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
+    assertResponseStatus(doPostExternalAPI(getNamePath(type1, "name"), "contents", USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
+    assertResponseStatus(doPostExternalAPI(getNamePath(type2, "name"), "contents", USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
+    assertResponseStatus(doDeleteExternalAPI(getVersionedPath(type1, meta), USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
+    assertResponseStatus(doDeleteExternalAPI(getVersionedPath(type2, meta), USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
+    assertResponseStatus(doGetExternalAPI(getNamePath(type1, "name"), USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
+    assertResponseStatus(doGetExternalAPI(getNamePath(type2, "name"), USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
+    assertResponseStatus(doGetExternalAPI(getTypePath(type1), USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
+    assertResponseStatus(doGetExternalAPI(getTypePath(type2), USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
   }
 
   @Test
@@ -81,7 +81,7 @@ public class PluginHandlerTest extends ServiceTestBase {
       "/plugins/automatortypes/chef-solo/keys"
     );
     for (String getPath : getPaths) {
-      assertResponseStatus(doGet(getPath, ADMIN_HEADERS), HttpResponseStatus.NOT_FOUND);
+      assertResponseStatus(doGetExternalAPI(getPath, ADMIN_HEADERS), HttpResponseStatus.NOT_FOUND);
     }
   }
 
@@ -130,7 +130,7 @@ public class PluginHandlerTest extends ServiceTestBase {
       getVersionedPath(keys, "dev", 2) + "/recall"
     );
     for (String path : paths) {
-      assertResponseStatus(doPost(path, "", ADMIN_HEADERS), HttpResponseStatus.NOT_FOUND);
+      assertResponseStatus(doPostExternalAPI(path, "", ADMIN_HEADERS), HttpResponseStatus.NOT_FOUND);
     }
   }
 
@@ -161,20 +161,20 @@ public class PluginHandlerTest extends ServiceTestBase {
     assertSendContents("research keys 1", keys, "research");
 
     // stage version 2 of hadoop
-    assertResponseStatus(doPost(getVersionedPath(cookbooks, "hadoop", 2) + "/stage", "", ADMIN_HEADERS),
+    assertResponseStatus(doPostExternalAPI(getVersionedPath(cookbooks, "hadoop", 2) + "/stage", "", ADMIN_HEADERS),
                          HttpResponseStatus.OK);
     // stage version 1 of mysql
-    assertResponseStatus(doPost(getVersionedPath(cookbooks, "mysql", 1) + "/stage", "", ADMIN_HEADERS),
+    assertResponseStatus(doPostExternalAPI(getVersionedPath(cookbooks, "mysql", 1) + "/stage", "", ADMIN_HEADERS),
                          HttpResponseStatus.OK);
     // stage version 2 of dev
-    assertResponseStatus(doPost(getVersionedPath(keys, "dev", 2) + "/stage", "", ADMIN_HEADERS),
+    assertResponseStatus(doPostExternalAPI(getVersionedPath(keys, "dev", 2) + "/stage", "", ADMIN_HEADERS),
                          HttpResponseStatus.OK);
 
     // sync
-    assertResponseStatus(doPost("/plugins/sync", "", ADMIN_HEADERS), HttpResponseStatus.OK);
+    assertResponseStatus(doPostExternalAPI("/plugins/sync", "", ADMIN_HEADERS), HttpResponseStatus.OK);
 
     // check cookbooks
-    HttpResponse response = doGet(getTypePath(cookbooks), ADMIN_HEADERS);
+    HttpResponse response = doGetExternalAPI(getTypePath(cookbooks), ADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     Map<String, Set<ResourceMeta>> actual = bodyToMetaMap(response);
     Map<String, Set<ResourceMeta>> expected = ImmutableMap.<String, Set<ResourceMeta>>of(
@@ -183,7 +183,7 @@ public class PluginHandlerTest extends ServiceTestBase {
     );
     Assert.assertEquals(expected, actual);
     // check keys
-    response = doGet(getTypePath(keys), ADMIN_HEADERS);
+    response = doGetExternalAPI(getTypePath(keys), ADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     actual = bodyToMetaMap(response);
     expected = ImmutableMap.<String, Set<ResourceMeta>>of(
@@ -193,20 +193,20 @@ public class PluginHandlerTest extends ServiceTestBase {
     Assert.assertEquals(expected, actual);
 
     // stage version3 of hadoop
-    assertResponseStatus(doPost(getVersionedPath(cookbooks, "hadoop", 3) + "/stage", "", ADMIN_HEADERS),
+    assertResponseStatus(doPostExternalAPI(getVersionedPath(cookbooks, "hadoop", 3) + "/stage", "", ADMIN_HEADERS),
                          HttpResponseStatus.OK);
     // recall version1 of mysql
-    assertResponseStatus(doPost(getVersionedPath(cookbooks, "mysql", 1) + "/recall", "", ADMIN_HEADERS),
+    assertResponseStatus(doPostExternalAPI(getVersionedPath(cookbooks, "mysql", 1) + "/recall", "", ADMIN_HEADERS),
                          HttpResponseStatus.OK);
-    response = doGet(getTypePath(cookbooks), ADMIN_HEADERS);
+    response = doGetExternalAPI(getTypePath(cookbooks), ADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     actual = bodyToMetaMap(response);
 
     // sync
-    assertResponseStatus(doPost("/plugins/sync", "", ADMIN_HEADERS), HttpResponseStatus.OK);
+    assertResponseStatus(doPostExternalAPI("/plugins/sync", "", ADMIN_HEADERS), HttpResponseStatus.OK);
 
     // check cookbooks
-    response = doGet(getTypePath(cookbooks), ADMIN_HEADERS);
+    response = doGetExternalAPI(getTypePath(cookbooks), ADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     actual = bodyToMetaMap(response);
     hadoop2 = new ResourceMeta("hadoop", 2, ResourceStatus.INACTIVE);
@@ -226,7 +226,7 @@ public class PluginHandlerTest extends ServiceTestBase {
 
   private void assertSendContents(String contents, ResourceType type, String name) throws Exception {
     String path = getNamePath(type, name);
-    HttpResponse response = doPost(path, contents, ADMIN_HEADERS);
+    HttpResponse response = doPostExternalAPI(path, contents, ADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     Reader reader = new InputStreamReader(response.getEntity().getContent());
     ResourceMeta responseMeta = gson.fromJson(reader, ResourceMeta.class);
@@ -240,7 +240,7 @@ public class PluginHandlerTest extends ServiceTestBase {
     ResourceMeta meta = new ResourceMeta("hello", 1, ResourceStatus.INACTIVE);
     assertSendContents(contents, type, pluginName, resourceType, "hello");
     // get metadata
-    HttpResponse response = doGet(getNamePath(pluginResourceType, meta.getName()), ADMIN_HEADERS);
+    HttpResponse response = doGetExternalAPI(getNamePath(pluginResourceType, meta.getName()), ADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     Assert.assertEquals(ImmutableSet.of(meta), bodyToMetaSet(response));
 
@@ -256,7 +256,7 @@ public class PluginHandlerTest extends ServiceTestBase {
       "versions",
       meta.getVersion()
     );
-    response = doGet(path);
+    response = doGetInternalAPI(path);
     assertResponseStatus(response, HttpResponseStatus.OK);
     Assert.assertEquals(contents, bodyToString(response));
   }
@@ -271,59 +271,59 @@ public class PluginHandlerTest extends ServiceTestBase {
 
     // stage version2
     meta2 = new ResourceMeta(meta2.getName(), meta2.getVersion(), ResourceStatus.STAGED);
-    assertResponseStatus(doPost(getVersionedPath(pluginResourceType, meta2) + "/stage", "", ADMIN_HEADERS),
+    assertResponseStatus(doPostExternalAPI(getVersionedPath(pluginResourceType, meta2) + "/stage", "", ADMIN_HEADERS),
                          HttpResponseStatus.OK);
     // should still see both versions when getting all versions of the resource name
-    HttpResponse response = doGet(getNamePath(pluginResourceType, meta2.getName()), ADMIN_HEADERS);
+    HttpResponse response = doGetExternalAPI(getNamePath(pluginResourceType, meta2.getName()), ADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     Assert.assertEquals(Sets.newHashSet(meta1, meta2), bodyToMetaSet(response));
     // check get staged versions of the resources
-    response = doGet(getTypePath(pluginResourceType) + "?status=staged", ADMIN_HEADERS);
+    response = doGetExternalAPI(getTypePath(pluginResourceType) + "?status=staged", ADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     Assert.assertEquals(
       ImmutableMap.<String, Set<ResourceMeta>>of("name", ImmutableSet.<ResourceMeta>of(meta2)),
       bodyToMetaMap(response)
     );
     // check get staged version of the specific resource
-    response = doGet(getNamePath(pluginResourceType, meta2.getName()) + "?status=staged", ADMIN_HEADERS);
+    response = doGetExternalAPI(getNamePath(pluginResourceType, meta2.getName()) + "?status=staged", ADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     Assert.assertEquals(Sets.newHashSet(meta2), bodyToMetaSet(response));
 
     // stage version1
     meta1 = new ResourceMeta(meta1.getName(), meta1.getVersion(), ResourceStatus.STAGED);
     meta2 = new ResourceMeta(meta2.getName(), meta2.getVersion(), ResourceStatus.INACTIVE);
-    assertResponseStatus(doPost(getVersionedPath(pluginResourceType, meta1) + "/stage", "", ADMIN_HEADERS),
+    assertResponseStatus(doPostExternalAPI(getVersionedPath(pluginResourceType, meta1) + "/stage", "", ADMIN_HEADERS),
                          HttpResponseStatus.OK);
     // should still see both versions when getting all versions of the resource name
-    response = doGet(getNamePath(pluginResourceType, meta1.getName()), ADMIN_HEADERS);
+    response = doGetExternalAPI(getNamePath(pluginResourceType, meta1.getName()), ADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     Assert.assertEquals(Sets.newHashSet(meta1, meta2), bodyToMetaSet(response));
     // check get staged versions of the resources
-    response = doGet(getTypePath(pluginResourceType) + "?status=staged", ADMIN_HEADERS);
+    response = doGetExternalAPI(getTypePath(pluginResourceType) + "?status=staged", ADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     Assert.assertEquals(
       ImmutableMap.<String, Set<ResourceMeta>>of("name", ImmutableSet.<ResourceMeta>of(meta1)),
       bodyToMetaMap(response)
     );
     // check get staged versions of the specific resource
-    response = doGet(getNamePath(pluginResourceType, meta1.getName()) + "?status=staged", ADMIN_HEADERS);
+    response = doGetExternalAPI(getNamePath(pluginResourceType, meta1.getName()) + "?status=staged", ADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     Assert.assertEquals(Sets.newHashSet(meta1), bodyToMetaSet(response));
 
     // recall
     meta1 = new ResourceMeta(meta1.getName(), meta1.getVersion(), ResourceStatus.INACTIVE);
-    assertResponseStatus(doPost(getVersionedPath(pluginResourceType, meta1) + "/recall", "", ADMIN_HEADERS),
+    assertResponseStatus(doPostExternalAPI(getVersionedPath(pluginResourceType, meta1) + "/recall", "", ADMIN_HEADERS),
                          HttpResponseStatus.OK);
     // should still see both versions when getting all versions of the resource name
-    response = doGet(getNamePath(pluginResourceType, meta1.getName()), ADMIN_HEADERS);
+    response = doGetExternalAPI(getNamePath(pluginResourceType, meta1.getName()), ADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     Assert.assertEquals(ImmutableSet.<ResourceMeta>of(meta1, meta2), bodyToMetaSet(response));
     // staged filter should return an empty map
-    response = doGet(getTypePath(pluginResourceType) + "?status=staged", ADMIN_HEADERS);
+    response = doGetExternalAPI(getTypePath(pluginResourceType) + "?status=staged", ADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     Assert.assertTrue(bodyToMetaMap(response).isEmpty());
     // no staged versions
-    response = doGet(getNamePath(pluginResourceType, meta1.getName()) + "?status=staged", ADMIN_HEADERS);
+    response = doGetExternalAPI(getNamePath(pluginResourceType, meta1.getName()) + "?status=staged", ADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     Assert.assertTrue(bodyToMetaSet(response).isEmpty());
   }
@@ -339,7 +339,7 @@ public class PluginHandlerTest extends ServiceTestBase {
     assertSendContents(contents, type, meta3.getName());
     assertSendContents(contents, type, meta4.getName());
 
-    HttpResponse response = doGet(getTypePath(type), ADMIN_HEADERS);
+    HttpResponse response = doGetExternalAPI(getTypePath(type), ADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     Assert.assertEquals(
       ImmutableMap.<String, Set<ResourceMeta>>of(
@@ -350,8 +350,8 @@ public class PluginHandlerTest extends ServiceTestBase {
     );
 
     // delete one
-    assertResponseStatus(doDelete(getVersionedPath(type, meta3), ADMIN_HEADERS), HttpResponseStatus.OK);
-    response = doGet(getTypePath(type), ADMIN_HEADERS);
+    assertResponseStatus(doDeleteExternalAPI(getVersionedPath(type, meta3), ADMIN_HEADERS), HttpResponseStatus.OK);
+    response = doGetExternalAPI(getTypePath(type), ADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     Assert.assertEquals(
       ImmutableMap.<String, Set<ResourceMeta>>of(

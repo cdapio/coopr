@@ -17,6 +17,17 @@
 # limitations under the License.
 #
 
+# Install some pre-requisites
+case node['platform_family']
+when 'debian'
+  zpkg = 'libz-dev'
+when 'rhel'
+  zpkg = 'zlib-devel'
+end
+
+r = package( zpkg ) { action :nothing }
+r.run_action( :install )
+
 %w(build-essential dnsimple).each do |recipe|
   include_recipe recipe
 end

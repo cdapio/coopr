@@ -1,0 +1,20 @@
+.vagrant
+Berksfile.lock
+*~
+*#
+.#*
+\#*#
+.*.sw[a-z]
+*.un~
+/cookbooks
+vendor
+
+# Bundler
+bin/*
+.bundle/*
+
+.kitchen/
+.kitchen.local.yml
+.idea/
+.DS_Store
+.coverage

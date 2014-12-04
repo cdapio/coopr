@@ -27,7 +27,7 @@ public class StatusHandlerTest extends ServiceTestBase {
 
   @Test
   public void testStatus() throws Exception {
-    HttpResponse response = doGetWithoutVersion("/status");
+    HttpResponse response = doGetWithoutVersionExternalAPI("/status");
     Assert.assertEquals(200, response.getStatusLine().getStatusCode());
     Assert.assertEquals("OK\n", EntityUtils.toString(response.getEntity()));
   }

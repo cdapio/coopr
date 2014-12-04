@@ -27,6 +27,7 @@ require_relative 'utils.rb'
 require_relative 'pluginmanager.rb'
 require_relative 'provider.rb'
 require_relative 'automator.rb'
+require_relative '../master/lib/provisioner/rest-helper'
 
 $stdout.sync = true
 
@@ -66,7 +67,16 @@ OptionParser.new do |opts|
   opts.on('-o', '--once', 'Only poll and run a single task') do
     options[:once] = true
   end
+  opts.on('--cert-path CERTPATH', 'Trust certificate path') do |c|
+    options[:cert_path] = c
+  end
+  opts.on('--cert-pass CERTPASS', 'Trust certificate password') do |p|
+    options[:cert_pass] = p
+  end
 end.parse!
+
+Coopr::RestHelper.cert_path = options[:cert_path]
+Coopr::RestHelper.cert_pass = options[:cert_pass]
 
 coopr_uri = options[:uri]
 if coopr_uri.nil? && !options[:file]
@@ -228,7 +238,7 @@ else
     response = nil
     task = nil
     begin
-      response = RestClient.post "#{coopr_uri}/v2/tasks/take", { 'provisionerId' => options[:provisioner], 'workerId' => myid, 'tenantId' => options[:tenant] }.to_json
+      response = Coopr::RestHelper.post "#{coopr_uri}/v2/tasks/take", { 'provisionerId' => options[:provisioner], 'workerId' => myid, 'tenantId' => options[:tenant] }.to_json
     rescue => e
       log.error "Caught exception connecting to coopr server #{coopr_uri}/v2/tasks/take: #{e}"
       sleep 10
@@ -266,7 +276,7 @@ else
 
         log.debug "Task <#{task['taskId']}> completed, updating results <#{result}>"
         begin
-          response = RestClient.post "#{coopr_uri}/v2/tasks/finish", result.to_json
+          response = Coopr::RestHelper.post "#{coopr_uri}/v2/tasks/finish", result.to_json
         rescue => e
           log.error "Caught exception posting back to coopr server #{coopr_uri}/v2/tasks/finish: #{e}"
         end
@@ -288,7 +298,7 @@ else
         end
         log.error "Task <#{task['taskId']}> failed, updating results <#{result}>"
         begin
-          response = RestClient.post "#{coopr_uri}/v2/tasks/finish", result.to_json
+          response = Coopr::RestHelper.post "#{coopr_uri}/v2/tasks/finish", result.to_json
         rescue => e
           log.error "Caught exception posting back to server #{coopr_uri}/v2/tasks/finish: #{e}"
         end

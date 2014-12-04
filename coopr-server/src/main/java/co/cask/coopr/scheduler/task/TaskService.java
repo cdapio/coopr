@@ -81,8 +81,8 @@ public class TaskService {
     }
 
     TaskId rollbackTaskId = idService.getNewTaskId(JobId.fromString(task.getJobId()));
-    ClusterTask rollbackTask = new ClusterTask(rollback, rollbackTaskId, task.getNodeId(),
-                                               task.getService(), task.getClusterAction());
+    ClusterTask rollbackTask = new ClusterTask(rollback, rollbackTaskId, task.getNodeId(), task.getService(),
+                                               task.getClusterAction(), task.getClusterTemplateName(), task.getAccount());
 
     return rollbackTask;
   }
@@ -122,7 +122,7 @@ public class TaskService {
       ProvisionerAction action = taskOrder.get(i);
       TaskId retryTaskId = idService.getNewTaskId(JobId.fromString(task.getJobId()));
       ClusterTask retry = new ClusterTask(action, retryTaskId, task.getNodeId(), task.getService(),
-                                          task.getClusterAction());
+                                          task.getClusterAction(), task.getClusterTemplateName(), task.getAccount());
       retryTasks.add(retry);
     }
     retryTasks.add(task);

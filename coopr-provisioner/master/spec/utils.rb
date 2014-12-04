@@ -15,17 +15,15 @@
 # limitations under the License.
 #
 
-
 module Coopr
-
   class SignalHandler
     def initialize(signal)
       @interruptable = false
       @enqueued     = []
       trap(signal) do
         if @interruptable
-          #log.info 'Gracefully shutting down provisioner...'
-          #print "Gracefully shutting down provisioner...\n"
+          # log.info 'Gracefully shutting down provisioner...'
+          # print "Gracefully shutting down provisioner...\n"
           exit
         else
           @enqueued.push(signal)
@@ -49,9 +47,9 @@ module Coopr
       @interruptable = true
       # Send the temporarily ignored signals to ourself
       # see http://www.ruby-doc.org/core/classes/Process.html#M001286
-      #@enqueued.each { |signal| Process.kill(signal, 0) }
+      # @enqueued.each { |signal| Process.kill(signal, 0) }
       @enqueued.each do |signal|
-        #print "*** sending queued #{signal} to process #{Process.pid} ***\n"
+        # print "*** sending queued #{signal} to process #{Process.pid} ***\n"
         Process.kill(signal, Process.pid)
         # there is a race condition here if the calling process immediately enters dont_interrupt again
         # allow time for signal handler to process, since this is only used for terminating signals
@@ -59,6 +57,4 @@ module Coopr
       end
     end
   end
-
 end
-

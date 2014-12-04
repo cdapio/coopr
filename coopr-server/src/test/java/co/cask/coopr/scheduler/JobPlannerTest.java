@@ -16,6 +16,7 @@
 package co.cask.coopr.scheduler;
 
 import co.cask.coopr.TestHelper;
+import co.cask.coopr.account.Account;
 import co.cask.coopr.cluster.Node;
 import co.cask.coopr.cluster.NodeProperties;
 import co.cask.coopr.scheduler.dag.TaskDag;
@@ -929,7 +930,8 @@ public class JobPlannerTest {
 
   private ClusterTask createClusterTask(String name, String taskId, String hostId) {
     return new ClusterTask(
-      ProvisionerAction.valueOf(name), TaskId.fromString(taskId), hostId, "service", ClusterAction.CLUSTER_CREATE);
+      ProvisionerAction.valueOf(name), TaskId.fromString(taskId), hostId, "service", ClusterAction.CLUSTER_CREATE,
+      "test", new Account("testUser", "testTenant"));
   }
 
   private Set<ClusterTask> createSortedSet(ClusterTask... t) {
