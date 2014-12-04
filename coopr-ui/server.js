@@ -23,9 +23,11 @@ var COOPR_HOME = process.env.COOPR_HOME || (__dirname + '/../'),
     COOPR_UI_KEY_FILE = process.env.COOPR_UI_KEY_FILE || COOPR_HOME + 'cert/server.key',
     COOPR_UI_CERT_FILE = process.env.COOPR_UI_CERT_FILE || COOPR_HOME + 'cert/server.crt',
     COOPR_CORS_PORT = parseInt(process.env.COOPR_CORS_PORT || 8081, 10),
-    COOPR_SERVER_URI = process.env.COOPR_SERVER_URI || 'http://127.0.0.1:55054',
+    COOPR_SERVER_URI = process.env.COOPR_SERVER_URI || 'http://127.0.0.1:55054';
 
-    color = {
+COOPR_SERVER_URI = COOPR_SERVER_URI.replace('/localhost:', '\/127.0.0.1:')
+
+var color = {
         hilite: function (v) {
             return '\x1B[7m' + v + '\x1B[27m';
         },
