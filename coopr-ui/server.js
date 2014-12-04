@@ -25,7 +25,7 @@ var COOPR_HOME = process.env.COOPR_HOME || (__dirname + '/../'),
     COOPR_CORS_PORT = parseInt(process.env.COOPR_CORS_PORT || 8081, 10),
     COOPR_SERVER_URI = process.env.COOPR_SERVER_URI || 'http://127.0.0.1:55054';
 
-COOPR_SERVER_URI = COOPR_SERVER_URI.replace('/localhost:', '\/127.0.0.1:')
+COOPR_SERVER_URI = COOPR_SERVER_URI.replace('/localhost:', '/127.0.0.1:');
 
 var color = {
         hilite: function (v) {
