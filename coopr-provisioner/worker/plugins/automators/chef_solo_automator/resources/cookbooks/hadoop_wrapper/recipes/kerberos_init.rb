@@ -35,9 +35,6 @@ if node['hadoop'].key?('core_site') && node['hadoop']['core_site'].key?('hadoop.
   end
 
   include_recipe 'krb5_utils'
-  if node['java']['install_flavor'] == 'oracle'
-    include_recipe 'hadoop_wrapper::_jce'
-  end
   # Hack up /etc/default/hadoop-hdfs-datanode
   execute 'modify-etc-default-files' do
     command 'sed -i -e "/HADOOP_SECURE_DN/ s/^#//g" /etc/default/hadoop-hdfs-datanode'
