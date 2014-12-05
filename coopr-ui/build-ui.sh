@@ -1,7 +1,9 @@
 #!/bin/sh
 
-COOPR_NODE=`whereis node | awk '{print $2}'`
-COOPR_NPM=`whereis npm | awk '{print $2}'`
+COOPR_NODE=${COOPR_NODE:-node}
+COOPR_NPM=${COOPR_NPM:-npm}
+COOPR_GULP='./node_modules/gulp/bin/gulp.js'
 
-rm -rf dist
-${COOPR_NPM} run build && gulp distribute && ${COOPR_NPM} install --production
+${COOPR_NPM} run prebuild
+${COOPR_NODE} ${COOPR_GULP} clean
+${COOPR_NODE} ${COOPR_GULP} distribute
