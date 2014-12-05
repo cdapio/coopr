@@ -313,12 +313,13 @@ class ChefSoloAutomator < Automator
         end
 
         # determine if curl is installed, else default to wget
-        chef_install_cmd = "curl -L https://www.opscode.com/chef/install.sh | #{sudo} bash"
+        chef_version = '11.16.4'
+        chef_install_cmd = "curl -L https://www.opscode.com/chef/install.sh | #{sudo} bash -s -- -v #{chef_version}"
         begin
           ssh_exec!(ssh, "which curl", "Checking for curl")
         rescue CommandExecutionError
           log.debug "curl not found, defaulting to wget"
-          chef_install_cmd = "wget -qO - https://www.opscode.com/chef/install.sh | #{sudo} bash"
+          chef_install_cmd = "wget -qO - https://www.opscode.com/chef/install.sh | #{sudo} bash -s -- -v #{chef_version}"
         end
         ssh_exec!(ssh, chef_install_cmd, "Installing Chef")
       end
