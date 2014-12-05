@@ -95,6 +95,11 @@ app.get('/robots.txt', [
 ]);
 
 
+// survive in case of proxy error
+proxy.on('error', function (err, req, res) {
+  res.status(500).send('Proxy ' + (err.message || 'fail'));
+});
+
 // proxy requests to the backend
 app.all('/proxy/*', [
     httpProxyLogger,
