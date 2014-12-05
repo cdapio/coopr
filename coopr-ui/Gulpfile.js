@@ -19,7 +19,7 @@ gulp.task('css:lib', ['fonts'], function() {
     ].concat(mainBowerFiles({
       filter: /cask\-angular\-[^\/]+\/.*\.(css|less)$/
     })))
-    .pipe(plug.size({showFiles:true}))
+    .pipe(plug.debug())
     .pipe(plug.if('*.less', plug.less()))
     .pipe(plug.concat('lib.css'))
     .pipe(gulp.dest('./dist/assets/bundle'));
@@ -48,7 +48,7 @@ gulp.task('css:app', function() {
       './app/styles/common.less',
       './app/features/**/*.{less,css}'
     ])
-    .pipe(plug.size({showFiles:true}))
+    .pipe(plug.debug())
     .pipe(plug.if('*.less', plug.less()))
     .pipe(plug.concat('app.css'))
     .pipe(plug.autoprefixer(["> 1%"], {cascade:true}))
