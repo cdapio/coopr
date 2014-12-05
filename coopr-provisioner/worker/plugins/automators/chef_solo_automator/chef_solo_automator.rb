@@ -67,11 +67,11 @@ class ChefSoloAutomator < Automator
   end
 
   def set_credentials(sshauth)
-    @credentials = Hash.new
+    @credentials = {}
     @credentials[:paranoid] = false
     sshauth.each do |k, v|
       if k =~ /identityfile/
-        @credentials[:keys] = [ v ]
+        @credentials[:keys] = [v]
       elsif k =~ /password/
         @credentials[:password] = v
       end
@@ -316,15 +316,15 @@ class ChefSoloAutomator < Automator
         chef_version = '11.16.4'
         chef_install_cmd = "curl -L https://www.opscode.com/chef/install.sh | #{sudo} bash -s -- -v #{chef_version}"
         begin
-          ssh_exec!(ssh, "which curl", "Checking for curl")
+          ssh_exec!(ssh, 'which curl', 'Checking for curl')
         rescue CommandExecutionError
-          log.debug "curl not found, defaulting to wget"
+          log.debug 'curl not found, defaulting to wget'
           chef_install_cmd = "wget -qO - https://www.opscode.com/chef/install.sh | #{sudo} bash -s -- -v #{chef_version}"
         end
-        ssh_exec!(ssh, chef_install_cmd, "Installing Chef")
+        ssh_exec!(ssh, chef_install_cmd, 'Installing Chef')
       end
     rescue
-      fail 'Failed to install Chef'
+      raise 'Failed to install Chef'
     end
   end
 
