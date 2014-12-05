@@ -35,6 +35,7 @@
         <module>../coopr-server</module>
         <module>../coopr-rest-client</module>
         <module>../coopr-cli</module>
+        <module>../coopr-ui</module>
     </modules>
 
     <properties>
@@ -52,7 +53,7 @@
                     </descriptors>
                     <finalName>coopr-${project.version}</finalName>
                 </configuration>
-            </plugin> 
+            </plugin>
         </plugins>
     </build>
 </project>
