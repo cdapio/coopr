@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--                                                                         -->
+<!-- AppFabric Logging Configuration                                         -->
+<!--                                                                         -->
+<!-- We use the LogBack project for logging in AppFabric. The manual for     -->
+<!-- Logback can be found here: http://logback.qos.ch/manual                 -->
+<!--                                                                         -->
+
+<configuration>
+
+    <!--
+      Disabling some chatty loggers.
+    -->
+    <logger name="org.apache.zookeeper.server" level="ERROR"/>
+    <logger name="org.apache.zookeeper" level="ERROR"/>
+    <logger name="org.apache" level="WARN"/>
+
+    <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{ISO8601} - %-5p [%t:%C{1}@%L] - %m%n</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>DEBUG</level>
+        </filter>
+    </appender>
+
+    <root level="WARN">
+        <appender-ref ref="Console"/>
+    </root>
+
+</configuration>
