@@ -48,7 +48,7 @@ check_before_start() {
 create_dist() {
   [ -d dist ] || {
     echo "- Installing Coopr UI dependencies ..."
-    ${COOPR_NPM} install -g bower gulp && ${COOPR_NPM} run build && gulp distribute && ${COOPR_NPM} install --production
+    ${COOPR_NPM} install -g bower gulp && ${COOPR_NPM} run prebuild && gulp distribute
   }
 }
 
