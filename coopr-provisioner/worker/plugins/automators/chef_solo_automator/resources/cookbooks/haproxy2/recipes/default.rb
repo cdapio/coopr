@@ -90,7 +90,7 @@ haproxy_cfg_config += generate_content(node['haproxy']['defaults'])
       end
     
       unless stanza['role_app'].nil?  
-        pool_members = search("node", "role:#{stanza['role_app']} AND chef_environment:#{node.chef_environment}") || []
+        pool_members = search("node", "roles:#{stanza['role_app']} AND chef_environment:#{node.chef_environment}") || []
         pool_members << node if node.run_list.roles.include?(stanza['role_app'])
 
         pool_members = pool_members.sort { |a,b| a[:hostname] <=> b[:hostname] }
