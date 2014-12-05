@@ -17,42 +17,33 @@ package co.cask.coopr.codec.json.current;
 
 import co.cask.coopr.spec.BaseEntity;
 import co.cask.coopr.spec.template.AbstractTemplate;
-import co.cask.coopr.spec.template.ClusterTemplate;
-import co.cask.coopr.spec.template.Include;
-import co.cask.coopr.spec.template.Parent;
+import co.cask.coopr.spec.template.PartialTemplate;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 
-import java.lang.reflect.Type;
-import java.util.Set;
-
 /**
- * Codec for serializing/deserializing a {@link ClusterTemplate}.
+ * Codec for serializing/deserializing a {@link co.cask.coopr.spec.template.PartialTemplate}.
  */
-public class ClusterTemplateCodec extends AbstractTemplateCodec<ClusterTemplate> {
-
-  private static final Type INCLUDES_TYPE = new com.google.common.reflect.TypeToken<Set<Include>>() { }.getType();
+public class PartialTemplateCodec extends AbstractTemplateCodec<PartialTemplate> {
 
   @Override
   protected void addChildFields(AbstractTemplate template, JsonObject jsonObj, JsonSerializationContext context) {
     super.addChildFields(template, jsonObj, context);
-    ClusterTemplate clusterTemplate = (ClusterTemplate) template;
-    jsonObj.add("extends", context.serialize(clusterTemplate.getParent()));
-    jsonObj.add("includes", context.serialize(clusterTemplate.getIncludes()));
+    PartialTemplate partialTemplate = (PartialTemplate) template;
+    jsonObj.add("immutable", context.serialize(partialTemplate.isImmutable()));
   }
 
   @Override
-  protected BaseEntity.Builder<ClusterTemplate> getBuilder(JsonObject jsonObj, JsonDeserializationContext context) {
-    ClusterTemplate.ClusterTemplateBuilder builder = (ClusterTemplate.ClusterTemplateBuilder)
+  protected BaseEntity.Builder<PartialTemplate> getBuilder(JsonObject jsonObj, JsonDeserializationContext context) {
+    PartialTemplate.PartialTemplateBuilder builder = (PartialTemplate.PartialTemplateBuilder)
       super.getBuilder(jsonObj, context);
-    builder.setParent(context.<Parent>deserialize(jsonObj.get("extends"), Parent.class))
-      .setIncludes(context.<Set<Include>>deserialize(jsonObj.get("includes"), INCLUDES_TYPE));
+    builder.setImmutable(context.<Boolean>deserialize(jsonObj.get("immutable"), Boolean.class));
     return builder;
   }
 
   @Override
   protected AbstractTemplate.Builder getConcreteBuilder() {
-    return ClusterTemplate.builder();
+    return PartialTemplate.builder();
   }
 }

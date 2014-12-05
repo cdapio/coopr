@@ -18,8 +18,6 @@ package co.cask.coopr.spec.template;
 import co.cask.coopr.spec.BaseEntity;
 import co.cask.coopr.spec.Link;
 import com.google.common.base.Objects;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableSet;
 
 import java.util.Set;
 
@@ -29,68 +27,36 @@ import java.util.Set;
  * will be used to determine which services to place on which nodes, and what hardware and images to use.  A cluster
  * template also specifies the full set of configuration key values that are needed on the cluster.
  */
-public final class ClusterTemplate extends BaseEntity {
-  private final ClusterDefaults clusterDefaults;
-  private final Constraints constraints;
-  private final Compatibilities compatibilities;
-  private final Administration administration;
-  private final Set<Link> links;
+public final class ClusterTemplate extends AbstractTemplate {
 
-  private ClusterTemplate(BaseEntity.Builder baseBuilder, ClusterDefaults clusterDefaults,
-                          Compatibilities compatibilities, Constraints constraints, Administration administration,
-                          Set<Link> links) {
-    super(baseBuilder);
-    Preconditions.checkArgument(clusterDefaults != null, "cluster defaults must be specified");
-    this.clusterDefaults = clusterDefaults;
-    this.constraints = constraints;
-    this.compatibilities = compatibilities;
-    this.administration = administration;
-    this.links = links;
+  private final Parent parent;
+  private final Set<Include> includes;
+
+  protected ClusterTemplate(BaseEntity.Builder baseBuilder, ClusterDefaults clusterDefaults,
+                            Compatibilities compatibilities, Constraints constraints, Administration administration,
+                            Set<Link> links, Parent parent, Set<Include> includes) {
+    super(baseBuilder, clusterDefaults, compatibilities, constraints, administration, links);
+
+    this.parent = parent;
+    this.includes = includes;
   }
 
   /**
-   * Get the {@link Compatibilities} for the cluster.
+   * Get the parent template name.
    *
-   * @return {@link Compatibilities} for the cluster.
+   * @return parent name for the template.
    */
-  public Compatibilities getCompatibilities() {
-    return compatibilities;
+  public Parent getParent() {
+    return parent;
   }
 
   /**
-   * Get the constraints that specify how the cluster should be laid out.
+   * Get the partial template names from this cluster template.
    *
-   * @return {@link Constraints} specifying how the cluster should be laid out.
+   * @return included partial template names.
    */
-  public Constraints getConstraints() {
-    return constraints;
-  }
-
-  /**
-   * Get the {@link ClusterDefaults} that will be used unless the user replaces them at create time.
-   *
-   * @return {@link ClusterDefaults} for the template.
-   */
-  public ClusterDefaults getClusterDefaults() {
-    return clusterDefaults;
-  }
-
-  /**
-   * Get administration settings like lease time for managing the cluster.
-   *
-   * @return Administration settings for managing the cluster.
-   */
-  public Administration getAdministration() {
-    return administration;
-  }
-
-  /**
-   * Get immutable set of cluster links to services on the cluster.
-   *
-   * @return Immutable set of cluster links to services on the cluster
-   */
-  public Set<Link> getLinks() {
-    return links;
+  public Set<Include> getIncludes() {
+    return includes;
   }
 
   /**
@@ -98,65 +64,37 @@ public final class ClusterTemplate extends BaseEntity {
    *
    * @return Builder for creating cluster templates.
    */
-  public static Builder builder() {
-    return new Builder();
+  public static ClusterTemplateBuilder builder() {
+    return new ClusterTemplateBuilder();
   }
 
   /**
    * Builder for creating cluster templates.
    */
-  public static class Builder extends BaseEntity.Builder<ClusterTemplate> {
-    private ClusterDefaults clusterDefaults;
-    private Constraints constraints = Constraints.EMPTY_CONSTRAINTS;
-    private Compatibilities compatibilities = Compatibilities.EMPTY_COMPATIBILITIES;
-    private Administration administration = Administration.EMPTY_ADMINISTRATION;
-    private Set<Link> links = ImmutableSet.of();
+  public static class ClusterTemplateBuilder extends AbstractTemplate.Builder<ClusterTemplate, ClusterTemplateBuilder> {
+
+    private Parent parent;
+    private Set<Include> includes;
 
     @Override
-    public Builder setName(String name) {
-      this.name = name;
-      return this;
-    }
-
-    @Override
-    public Builder setIcon(String icon) {
-      this.icon = icon;
-      return this;
-    }
-
-    @Override
-    public Builder setDescription(String description) {
-      this.description = description;
-      return this;
-    }
-
-    public Builder setClusterDefaults(ClusterDefaults clusterDefaults) {
-      this.clusterDefaults = clusterDefaults;
-      return this;
-    }
-
-    public Builder setConstraints(Constraints constraints) {
-      this.constraints = constraints == null ? Constraints.EMPTY_CONSTRAINTS : constraints;
-      return this;
-    }
-
-    public Builder setCompatibilities(Compatibilities compatibilities) {
-      this.compatibilities = compatibilities == null ? Compatibilities.EMPTY_COMPATIBILITIES : compatibilities;
-      return this;
-    }
-
-    public Builder setAdministration(Administration administration) {
-      this.administration = administration == null ? Administration.EMPTY_ADMINISTRATION : administration;
-      return this;
-    }
-
-    public Builder setLinks(Set<Link> links) {
-      this.links = links == null ? ImmutableSet.<Link>of() : ImmutableSet.copyOf(links);
-      return this;
-    }
-
     public ClusterTemplate build() {
-      return new ClusterTemplate(this, clusterDefaults, compatibilities, constraints, administration, links);
+      return new ClusterTemplate(this, clusterDefaults, compatibilities, constraints, administration,
+                                 links, parent, includes);
+    }
+
+    @Override
+    protected ClusterTemplateBuilder getThis() {
+      return this;
+    }
+
+    public ClusterTemplateBuilder setParent(Parent parent) {
+      this.parent = parent;
+      return this;
+    }
+
+    public ClusterTemplateBuilder setIncludes(Set<Include> includes) {
+      this.includes = includes;
+      return this;
     }
   }
 
@@ -170,7 +108,9 @@ public final class ClusterTemplate extends BaseEntity {
       Objects.equal(compatibilities, other.compatibilities) &&
       Objects.equal(constraints, other.constraints) &&
       Objects.equal(administration, other.administration) &&
-      Objects.equal(links, other.links);
+      Objects.equal(links, other.links) &&
+      Objects.equal(includes, other.includes) &&
+      Objects.equal(parent, other.parent);
   }
 
   @Override
@@ -186,6 +126,8 @@ public final class ClusterTemplate extends BaseEntity {
       .add("compatibilities", compatibilities)
       .add("administration", administration)
       .add("links", links)
+      .add("includes", includes)
+      .add("parent", parent)
       .toString();
   }
 }
