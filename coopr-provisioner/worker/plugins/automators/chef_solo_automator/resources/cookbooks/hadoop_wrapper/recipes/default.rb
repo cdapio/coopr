@@ -35,4 +35,10 @@ if node.key?('java') && node['java'].key?('java_home')
 end
 
 include_recipe 'hadoop::default'
+
+# Allow unlimited crypto
+if node['java']['install_flavor'] == 'oracle'
+  include_recipe 'hadoop_wrapper::_jce'
+end
+
 include_recipe 'hadoop_wrapper::kerberos_init'

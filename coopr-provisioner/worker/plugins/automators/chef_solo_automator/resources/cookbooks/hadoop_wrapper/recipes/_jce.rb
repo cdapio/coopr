@@ -62,7 +62,7 @@ if node['java'].key? 'jdk_version'
 
   bash 'copy-jce-files' do
     code <<-CODE
-      find -name '*.jar' -exec cp '{}' #{jce_dir} \\;
+      find #{jce_tmp} -name '*.jar' -exec cp '{}' #{jce_dir} \\;
     CODE
     not_if "diff -q #{jce_tmp}/jce/US_export_policy.jar #{jce_dir}/US_export_policy.jar"
   end
