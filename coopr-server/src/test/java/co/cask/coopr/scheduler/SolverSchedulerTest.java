@@ -23,6 +23,7 @@ import co.cask.coopr.cluster.Node;
 import co.cask.coopr.common.conf.Constants;
 import co.cask.coopr.common.queue.Element;
 import co.cask.coopr.common.queue.QueueGroup;
+import co.cask.coopr.common.queue.QueueType;
 import co.cask.coopr.http.request.ClusterCreateRequest;
 import co.cask.coopr.scheduler.task.ClusterJob;
 import co.cask.coopr.scheduler.task.JobId;
@@ -45,8 +46,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Sets;
-import com.google.inject.Key;
-import com.google.inject.name.Names;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -125,8 +124,8 @@ public class SolverSchedulerTest extends BaseTest {
 
   @BeforeClass
   public static void setupSchedulerTest() throws Exception {
-    solverQueues = injector.getInstance(Key.get(QueueGroup.class, Names.named(Constants.Queue.SOLVER)));
-    clusterQueues = injector.getInstance(Key.get(QueueGroup.class, Names.named(Constants.Queue.CLUSTER)));
+    solverQueues = queueService.getQueueGroup(QueueType.SOLVER);
+    clusterQueues = queueService.getQueueGroup(QueueType.CLUSTER);
     solverScheduler = injector.getInstance(SolverScheduler.class);
 
     Set<String> services = ImmutableSet.of("namenode", "datanode", "resourcemanager", "nodemanager",

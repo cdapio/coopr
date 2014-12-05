@@ -26,6 +26,7 @@ import co.cask.coopr.common.conf.Configuration;
 import co.cask.coopr.common.conf.Constants;
 import co.cask.coopr.common.conf.guice.ConfigurationModule;
 import co.cask.coopr.common.daemon.DaemonMain;
+import co.cask.coopr.common.queue.QueueService;
 import co.cask.coopr.common.queue.guice.QueueModule;
 import co.cask.coopr.common.zookeeper.IdService;
 import co.cask.coopr.common.zookeeper.guice.ZookeeperModule;
@@ -90,6 +91,7 @@ public final class ServerMain extends DaemonMain {
   private TenantStore tenantStore;
   private UserStore userStore;
   private CredentialStore credentialStore;
+  private QueueService queueService;
   // Authentication
   private boolean securityEnabled;
   private ExternalAuthenticationServer externalAuthenticationServer;
@@ -148,8 +150,8 @@ public final class ServerMain extends DaemonMain {
     cConfiguration.addResource("coopr-site.xml");
 
     try {
-      // this is here because modules do things that need to connect to zookeeper...
-      // TODO: move everything that needs zk started out of the module
+      // this is here instead of in init because when it runs with in-process zookeeper, the zk client service
+      // cannot be created until the server is started (needs connection string)
       injector = Guice.createInjector(
         new ConfigurationModule(conf),
         new ZookeeperModule(zkClientService),
@@ -182,6 +184,8 @@ public final class ServerMain extends DaemonMain {
       userStore.startAndWait();
       credentialStore = injector.getInstance(CredentialStore.class);
       credentialStore.startAndWait();
+      queueService = injector.getInstance(QueueService.class);
+      queueService.startAndWait();
       if (securityEnabled) {
         externalAuthenticationServer = injector.getInstance(ExternalAuthenticationServer.class);
         externalAuthenticationServer.startAndWait();
@@ -235,7 +239,8 @@ public final class ServerMain extends DaemonMain {
       }
     }
 
-    stopAll(internalHandlerServer, externalHandlerServer, userStore, resourceService, provisionerStore, tenantStore,
+    stopAll(internalHandlerServer, externalHandlerServer, queueService,
+            userStore, resourceService, provisionerStore, tenantStore,
             clusterStoreService, entityStoreService, idService, zkClientService, inMemoryZKServer,
             externalAuthenticationServer);
   }

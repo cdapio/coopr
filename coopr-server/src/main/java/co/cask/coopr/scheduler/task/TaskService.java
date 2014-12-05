@@ -16,9 +16,10 @@
 package co.cask.coopr.scheduler.task;
 
 import co.cask.coopr.cluster.Cluster;
-import co.cask.coopr.common.conf.Constants;
 import co.cask.coopr.common.queue.Element;
 import co.cask.coopr.common.queue.QueueGroup;
+import co.cask.coopr.common.queue.QueueService;
+import co.cask.coopr.common.queue.QueueType;
 import co.cask.coopr.common.zookeeper.IdService;
 import co.cask.coopr.management.ServerStats;
 import co.cask.coopr.scheduler.Actions;
@@ -32,7 +33,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
-import com.google.inject.name.Named;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,7 +57,7 @@ public class TaskService {
   private TaskService(ClusterStoreService clusterStoreService,
                       CredentialStore credentialStore,
                       ServerStats serverStats,
-                      @Named(Constants.Queue.CALLBACK) QueueGroup callbackQueues,
+                      QueueService queueService,
                       IdService idService,
                       Gson gson) {
     this.clusterStore = clusterStoreService.getSystemView();
@@ -65,7 +65,7 @@ public class TaskService {
     this.serverStats = serverStats;
     this.idService = idService;
     this.gson = gson;
-    this.callbackQueues = callbackQueues;
+    this.callbackQueues = queueService.getQueueGroup(QueueType.CALLBACK);
   }
 
   /**

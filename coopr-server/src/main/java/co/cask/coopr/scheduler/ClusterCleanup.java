@@ -22,6 +22,8 @@ import co.cask.coopr.common.conf.Configuration;
 import co.cask.coopr.common.conf.Constants;
 import co.cask.coopr.common.queue.Element;
 import co.cask.coopr.common.queue.QueueGroup;
+import co.cask.coopr.common.queue.QueueService;
+import co.cask.coopr.common.queue.QueueType;
 import co.cask.coopr.common.queue.QueuedElement;
 import co.cask.coopr.http.request.ClusterOperationRequest;
 import co.cask.coopr.scheduler.task.ClusterTask;
@@ -31,7 +33,6 @@ import co.cask.coopr.scheduler.task.TaskService;
 import co.cask.coopr.store.cluster.ClusterStore;
 import co.cask.coopr.store.cluster.ClusterStoreService;
 import com.google.inject.Inject;
-import com.google.inject.name.Named;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,10 +63,11 @@ public class ClusterCleanup implements Runnable {
                          ClusterService clusterService,
                          NodeService nodeService,
                          TaskService taskService,
-                         @Named(Constants.Queue.JOB) QueueGroup jobQueues,
-                         @Named(Constants.Queue.PROVISIONER) QueueGroup provisionerQueues,
+                         QueueService queueService,
                          Configuration conf) {
-    this(clusterStoreService.getSystemView(), clusterService, nodeService, taskService, jobQueues, provisionerQueues,
+    this(clusterStoreService.getSystemView(), clusterService, nodeService, taskService,
+         queueService.getQueueGroup(QueueType.JOB),
+         queueService.getQueueGroup(QueueType.PROVISIONER),
          conf.getLong(Constants.TASK_TIMEOUT_SECS),
          conf.getLong(Constants.ID_START_NUM),
          conf.getLong(Constants.ID_INCREMENT_BY));

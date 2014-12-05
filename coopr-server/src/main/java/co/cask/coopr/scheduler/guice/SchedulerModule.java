@@ -5,7 +5,7 @@ import co.cask.coopr.common.conf.Constants;
 import co.cask.coopr.scheduler.ClusterCleanup;
 import co.cask.coopr.scheduler.ClusterScheduler;
 import co.cask.coopr.scheduler.JobScheduler;
-import co.cask.coopr.scheduler.ProvisionerCleanup;
+import co.cask.coopr.scheduler.TenantProvisionerCleanup;
 import co.cask.coopr.scheduler.Scheduler;
 import co.cask.coopr.scheduler.SolverScheduler;
 import co.cask.coopr.scheduler.WorkerBalanceScheduler;
@@ -51,6 +51,6 @@ public class SchedulerModule extends AbstractModule {
     bind(Scheduler.class).in(Scopes.SINGLETON);
     bind(WorkerBalanceScheduler.class).in(Scopes.SINGLETON);
     bind(ClusterCleanup.class).in(Scopes.SINGLETON);
-    bind(ProvisionerCleanup.class).in(Scopes.SINGLETON);
+    bind(TenantProvisionerCleanup.class).in(Scopes.SINGLETON);
   }
 }

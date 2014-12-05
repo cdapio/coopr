@@ -119,14 +119,14 @@ public class ClusterCleanupTest extends ServiceTestBase {
 
     Assert.assertEquals(4, Iterators.size(provisionerQueues.getQueued(queueName)));
 
-    provisionerQueues.take("consumer1");
-    provisionerQueues.take("consumer2");
+    provisionerQueues.takeIterator("consumer1").next();
+    provisionerQueues.takeIterator("consumer2").next();
     Assert.assertEquals(2, Iterators.size(provisionerQueues.getBeingConsumed(queueName)));
     Assert.assertEquals(2, Iterators.size(provisionerQueues.getQueued(queueName)));
 
     TimeUnit.SECONDS.sleep(1);
 
-    provisionerQueues.take("consumer3");
+    provisionerQueues.takeIterator("consumer3").next();
     Assert.assertEquals(3, Iterators.size(provisionerQueues.getBeingConsumed(queueName)));
     Assert.assertEquals(1, Iterators.size(provisionerQueues.getQueued(queueName)));
 
@@ -218,7 +218,7 @@ public class ClusterCleanupTest extends ServiceTestBase {
 
     // add a task to the queue without storing it.x
     provisionerQueues.add(queueName, new Element(task.getTaskId(), gson.toJson(schedulableTask)));
-    provisionerQueues.take("0");
+    provisionerQueues.takeIterator("0").next();
 
     clusterCleanup.run();
     Assert.assertEquals(0, Iterators.size(provisionerQueues.getBeingConsumed(queueName)));

@@ -17,6 +17,7 @@
 package co.cask.coopr.common.queue;
 
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.Service;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -29,7 +30,7 @@ import java.util.Set;
  * One example use case is if multiple queues are being used to manage tasks of some sort, with each queue holding
  * tasks for a specific tenant to ensure quality of service across tenants.
  */
-public interface QueueGroup {
+public interface QueueGroup extends Service {
 
   /**
    * Adds the given elements to the specified queue.
@@ -41,12 +42,14 @@ public interface QueueGroup {
   ListenableFuture<String> add(String queueName, Element element);
 
   /**
-   * Take an element from a queue in the group, or null if there are no elements to take.
+   * Get an iterator that will take elements from each queue in the group in a round robin fashion until it reaches
+   * a state where there are no more elements to take from any queue.
    *
    * @param consumerId Id of the consumer taking the element.
-   * @return Element from a queue in the group, or null if there are no elements to take.
+   * @return Iterator that will take elements from each queue in the group in a round robin fashion until it reaches
+   *         a state where there are no more elements to take from any queue.
    */
-  GroupElement take(String consumerId);
+  Iterator<GroupElement> takeIterator(String consumerId);
 
   /**
    * Take an element from a specific queue in the group, or null if there are no elements to take.
@@ -94,22 +97,6 @@ public interface QueueGroup {
    * @return True if all elements were removed successfully, false if not.
    */
   boolean removeAll(String queueName);
-
-  /**
-   * Remove the specified queue from the group. The queue itself may still exist, it is just no longer managed by this
-   * group. This means elements in the queue will not be returned by the
-   * {@link #take(String)} method. Referencing the queue again in any other method will add it back to the group.
-   *
-   * @param queueName Name of the queue to remove from the group.
-   */
-  void removeQueue(String queueName);
-
-  /**
-   * Get the size (both queued and being consumed) of all queues.
-   *
-   * @return Size of all queues.
-   */
-  int size();
 
   /**
    * Get the size (both queued and being consumed) of a specific queue.

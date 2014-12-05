@@ -19,7 +19,8 @@ import co.cask.coopr.BaseTest;
 import co.cask.coopr.account.Account;
 import co.cask.coopr.common.conf.Constants;
 import co.cask.coopr.common.queue.QueueGroup;
-import co.cask.coopr.common.queue.internal.ElementsTrackingQueue;
+import co.cask.coopr.common.queue.QueueType;
+import co.cask.coopr.common.queue.TrackingQueue;
 import co.cask.coopr.provisioner.Provisioner;
 import co.cask.coopr.provisioner.TenantProvisionerService;
 import co.cask.coopr.spec.Tenant;
@@ -54,7 +55,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
-import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import javax.net.ssl.KeyManager;
@@ -97,13 +97,14 @@ public class ServiceTestBase extends BaseTest {
     new BasicHeader(Constants.API_KEY_HEADER, API_KEY),
     new BasicHeader(Constants.TENANT_HEADER, Constants.SUPERADMIN_TENANT)
   };
+
+  protected static TrackingQueue balancerQueue;
   private static int externalPort;
   private static int internalPort;
   private static String externalBase;
   private static String internalBase;
   protected static ExternalHandlerServer externalHandlerServer;
   protected static InternalHandlerServer internalHandlerServer;
-  protected static ElementsTrackingQueue balancerQueue;
   protected static QueueGroup provisionerQueues;
   protected static QueueGroup clusterQueues;
   protected static QueueGroup solverQueues;
@@ -111,16 +112,14 @@ public class ServiceTestBase extends BaseTest {
   protected static QueueGroup callbackQueues;
   protected static TenantProvisionerService tenantProvisionerService;
 
-
   @BeforeClass
   public static void setupServiceBase() throws Exception {
-    balancerQueue = injector.getInstance(
-      Key.get(ElementsTrackingQueue.class, Names.named(Constants.Queue.WORKER_BALANCE)));
-    provisionerQueues = injector.getInstance(Key.get(QueueGroup.class, Names.named(Constants.Queue.PROVISIONER)));
-    clusterQueues = injector.getInstance(Key.get(QueueGroup.class, Names.named(Constants.Queue.CLUSTER)));
-    solverQueues = injector.getInstance(Key.get(QueueGroup.class, Names.named(Constants.Queue.SOLVER)));
-    jobQueues = injector.getInstance(Key.get(QueueGroup.class, Names.named(Constants.Queue.JOB)));
-    callbackQueues = injector.getInstance(Key.get(QueueGroup.class, Names.named(Constants.Queue.CALLBACK)));
+    balancerQueue = injector.getInstance(Key.get(TrackingQueue.class, Names.named(Constants.Queue.WORKER_BALANCE)));
+    provisionerQueues = queueService.getQueueGroup(QueueType.PROVISIONER);
+    clusterQueues = queueService.getQueueGroup(QueueType.CLUSTER);
+    solverQueues = queueService.getQueueGroup(QueueType.SOLVER);
+    jobQueues = queueService.getQueueGroup(QueueType.JOB);
+    callbackQueues = queueService.getQueueGroup(QueueType.CALLBACK);
     internalHandlerServer = injector.getInstance(InternalHandlerServer.class);
     internalHandlerServer.startAndWait();
     internalPort = internalHandlerServer.getBindAddress().getPort();

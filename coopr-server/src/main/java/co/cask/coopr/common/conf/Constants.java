@@ -153,11 +153,6 @@ public class Constants {
    * Queue related constants.
    */
   public static final class Queue {
-    public static final String PROVISIONER = "nodeprovisioner.queue";
-    public static final String CLUSTER = "cluster.queue";
-    public static final String SOLVER = "solver.queue";
-    public static final String JOB = "internal.job.queue";
-    public static final String CALLBACK = "callback.queue";
     public static final String WORKER_BALANCE = "worker.balance.queue";
   }
 

@@ -22,6 +22,8 @@ import co.cask.coopr.common.conf.Constants;
 import co.cask.coopr.common.queue.Element;
 import co.cask.coopr.common.queue.GroupElement;
 import co.cask.coopr.common.queue.QueueGroup;
+import co.cask.coopr.common.queue.QueueService;
+import co.cask.coopr.common.queue.QueueType;
 import co.cask.coopr.common.queue.TrackingQueue;
 import co.cask.coopr.common.zookeeper.LockService;
 import co.cask.coopr.common.zookeeper.lib.ZKInterProcessReentrantLock;
@@ -44,11 +46,11 @@ import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
-import com.google.inject.name.Named;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -75,8 +77,7 @@ public class JobScheduler implements Runnable {
 
   @Inject
   private JobScheduler(ClusterStoreService clusterStoreService,
-                       @Named(Constants.Queue.JOB) QueueGroup jobQueues,
-                       @Named(Constants.Queue.PROVISIONER) QueueGroup provisionerQueues,
+                       QueueService queueService,
                        LockService lockService,
                        TaskService taskService,
                        Configuration conf,
@@ -86,18 +87,16 @@ public class JobScheduler implements Runnable {
     this.taskService = taskService;
     this.maxTaskRetries = conf.getInt(Constants.MAX_ACTION_RETRIES);
     this.gson = gson;
-    this.jobQueues = jobQueues;
-    this.provisionerQueues = provisionerQueues;
+    this.jobQueues = queueService.getQueueGroup(QueueType.JOB);
+    this.provisionerQueues = queueService.getQueueGroup(QueueType.PROVISIONER);
   }
 
   @Override
   public void run() {
     try {
-      while (true) {
-        GroupElement gElement = jobQueues.take(consumerId);
-        if (gElement == null) {
-          return;
-        }
+      Iterator<GroupElement> jobIter = jobQueues.takeIterator(consumerId);
+      while (jobIter.hasNext()) {
+        GroupElement gElement = jobIter.next();
         String queueName = gElement.getQueueName();
         Element element = gElement.getElement();
         String jobIdStr = element.getValue();
