@@ -31,14 +31,13 @@ limitations under the License.
 
   <properties>
     <http.client.version>4.3.3</http.client.version>
-    <cask.common.version>0.1.0-SNAPSHOT</cask.common.version>
+    <cask.common.version>0.1.0</cask.common.version>
   </properties>
 
   <dependencies>
     <dependency>
       <groupId>co.cask</groupId>
       <artifactId>coopr</artifactId>
-      <version>${project.parent.version}</version>
     </dependency>
     <dependency>
       <groupId>co.cask.common</groupId>
@@ -53,6 +52,12 @@ limitations under the License.
       <version>${project.parent.version}</version>
       <type>test-jar</type>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>co.cask.cdap</groupId>
+          <artifactId>cdap-security</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>

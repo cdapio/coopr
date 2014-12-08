@@ -288,6 +288,22 @@
         </dependency>
     </dependencies>
 
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>co.cask</groupId>
+        <artifactId>coopr</artifactId>
+        <version>${project.parent.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>co.cask.cdap</groupId>
+            <artifactId>cdap-security</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
     <reporting>
         <plugins>
             <plugin>
