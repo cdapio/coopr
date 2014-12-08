@@ -58,7 +58,6 @@
         <dependency>
             <groupId>co.cask</groupId>
             <artifactId>coopr</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <dependency>
