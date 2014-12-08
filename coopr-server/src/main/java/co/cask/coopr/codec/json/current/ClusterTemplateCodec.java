@@ -35,11 +35,10 @@ public class ClusterTemplateCodec extends AbstractTemplateCodec<ClusterTemplate>
   private static final Type INCLUDES_TYPE = new com.google.common.reflect.TypeToken<Set<Include>>() { }.getType();
 
   @Override
-  protected void addChildFields(AbstractTemplate template, JsonObject jsonObj, JsonSerializationContext context) {
+  protected void addChildFields(ClusterTemplate template, JsonObject jsonObj, JsonSerializationContext context) {
     super.addChildFields(template, jsonObj, context);
-    ClusterTemplate clusterTemplate = (ClusterTemplate) template;
-    jsonObj.add("extends", context.serialize(clusterTemplate.getParent()));
-    jsonObj.add("includes", context.serialize(clusterTemplate.getIncludes()));
+    jsonObj.add("extends", context.serialize(template.getParent()));
+    jsonObj.add("includes", context.serialize(template.getIncludes()));
   }
 
   @Override

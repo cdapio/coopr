@@ -37,7 +37,7 @@ public abstract class AbstractTemplateCodec<T extends AbstractTemplate> extends 
   protected static final Type LINKS_TYPE = new com.google.common.reflect.TypeToken<Set<Link>>() { }.getType();
 
   @Override
-  protected void addChildFields(AbstractTemplate template, JsonObject jsonObj, JsonSerializationContext context) {
+  protected void addChildFields(T template, JsonObject jsonObj, JsonSerializationContext context) {
     jsonObj.add("defaults", context.serialize(template.getClusterDefaults()));
     jsonObj.add("compatibility", context.serialize(template.getCompatibilities()));
     jsonObj.add("constraints", context.serialize(template.getConstraints()));
