@@ -66,6 +66,12 @@
           <version>${project.parent.version}</version>
           <type>test-jar</type>
           <scope>test</scope>
+          <exclusions>
+            <exclusion>
+              <groupId>co.cask.cdap</groupId>
+              <artifactId>cdap-security</artifactId>
+            </exclusion>
+          </exclusions>
         </dependency>
 
         <dependency>
