@@ -16,7 +16,7 @@
       <li ng-repeat="link in navbarAdminLinks" ng-class="{active: $state.includes(link.sref)}">
         <a ui-sref="{{link.sref + '.list'}}">
           <span ng-class="link.icon && 'fa fa-' + link.icon"></span>
-          <span ng-bind-once="link.label"></span>
+          <span ng-bind="link.label"></span>
         </a>
       </li>
     </ul>
