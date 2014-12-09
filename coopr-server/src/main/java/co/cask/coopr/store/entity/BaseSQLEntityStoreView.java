@@ -184,8 +184,6 @@ public abstract class BaseSQLEntityStoreView extends BaseEntityStoreView {
     queryStr.append("s WHERE name=? AND tenant_id=?");
     // TODO: remove once types are defined through server instead of through provisioner
     // automator and provider types are constant across tenants and defined only in the superadmin tenant.
-//    String tenantId = (entityType == EntityType.AUTOMATOR_TYPE || entityType == EntityType.PROVIDER_TYPE) ?
-//      Constants.SUPERADMIN_TENANT : account.getTenantId();
     PreparedStatement statement = conn.prepareStatement(queryStr.toString());
     statement.setString(1, entityName);
     statement.setString(2, Constants.SUPERADMIN_TENANT);
