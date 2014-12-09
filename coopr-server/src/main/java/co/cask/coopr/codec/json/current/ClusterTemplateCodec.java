@@ -43,7 +43,7 @@ public class ClusterTemplateCodec extends AbstractTemplateCodec<ClusterTemplate>
 
   @Override
   protected BaseEntity.Builder<ClusterTemplate> getBuilder(JsonObject jsonObj, JsonDeserializationContext context) {
-    ClusterTemplate.ClusterTemplateBuilder builder = (ClusterTemplate.ClusterTemplateBuilder)
+    ClusterTemplate.Builder builder = (ClusterTemplate.Builder)
       super.getBuilder(jsonObj, context);
     builder.setParent(context.<Parent>deserialize(jsonObj.get("extends"), Parent.class))
       .setIncludes(context.<Set<Include>>deserialize(jsonObj.get("includes"), INCLUDES_TYPE));

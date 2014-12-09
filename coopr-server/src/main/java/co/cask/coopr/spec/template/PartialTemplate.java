@@ -46,19 +46,19 @@ public class PartialTemplate extends AbstractTemplate {
    *
    * @return Builder for creating partial templates.
    */
-  public static PartialTemplateBuilder builder() {
-    return new PartialTemplateBuilder();
+  public static PartialTemplate.Builder builder() {
+    return new Builder();
   }
 
   /**
    * Builder for creating partial templates.
    */
-  public static class PartialTemplateBuilder extends AbstractTemplate.Builder<PartialTemplate, PartialTemplateBuilder> {
+  public static class Builder extends AbstractTemplate.Builder<PartialTemplate, Builder> {
 
     private boolean immutable;
 
     @Override
-    protected PartialTemplateBuilder getThis() {
+    protected PartialTemplate.Builder getThis() {
       return this;
     }
 
@@ -66,7 +66,7 @@ public class PartialTemplate extends AbstractTemplate {
       return new PartialTemplate(this, clusterDefaults, compatibilities, constraints, administration, links, immutable);
     }
 
-    public PartialTemplateBuilder setImmutable(boolean immutable) {
+    public PartialTemplate.Builder setImmutable(boolean immutable) {
       this.immutable = immutable;
       return this;
     }
@@ -79,10 +79,6 @@ public class PartialTemplate extends AbstractTemplate {
     }
     PartialTemplate other = (PartialTemplate) o;
     return super.equals(other) &&
-      Objects.equal(compatibilities, other.compatibilities) &&
-      Objects.equal(constraints, other.constraints) &&
-      Objects.equal(administration, other.administration) &&
-      Objects.equal(links, other.links) &&
       Objects.equal(immutable, other.immutable);
   }
 

@@ -36,7 +36,6 @@ public class PartialTemplateTest extends BaseTest {
 
   @BeforeClass
   public static void setupClusterServiceTests() throws Exception {
-    gson = injector.getInstance(Gson.class);
     TenantProvisionerService tenantProvisionerService = injector.getInstance(TenantProvisionerService.class);
     // setup data
     tenantProvisionerService.writeProvisioner(new Provisioner("p1", "host", 50056, 100, null, null));

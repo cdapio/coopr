@@ -23,7 +23,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 
 /**
- * Codec for serializing/deserializing a {@link co.cask.coopr.spec.template.PartialTemplate}.
+ * Codec for serializing/deserializing a {@link PartialTemplate}.
  */
 public class PartialTemplateCodec extends AbstractTemplateCodec<PartialTemplate> {
 
@@ -35,7 +35,7 @@ public class PartialTemplateCodec extends AbstractTemplateCodec<PartialTemplate>
 
   @Override
   protected BaseEntity.Builder<PartialTemplate> getBuilder(JsonObject jsonObj, JsonDeserializationContext context) {
-    PartialTemplate.PartialTemplateBuilder builder = (PartialTemplate.PartialTemplateBuilder)
+    PartialTemplate.Builder builder = (PartialTemplate.Builder)
       super.getBuilder(jsonObj, context);
     builder.setImmutable(context.<Boolean>deserialize(jsonObj.get("immutable"), Boolean.class));
     return builder;

@@ -38,7 +38,7 @@ public class ClusterDefaults {
   private ClusterDefaults(Set<String> services, String provider, String hardwaretype,
                           String imagetype, String dnsSuffix, JsonObject config) {
     Preconditions.checkArgument(services != null && !services.isEmpty(), "default services must be specified");
-    //todo: move it to the final phase
+    //TODO: move it to the final phase
 //    Preconditions.checkArgument(provider != null, "default provider must be specified");
     Preconditions.checkArgument(dnsSuffix == null || StringUtils.isValidDNSSuffix(dnsSuffix),
                                 dnsSuffix + " is an invalid DNS suffix.");
