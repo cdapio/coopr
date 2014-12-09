@@ -15,7 +15,7 @@
  */
 package co.cask.coopr.codec.json.current;
 
-import co.cask.coopr.spec.BaseEntity;
+import co.cask.coopr.spec.BaseVersionedEntity;
 import co.cask.coopr.spec.Link;
 import co.cask.coopr.spec.template.Administration;
 import co.cask.coopr.spec.template.ClusterDefaults;
@@ -32,11 +32,12 @@ import java.util.Set;
 /**
  * Codec for serializing/deserializing a {@link ClusterTemplate}.
  */
-public class ClusterTemplateCodec extends AbstractBaseEntityCodec<ClusterTemplate> {
+public class ClusterTemplateCodec extends AbstractBaseVersionedEntityCodec<ClusterTemplate> {
   private static final Type LINKS_TYPE = new com.google.common.reflect.TypeToken<Set<Link>>() { }.getType();
 
   @Override
   protected void addChildFields(ClusterTemplate clusterTemplate, JsonObject jsonObj, JsonSerializationContext context) {
+    super.addChildFields(clusterTemplate, jsonObj, context);
     jsonObj.add("defaults", context.serialize(clusterTemplate.getClusterDefaults()));
     jsonObj.add("compatibility", context.serialize(clusterTemplate.getCompatibilities()));
     jsonObj.add("constraints", context.serialize(clusterTemplate.getConstraints()));
@@ -45,8 +46,8 @@ public class ClusterTemplateCodec extends AbstractBaseEntityCodec<ClusterTemplat
   }
 
   @Override
-  protected BaseEntity.Builder<ClusterTemplate> getBuilder(JsonObject jsonObj,
-                                                                JsonDeserializationContext context) {
+  protected BaseVersionedEntity.Builder<ClusterTemplate> builder(JsonObject jsonObj,
+                                                                 JsonDeserializationContext context) {
     return ClusterTemplate.builder()
       .setClusterDefaults(context.<ClusterDefaults>deserialize(jsonObj.get("defaults"), ClusterDefaults.class))
       .setCompatibilities(context.<Compatibilities>deserialize(jsonObj.get("compatibility"), Compatibilities.class))

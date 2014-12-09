@@ -62,9 +62,19 @@ public class AdminHandlerTest extends ServiceTestBase {
   }
 
   @Test
+  public void testProvidersBumpVersion() throws Exception {
+    testRestAPIsBumpVersion("providers", gson.toJsonTree(Entities.ProviderExample.JOYENT).getAsJsonObject());
+  }
+
+  @Test
   public void testHardwareTypes() throws Exception {
     testRestAPIs("hardwaretypes", gson.toJsonTree(Entities.HardwareTypeExample.SMALL).getAsJsonObject(),
                  gson.toJsonTree(Entities.HardwareTypeExample.MEDIUM).getAsJsonObject());
+  }
+
+  @Test
+  public void testHardwareTypesBumpVersion() throws Exception {
+    testRestAPIsBumpVersion("hardwaretypes", gson.toJsonTree(Entities.HardwareTypeExample.SMALL).getAsJsonObject());
   }
 
   @Test
@@ -74,15 +84,31 @@ public class AdminHandlerTest extends ServiceTestBase {
   }
 
   @Test
+  public void testImageTypesBumpVersion() throws Exception {
+    testRestAPIsBumpVersion("imagetypes", gson.toJsonTree(Entities.ImageTypeExample.CENTOS_6).getAsJsonObject());
+  }
+
+  @Test
   public void testServices() throws Exception {
     testRestAPIs("services", gson.toJsonTree(Entities.ServiceExample.HOSTS).getAsJsonObject(),
                  gson.toJsonTree(Entities.ServiceExample.NAMENODE).getAsJsonObject());
   }
 
   @Test
+  public void testServicesBumpVersion() throws Exception {
+    testRestAPIsBumpVersion("services", gson.toJsonTree(Entities.ServiceExample.HOSTS).getAsJsonObject());
+  }
+
+  @Test
   public void testClusterTemplates() throws Exception {
     testRestAPIs("clustertemplates", gson.toJsonTree(Entities.ClusterTemplateExample.HDFS).getAsJsonObject(),
                  gson.toJsonTree(Entities.ClusterTemplateExample.REACTOR).getAsJsonObject());
+  }
+
+  @Test
+  public void testClusterTemplatesBumpVersion() throws Exception {
+    testRestAPIsBumpVersion("clustertemplates",
+                            gson.toJsonTree(Entities.ClusterTemplateExample.HDFS).getAsJsonObject());
   }
 
   @Test
@@ -263,6 +289,42 @@ public class AdminHandlerTest extends ServiceTestBase {
     provider.addProperty("name", "?");
     assertResponseStatus(doPostExternalAPI("/providers", provider.toString(), ADMIN_HEADERS),
                          HttpResponseStatus.BAD_REQUEST);
+  }
+
+  private void testRestAPIsBumpVersion(String entityType, JsonObject entity) throws Exception {
+    String base = "/" + entityType;
+    String entityPath = base + "/" + entity.get("name").getAsString();
+
+    // add a an entity through post
+    Assert.assertEquals(HttpResponseStatus.OK.getCode(),
+                        doPostExternalAPI(base, entity.toString(), ADMIN_HEADERS).getStatusLine().getStatusCode());
+
+    // bump version
+    Assert.assertEquals(HttpResponseStatus.OK.getCode(),
+                        doPutExternalAPI(entityPath, entity.toString(), ADMIN_HEADERS).getStatusLine().getStatusCode());
+
+
+
+    HttpResponse response1 = doGetExternalAPI(entityPath + "/2", ADMIN_HEADERS);
+    assertResponseStatus(response1, HttpResponseStatus.OK);
+    Assert.assertEquals("application/json", response1.getEntity().getContentType().getValue());
+    Reader reader1 = new InputStreamReader(response1.getEntity().getContent(), Charsets.UTF_8);
+    JsonObject result1 = new Gson().fromJson(reader1, JsonObject.class);
+    Assert.assertEquals(2, result1.get("version").getAsInt());
+
+    assertResponseStatus(doDeleteExternalAPI(entityPath + "/2", ADMIN_HEADERS), HttpResponseStatus.OK);
+
+    HttpResponse response2 = doGetExternalAPI(entityPath + "/2", ADMIN_HEADERS);
+    assertResponseStatus(response2, HttpResponseStatus.NOT_FOUND);
+
+    HttpResponse response3 = doGetExternalAPI(entityPath + "/1", ADMIN_HEADERS);
+    assertResponseStatus(response3, HttpResponseStatus.OK);
+    Assert.assertEquals("application/json", response3.getEntity().getContentType().getValue());
+    Reader reader3 = new InputStreamReader(response3.getEntity().getContent(), Charsets.UTF_8);
+    JsonObject result3 = new Gson().fromJson(reader3, JsonObject.class);
+    Assert.assertEquals(1, result3.get("version").getAsInt());
+
+    assertResponseStatus(doDeleteExternalAPI(entityPath, ADMIN_HEADERS), HttpResponseStatus.OK);
   }
 
   private void testRestAPIs(String entityType, JsonObject entity1, JsonObject entity2) throws Exception {

@@ -15,7 +15,7 @@
  */
 package co.cask.coopr.codec.json.current;
 
-import co.cask.coopr.spec.BaseEntity;
+import co.cask.coopr.spec.BaseVersionedEntity;
 import co.cask.coopr.spec.Provider;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.JsonDeserializationContext;
@@ -28,17 +28,18 @@ import java.util.Map;
 /**
  * Codec for serializing/deserializing a {@link Provider}.
  */
-public class ProviderCodec extends AbstractBaseEntityCodec<Provider> {
+public class ProviderCodec extends AbstractBaseVersionedEntityCodec<Provider> {
   private static final Type PROVISIONER_FIELDS_TYPE = new TypeToken<Map<String, Object>>() { }.getType();
 
   @Override
   protected void addChildFields(Provider provider, JsonObject jsonObj, JsonSerializationContext context) {
+    super.addChildFields(provider, jsonObj, context);
     jsonObj.add("providertype", context.serialize(provider.getProviderType()));
     jsonObj.add("provisioner", context.serialize(provider.getProvisionerFields()));
   }
 
   @Override
-  protected BaseEntity.Builder<Provider> getBuilder(JsonObject jsonObj, JsonDeserializationContext context) {
+  protected BaseVersionedEntity.Builder<Provider> builder(JsonObject jsonObj, JsonDeserializationContext context) {
     return Provider.builder()
       .setProviderType(context.<String>deserialize(jsonObj.get("providertype"), String.class))
       .setProvisionerFields(context.<Map<String, Object>>deserialize(

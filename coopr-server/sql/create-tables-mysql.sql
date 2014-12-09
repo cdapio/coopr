@@ -84,37 +84,42 @@ CREATE TABLE IF NOT EXISTS automatorTypes (
 
 CREATE TABLE IF NOT EXISTS providers (
     name VARCHAR(255),
+    version BIGINT,
     tenant_id VARCHAR(64),
     provider MEDIUMBLOB,
-    PRIMARY KEY (tenant_id, name)
+    PRIMARY KEY (tenant_id, name, version)
 ) ENGINE = InnoDB;
 
 CREATE TABLE IF NOT EXISTS hardwareTypes (
     name VARCHAR(255),
+    version BIGINT,
     tenant_id VARCHAR(64),
     hardwareType MEDIUMBLOB,
-    PRIMARY KEY (tenant_id, name)
+    PRIMARY KEY (tenant_id, name, version)
 ) ENGINE = InnoDB;
 
 CREATE TABLE IF NOT EXISTS imageTypes (
     name VARCHAR(255),
+    version BIGINT,
     tenant_id VARCHAR(64),
     imageType MEDIUMBLOB,
-    PRIMARY KEY (tenant_id, name)
+    PRIMARY KEY (tenant_id, name, version)
 ) ENGINE = InnoDB;
 
 CREATE TABLE IF NOT EXISTS services (
     name VARCHAR(255),
+    version BIGINT,
     tenant_id VARCHAR(64),
     service MEDIUMBLOB,
-    PRIMARY KEY (tenant_id, name)
+    PRIMARY KEY (tenant_id, name, version)
 ) ENGINE = InnoDB;
 
 CREATE TABLE IF NOT EXISTS clusterTemplates (
     name VARCHAR(255),
+    version BIGINT,
     tenant_id VARCHAR(64),
     clusterTemplate MEDIUMBLOB,
-    PRIMARY KEY (tenant_id, name)
+    PRIMARY KEY (tenant_id, name, version)
 ) ENGINE = InnoDB;
 
 CREATE TABLE IF NOT EXISTS tenants (

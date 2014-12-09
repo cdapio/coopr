@@ -44,6 +44,17 @@ public interface EntityStoreView {
   Provider getProvider(String providerName) throws IOException;
 
   /**
+   * Get the {@link co.cask.coopr.spec.Provider} associated with the given unique name and version
+   * or null if no such provider exists.
+   *
+   * @param providerName Unique name of the provider to get.
+   * @param version Version of the provider to get.
+   * @return Provider matching the given name and version or null if no such provider exists.
+   * @throws Exception
+   */
+  Provider getProvider(String providerName, int version) throws IOException;
+
+  /**
    * Get all {@link co.cask.coopr.spec.Provider}s.
    *
    * @return Collection of all providers.
@@ -69,14 +80,34 @@ public interface EntityStoreView {
   void deleteProvider(String providerName) throws IOException, IllegalAccessException;
 
   /**
-   * Get the {@link co.cask.coopr.spec.HardwareType} associated with the
-   * given unique name or null if no such provider exists.
+   * Delete the {@link co.cask.coopr.spec.Provider} associated with the given unique name and version.
    *
-   * @param hardwareTypeName Unique name of the provider to get.
-   * @return Hardware type matching the given name or null if no such provider exists.
+   * @param providerName Name of the provider to delete.
+   * @param version Version of the provider to delete.
+   * @throws Exception
+   */
+  void deleteProvider(String providerName, int version) throws IOException, IllegalAccessException;
+
+  /**
+   * Get the {@link co.cask.coopr.spec.HardwareType} associated with the
+   * given unique name or null if no such hardware type exists.
+   *
+   * @param hardwareTypeName Unique name of the hardware type to get.
+   * @return Hardware type matching the given name or null if no such hardware type exists.
    * @throws Exception
    */
   HardwareType getHardwareType(String hardwareTypeName) throws IOException;
+
+  /**
+   * Get the {@link co.cask.coopr.spec.HardwareType} associated with the
+   * given unique name and version or null if no such hardware type exists.
+   *
+   * @param hardwareTypeName Unique name of the hardware type to get.
+   * @param version Version of the hardware type to get.
+   * @return Hardware type matching the given name and version or null if no such hardware type exists.
+   * @throws Exception
+   */
+  HardwareType getHardwareType(String hardwareTypeName, int version) throws IOException;
 
   /**
    * Get all {@link co.cask.coopr.spec.HardwareType}s.
@@ -104,14 +135,34 @@ public interface EntityStoreView {
   void deleteHardwareType(String hardwareTypeName) throws IOException, IllegalAccessException;
 
   /**
-   * Get the {@link co.cask.coopr.spec.ImageType} associated with the
-   * given unique name or null if no such provider exists.
+   * Delete the {@link co.cask.coopr.spec.HardwareType} associated with the given unique name and version.
    *
-   * @param imageTypeName Unique name of the provider to get.
-   * @return Image type matching the given name or null if no such provider exists.
+   * @param hardwareTypeName Name of the hardware type to delete.
+   * @param version Version of the hardware type to delete.
+   * @throws Exception
+   */
+  void deleteHardwareType(String hardwareTypeName, int version) throws IOException, IllegalAccessException;
+
+  /**
+   * Get the {@link co.cask.coopr.spec.ImageType} associated with the
+   * given unique name or null if no such image type exists.
+   *
+   * @param imageTypeName Unique name of the image type to get.
+   * @return Image type matching the given name or null if no such image type exists.
    * @throws Exception
    */
   ImageType getImageType(String imageTypeName) throws IOException;
+
+  /**
+   * Get the {@link co.cask.coopr.spec.ImageType} associated with the
+   * given unique name or null if no such image type exists.
+   *
+   * @param imageTypeName Unique name of the image type to get.
+   * @param version Version of the image type to get.
+   * @return Image type matching the given name and version or null if no such image type exists.
+   * @throws Exception
+   */
+  ImageType getImageType(String imageTypeName, int version) throws IOException;
 
   /**
    * Get all {@link co.cask.coopr.spec.ImageType}s.
@@ -139,14 +190,34 @@ public interface EntityStoreView {
   void deleteImageType(String imageTypeName) throws IOException, IllegalAccessException;
 
   /**
-   * Get the {@link co.cask.coopr.spec.service.Service} associated with the given
-   * unique name or null if no such provider exists.
+   * Delete the {@link co.cask.coopr.spec.ImageType} associated with the given unique name and version.
    *
-   * @param serviceName Unique name of the provider to get.
-   * @return Service matching the given name or null if no such provider exists.
+   * @param imageTypeName Name of the image type to delete.
+   * @param version Version of the image type to delete.
+   * @throws Exception
+   */
+  void deleteImageType(String imageTypeName, int version) throws IOException, IllegalAccessException;
+
+  /**
+   * Get the {@link co.cask.coopr.spec.service.Service} associated with the given
+   * unique name or null if no such service exists.
+   *
+   * @param serviceName Unique name of the service to get.
+   * @return Service matching the given name or null if no such service exists.
    * @throws Exception
    */
   Service getService(String serviceName) throws IOException;
+
+  /**
+   * Get the {@link co.cask.coopr.spec.service.Service} associated with the given
+   * unique name and version or null if no such service exists.
+   *
+   * @param serviceName Unique name of the service to get.
+   * @param version Version of the service to get.
+   * @return Service matching the given name and version or null if no such service exists.
+   * @throws Exception
+   */
+  Service getService(String serviceName, int version) throws IOException;
 
   /**
    * Get all {@link co.cask.coopr.spec.service.Service}s.
@@ -174,14 +245,34 @@ public interface EntityStoreView {
   void deleteService(String serviceName) throws IOException, IllegalAccessException;
 
   /**
-   * Get the {@link co.cask.coopr.spec.template.ClusterTemplate} associated with the given unique name
-   * or null if no such provider exists.
+   * Delete the {@link co.cask.coopr.spec.service.Service} associated with the given unique name and version.
    *
-   * @param clusterTemplateName Unique name of the provider to get.
-   * @return Cluster template matching the given name or null if no such provider exists.
+   * @param serviceName Name of the service to delete.
+   * @param version Version of the service to delete.
+   * @throws Exception
+   */
+  void deleteService(String serviceName, int version) throws IOException, IllegalAccessException;
+
+  /**
+   * Get the {@link co.cask.coopr.spec.template.ClusterTemplate} associated with the given unique name
+   * or null if no such cluster template exists.
+   *
+   * @param clusterTemplateName Unique name of the cluster template to get.
+   * @return Cluster template matching the given name or null if no such cluster template exists.
    * @throws Exception
    */
   ClusterTemplate getClusterTemplate(String clusterTemplateName) throws IOException;
+
+  /**
+   * Get the {@link co.cask.coopr.spec.template.ClusterTemplate} associated with the given unique name and version
+   * or null if no such cluster template exists.
+   *
+   * @param clusterTemplateName Unique name of the cluster template to get.
+   * @param version Version of the cluster template to get.
+   * @return Cluster template matching the given name or null if no such cluster template exists.
+   * @throws Exception
+   */
+  ClusterTemplate getClusterTemplate(String clusterTemplateName, int version) throws IOException;
 
   /**
    * Get all {@link co.cask.coopr.spec.template.ClusterTemplate}s.
@@ -207,6 +298,15 @@ public interface EntityStoreView {
    * @throws Exception
    */
   void deleteClusterTemplate(String clusterTemplateName) throws IOException, IllegalAccessException;
+
+  /**
+   * Delete the {@link co.cask.coopr.spec.template.ClusterTemplate} associated with the given unique name and version.
+   *
+   * @param clusterTemplateName Name of the cluster template to delete.
+   * @param version Version of the cluster template to delete.
+   * @throws Exception
+   */
+  void deleteClusterTemplate(String clusterTemplateName, int version) throws IOException, IllegalAccessException;
 
   /**
    * Get the {@link co.cask.coopr.spec.plugin.ProviderType} associated with the given unique name

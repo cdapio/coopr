@@ -15,7 +15,7 @@
  */
 package co.cask.coopr.codec.json.current;
 
-import co.cask.coopr.spec.BaseEntity;
+import co.cask.coopr.spec.BaseVersionedEntity;
 import co.cask.coopr.spec.ImageType;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.JsonDeserializationContext;
@@ -28,16 +28,17 @@ import java.util.Map;
 /**
  * Codec for serializing/deserializing a {@link ImageType}.
  */
-public class ImageTypeCodec extends AbstractBaseEntityCodec<ImageType> {
+public class ImageTypeCodec extends AbstractBaseVersionedEntityCodec<ImageType> {
   private static final Type PROVIDERMAP_TYPE = new TypeToken<Map<String, Map<String, String>>>() { }.getType();
 
   @Override
   protected void addChildFields(ImageType imageType, JsonObject jsonObj, JsonSerializationContext context) {
+    super.addChildFields(imageType, jsonObj, context);
     jsonObj.add("providermap", context.serialize(imageType.getProviderMap()));
   }
 
   @Override
-  protected BaseEntity.Builder<ImageType> getBuilder(JsonObject jsonObj, JsonDeserializationContext context) {
+  protected BaseVersionedEntity.Builder<ImageType> builder(JsonObject jsonObj, JsonDeserializationContext context) {
     return ImageType.builder()
       .setProviderMap(context.<Map<String, Map<String, String>>>deserialize(
         jsonObj.get("providermap"), PROVIDERMAP_TYPE));

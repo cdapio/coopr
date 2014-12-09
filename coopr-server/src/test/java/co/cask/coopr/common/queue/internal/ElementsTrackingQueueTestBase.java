@@ -168,7 +168,7 @@ public abstract class ElementsTrackingQueueTestBase {
     Assert.assertNull(queue.take("worker6"));
   }
 
-  @Test(timeout = 40000)
+  @Test(timeout = 90000)
   public void testConcurrentAccess() throws Exception {
     final ElementsTrackingQueue queue = getQueue();
 
