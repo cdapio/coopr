@@ -17,6 +17,7 @@ package co.cask.coopr.spec.template;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 
 import java.util.Map;
 
@@ -33,7 +34,7 @@ public final class Constraints {
   public Constraints(Map<String, ServiceConstraint> serviceConstraints, LayoutConstraint layoutConstraint,
                      SizeConstraint sizeConstraint) {
     this.serviceConstraints = serviceConstraints == null ?
-      ImmutableMap.<String, ServiceConstraint>of() : serviceConstraints;
+      Maps.<String, ServiceConstraint>newHashMap() : serviceConstraints;
     this.layoutConstraint = layoutConstraint == null ? LayoutConstraint.EMPTY_LAYOUT_CONSTRAINT : layoutConstraint;
     this.sizeConstraint = sizeConstraint == null ? SizeConstraint.EMPTY : sizeConstraint;
   }

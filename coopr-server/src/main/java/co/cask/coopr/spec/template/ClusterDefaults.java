@@ -22,18 +22,20 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.JsonObject;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
  * Default values for a cluster.  Everything in here can be overwritten by a user.
  */
 public class ClusterDefaults {
-  private final Set<String> services;
-  private final String provider;
-  private final String hardwaretype;
-  private final String imagetype;
-  private final String dnsSuffix;
-  private final JsonObject config;
+  private Set<String> services;
+  private String provider;
+  private String hardwaretype;
+  private String imagetype;
+  private String dnsSuffix;
+  private JsonObject config;
 
   private ClusterDefaults(Set<String> services, String provider, String hardwaretype,
                           String imagetype, String dnsSuffix, JsonObject config) {
@@ -109,6 +111,38 @@ public class ClusterDefaults {
   }
 
   /**
+   * Set the provider for the cluster.
+   *
+   */
+  public void setProvider(String provider) {
+    this.provider = provider;
+  }
+
+  /**
+   * Set the hardware type for the cluster.
+   *
+   */
+  public void setHardwaretype(String hardwaretype) {
+    this.hardwaretype = hardwaretype;
+  }
+
+  /**
+   * Set the image type for the cluster.
+   *
+   */
+  public void setImagetype(String imagetype) {
+    this.imagetype = imagetype;
+  }
+
+  /**
+   * Set the dns suffix for the cluster.
+   *
+   */
+  public void setDnsSuffix(String dnsSuffix) {
+    this.dnsSuffix = dnsSuffix;
+  }
+
+  /**
    * Get a builder for creating cluster defaults.
    *
    * @return Builder for creating cluster defaults.
@@ -129,12 +163,12 @@ public class ClusterDefaults {
     private JsonObject config = new JsonObject();
 
     public Builder setServices(Set<String> services) {
-      this.services = ImmutableSet.copyOf(services);
+      this.services = services;
       return this;
     }
 
     public Builder setServices(String... services) {
-      this.services = ImmutableSet.copyOf(services);
+      this.services = new HashSet<String>(Arrays.asList(services));
       return this;
     }
 

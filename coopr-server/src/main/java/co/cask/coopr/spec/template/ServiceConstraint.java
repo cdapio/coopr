@@ -26,10 +26,10 @@ import java.util.Set;
  * reference to the total size of the cluster.
  */
 public final class ServiceConstraint {
-  private final Set<String> requiredHardwareTypes;
-  private final Set<String> requiredImageTypes;
-  private final Integer minCount;
-  private final Integer maxCount;
+  private Set<String> requiredHardwareTypes;
+  private Set<String> requiredImageTypes;
+  private Integer minCount;
+  private Integer maxCount;
 
   public ServiceConstraint(Set<String> requiredHardwareTypes, Set<String> requiredImageTypes,
                            Integer minCount, Integer maxCount) {

@@ -1,14 +1,14 @@
 {
     "name": "LDAPInternal",
     "description": "Configure Example, Inc. LDAP services",
-    "immutable": "true",
+    "immutable": "false",
     "defaults": {
         "services": [
             "ldap­internal"
         ],
         "config": {
             "ldap": {
-                "endpoint": "ldap.example.com"
+                "endpoint": "ldap.wrong.com"
             }
         }
     },

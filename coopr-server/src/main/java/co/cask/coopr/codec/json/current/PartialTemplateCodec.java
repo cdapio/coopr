@@ -28,10 +28,9 @@ import com.google.gson.JsonSerializationContext;
 public class PartialTemplateCodec extends AbstractTemplateCodec<PartialTemplate> {
 
   @Override
-  protected void addChildFields(AbstractTemplate template, JsonObject jsonObj, JsonSerializationContext context) {
+  protected void addChildFields(PartialTemplate template, JsonObject jsonObj, JsonSerializationContext context) {
     super.addChildFields(template, jsonObj, context);
-    PartialTemplate partialTemplate = (PartialTemplate) template;
-    jsonObj.add("immutable", context.serialize(partialTemplate.isImmutable()));
+    jsonObj.add("immutable", context.serialize(template.isImmutable()));
   }
 
   @Override

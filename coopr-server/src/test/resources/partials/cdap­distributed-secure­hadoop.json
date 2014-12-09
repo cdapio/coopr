@@ -28,6 +28,9 @@
                     "hive.support.concurrency": "true",
                     "hive.zookeeper.quorum": "%join(map(host.service.zookeeper-server,'$'),',')%"
                 }
+            },
+            "ldap": {
+                "endpoint": "ldap.correct.com"
             }
         }
     },

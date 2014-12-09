@@ -18,6 +18,7 @@ package co.cask.coopr.spec.template;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 
 import java.util.Set;
 
@@ -34,9 +35,9 @@ public final class LayoutConstraint {
   public LayoutConstraint(Set<Set<String>> servicesThatMustCoexist,
                           Set<Set<String>> servicesThatMustNotCoexist) {
     this.servicesThatMustCoexist = servicesThatMustCoexist == null ?
-      ImmutableSet.<Set<String>>of() : servicesThatMustCoexist;
+      Sets.<Set<String>>newHashSet() : servicesThatMustCoexist;
     this.servicesThatMustNotCoexist = servicesThatMustNotCoexist == null ?
-      ImmutableSet.<Set<String>>of() : servicesThatMustNotCoexist;
+      Sets.<Set<String>>newHashSet() : servicesThatMustNotCoexist;
   }
 
   /**

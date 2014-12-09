@@ -29,12 +29,12 @@ import java.util.Set;
  */
 public final class ClusterTemplate extends AbstractTemplate {
 
-  private final Parent parent;
-  private final Set<Include> includes;
+  private final ClusterTemplate parent;
+  private final Set<PartialTemplate> includes;
 
   protected ClusterTemplate(BaseEntity.Builder baseBuilder, ClusterDefaults clusterDefaults,
                             Compatibilities compatibilities, Constraints constraints, Administration administration,
-                            Set<Link> links, Parent parent, Set<Include> includes) {
+                            Set<Link> links, ClusterTemplate parent, Set<PartialTemplate> includes) {
     super(baseBuilder, clusterDefaults, compatibilities, constraints, administration, links);
 
     this.parent = parent;
@@ -46,7 +46,7 @@ public final class ClusterTemplate extends AbstractTemplate {
    *
    * @return parent name for the template.
    */
-  public Parent getParent() {
+  public ClusterTemplate getParent() {
     return parent;
   }
 
@@ -55,7 +55,7 @@ public final class ClusterTemplate extends AbstractTemplate {
    *
    * @return included partial template names.
    */
-  public Set<Include> getIncludes() {
+  public Set<PartialTemplate> getIncludes() {
     return includes;
   }
 
@@ -73,8 +73,8 @@ public final class ClusterTemplate extends AbstractTemplate {
    */
   public static class ClusterTemplateBuilder extends AbstractTemplate.Builder<ClusterTemplate, ClusterTemplateBuilder> {
 
-    private Parent parent;
-    private Set<Include> includes;
+    private ClusterTemplate parent;
+    private Set<PartialTemplate> includes;
 
     @Override
     public ClusterTemplate build() {
@@ -87,12 +87,12 @@ public final class ClusterTemplate extends AbstractTemplate {
       return this;
     }
 
-    public ClusterTemplateBuilder setParent(Parent parent) {
+    public ClusterTemplateBuilder setParent(ClusterTemplate parent) {
       this.parent = parent;
       return this;
     }
 
-    public ClusterTemplateBuilder setIncludes(Set<Include> includes) {
+    public ClusterTemplateBuilder setIncludes(Set<PartialTemplate> includes) {
       this.includes = includes;
       return this;
     }

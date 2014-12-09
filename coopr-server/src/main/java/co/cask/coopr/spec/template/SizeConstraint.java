@@ -23,8 +23,8 @@ import com.google.common.base.Objects;
  */
 public class SizeConstraint {
   public static final SizeConstraint EMPTY = new SizeConstraint(1, Integer.MAX_VALUE);
-  private final int min;
-  private final int max;
+  private int min;
+  private int max;
 
   public SizeConstraint(Integer min, Integer max) {
     this.min = min == null ? 1 : min;
@@ -65,6 +65,22 @@ public class SizeConstraint {
    */
   public int getMax() {
     return max;
+  }
+
+  /**
+   * Set the minimum size allowed.
+   *
+   */
+  public void setMin(int min) {
+    this.min = min;
+  }
+
+  /**
+   * Set the maximum size allowed.
+   *
+   */
+  public void setMax(int max) {
+    this.max = max;
   }
 
   @Override

@@ -35,7 +35,8 @@ public abstract class AbstractTemplate extends BaseEntity {
                           Compatibilities compatibilities, Constraints constraints, Administration administration,
                           Set<Link> links) {
     super(baseBuilder);
-    Preconditions.checkArgument(clusterDefaults != null, "cluster defaults must be specified");
+    //todo:move to template compile phase
+    //Preconditions.checkArgument(clusterDefaults != null, "cluster defaults must be specified");
     this.clusterDefaults = clusterDefaults;
     this.constraints = constraints;
     this.compatibilities = compatibilities;

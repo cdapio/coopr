@@ -23,7 +23,7 @@ import com.google.common.base.Objects;
 public class Administration {
   public static final Administration EMPTY_ADMINISTRATION = new Administration(LeaseDuration.FOREVER_LEASE_DURATION);
 
-  private final LeaseDuration leaseDuration;
+  private LeaseDuration leaseDuration;
 
   public Administration(LeaseDuration leaseDuration) {
     this.leaseDuration = leaseDuration;
