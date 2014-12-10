@@ -670,7 +670,7 @@ public class AdminHandler extends AbstractAuthHandler {
       responder.sendStatus(HttpResponseStatus.OK);
     } catch (IOException e) {
       responder.sendString(HttpResponseStatus.INTERNAL_SERVER_ERROR,
-                           "Exception deleting cluster template " + partialtemplateId);
+                           "Exception deleting partial template " + partialtemplateId);
     } catch (IllegalAccessException e) {
       responder.sendString(HttpResponseStatus.FORBIDDEN, "user unauthorized to delete partial template.");
     }
