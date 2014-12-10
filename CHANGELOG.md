@@ -119,7 +119,7 @@ Unreleased
 - Coopr rest client - Created interfaces for Coopr Rest Client API ( Issues: #635 )
 - Coopr rest client - Gix plugin rest tests fail flapping ( Issues: #726 )
 - Coopr rest client - add unit tests for negative cases, refactor AdminRestClient  ( Issues: #674 )
-- Coopr rest client - start implementing client interfaces (COOPR-501, COOPR-510) ( Issues: #648 )
+- Coopr rest client - COOPR-501, COOPR-510 start implementing client interfaces ( Issues: #648 )
 - Coopr server - 204 must not contain any body ( Issues: #658 )
 - Coopr server - Add builders for cluster template classes ( Issues: #631 )
 - Coopr server - Add builders for service related classes to make it easier to add fields in the future  ( Issues: #636 )
