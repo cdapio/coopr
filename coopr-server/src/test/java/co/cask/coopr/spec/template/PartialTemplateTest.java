@@ -2,38 +2,19 @@ package co.cask.coopr.spec.template;
 
 import co.cask.coopr.BaseTest;
 import co.cask.coopr.account.Account;
+import co.cask.coopr.cluster.ClusterService;
 import co.cask.coopr.common.conf.Constants;
 import co.cask.coopr.provisioner.Provisioner;
 import co.cask.coopr.provisioner.TenantProvisionerService;
 import co.cask.coopr.spec.Tenant;
 import co.cask.coopr.spec.TenantSpecification;
 import co.cask.coopr.store.entity.EntityStoreView;
-import com.google.common.collect.Sets;
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.beanutils.BeanUtilsBean;
-import org.apache.commons.beanutils.PropertyUtils;
-import org.apache.commons.beanutils.PropertyUtilsBean;
-import org.apache.commons.beanutils.expression.Resolver;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.SerializationUtils;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.beans.BeanInfo;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
-import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  *
@@ -47,8 +28,8 @@ public class PartialTemplateTest extends BaseTest {
   private static PartialTemplate ldapPartial;
 
   private static EntityStoreView entityStoreView;
-
-  private Set<String> immutables = Sets.newHashSet();
+  private static ClusterService  clusterService;
+  private static Account account;
 
   @Override
   protected boolean shouldClearDataBetweenTests() {
@@ -57,13 +38,14 @@ public class PartialTemplateTest extends BaseTest {
 
   @BeforeClass
   public static void setupClusterServiceTests() throws Exception {
-    gson = injector.getInstance(Gson.class);
+    clusterService = injector.getInstance(ClusterService.class);
     TenantProvisionerService tenantProvisionerService = injector.getInstance(TenantProvisionerService.class);
     // setup data
     tenantProvisionerService.writeProvisioner(new Provisioner("p1", "host", 50056, 100, null, null));
     tenantProvisionerService.writeTenantSpecification(new TenantSpecification("tenantX", 10, 1, 10));
     Tenant tenant = tenantStore.getTenantByName("tenantX");
-    entityStoreView = entityStoreService.getView(new Account(Constants.ADMIN_USER, tenant.getId()));
+    account = new Account(Constants.ADMIN_USER, tenant.getId());
+    entityStoreView = entityStoreService.getView(account);
   }
 
   @Test
@@ -98,7 +80,6 @@ public class PartialTemplateTest extends BaseTest {
   }
 
   public void persist() throws Exception {
-
     int beforePartialsCount = entityStoreView.getAllPartialTemplates().size();
     int beforeClusterTemplatesCount = entityStoreView.getAllClusterTemplates().size();
 
@@ -166,114 +147,7 @@ public class PartialTemplateTest extends BaseTest {
   }
 
   public void resolveTemplateTest() throws Exception {
-    immutables.clear();
-    resolveParentTemplate(secureTemplate);
+    ClusterTemplate clusterTemplate = clusterService.resolveTemplate(account, secureTemplate);
     secureTemplate.getParent();
-  }
-
-  private ClusterTemplate resolveParentTemplate(ClusterTemplate clusterTemplate) throws Exception {
-    ClusterTemplate dummyParent = clusterTemplate.getParent();
-    if (dummyParent != null) {
-      ClusterTemplate persistedParent = entityStoreView.getClusterTemplate(dummyParent.getName());
-      if (persistedParent == null) {
-        throw new Exception(dummyParent.getName() + " parent template not found.");
-      }
-      resolveParentTemplate(persistedParent);
-
-      //merge all from parent to child
-      copyFullProps(clusterTemplate, persistedParent);
-    }
-
-    resolvePartialIncludes(clusterTemplate);
-    //check overrides in child template
-    checkImmutability(clusterTemplate.getClusterDefaults().getConfig(), false);
-
-    return clusterTemplate;
-  }
-
-
-  private ClusterTemplate resolvePartialIncludes(ClusterTemplate clusterTemplate) throws Exception {
-    Set<PartialTemplate> partialTemplates = clusterTemplate.getIncludes();
-    if (partialTemplates != null) {
-      for (PartialTemplate dummyPartial : partialTemplates) {
-        PartialTemplate persistedPartial = entityStoreView.getPartialTemplate(dummyPartial.getName());
-        if (persistedPartial == null) {
-          throw new Exception(dummyPartial.getName() + " partial not found.");
-        }
-        copyMainProps(clusterTemplate, persistedPartial);
-
-        if (persistedPartial.isImmutable()) {
-          JsonObject config = persistedPartial.getClusterDefaults().getConfig();
-          //check overrides in partial template
-          checkImmutability(config, true);
-          for (Map.Entry<String, JsonElement> configItem : config.entrySet()) {
-            immutables.add(configItem.getKey());
-          }
-        }
-      }
-    }
-    return clusterTemplate;
-  }
-
-  //for partial includes
-  private void copyMainProps(AbstractTemplate dest, AbstractTemplate from) throws Exception {
-    //merge defaults
-    JsonObject defaultsConfig = from.getClusterDefaults().getConfig();
-    mergeSet(dest.getClusterDefaults().getServices(), from.getClusterDefaults().getServices());
-
-    //merge defaults config
-    for (Map.Entry<String, JsonElement> configItem : defaultsConfig.entrySet()) {
-      dest.getClusterDefaults().getConfig().add(configItem.getKey(), configItem.getValue());
-    }
-    //merge compatibilities services
-    mergeSet(dest.getCompatibilities().getServices(), from.getCompatibilities().getServices());
-  }
-
-  private void checkImmutability(JsonObject config, boolean isPartial) throws Exception {
-      for (String immutable : immutables) {
-        if (config.has(immutable)) {
-          throw new Exception(immutable + " can't be overridden due immutability.");
-        }
-      }
-  }
-
-  //for parent extension
-  private void copyFullProps(AbstractTemplate dest, AbstractTemplate from) throws Exception {
-    copyMainProps(dest, from);
-
-    //merge defaults options
-    BeanUtils.copyProperties(dest.getClusterDefaults(), from.getClusterDefaults());
-
-    //merge compatibilities services
-    mergeSet(dest.getCompatibilities().getServices(), from.getCompatibilities().getServices());
-    BeanUtils.copyProperties(dest.getCompatibilities(), from.getCompatibilities());
-
-    //merge constraints
-    mergeMap(dest.getConstraints().getServiceConstraints(), from.getConstraints().getServiceConstraints());
-    mergeSet(dest.getConstraints().getLayoutConstraint().getServicesThatMustCoexist(),
-             from.getConstraints().getLayoutConstraint().getServicesThatMustCoexist());
-    mergeSet(dest.getConstraints().getLayoutConstraint().getServicesThatMustNotCoexist(),
-             from.getConstraints().getLayoutConstraint().getServicesThatMustNotCoexist());
-    BeanUtils.copyProperties(dest.getConstraints().getSizeConstraint(), from.getConstraints().getSizeConstraint());
-
-    //merge compatibilities
-    mergeSet(dest.getCompatibilities().getHardwaretypes(), from.getCompatibilities().getHardwaretypes());
-    mergeSet(dest.getCompatibilities().getImagetypes(), from.getCompatibilities().getImagetypes());
-//    dest.getCompatibilities().getServices().addAll(from.getCompatibilities().getServices());
-    BeanUtils.copyProperties(dest.getAdministration().getLeaseDuration(), from.getAdministration().getLeaseDuration());
-  }
-
-  @SuppressWarnings("unchecked")
-  private void mergeSet(Set dest, Set from) {
-    if (dest != null && from != null) {
-      dest.addAll(from);
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  private void mergeMap(Map dest, Map from) {
-    if (dest != null && from != null) {
-      dest.putAll(from);
-    }
   }
 }

@@ -20,7 +20,6 @@ import co.cask.coopr.spec.template.AbstractTemplate;
 import co.cask.coopr.spec.template.ClusterTemplate;
 import co.cask.coopr.spec.template.Include;
 import co.cask.coopr.spec.template.Parent;
-import co.cask.coopr.spec.template.PartialTemplate;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
@@ -33,7 +32,7 @@ import java.util.Set;
  */
 public class ClusterTemplateCodec extends AbstractTemplateCodec<ClusterTemplate> {
 
-  private static final Type INCLUDES_TYPE = new com.google.common.reflect.TypeToken<Set<PartialTemplate>>() { }.getType();
+  private static final Type INCLUDES_TYPE = new com.google.common.reflect.TypeToken<Set<Include>>() { }.getType();
 
   @Override
   protected void addChildFields(ClusterTemplate template, JsonObject jsonObj, JsonSerializationContext context) {
@@ -46,8 +45,8 @@ public class ClusterTemplateCodec extends AbstractTemplateCodec<ClusterTemplate>
   protected BaseEntity.Builder<ClusterTemplate> getBuilder(JsonObject jsonObj, JsonDeserializationContext context) {
     ClusterTemplate.Builder builder = (ClusterTemplate.Builder)
       super.getBuilder(jsonObj, context);
-    builder.setParent(context.<ClusterTemplate>deserialize(jsonObj.get("extends"), ClusterTemplate.class))
-      .setIncludes(context.<Set<PartialTemplate>>deserialize(jsonObj.get("includes"), INCLUDES_TYPE));
+    builder.setParent(context.<Parent>deserialize(jsonObj.get("extends"), Parent.class))
+      .setIncludes(context.<Set<Include>>deserialize(jsonObj.get("includes"), INCLUDES_TYPE));
     return builder;
   }
 

@@ -44,8 +44,13 @@ import co.cask.coopr.spec.plugin.FieldSchema;
 import co.cask.coopr.spec.plugin.ParameterType;
 import co.cask.coopr.spec.plugin.PluginFields;
 import co.cask.coopr.spec.plugin.ProviderType;
+import co.cask.coopr.spec.template.AbstractTemplate;
 import co.cask.coopr.spec.template.ClusterTemplate;
+import co.cask.coopr.spec.template.Include;
+import co.cask.coopr.spec.template.Parent;
+import co.cask.coopr.spec.template.PartialTemplate;
 import co.cask.coopr.spec.template.SizeConstraint;
+import co.cask.coopr.spec.template.TemplateException;
 import co.cask.coopr.store.cluster.ClusterStore;
 import co.cask.coopr.store.cluster.ClusterStoreService;
 import co.cask.coopr.store.cluster.ClusterStoreView;
@@ -731,5 +736,62 @@ public class ClusterService {
       throw new MissingClusterException("cluster " + clusterId + " does not exist");
     }
     return cluster;
+  }
+
+  public ClusterTemplate resolveTemplate(Account account, ClusterTemplate clusterTemplate) throws Exception {
+    EntityStoreView entityStore = entityStoreService.getView(account);
+    Set<AbstractTemplate> mergeSet = getMergeCollection(entityStore, clusterTemplate);
+    return ClusterTemplate.builder()
+      .merger().merge(mergeSet).setInitialTemplate(clusterTemplate)
+      .builder().build();
+  }
+
+  public ClusterTemplate resolveTemplate(Account account, String templateName) throws Exception {
+    EntityStoreView entityStore = entityStoreService.getView(account);
+    ClusterTemplate clusterTemplate = entityStore.getClusterTemplate(templateName);
+    if  (clusterTemplate == null) {
+      throw new TemplateException("Cluster template " + templateName + " does not exist");
+    }
+    return resolveTemplate(account, clusterTemplate);
+  }
+
+  /*
+  Merging in order Parent Includes -> Parent -> Child Includes -> Child -> ...
+  TODO: merging with mandatory partials and user-level attributes(???)
+   */
+  private Set<AbstractTemplate> getMergeCollection(EntityStoreView entityStore, ClusterTemplate clusterTemplate)
+    throws Exception {
+    Set<AbstractTemplate> forMerge;
+    Parent parent = clusterTemplate.getParent();
+    if (parent != null) {
+      ClusterTemplate parentTemplate = entityStore.getClusterTemplate(parent.getName());
+      if (parentTemplate == null) {
+        throw new Exception(parent.getName() + " parent template not found.");
+      }
+      forMerge = getMergeCollection(entityStore, parentTemplate);
+    }
+    else {
+      forMerge = Sets.newLinkedHashSet();
+    }
+    Set<AbstractTemplate> includes = resolvePartialIncludes(entityStore, clusterTemplate.getIncludes());
+    forMerge.addAll(includes);
+    forMerge.add(clusterTemplate);
+
+    return forMerge;
+  }
+
+  private Set<AbstractTemplate> resolvePartialIncludes(EntityStoreView entityStore, Set<Include> includes)
+    throws Exception {
+    Set<AbstractTemplate> partials = Sets.newLinkedHashSet();
+    if (includes != null) {
+      for (Include include : includes) {
+        PartialTemplate partialTemplate = entityStore.getPartialTemplate(include.getName());
+        if (partialTemplate == null) {
+          throw new Exception(include.getName() + " partial not found.");
+        }
+        partials.add(partialTemplate);
+      }
+    }
+    return partials;
   }
 }

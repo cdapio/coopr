@@ -5,7 +5,13 @@
         "services": [
             "zookeeper­server",
             "mysql­server",
-            "cdap"
+            "cdap",
+            {
+                "name" : "bob",
+                "config" : {
+                    "bob_address" : "somewhere"
+                }
+            }
         ],
         "provider": "google",
         "hardwaretype": "standard­large",

@@ -19,7 +19,6 @@ package co.cask.coopr.spec.template;
 import co.cask.coopr.spec.BaseEntity;
 import co.cask.coopr.spec.Link;
 import com.google.common.base.Objects;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 
 import java.util.Set;
@@ -36,8 +35,6 @@ public abstract class AbstractTemplate extends BaseEntity {
                           Compatibilities compatibilities, Constraints constraints, Administration administration,
                           Set<Link> links) {
     super(baseBuilder);
-    //todo:move to template compile phase
-    //Preconditions.checkArgument(clusterDefaults != null, "cluster defaults must be specified");
     this.clusterDefaults = clusterDefaults;
     this.constraints = constraints;
     this.compatibilities = compatibilities;
@@ -94,7 +91,7 @@ public abstract class AbstractTemplate extends BaseEntity {
    * Builder for creating templates.
    */
   public abstract static class Builder<T extends AbstractTemplate, V extends Builder<T, V>> extends BaseEntity.Builder<T> {
-    protected ClusterDefaults clusterDefaults;
+    protected ClusterDefaults clusterDefaults = ClusterDefaults.EMPTY_CLUSTER_DEFAULTS;
     protected Constraints constraints = Constraints.EMPTY_CONSTRAINTS;
     protected Compatibilities compatibilities = Compatibilities.EMPTY_COMPATIBILITIES;
     protected Administration administration = Administration.EMPTY_ADMINISTRATION;

@@ -21,7 +21,7 @@ import com.google.common.base.Objects;
 
 import java.util.Set;
 
-public class PartialTemplate extends AbstractTemplate {
+public final class PartialTemplate extends AbstractTemplate {
 
   private final boolean immutable;
 

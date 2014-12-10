@@ -17,11 +17,13 @@ package co.cask.coopr.codec.json.current;
 
 import co.cask.coopr.codec.json.AbstractCodec;
 import co.cask.coopr.spec.template.ClusterDefaults;
-import com.google.common.reflect.TypeToken;
+import com.google.common.collect.Sets;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 
 import java.lang.reflect.Type;
@@ -50,9 +52,20 @@ public class ClusterDefaultsCodec extends AbstractCodec<ClusterDefaults> {
   public ClusterDefaults deserialize(JsonElement json, Type type, JsonDeserializationContext context)
     throws JsonParseException {
     JsonObject jsonObj = json.getAsJsonObject();
+    JsonObject config = context.deserialize(jsonObj.get("config"), JsonObject.class);
+    Set<String> services = Sets.newHashSet();
 
-    Set<String> services = context.deserialize(jsonObj.get("services"),
-                                               new TypeToken<Set<String>>() { }.getType());
+    JsonArray rawServices = jsonObj.get("services").getAsJsonArray();
+    for (JsonElement service : rawServices) {
+      if(service instanceof JsonPrimitive){
+        services.add(service.getAsString());
+      } else if (service instanceof JsonObject){
+        String name = ((JsonObject) service).get("name").getAsString();
+        JsonElement internalServiceConfig = ((JsonObject) service).get("config");
+        services.add(name);
+        config.add(name, internalServiceConfig);
+      }
+    }
 
     return ClusterDefaults.builder()
       .setServices(services)
@@ -60,7 +73,7 @@ public class ClusterDefaultsCodec extends AbstractCodec<ClusterDefaults> {
       .setHardwaretype(context.<String>deserialize(jsonObj.get("hardwaretype"), String.class))
       .setImagetype(context.<String>deserialize(jsonObj.get("imagetype"), String.class))
       .setDNSSuffix(context.<String>deserialize(jsonObj.get("dnsSuffix"), String.class))
-      .setConfig(context.<JsonObject>deserialize(jsonObj.get("config"), JsonObject.class))
+      .setConfig(config)
       .build();
   }
 }

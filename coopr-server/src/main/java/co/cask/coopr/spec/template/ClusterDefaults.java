@@ -16,10 +16,8 @@
 
 package co.cask.coopr.spec.template;
 
-import co.cask.coopr.common.utils.StringUtils;
 import com.google.common.base.Objects;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 import com.google.gson.JsonObject;
 
 import java.util.Arrays;
@@ -30,6 +28,8 @@ import java.util.Set;
  * Default values for a cluster.  Everything in here can be overwritten by a user.
  */
 public class ClusterDefaults {
+  public static ClusterDefaults EMPTY_CLUSTER_DEFAULTS =
+    new ClusterDefaults(Sets.<String>newHashSet(), null, null, null, null, new JsonObject());
   private Set<String> services;
   private String provider;
   private String hardwaretype;
@@ -39,11 +39,6 @@ public class ClusterDefaults {
 
   private ClusterDefaults(Set<String> services, String provider, String hardwaretype,
                           String imagetype, String dnsSuffix, JsonObject config) {
-    Preconditions.checkArgument(services != null && !services.isEmpty(), "default services must be specified");
-    //todo: move it to the final phase
-//    Preconditions.checkArgument(provider != null, "default provider must be specified");
-    Preconditions.checkArgument(dnsSuffix == null || StringUtils.isValidDNSSuffix(dnsSuffix),
-                                dnsSuffix + " is an invalid DNS suffix.");
     this.services = services;
     this.provider = provider;
     this.hardwaretype = hardwaretype;

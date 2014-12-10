@@ -27,14 +27,8 @@ public class SizeConstraint {
   private int max;
 
   public SizeConstraint(Integer min, Integer max) {
-    this.min = min == null ? 1 : min;
-    if (this.min < 1) {
-      throw new IllegalArgumentException("Minimum must be at least 1.");
-    }
-    this.max = max == null ? Integer.MAX_VALUE : max;
-    if (this.max < this.min) {
-      throw new IllegalArgumentException("Maximum must greater than or equal to the minimum.");
-    }
+    this.setMin(min);
+    this.setMax(max);
   }
 
   /**
@@ -71,16 +65,22 @@ public class SizeConstraint {
    * Set the minimum size allowed.
    *
    */
-  public void setMin(int min) {
-    this.min = min;
+  public void setMin(Integer min) {
+    this.min = min == null ? 1 : min;
+    if (this.min < 1) {
+      throw new IllegalArgumentException("Minimum must be at least 1.");
+    }
   }
 
   /**
    * Set the maximum size allowed.
    *
    */
-  public void setMax(int max) {
-    this.max = max;
+  public void setMax(Integer max) {
+    this.max = max == null ? Integer.MAX_VALUE : max;
+    if (this.max < this.min) {
+      throw new IllegalArgumentException("Maximum must greater than or equal to the minimum.");
+    }
   }
 
   @Override
