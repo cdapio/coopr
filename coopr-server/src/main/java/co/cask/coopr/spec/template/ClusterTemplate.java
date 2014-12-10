@@ -18,6 +18,7 @@ package co.cask.coopr.spec.template;
 import co.cask.coopr.spec.BaseEntity;
 import co.cask.coopr.spec.Link;
 import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableSet;
 
 import java.util.Set;
 
@@ -64,17 +65,17 @@ public final class ClusterTemplate extends AbstractTemplate {
    *
    * @return Builder for creating cluster templates.
    */
-  public static ClusterTemplateBuilder builder() {
-    return new ClusterTemplateBuilder();
+  public static ClusterTemplate.Builder builder() {
+    return new Builder();
   }
 
   /**
    * Builder for creating cluster templates.
    */
-  public static class ClusterTemplateBuilder extends AbstractTemplate.Builder<ClusterTemplate, ClusterTemplateBuilder> {
+  public static class Builder extends AbstractTemplate.Builder<ClusterTemplate, Builder> {
 
     private ClusterTemplate parent;
-    private Set<PartialTemplate> includes;
+    private Set<PartialTemplate> includes = ImmutableSet.of();
 
     @Override
     public ClusterTemplate build() {
@@ -83,17 +84,17 @@ public final class ClusterTemplate extends AbstractTemplate {
     }
 
     @Override
-    protected ClusterTemplateBuilder getThis() {
+    protected ClusterTemplate.Builder getThis() {
       return this;
     }
 
-    public ClusterTemplateBuilder setParent(ClusterTemplate parent) {
+    public ClusterTemplate.Builder setParent(ClusterTemplate parent) {
       this.parent = parent;
       return this;
     }
 
-    public ClusterTemplateBuilder setIncludes(Set<PartialTemplate> includes) {
-      this.includes = includes;
+    public ClusterTemplate.Builder setIncludes(Set<PartialTemplate> includes) {
+      this.includes = includes == null ? ImmutableSet.<PartialTemplate>of() : ImmutableSet.copyOf(includes);
       return this;
     }
   }
@@ -105,10 +106,6 @@ public final class ClusterTemplate extends AbstractTemplate {
     }
     ClusterTemplate other = (ClusterTemplate) o;
     return super.equals(other) &&
-      Objects.equal(compatibilities, other.compatibilities) &&
-      Objects.equal(constraints, other.constraints) &&
-      Objects.equal(administration, other.administration) &&
-      Objects.equal(links, other.links) &&
       Objects.equal(includes, other.includes) &&
       Objects.equal(parent, other.parent);
   }

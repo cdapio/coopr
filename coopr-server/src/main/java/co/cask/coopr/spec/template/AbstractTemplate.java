@@ -18,6 +18,7 @@ package co.cask.coopr.spec.template;
 
 import co.cask.coopr.spec.BaseEntity;
 import co.cask.coopr.spec.Link;
+import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 
@@ -145,5 +146,18 @@ public abstract class AbstractTemplate extends BaseEntity {
     }
 
     public abstract T build();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (!(o instanceof AbstractTemplate)) {
+      return false;
+    }
+    AbstractTemplate other = (AbstractTemplate) o;
+    return super.equals(other) &&
+      Objects.equal(compatibilities, other.compatibilities) &&
+      Objects.equal(constraints, other.constraints) &&
+      Objects.equal(administration, other.administration) &&
+      Objects.equal(links, other.links);
   }
 }
