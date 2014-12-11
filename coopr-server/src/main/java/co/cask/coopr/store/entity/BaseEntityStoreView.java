@@ -98,27 +98,21 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
    * Types of entities.
    */
   protected enum EntityType {
-    PROVIDER("provider", true),
-    HARDWARE_TYPE("hardwareType", true),
-    IMAGE_TYPE("imageType", true),
-    SERVICE("service", true),
-    CLUSTER_TEMPLATE("clusterTemplate", true),
-    PROVIDER_TYPE("providerType", false),
-    AUTOMATOR_TYPE("automatorType", false);
+    PROVIDER("provider"),
+    HARDWARE_TYPE("hardwareType"),
+    IMAGE_TYPE("imageType"),
+    SERVICE("service"),
+    CLUSTER_TEMPLATE("clusterTemplate"),
+    PROVIDER_TYPE("providerType"),
+    AUTOMATOR_TYPE("automatorType");
     private final String id;
-    private final boolean versioned;
 
-    EntityType(String id, boolean versioned) {
+    EntityType(String id) {
       this.id = id;
-      this.versioned = versioned;
     }
 
     String getId() {
       return id;
-    }
-
-    boolean isVersioned() {
-      return versioned;
     }
   }
 
@@ -299,7 +293,12 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
 
   @Override
   public ProviderType getProviderType(String providerTypeName) throws IOException {
-    return get(EntityType.PROVIDER_TYPE, providerTypeName, providerTypeTransform);
+    return get(EntityType.PROVIDER_TYPE, providerTypeName, Constants.FIND_MAX_VERSION, providerTypeTransform);
+  }
+
+  @Override
+  public ProviderType getProviderType(String providerTypeName, int version) throws IOException {
+    return get(EntityType.PROVIDER_TYPE, providerTypeName, version, providerTypeTransform);
   }
 
   @Override
@@ -309,7 +308,11 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
 
   @Override
   public void writeProviderType(ProviderType providerType) throws IOException, IllegalAccessException {
-    writeEntity(EntityType.PROVIDER_TYPE, providerType.getName(), serialize(providerType, ProviderType.class));
+    int version = getVersion(EntityType.PROVIDER_TYPE, providerType.getName());
+    providerType.setVersion(version);
+    writeEntity(EntityType.PROVIDER_TYPE, providerType.getName(), version,
+                serialize(providerType, ProviderType.class));
+    providerType.setVersion(Constants.DEFAULT_VERSION);
   }
 
   @Override
@@ -318,8 +321,18 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
   }
 
   @Override
+  public void deleteProviderType(String providerTypeName, int version) throws IOException, IllegalAccessException {
+    deleteEntity(EntityType.PROVIDER_TYPE, providerTypeName, version);
+  }
+
+  @Override
   public AutomatorType getAutomatorType(String automatorTypeName) throws IOException {
-    return get(EntityType.AUTOMATOR_TYPE, automatorTypeName, automatorTypeTransform);
+    return get(EntityType.AUTOMATOR_TYPE, automatorTypeName, Constants.FIND_MAX_VERSION, automatorTypeTransform);
+  }
+
+  @Override
+  public AutomatorType getAutomatorType(String automatorTypeName, int version) throws IOException {
+    return get(EntityType.AUTOMATOR_TYPE, automatorTypeName, version, automatorTypeTransform);
   }
 
   @Override
@@ -329,8 +342,11 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
 
   @Override
   public void writeAutomatorType(AutomatorType automatorType) throws IOException, IllegalAccessException {
-    writeEntity(EntityType.AUTOMATOR_TYPE, automatorType.getName(),
+    int version = getVersion(EntityType.AUTOMATOR_TYPE, automatorType.getName());
+    automatorType.setVersion(version);
+    writeEntity(EntityType.AUTOMATOR_TYPE, automatorType.getName(), version,
                 serialize(automatorType, AutomatorType.class));
+    automatorType.setVersion(Constants.DEFAULT_VERSION);
   }
 
   @Override
@@ -338,9 +354,9 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
     deleteEntity(EntityType.AUTOMATOR_TYPE, automatorTypeName);
   }
 
-  private <T> T get(EntityType entityType, String entityName, Function<byte[], T> transform) throws IOException {
-    byte[] data = getEntity(entityType, entityName);
-    return (data == null) ? null : transform.apply(data);
+  @Override
+  public void deleteAutomatorType(String automatorTypeName, int version) throws IOException, IllegalAccessException {
+    deleteEntity(EntityType.AUTOMATOR_TYPE, automatorTypeName, version);
   }
 
   private <T> T get(EntityType entityType, String entityName, int entityVersion,
@@ -370,30 +386,11 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
    *
    * @param entityType Type of entity.
    * @param entityName Unique name of entity.
-   * @param data Representation of the entity as bytes.
-   */
-  protected abstract void writeEntity(EntityType entityType, String entityName, byte[] data)
-    throws IOException, IllegalAccessException;
-
-  /**
-   * Write the specified entity to some persistent store.
-   *
-   * @param entityType Type of entity.
-   * @param entityName Unique name of entity.
    * @param version Version of entity.
    * @param data Representation of the entity as bytes.
    */
   protected abstract void writeEntity(EntityType entityType, String entityName, int version, byte[] data)
     throws IOException, IllegalAccessException;
-
-  /**
-   * Get the specified entity from some persistent store.
-   *
-   * @param entityType Type of entity.
-   * @param entityName Unique name of entity.
-   * @return Entity of given type and name as bytes.
-   */
-  protected abstract byte[] getEntity(EntityType entityType, String entityName) throws IOException;
 
   /**
    * Get the specified entity from some persistent store.

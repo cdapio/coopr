@@ -161,7 +161,7 @@ public class AdminHandler extends AbstractAuthHandler {
     }
 
     int version = getVersionFromString(responder, versionStr);
-    if (version <= 0) {
+    if (!validateVersion(version)) {
       return;
     }
 
@@ -218,7 +218,7 @@ public class AdminHandler extends AbstractAuthHandler {
     }
 
     int version = getVersionFromString(responder, versionStr);
-    if (version <= 0) {
+    if (!validateVersion(version)) {
       return;
     }
 
@@ -273,7 +273,7 @@ public class AdminHandler extends AbstractAuthHandler {
     }
 
     int version = getVersionFromString(responder, versionStr);
-    if (version <= 0) {
+    if (!validateVersion(version)) {
       return;
     }
 
@@ -327,7 +327,7 @@ public class AdminHandler extends AbstractAuthHandler {
     }
 
     int version = getVersionFromString(responder, versionStr);
-    if (version <= 0) {
+    if (!validateVersion(version)) {
       return;
     }
 
@@ -384,7 +384,7 @@ public class AdminHandler extends AbstractAuthHandler {
     }
 
     int version = getVersionFromString(responder, versionStr);
-    if (version <= 0) {
+    if (!validateVersion(version)) {
       return;
     }
 
@@ -423,6 +423,38 @@ public class AdminHandler extends AbstractAuthHandler {
   }
 
   /**
+   * Get a specific {@link co.cask.coopr.spec.plugin.ProviderType} if readable by the user.
+   *
+   * @param request The request for the provider type.
+   * @param responder Responder for sending the response.
+   * @param providertypeId Id of the provider type to get.
+   * @param versionStr Version of the provider type to get.
+   */
+  @GET
+  @Path("/plugins/providertypes/{providertype-id}/{version}")
+  public void getProviderType(HttpRequest request, HttpResponder responder,
+                              @PathParam("providertype-id") String providertypeId,
+                              @PathParam("version") String versionStr) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+
+    int version = getVersionFromString(responder, versionStr);
+    if (!validateVersion(version)) {
+      return;
+    }
+
+    try {
+      respondToGetEntity(entityStoreService.getView(account).getProviderType(providertypeId, version),
+                         "provider type", providertypeId, ProviderType.class, responder);
+    } catch (IOException e) {
+      responder.sendString(HttpResponseStatus.INTERNAL_SERVER_ERROR,
+                          "Exception getting provider type " + providertypeId + " with version " + versionStr);
+    }
+  }
+
+  /**
    * Get a specific {@link co.cask.coopr.spec.plugin.AutomatorType} if readable by the user.
    *
    * @param request The request for the automator type.
@@ -444,6 +476,38 @@ public class AdminHandler extends AbstractAuthHandler {
     } catch (IOException e) {
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR,
                           "Exception getting automator type " + automatortypeId);
+    }
+  }
+
+  /**
+   * Get a specific {@link co.cask.coopr.spec.plugin.AutomatorType} if readable by the user.
+   *
+   * @param request The request for the automator type.
+   * @param responder Responder for sending the response.
+   * @param automatortypeId Id of the automator type to get.
+   * @param versionStr Version of the automator type to get.
+   */
+  @GET
+  @Path("/plugins/automatortypes/{automatortype-id}/{version}")
+  public void getAutomatorType(HttpRequest request, HttpResponder responder,
+                               @PathParam("automatortype-id") String automatortypeId,
+                               @PathParam("version") String versionStr) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+
+    int version = getVersionFromString(responder, versionStr);
+    if (!validateVersion(version)) {
+      return;
+    }
+
+    try {
+      respondToGetEntity(entityStoreService.getView(account).getAutomatorType(automatortypeId, version),
+                         "automator type", automatortypeId, AutomatorType.class, responder);
+    } catch (IOException e) {
+      responder.sendString(HttpResponseStatus.INTERNAL_SERVER_ERROR,
+                          "Exception getting automator type " + automatortypeId + " with version " + versionStr);
     }
   }
 
@@ -653,7 +717,7 @@ public class AdminHandler extends AbstractAuthHandler {
     }
 
     int version = getVersionFromString(responder, versionStr);
-    if (version <= 0) {
+    if (!validateVersion(version)) {
       return;
     }
 
@@ -722,7 +786,7 @@ public class AdminHandler extends AbstractAuthHandler {
     }
 
     int version = getVersionFromString(responder, versionStr);
-    if (version <= 0) {
+    if (!validateVersion(version)) {
       return;
     }
 
@@ -789,7 +853,7 @@ public class AdminHandler extends AbstractAuthHandler {
     }
 
     int version = getVersionFromString(responder, versionStr);
-    if (version <= 0) {
+    if (!validateVersion(version)) {
       return;
     }
 
@@ -855,7 +919,7 @@ public class AdminHandler extends AbstractAuthHandler {
     }
 
     int version = getVersionFromString(responder, versionStr);
-    if (version <= 0) {
+    if (!validateVersion(version)) {
       return;
     }
 
@@ -924,7 +988,7 @@ public class AdminHandler extends AbstractAuthHandler {
     }
 
     int version = getVersionFromString(responder, versionStr);
-    if (version <= 0) {
+    if (!validateVersion(version)) {
       return;
     }
 
@@ -1509,10 +1573,14 @@ public class AdminHandler extends AbstractAuthHandler {
       responder.sendString(HttpResponseStatus.BAD_REQUEST, "Version must be a number");
       return 0;
     }
-    if (version <= 0) {
+    if (!validateVersion(version)) {
       responder.sendString(HttpResponseStatus.BAD_REQUEST, "Version must be higher then zero");
     }
     return version;
+  }
+
+  private boolean validateVersion(int version) {
+    return version > 0;
   }
 
   private <T> T getEntityFromRequest(HttpRequest request, HttpResponder responder, Type tClass) {

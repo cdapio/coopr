@@ -319,6 +319,17 @@ public interface EntityStoreView {
   ProviderType getProviderType(String providerTypeName) throws IOException;
 
   /**
+   * Get the {@link co.cask.coopr.spec.plugin.ProviderType} associated with the given unique name
+   * or null if no such provider type exists.
+   *
+   * @param providerTypeName Unique name of the provider type to get.
+   * @param version Version of the provider type to get.
+   * @return Provider type matching the given name or null if no such provider exists.
+   * @throws Exception
+   */
+  ProviderType getProviderType(String providerTypeName, int version) throws IOException;
+
+  /**
    * Get all {@link co.cask.coopr.spec.plugin.ProviderType}s.
    *
    * @return Collection of all provider types.
@@ -344,6 +355,15 @@ public interface EntityStoreView {
   void deleteProviderType(String providerTypeName) throws IOException, IllegalAccessException;
 
   /**
+   * Delete the {@link co.cask.coopr.spec.plugin.ProviderType} associated with the given unique name.
+   *
+   * @param providerTypeName Name of the provider type to delete.
+   * @param version Version of the provider type to delete.
+   * @throws Exception
+   */
+  void deleteProviderType(String providerTypeName, int version) throws IOException, IllegalAccessException;
+
+  /**
    * Get the {@link co.cask.coopr.spec.plugin.AutomatorType} associated with the given unique name or null if
    * no such automator type exists.
    *
@@ -352,6 +372,17 @@ public interface EntityStoreView {
    * @throws Exception
    */
   AutomatorType getAutomatorType(String automatorTypeName) throws IOException;
+
+  /**
+   * Get the {@link co.cask.coopr.spec.plugin.AutomatorType} associated with the given unique name or null if
+   * no such automator type exists.
+   *
+   * @param automatorTypeName Unique name of the automator type to get.
+   * @param version Version of the automator type to get.
+   * @return Automator type matching the given name or null if no such provider exists.
+   * @throws Exception
+   */
+  AutomatorType getAutomatorType(String automatorTypeName, int version) throws IOException;
 
   /**
    * Get all {@link co.cask.coopr.spec.plugin.AutomatorType}s.
@@ -377,4 +408,13 @@ public interface EntityStoreView {
    * @throws Exception
    */
   void deleteAutomatorType(String automatorTypeName) throws IOException, IllegalAccessException;
+
+  /**
+   * Delete the {@link co.cask.coopr.spec.plugin.AutomatorType} associated with the given unique name.
+   *
+   * @param automatorTypeName Name of the automator type to delete.
+   * @param version Version of the automator type to delete.
+   * @throws Exception
+   */
+  void deleteAutomatorType(String automatorTypeName, int version) throws IOException, IllegalAccessException;
 }

@@ -37,27 +37,11 @@ public class SQLAdminEntityStoreView extends BaseSQLEntityStoreView {
   }
 
   @Override
-  protected void writeEntity(EntityType entityType, String entityName, byte[] data) throws IOException {
-    try {
-      Connection conn = dbConnectionPool.getConnection();
-      try {
-        DBPut entityPut = new EntityDBPut(entityType, entityName, data);
-        entityPut.executePut(conn);
-      } finally {
-        conn.close();
-      }
-    } catch (SQLException e) {
-      throw new IOException("Exception writing entity of type " + entityType.name().toLowerCase()
-                              + " of name " + entityName + accountErrorSnippet);
-    }
-  }
-
-  @Override
   protected void writeEntity(EntityType entityType, String entityName, int version, byte[] data) throws IOException {
     try {
       Connection conn = dbConnectionPool.getConnection();
       try {
-        DBPut entityPut = new VersionedEntityDBPut(entityType, entityName, version, data);
+        DBPut entityPut = new EntityDBPut(entityType, entityName, version, data);
         entityPut.executePut(conn);
       } finally {
         conn.close();
@@ -133,57 +117,16 @@ public class SQLAdminEntityStoreView extends BaseSQLEntityStoreView {
   }
 
   private class EntityDBPut extends DBPut {
-    protected final EntityType entityType;
-    protected final String entityName;
-    protected final byte[] data;
+    private final EntityType entityType;
+    private final String entityName;
+    private final int version;
+    private final byte[] data;
 
-    private EntityDBPut(EntityType entityType, String entityName, byte[] data) {
+    private EntityDBPut(EntityType entityType, String entityName, int version, byte[] data) {
       this.entityType = entityType;
       this.entityName = entityName;
-      this.data = data;
-    }
-
-    @Override
-    public PreparedStatement createUpdateStatement(Connection conn) throws SQLException {
-      String entityTypeId = entityType.getId();
-      // immune to sql injection since it comes from the enum.
-      String queryStr = "UPDATE " + entityTypeId + "s SET " + entityTypeId + "=? WHERE name=? AND tenant_id=?";
-      PreparedStatement statement = conn.prepareStatement(queryStr);
-      statement.setBytes(1, data);
-      statement.setString(2, entityName);
-      statement.setString(3, account.getTenantId());
-      return statement;
-    }
-
-    @Override
-    public PreparedStatement createInsertStatement(Connection conn) throws SQLException {
-      String entityTypeId = entityType.getId();
-      // immune to sql injection since it comes from the enum.
-      String queryStr = getInsertQueryString(entityTypeId);
-      PreparedStatement statement = conn.prepareStatement(queryStr);
-      setInsertPreparedStatementParameters(statement);
-      return statement;
-    }
-
-    public String getInsertQueryString(String entityTypeId) {
-      return "INSERT INTO " + entityTypeId + "s (name, tenant_id, " + entityTypeId +
-        ") VALUES (?, ?, ?)";
-    }
-
-    public void setInsertPreparedStatementParameters(PreparedStatement statement) throws SQLException {
-      statement.setString(1, entityName);
-      statement.setString(2, account.getTenantId());
-      statement.setBytes(3, data);
-    }
-  }
-
-  private class VersionedEntityDBPut extends EntityDBPut {
-
-    private final int version;
-
-    private VersionedEntityDBPut(EntityType entityType, String entityName, int version, byte[] data) {
-      super(entityType, entityName, data);
       this.version = version;
+      this.data = data;
     }
 
     public void executePut(Connection conn) throws SQLException {
@@ -196,17 +139,22 @@ public class SQLAdminEntityStoreView extends BaseSQLEntityStoreView {
     }
 
     @Override
-    public String getInsertQueryString(String entityTypeId) {
-      return "INSERT INTO " + entityTypeId + "s (name, version, tenant_id, " + entityTypeId +
-        ") VALUES (?, ?, ?, ?)";
+    public PreparedStatement createUpdateStatement(Connection conn) throws SQLException {
+      throw new UnsupportedOperationException();
     }
 
     @Override
-    public void setInsertPreparedStatementParameters(PreparedStatement statement) throws SQLException {
+    public PreparedStatement createInsertStatement(Connection conn) throws SQLException {
+      String entityTypeId = entityType.getId();
+      // immune to sql injection since it comes from the enum.
+      String queryStr = "INSERT INTO " + entityTypeId + "s (name, version, tenant_id, " + entityTypeId +
+        ") VALUES (?, ?, ?, ?)";
+      PreparedStatement statement = conn.prepareStatement(queryStr);
       statement.setString(1, entityName);
       statement.setInt(2, version);
       statement.setString(3, account.getTenantId());
       statement.setBytes(4, data);
+      return statement;
     }
   }
 }

@@ -70,6 +70,7 @@ CREATE TABLE IF NOT EXISTS nodes (
 
 CREATE TABLE IF NOT EXISTS providerTypes (
     name VARCHAR(255),
+    version BIGINT,
     tenant_id VARCHAR(64),
     providerType MEDIUMBLOB,
     PRIMARY KEY (tenant_id, name)
@@ -77,6 +78,7 @@ CREATE TABLE IF NOT EXISTS providerTypes (
 
 CREATE TABLE IF NOT EXISTS automatorTypes (
     name VARCHAR(255),
+    version BIGINT,
     tenant_id VARCHAR(64),
     automatorType MEDIUMBLOB,
     PRIMARY KEY (tenant_id, name)

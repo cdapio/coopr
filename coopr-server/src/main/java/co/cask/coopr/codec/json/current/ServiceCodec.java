@@ -15,7 +15,7 @@
  */
 package co.cask.coopr.codec.json.current;
 
-import co.cask.coopr.spec.BaseVersionedEntity;
+import co.cask.coopr.spec.BaseEntity;
 import co.cask.coopr.spec.Link;
 import co.cask.coopr.spec.ProvisionerAction;
 import co.cask.coopr.spec.service.Service;
@@ -34,13 +34,12 @@ import java.util.Set;
 /**
  * Codec for serializing/deserializing a {@link Service}.
  */
-public class ServiceCodec extends AbstractBaseVersionedEntityCodec<Service> {
+public class ServiceCodec extends AbstractBaseEntityCodec<Service> {
   private static final Type ACTIONS_TYPE = new TypeToken<Map<ProvisionerAction, ServiceAction>>() { }.getType();
   private static final Type LINKS_TYPE = new TypeToken<Set<Link>>() { }.getType();
 
   @Override
   protected void addChildFields(Service service, JsonObject jsonObj, JsonSerializationContext context) {
-    super.addChildFields(service, jsonObj, context);
     jsonObj.add("dependencies", context.serialize(service.getDependencies()));
     JsonObject provisioner = new JsonObject();
     provisioner.add("actions", context.serialize(service.getProvisionerActions()));
@@ -49,7 +48,7 @@ public class ServiceCodec extends AbstractBaseVersionedEntityCodec<Service> {
   }
 
   @Override
-  protected BaseVersionedEntity.Builder<Service> builder(JsonObject jsonObj, JsonDeserializationContext context) {
+  protected BaseEntity.Builder<Service> getBuilder(JsonObject jsonObj, JsonDeserializationContext context) {
     ServiceDependencies dependencies = context.deserialize(jsonObj.get("dependencies"), ServiceDependencies.class);
 
     JsonObject provisioner = context.deserialize(jsonObj.get("provisioner"), JsonObject.class);

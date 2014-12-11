@@ -303,7 +303,16 @@ public class AdminHandlerTest extends ServiceTestBase {
     Assert.assertEquals(HttpResponseStatus.OK.getCode(),
                         doPutExternalAPI(entityPath, entity.toString(), ADMIN_HEADERS).getStatusLine().getStatusCode());
 
+    // bump version
+    Assert.assertEquals(HttpResponseStatus.OK.getCode(),
+                        doPutExternalAPI(entityPath, entity.toString(), ADMIN_HEADERS).getStatusLine().getStatusCode());
 
+    HttpResponse response = doGetExternalAPI(entityPath, ADMIN_HEADERS);
+    assertResponseStatus(response, HttpResponseStatus.OK);
+    Assert.assertEquals("application/json", response.getEntity().getContentType().getValue());
+    Reader reader = new InputStreamReader(response.getEntity().getContent(), Charsets.UTF_8);
+    JsonObject result = new Gson().fromJson(reader, JsonObject.class);
+    Assert.assertEquals(3, result.get("version").getAsInt());
 
     HttpResponse response1 = doGetExternalAPI(entityPath + "/2", ADMIN_HEADERS);
     assertResponseStatus(response1, HttpResponseStatus.OK);

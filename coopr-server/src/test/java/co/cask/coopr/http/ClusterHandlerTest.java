@@ -1222,8 +1222,7 @@ public class ClusterHandlerTest extends ServiceTestBase {
 
     // now check the cluster's template is as expected
     cluster = clusterStoreService.getView(cluster.getAccount()).getCluster(cluster.getId());
-    System.out.println(updatedTemplate.getVersion());
-    System.out.println(cluster.getClusterTemplate().getVersion());
+    cluster.getClusterTemplate().setVersion(Constants.DEFAULT_VERSION);
     Assert.assertEquals(updatedTemplate, cluster.getClusterTemplate());
   }
 

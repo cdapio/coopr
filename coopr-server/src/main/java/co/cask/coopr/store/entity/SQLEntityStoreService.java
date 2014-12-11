@@ -8,7 +8,6 @@ import co.cask.coopr.spec.service.Service;
 import co.cask.coopr.spec.template.ClusterTemplate;
 import co.cask.coopr.store.DBConnectionPool;
 import co.cask.coopr.store.DBHelper;
-import co.cask.coopr.store.DBQueryExecutor;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
@@ -54,16 +53,9 @@ public class SQLEntityStoreService extends AbstractIdleService implements Entity
       for (BaseEntityStoreView.EntityType entityType : BaseEntityStoreView.EntityType.values()) {
         String entityName = entityType.getId();
         // immune to sql injection since it comes from the enum
-        String createString;
-        if (entityType.isVersioned()) {
-          createString = "CREATE TABLE " + entityName +
-            "s ( name VARCHAR(255), version BIGINT, tenant_id VARCHAR(255), " +
-            entityName + " BLOB, PRIMARY KEY (tenant_id, name, version))";
-        } else {
-          createString = "CREATE TABLE " + entityName +
-            "s ( name VARCHAR(255), tenant_id VARCHAR(255), " +
-            entityName + " BLOB, PRIMARY KEY (tenant_id, name))";
-        }
+        String createString = "CREATE TABLE " + entityName +
+          "s ( name VARCHAR(255), version BIGINT, tenant_id VARCHAR(255), " + entityName +
+          " BLOB, PRIMARY KEY (tenant_id, name, version))";
         DBHelper.createDerbyTableIfNotExists(createString, dbConnectionPool);
       }
     }

@@ -31,12 +31,6 @@ public class SQLUserEntityStoreView extends BaseSQLEntityStoreView {
   }
 
   @Override
-  protected void writeEntity(EntityType entityType, String entityName, byte[] data)
-    throws IOException, IllegalAccessException {
-    throw new IllegalAccessException("Non-admins are not allowed to write entities.");
-  }
-
-  @Override
   protected void writeEntity(EntityType entityType, String entityName, int version, byte[] data)
     throws IOException, IllegalAccessException {
     throw new IllegalAccessException("Non-admins are not allowed to write entities.");
