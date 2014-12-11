@@ -1339,11 +1339,6 @@ public class AdminHandler extends AbstractAuthHandler {
       for (PartialTemplate partialTemplate : newPartialTemplates) {
         view.writePartialTemplate(partialTemplate);
       }
-
-      LOG.debug("Importing {} cluster templates", newClusterTemplates.size());
-      for (ClusterTemplate clusterTemplate : newClusterTemplates) {
-        view.writeClusterTemplate(clusterTemplate);
-      }
       responder.sendStatus(HttpResponseStatus.OK);
     } catch (IllegalAccessException e) {
       responder.sendString(HttpResponseStatus.FORBIDDEN, e.getMessage());
