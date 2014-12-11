@@ -105,7 +105,12 @@ function myServicePickerDirective (MYSERVICEPICKER_EVENT) {
               });            
             }
 
-            out[name] = dd;
+            /**
+             * As long empty array is a valid object and angular expressions are not able to check for array length,
+             * dropdown control would be displayed.
+             * null would help to serve this expression in thingpicker template: ng-if="actionDropdowns[name]".
+             */
+            out[name] = dd.length ? dd : null;
 
           }
           return out;
