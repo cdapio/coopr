@@ -50,7 +50,7 @@ import co.cask.coopr.spec.template.Include;
 import co.cask.coopr.spec.template.Parent;
 import co.cask.coopr.spec.template.PartialTemplate;
 import co.cask.coopr.spec.template.SizeConstraint;
-import co.cask.coopr.spec.template.TemplateException;
+import co.cask.coopr.spec.template.TemplateNotFoundException;
 import co.cask.coopr.store.cluster.ClusterStore;
 import co.cask.coopr.store.cluster.ClusterStoreService;
 import co.cask.coopr.store.cluster.ClusterStoreView;
@@ -750,7 +750,7 @@ public class ClusterService {
     EntityStoreView entityStore = entityStoreService.getView(account);
     ClusterTemplate clusterTemplate = entityStore.getClusterTemplate(templateName);
     if  (clusterTemplate == null) {
-      throw new TemplateException("Cluster template " + templateName + " does not exist");
+      throw new TemplateNotFoundException("Cluster template " + templateName + " does not exist");
     }
     return resolveTemplate(account, clusterTemplate);
   }

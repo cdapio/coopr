@@ -16,33 +16,22 @@
 package co.cask.coopr.spec.template;
 
 /**
- * Includes for template
+ * Template exception can be caused by template missing.
  */
-public final class Include {
-  private final String name;
-
-  public Include(String name) {
-    this.name = name;
+public class TemplateNotFoundException extends Exception {
+  /**
+   * New exception with error message.
+   * @param message the error message
+   */
+  public TemplateNotFoundException(String message) {
+    super(message);
   }
 
-  public String getName() {
-    return name;
+  public TemplateNotFoundException(String message, Throwable cause) {
+    super(message, cause);
   }
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-
-    Include include = (Include) o;
-
-    if (name != null ? !name.equals(include.name) : include.name != null) return false;
-
-    return true;
-  }
-
-  @Override
-  public int hashCode() {
-    return name != null ? name.hashCode() : 0;
+  public TemplateNotFoundException(Throwable cause) {
+    super(cause);
   }
 }

@@ -1,11 +1,11 @@
 {
-    "name": "cdapDistributedSecureHadoop",
+    "name": "cdap-distributed-secure-hadoop",
     "description": "Cask DAP (CDAP) with Security and Secure Hadoop cluster with single master",
     "extends": {
-        "name": "cdapDistributed"
+        "name": "cdap-distributed"
     },
     "includes": [{
-        "name" : "LDAPInternal"
+        "name" : "LDAP-internal"
     }],
     "defaults": {
         "provider": "rackspace",

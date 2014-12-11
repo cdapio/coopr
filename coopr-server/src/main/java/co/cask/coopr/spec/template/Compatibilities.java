@@ -26,7 +26,7 @@ import java.util.Set;
  * Defines hardwaretypes, imagetypes, and services that a cluster is compatible with.
  */
 public final class Compatibilities {
-  public static Compatibilities EMPTY_COMPATIBILITIES = new Compatibilities(null, null, null);
+  public static Compatibilities EMPTY_COMPATIBILITIES = builder().build();
   private Set<String> hardwaretypes;
   private Set<String> imagetypes;
   private Set<String> services;
@@ -140,7 +140,7 @@ public final class Compatibilities {
     private Set<String> services = Sets.newHashSet();
 
     public Builder setHardwaretypes(Set<String> hardwaretypes) {
-      this.hardwaretypes = hardwaretypes;
+      this.hardwaretypes = hardwaretypes == null ? Sets.<String>newHashSet() : hardwaretypes;
       return this;
     }
 
@@ -150,7 +150,7 @@ public final class Compatibilities {
     }
 
     public Builder setImagetypes(Set<String> imagetypes) {
-      this.imagetypes = imagetypes;
+      this.imagetypes = imagetypes == null ? Sets.<String>newHashSet() : imagetypes;
       return this;
     }
 
@@ -160,7 +160,7 @@ public final class Compatibilities {
     }
 
     public Builder setServices(Set<String> services) {
-      this.services = services;
+      this.services = services == null ? Sets.<String>newHashSet() : services;
       return this;
     }
 

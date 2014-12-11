@@ -16,23 +16,23 @@
 package co.cask.coopr.spec.template;
 
 /**
- * Template exception can be caused by tempalate immutability or template missing.
+ * Template exception can be caused by template immutability.
  */
-public class TemplateException extends Exception {
+public class TemplateImmutabilityException extends Exception {
 
   /**
    * New exception with error message.
    * @param message the error message
    */
-  public TemplateException(String message) {
+  public TemplateImmutabilityException(String message) {
     super(message);
   }
 
-  public TemplateException(String message, Throwable cause) {
+  public TemplateImmutabilityException(String message, Throwable cause) {
     super(message, cause);
   }
 
-  public TemplateException(Throwable cause) {
+  public TemplateImmutabilityException(Throwable cause) {
     super(cause);
   }
 }

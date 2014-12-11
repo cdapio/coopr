@@ -21,14 +21,20 @@ import com.google.common.base.Objects;
 /**
  * A size constraint on the cluster, enforcing some min and/or max on the number of nodes in the cluster.
  */
-public class SizeConstraint {
+public final class SizeConstraint {
   public static final SizeConstraint EMPTY = new SizeConstraint(1, Integer.MAX_VALUE);
-  private int min;
-  private int max;
+  private final int min;
+  private final int max;
 
   public SizeConstraint(Integer min, Integer max) {
-    this.setMin(min);
-    this.setMax(max);
+    this.min = min == null ? 1 : min;
+    if (this.min < 1) {
+      throw new IllegalArgumentException("Minimum must be at least 1.");
+    }
+    this.max = max == null ? Integer.MAX_VALUE : max;
+    if (this.max < this.min) {
+      throw new IllegalArgumentException("Maximum must greater than or equal to the minimum.");
+    }
   }
 
   /**
@@ -59,28 +65,6 @@ public class SizeConstraint {
    */
   public int getMax() {
     return max;
-  }
-
-  /**
-   * Set the minimum size allowed.
-   *
-   */
-  public void setMin(Integer min) {
-    this.min = min == null ? 1 : min;
-    if (this.min < 1) {
-      throw new IllegalArgumentException("Minimum must be at least 1.");
-    }
-  }
-
-  /**
-   * Set the maximum size allowed.
-   *
-   */
-  public void setMax(Integer max) {
-    this.max = max == null ? Integer.MAX_VALUE : max;
-    if (this.max < this.min) {
-      throw new IllegalArgumentException("Maximum must greater than or equal to the minimum.");
-    }
   }
 
   @Override

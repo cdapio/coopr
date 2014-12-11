@@ -23,7 +23,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 
 /**
- * Codec for serializing/deserializing a {@link co.cask.coopr.spec.template.PartialTemplate}.
+ * Codec for serializing/deserializing a {@link PartialTemplate}.
  */
 public class PartialTemplateCodec extends AbstractTemplateCodec<PartialTemplate> {
 

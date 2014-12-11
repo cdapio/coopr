@@ -163,7 +163,7 @@ public final class ClusterTemplate extends AbstractTemplate {
           String name = fromConfigItem.getKey();
           JsonElement value = fromConfigItem.getValue();
           if (immutables.contains(name) && thisConfig.has(name)) {
-            throw new TemplateException(name + " can't be overridden due immutability. Overrides in " + from.getName());
+            throw new TemplateImmutabilityException(name + " can't be overridden due immutability. Overrides in " + from.getName());
           }
           thisConfig.add(name, value);
           if (isImmutable) {
@@ -179,10 +179,11 @@ public final class ClusterTemplate extends AbstractTemplate {
         copyMainProps(from, false);
 
         //merge defaults options
-        clusterDefaults.setDnsSuffix(from.getClusterDefaults().getDnsSuffix());
-        clusterDefaults.setHardwaretype(from.getClusterDefaults().getHardwaretype());
-        clusterDefaults.setImagetype(from.getClusterDefaults().getImagetype());
-        clusterDefaults.setProvider(from.getClusterDefaults().getProvider());
+        ClusterDefaults fromDefaults = from.getClusterDefaults();
+        if(isNotBlank(fromDefaults.getDnsSuffix())) clusterDefaults.setDnsSuffix(fromDefaults.getDnsSuffix());
+        if(isNotBlank(fromDefaults.getHardwaretype())) clusterDefaults.setHardwaretype(fromDefaults.getHardwaretype());
+        if(isNotBlank(fromDefaults.getImagetype())) clusterDefaults.setImagetype(fromDefaults.getImagetype());
+        if(isNotBlank(fromDefaults.getProvider())) clusterDefaults.setProvider(fromDefaults.getProvider());
 
         //merge constraints
         mergeMap(constraints.getServiceConstraints(), from.getConstraints().getServiceConstraints());
@@ -190,9 +191,8 @@ public final class ClusterTemplate extends AbstractTemplate {
                  from.getConstraints().getLayoutConstraint().getServicesThatMustCoexist());
         mergeSet(constraints.getLayoutConstraint().getServicesThatMustNotCoexist(),
                  from.getConstraints().getLayoutConstraint().getServicesThatMustNotCoexist());
-        if (from.getConstraints().getSizeConstraint() != null) {
-          constraints.getSizeConstraint().setMax(from.getConstraints().getSizeConstraint().getMax());
-          constraints.getSizeConstraint().setMin(from.getConstraints().getSizeConstraint().getMin());
+        if (!from.getConstraints().getSizeConstraint().equals(SizeConstraint.EMPTY)) {
+          constraints.sizeConstraint = from.getConstraints().getSizeConstraint();
         }
 
         //merge compatibilities
@@ -201,10 +201,8 @@ public final class ClusterTemplate extends AbstractTemplate {
         mergeSet(compatibilities.getServices(), from.getCompatibilities().getServices());
 
         //merge admin lease duration
-        if (from.getAdministration().getLeaseDuration() != null) {
-          administration.getLeaseDuration().setInitial(from.getAdministration().getLeaseDuration().getInitial());
-          administration.getLeaseDuration().setMax(from.getAdministration().getLeaseDuration().getMax());
-          administration.getLeaseDuration().setStep(from.getAdministration().getLeaseDuration().getStep());
+        if (!from.getAdministration().getLeaseDuration().equals(LeaseDuration.FOREVER_LEASE_DURATION)) {
+          administration.leaseDuration = from.getAdministration().getLeaseDuration();
         }
 
         //merge base entity properties

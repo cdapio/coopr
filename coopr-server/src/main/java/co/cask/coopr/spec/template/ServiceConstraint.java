@@ -16,6 +16,7 @@
 package co.cask.coopr.spec.template;
 
 import com.google.common.base.Objects;
+import com.google.common.collect.Sets;
 
 import java.util.Set;
 
@@ -33,8 +34,8 @@ public final class ServiceConstraint {
 
   public ServiceConstraint(Set<String> requiredHardwareTypes, Set<String> requiredImageTypes,
                            Integer minCount, Integer maxCount) {
-    this.requiredHardwareTypes = requiredHardwareTypes;
-    this.requiredImageTypes = requiredImageTypes;
+    this.requiredHardwareTypes = requiredHardwareTypes == null ? Sets.<String>newHashSet() : requiredHardwareTypes;
+    this.requiredImageTypes = requiredImageTypes == null ? Sets.<String>newHashSet() : requiredImageTypes;
     this.minCount = minCount == null ? 0 : minCount;
     this.maxCount = maxCount == null ? Integer.MAX_VALUE : maxCount;
   }

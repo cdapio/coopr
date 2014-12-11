@@ -27,9 +27,8 @@ import java.util.Set;
 /**
  * Default values for a cluster.  Everything in here can be overwritten by a user.
  */
-public class ClusterDefaults {
-  public static ClusterDefaults EMPTY_CLUSTER_DEFAULTS =
-    new ClusterDefaults(Sets.<String>newHashSet(), null, null, null, null, new JsonObject());
+public final class ClusterDefaults {
+  public static final ClusterDefaults EMPTY_CLUSTER_DEFAULTS = builder().build();
   private Set<String> services;
   private String provider;
   private String hardwaretype;
@@ -150,7 +149,7 @@ public class ClusterDefaults {
    * Builder for creating cluster defaults.
    */
   public static class Builder {
-    private Set<String> services;
+    private Set<String> services = Sets.newHashSet();
     private String provider;
     private String hardwaretype;
     private String imagetype;
@@ -158,7 +157,7 @@ public class ClusterDefaults {
     private JsonObject config = new JsonObject();
 
     public Builder setServices(Set<String> services) {
-      this.services = services;
+      this.services = services == null ? Sets.<String>newHashSet() : services;
       return this;
     }
 

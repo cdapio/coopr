@@ -18,7 +18,6 @@ package co.cask.coopr.codec.json.current;
 import co.cask.coopr.codec.json.AbstractCodec;
 import co.cask.coopr.spec.template.ClusterDefaults;
 import com.google.common.collect.Sets;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -55,15 +54,17 @@ public class ClusterDefaultsCodec extends AbstractCodec<ClusterDefaults> {
     JsonObject config = context.deserialize(jsonObj.get("config"), JsonObject.class);
     Set<String> services = Sets.newHashSet();
 
-    JsonArray rawServices = jsonObj.get("services").getAsJsonArray();
-    for (JsonElement service : rawServices) {
-      if(service instanceof JsonPrimitive){
-        services.add(service.getAsString());
-      } else if (service instanceof JsonObject){
-        String name = ((JsonObject) service).get("name").getAsString();
-        JsonElement internalServiceConfig = ((JsonObject) service).get("config");
-        services.add(name);
-        config.add(name, internalServiceConfig);
+    JsonElement rawServices = jsonObj.get("services");
+    if(rawServices != null) {
+      for (JsonElement service : rawServices.getAsJsonArray()) {
+        if (service instanceof JsonPrimitive) {
+          services.add(service.getAsString());
+        } else if (service instanceof JsonObject) {
+          String name = ((JsonObject) service).get("name").getAsString();
+          JsonElement internalServiceConfig = ((JsonObject) service).get("config");
+          services.add(name);
+          config.add(name, internalServiceConfig);
+        }
       }
     }
 
