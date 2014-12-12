@@ -33,17 +33,22 @@ import java.util.Set;
  */
 public class ClusterDefaultsCodec extends AbstractCodec<ClusterDefaults> {
 
+  private static final String SERVICES_KEY = "services";
+  private static final String PROVIDER_KEY = "provider";
+  private static final String HARDWARE_TYPE_KEY = "hardwaretype";
+  private static final String IMAGE_TYPE_KEY = "imagetype";
+  private static final String DNS_SUFFIX_KEY = "dnsSuffix";
+  private static final String CONFIG_KEY = "config";
+
   @Override
   public JsonElement serialize(ClusterDefaults clusterDefaults, Type type, JsonSerializationContext context) {
     JsonObject jsonObj = new JsonObject();
-
-    jsonObj.add("services", context.serialize(clusterDefaults.getServices()));
-    jsonObj.add("provider", context.serialize(clusterDefaults.getProvider()));
-    jsonObj.add("hardwaretype", context.serialize(clusterDefaults.getHardwaretype()));
-    jsonObj.add("imagetype", context.serialize(clusterDefaults.getImagetype()));
-    jsonObj.add("dnsSuffix", context.serialize(clusterDefaults.getDnsSuffix()));
-    jsonObj.add("config", context.serialize(clusterDefaults.getConfig()));
-
+    jsonObj.add(SERVICES_KEY, context.serialize(clusterDefaults.getServices()));
+    jsonObj.add(PROVIDER_KEY, context.serialize(clusterDefaults.getProvider()));
+    jsonObj.add(HARDWARE_TYPE_KEY, context.serialize(clusterDefaults.getHardwaretype()));
+    jsonObj.add(IMAGE_TYPE_KEY, context.serialize(clusterDefaults.getImagetype()));
+    jsonObj.add(DNS_SUFFIX_KEY, context.serialize(clusterDefaults.getDnsSuffix()));
+    jsonObj.add(CONFIG_KEY, context.serialize(clusterDefaults.getConfig()));
     return jsonObj;
   }
 
@@ -51,17 +56,17 @@ public class ClusterDefaultsCodec extends AbstractCodec<ClusterDefaults> {
   public ClusterDefaults deserialize(JsonElement json, Type type, JsonDeserializationContext context)
     throws JsonParseException {
     JsonObject jsonObj = json.getAsJsonObject();
-    JsonObject config = context.deserialize(jsonObj.get("config"), JsonObject.class);
+    JsonObject config = context.deserialize(jsonObj.get(CONFIG_KEY), JsonObject.class);
     Set<String> services = Sets.newHashSet();
 
-    JsonElement rawServices = jsonObj.get("services");
+    JsonElement rawServices = jsonObj.get(SERVICES_KEY);
     if(rawServices != null) {
       for (JsonElement service : rawServices.getAsJsonArray()) {
         if (service instanceof JsonPrimitive) {
           services.add(service.getAsString());
         } else if (service instanceof JsonObject) {
           String name = ((JsonObject) service).get("name").getAsString();
-          JsonElement internalServiceConfig = ((JsonObject) service).get("config");
+          JsonElement internalServiceConfig = ((JsonObject) service).get(CONFIG_KEY);
           services.add(name);
           config.add(name, internalServiceConfig);
         }
@@ -70,10 +75,10 @@ public class ClusterDefaultsCodec extends AbstractCodec<ClusterDefaults> {
 
     return ClusterDefaults.builder()
       .setServices(services)
-      .setProvider(context.<String>deserialize(jsonObj.get("provider"), String.class))
-      .setHardwaretype(context.<String>deserialize(jsonObj.get("hardwaretype"), String.class))
-      .setImagetype(context.<String>deserialize(jsonObj.get("imagetype"), String.class))
-      .setDNSSuffix(context.<String>deserialize(jsonObj.get("dnsSuffix"), String.class))
+      .setProvider(context.<String>deserialize(jsonObj.get(PROVIDER_KEY), String.class))
+      .setHardwaretype(context.<String>deserialize(jsonObj.get(HARDWARE_TYPE_KEY), String.class))
+      .setImagetype(context.<String>deserialize(jsonObj.get(IMAGE_TYPE_KEY), String.class))
+      .setDNSSuffix(context.<String>deserialize(jsonObj.get(DNS_SUFFIX_KEY), String.class))
       .setConfig(config)
       .build();
   }

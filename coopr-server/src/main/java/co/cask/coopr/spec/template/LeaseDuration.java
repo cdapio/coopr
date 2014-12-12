@@ -25,14 +25,17 @@ import com.google.common.base.Preconditions;
 public final class LeaseDuration {
   public static final LeaseDuration FOREVER_LEASE_DURATION = new LeaseDuration(0, 0, 0);
 
-  private long initial;
-  private long max;
-  private long step;
+  private final long initial;
+  private final long max;
+  private final long step;
 
   public LeaseDuration(long initial, long max, long step) {
-    this.setInitial(initial);
-    this.setMax(max);
-    this.setStep(step);
+    Preconditions.checkArgument(initial >= 0, "initial lease duration should be >=0");
+    Preconditions.checkArgument(max >= 0, "max lease duration should be >=0");
+    Preconditions.checkArgument(step >= 0, "step should be >=0");
+    this.initial = initial;
+    this.max = max;
+    this.step = step;
   }
 
   /**
@@ -56,37 +59,10 @@ public final class LeaseDuration {
   /**
    * Get the step size in seconds to use when extending a lease, with 0 meaning any step size.
    *
-   * @return Step size in seconds to use whePreconditions.checkArgument(max >= 0, "max lease duration should be >=0");n extending a lease, with 0 meaning any step size.
+   * @return Step size in seconds to use when extending a lease, with 0 meaning any step size.
    */
   public long getStep() {
     return step;
-  }
-
-  /**
-   * Set the initial lease time in seconds, with 0 meaning forever.
-   *
-   */
-  public void setInitial(long initial) {
-    Preconditions.checkArgument(initial >= 0, "initial lease duration should be >=0");
-    this.initial = initial;
-  }
-
-  /**
-   * Set the maximum lease time in seconds, with 0 meaning forever.
-   *
-   */
-  public void setMax(long max) {
-    Preconditions.checkArgument(max >= 0, "max lease duration should be >=0");
-    this.max = max;
-  }
-
-  /**
-   * Set the step size in seconds to use when extending a lease, with 0 meaning any step size.
-   *
-   */
-  public void setStep(long step) {
-    Preconditions.checkArgument(step >= 0, "step should be >=0");
-    this.step = step;
   }
 
   /**

@@ -740,10 +740,7 @@ public class ClusterService {
 
   public ClusterTemplate resolveTemplate(Account account, ClusterTemplate clusterTemplate) throws Exception {
     EntityStoreView entityStore = entityStoreService.getView(account);
-    Set<AbstractTemplate> mergeSet = getMergeCollection(entityStore, clusterTemplate);
-    return ClusterTemplate.builder()
-      .merger().merge(mergeSet).setInitialTemplate(clusterTemplate)
-      .builder().build();
+    return resolveTemplate(entityStore, clusterTemplate);
   }
 
   public ClusterTemplate resolveTemplate(Account account, String templateName) throws Exception {
@@ -752,7 +749,14 @@ public class ClusterService {
     if  (clusterTemplate == null) {
       throw new TemplateNotFoundException("Cluster template " + templateName + " does not exist");
     }
-    return resolveTemplate(account, clusterTemplate);
+    return resolveTemplate(entityStore, clusterTemplate);
+  }
+
+  private ClusterTemplate resolveTemplate(EntityStoreView entityStore, ClusterTemplate clusterTemplate) throws Exception {
+    Set<AbstractTemplate> mergeSet = getMergeCollection(entityStore, clusterTemplate);
+    return ClusterTemplate.builder()
+      .merger().merge(mergeSet).setInitialTemplate(clusterTemplate)
+      .builder().build();
   }
 
   /*
@@ -766,11 +770,10 @@ public class ClusterService {
     if (parent != null) {
       ClusterTemplate parentTemplate = entityStore.getClusterTemplate(parent.getName());
       if (parentTemplate == null) {
-        throw new Exception(parent.getName() + " parent template not found.");
+        throw new TemplateNotFoundException(parent.getName() + " parent template not found.");
       }
       forMerge = getMergeCollection(entityStore, parentTemplate);
-    }
-    else {
+    } else {
       forMerge = Sets.newLinkedHashSet();
     }
     Set<AbstractTemplate> includes = resolvePartialIncludes(entityStore, clusterTemplate.getIncludes());
@@ -787,7 +790,7 @@ public class ClusterService {
       for (Include include : includes) {
         PartialTemplate partialTemplate = entityStore.getPartialTemplate(include.getName());
         if (partialTemplate == null) {
-          throw new Exception(include.getName() + " partial not found.");
+          throw new TemplateNotFoundException(include.getName() + " partial template not found.");
         }
         partials.add(partialTemplate);
       }
