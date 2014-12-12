@@ -199,6 +199,10 @@ public class PartialTemplateTest extends BaseTest {
     Assert.assertEquals(compatibilitiesHardwaretypes, rt.getCompatibilities().getHardwaretypes());
     Assert.assertEquals(compatibilitiesImagetypes, rt.getCompatibilities().getImagetypes());
     Assert.assertEquals(compatibilitiesServices, rt.getCompatibilities().getServices());
+
+    //overrides in child
+    Assert.assertEquals("ldap.correct.com", rt.getClusterDefaults().getConfig().get("ldap")
+      .getAsJsonObject().get("endpoint").getAsString());
   }
 
   @Test

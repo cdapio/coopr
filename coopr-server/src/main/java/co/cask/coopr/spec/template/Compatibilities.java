@@ -26,10 +26,10 @@ import java.util.Set;
  * Defines hardwaretypes, imagetypes, and services that a cluster is compatible with.
  */
 public final class Compatibilities {
-  public static Compatibilities EMPTY_COMPATIBILITIES = builder().build();
-  private Set<String> hardwaretypes;
-  private Set<String> imagetypes;
-  private Set<String> services;
+  public static final Compatibilities EMPTY_COMPATIBILITIES = builder().build();
+  private final Set<String> hardwaretypes;
+  private final Set<String> imagetypes;
+  private final Set<String> services;
 
   private Compatibilities(Set<String> hardwaretypes, Set<String> imagetypes, Set<String> services) {
     this.hardwaretypes = hardwaretypes;
