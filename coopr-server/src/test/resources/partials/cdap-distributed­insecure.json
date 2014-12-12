@@ -1,0 +1,61 @@
+{
+    "name": "cdapDistributedInsecure",
+    "version": "1",
+    "description": "Cask DAP (CDAP) and Hadoop cluster with single master",
+    "defaults": {
+        "services": [
+            "zookeeper­server",
+            "mysql­server",
+            "cdap"
+        ],
+        "provider": "google",
+        "hardwaretype": "standard­large",
+        "imagetype": "centos6",
+        "dnsSuffix": "dev.continuuity.net",
+        "config": {
+            "mysql": {
+                "server_debian_password": "somedefaultpassword",
+                "server_root_password": "somedefaultpassword",
+                "server_repl_password": "somedefaultpassword",
+                "data_dir": "/data/mysql",
+                "server": {
+                    "directories": {
+                        "log_dir": "/data/mysql"
+                    }
+                },
+                "bind_address": "%ip.bind_v4.service.mysql-server%"
+            },
+            "zookeeper": {
+                "zookeeper_env": {
+                    "zookeeper_log_dir": "/data/logs/zookeeper"
+                }
+            }
+        }
+    },
+    "compatibility": {
+        "hardwaretypes": [
+        ],
+        "imagetypes": [
+        ],
+        "services": [
+            "zookeeper­server",
+            "cdap",
+            "mysql­server"
+        ]
+    },
+    "constraints": {
+        "size": {
+        },
+        "layout": {
+        },
+        "services": {
+        }
+    },
+    "administration": {
+        "leaseduration": {
+            "initial": 43200000,
+            "max": 0,
+            "step": 43200000
+        }
+    }
+}

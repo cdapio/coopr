@@ -22,6 +22,7 @@ import co.cask.coopr.spec.plugin.AutomatorType;
 import co.cask.coopr.spec.plugin.ProviderType;
 import co.cask.coopr.spec.service.Service;
 import co.cask.coopr.spec.template.ClusterTemplate;
+import co.cask.coopr.spec.template.PartialTemplate;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -307,6 +308,61 @@ public interface EntityStoreView {
    * @throws Exception
    */
   void deleteClusterTemplate(String clusterTemplateName, int version) throws IOException, IllegalAccessException;
+
+  /**
+   * Get the {@link co.cask.coopr.spec.template.PartialTemplate} associated with the given unique name
+   * or null if no such provider exists.
+   *
+   * @param partialTemplateName Unique name of the provider to get.
+   * @return Partial template matching the given name or null if no such provider exists.
+   * @throws Exception
+   */
+  PartialTemplate getPartialTemplate(String partialTemplateName) throws IOException;
+
+  /**
+   * Get the {@link co.cask.coopr.spec.template.PartialTemplate} associated with the given unique name
+   * or null if no such provider exists.
+   *
+   * @param partialTemplateName Unique name of the provider to get.
+   * @param version Version of the provider to get.
+   * @return Partial template matching the given name or null if no such provider exists.
+   * @throws Exception
+   */
+  PartialTemplate getPartialTemplate(String partialTemplateName, int version) throws IOException;
+
+  /**
+   * Get all {@link co.cask.coopr.spec.template.PartialTemplate}s.
+   *
+   * @return Collection of all partial templates.
+   * @throws Exception
+   */
+  Collection<PartialTemplate> getAllPartialTemplates() throws IOException;
+
+  /**
+   * Write the given {@link co.cask.coopr.spec.template.PartialTemplate} to the store.
+   * Will overwrite the existing {@link co.cask.coopr.spec.template.PartialTemplate} if it exists.
+   *
+   * @param partialTemplate Partial template to write.
+   * @throws Exception
+   */
+  void writePartialTemplate(PartialTemplate partialTemplate) throws IOException, IllegalAccessException;
+
+  /**
+   * Delete the {@link co.cask.coopr.spec.template.PartialTemplate} associated with the given unique name.
+   *
+   * @param partialTemplateName Name of the partial template to delete.
+   * @throws Exception
+   */
+  void deletePartialTemplate(String partialTemplateName) throws IOException, IllegalAccessException;
+
+  /**
+   * Delete the {@link co.cask.coopr.spec.template.PartialTemplate} associated with the given unique name.
+   *
+   * @param partialTemplateName Name of the partial template to delete.
+   * @param version Version of the partial template to delete.
+   * @throws Exception
+   */
+  void deletePartialTemplate(String partialTemplateName, int version) throws IOException, IllegalAccessException;
 
   /**
    * Get the {@link co.cask.coopr.spec.plugin.ProviderType} associated with the given unique name

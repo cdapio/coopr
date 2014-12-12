@@ -1,0 +1,40 @@
+{
+    "name": "cdapDistributedSecureHadoop",
+    "version": "1",
+    "description": "Cask DAP (CDAP) with Security and Secure Hadoop cluster with single master",
+    "extends": {
+        "name": "cdapDistributed"
+    },
+    "includes": [{
+        "name" : "LDAPInternal"
+    }],
+    "defaults": {
+        "provider": "rackspace",
+        "services": [
+            "hive-metastore-database",
+            "hive-metastore",
+            "hive-server2"
+        ],
+        "config": {
+            "hive": {
+                "hive_env": {
+                    "hive_log_dir": "/data/logs/hive"
+                },
+                "hive_site": {
+                    "javax.jdo.option.ConnectionURL": "jdbc:mysql://%host.service.mysql-server%:3306/hive",
+                    "javax.jdo.option.ConnectionDriverName": "com.mysql.jdbc.Driver",
+                    "javax.jdo.option.ConnectionUserName": "dbuser",
+                    "javax.jdo.option.ConnectionPassword": "dbuserpassword",
+                    "hive.metastore.uris": "%join(map(host.service.hive-metastore,'thrift://$:9083'),',')%",
+                    "hive.support.concurrency": "true",
+                    "hive.zookeeper.quorum": "%join(map(host.service.zookeeper-server,'$'),',')%"
+                }
+            }
+        }
+    },
+    "compatibility": {
+        "services": [
+            "kerberos­client"
+        ]
+    }
+}

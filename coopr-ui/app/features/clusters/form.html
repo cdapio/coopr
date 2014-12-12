@@ -38,6 +38,15 @@
 
   </div>
 
+  <div class="form-group">
+    <label for="inputClusterDescription" class="col-xs-2 control-label">Description</label>
+    <div class="col-xs-10">
+      <textarea id="inputClusterDescription" name="description" class="form-control"
+        placeholder="Description"
+        ng-model="model.description"></textarea>
+    </div>
+  </div>
+
   <div ng-include="'/assets/features/clusters/form-advanced.html'" ng-show="showAdvanced" class="am-fade-and-slide-right"></div>
 
   <div class="form-group" ng-show="showConfig">
