@@ -31,6 +31,7 @@
         <module>coopr-server</module>
         <module>coopr-rest-client</module>
         <module>coopr-cli</module>
+        <module>coopr-ui</module>
     </modules>
 
     <properties>
@@ -230,15 +231,15 @@
         </dependency>
 
         <dependency>
-          <groupId>org.apache.twill</groupId>
-          <artifactId>twill-zookeeper</artifactId>
-          <version>0.2.0-incubating</version>
+            <groupId>org.apache.twill</groupId>
+            <artifactId>twill-zookeeper</artifactId>
+            <version>0.2.0-incubating</version>
         </dependency>
 
         <dependency>
-          <groupId>com.google.guava</groupId>
-          <artifactId>guava</artifactId>
-          <version>13.0.1</version>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>13.0.1</version>
         </dependency>
 
         <dependency>
@@ -280,12 +281,28 @@
         </dependency>
 
         <dependency>
-          <groupId>org.mockito</groupId>
-          <artifactId>mockito-all</artifactId>
-          <version>1.9.5</version>
-          <scope>test</scope>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <version>1.9.5</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>co.cask</groupId>
+        <artifactId>coopr</artifactId>
+        <version>${project.parent.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>co.cask.cdap</groupId>
+            <artifactId>cdap-security</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
     <reporting>
         <plugins>

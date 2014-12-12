@@ -120,6 +120,7 @@ function ($scope, $state, $q, $alert, CrudFormBase, myApi, caskFocusManager, myH
         // but we still need a populated model for display purposes
         angular.extend($scope.model, {
           name: data.name,
+          description: data.description,
           numMachines: data.nodes.length,
           clusterTemplate: data.clusterTemplate.name,
           provider: data.provider.name,

@@ -27,8 +27,13 @@ end
 
 # We always run our dns, firewall, and hosts cookbooks
 %w(dns firewall hosts).each do |cb|
-  include_recipe "coopr_#{cb}::default"
+  include_recipe "coopr_#{cb}::default" unless node['base'].key?("no_#{cb}") && node['base']["no_#{cb}"].to_s == 'true'
 end
 
-# ensure user ulimits are enabled 
+# Ensure user ulimits are enabled
 include_recipe 'ulimit::default'
+
+# Add users in the sysadmins group and give them sudo access
+%w(chef-solo-search sudo users).each do |cb|
+  include_recipe cb unless node['base'].key?("no_#{cb}") && node['base']["no_#{cb}"].to_s == 'true'
+end
