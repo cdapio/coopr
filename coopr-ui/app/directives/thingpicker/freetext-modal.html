@@ -16,11 +16,11 @@
 
           <div class="form-group">
             <p class="help-block" ng-show="modalError">
-              this {{thingName}} already exists!
+              this <span ng-bind="thingName"></span> already exists!
             </p>
             <div class="input-group">
               <label for="newThingName-{{thingName}}" class="input-group-addon">
-                New {{thingName}} name
+                New <span ng-bind="thingName"></span> name
               </label>
               <input type="text"
                 name="newThingName"

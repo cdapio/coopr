@@ -7,7 +7,6 @@
   incomplete: 'label-danger',
   failed: 'label-danger'
 
-}[status] || 'label-default'">
-  {{ display[status] || status }}
+}[status] || 'label-default'" ng-bind="display[status] || status">
 </span>
 
