@@ -121,7 +121,7 @@ public final class ClusterTemplate extends AbstractTemplate {
         return this;
       }
 
-      public Merger merge(Collection<AbstractTemplate> templates) throws Exception {
+      public Merger merge(Collection<AbstractTemplate> templates) throws TemplateImmutabilityException {
         for (AbstractTemplate template : templates) {
           if (template instanceof ClusterTemplate) {
             copyFullProps(template);
@@ -152,7 +152,7 @@ public final class ClusterTemplate extends AbstractTemplate {
       }
 
       //for partial includes
-      private void copyMainProps(AbstractTemplate from, boolean isImmutable) throws Exception {
+      private void copyMainProps(AbstractTemplate from, boolean isImmutable) throws TemplateImmutabilityException {
         //merge defaults
         mergeSet(clusterDefaults.getServices(), from.getClusterDefaults().getServices());
 
@@ -175,7 +175,7 @@ public final class ClusterTemplate extends AbstractTemplate {
       }
 
       //for parent extension
-      private void copyFullProps(AbstractTemplate from) throws Exception {
+      private void copyFullProps(AbstractTemplate from) throws TemplateImmutabilityException {
         copyMainProps(from, false);
 
         //merge defaults options
