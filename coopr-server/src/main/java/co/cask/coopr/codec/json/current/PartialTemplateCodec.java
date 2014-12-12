@@ -32,11 +32,7 @@ public class PartialTemplateCodec extends AbstractTemplateCodec<PartialTemplate>
   @Override
   protected void addChildFields(PartialTemplate template, JsonObject jsonObj, JsonSerializationContext context) {
     super.addChildFields(template, jsonObj, context);
-<<<<<<< HEAD
     jsonObj.add(IMMUTABLE_KEY, context.serialize(template.isImmutable()));
-=======
-    jsonObj.add("immutable", context.serialize(template.isImmutable()));
->>>>>>> upstream/develop
   }
 
   @Override
