@@ -48,7 +48,7 @@ public class SQLAdminEntityStoreView extends BaseSQLEntityStoreView {
       }
     } catch (SQLException e) {
       throw new IOException("Exception writing entity of type " + entityType.name().toLowerCase()
-                              + " of name " + entityName + accountErrorSnippet);
+                              + " with name " + entityName + accountErrorSnippet);
     }
   }
 
@@ -67,8 +67,8 @@ public class SQLAdminEntityStoreView extends BaseSQLEntityStoreView {
         conn.close();
       }
     } catch (SQLException e) {
-      throw new IOException("Exception deleting entities of type " + entityType.name().toLowerCase()
-                              + " of name " + entityName + accountErrorSnippet);
+      throw new IOException("Exception deleting all versions of type " + entityType.name().toLowerCase()
+                              + " with name " + entityName + accountErrorSnippet);
     }
   }
 
@@ -89,7 +89,7 @@ public class SQLAdminEntityStoreView extends BaseSQLEntityStoreView {
       }
     } catch (SQLException e) {
       throw new IOException("Exception deleting entity of type " + entityType.name().toLowerCase()
-                              + " of name " + entityName + " of version " + entityVersion + accountErrorSnippet);
+                              + " with name " + entityName + " and version " + entityVersion + accountErrorSnippet);
     }
   }
 
