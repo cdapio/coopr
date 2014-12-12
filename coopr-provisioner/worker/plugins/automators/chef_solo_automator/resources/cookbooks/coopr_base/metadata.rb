@@ -11,5 +11,9 @@ depends "coopr_firewall"
 depends "coopr_hosts"
 
 depends "apt"
-depends 'yum-epel'
+depends "yum-epel"
 depends "ulimit"
+
+depends "chef-solo-search" 
+depends "sudo"
+depends "users"
