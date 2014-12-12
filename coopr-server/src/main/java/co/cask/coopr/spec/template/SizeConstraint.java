@@ -45,7 +45,8 @@ public final class SizeConstraint {
    */
   public void verify(int numMachines) throws InvalidClusterException {
     if (numMachines < min || numMachines > max) {
-      throw new InvalidClusterException("Size must be at least " + min + " but not greater than " + max);
+      throw new InvalidClusterException(
+        "Size must be at least " + min + " but not greater than " + max + ". Now it's " + numMachines);
     }
   }
 
