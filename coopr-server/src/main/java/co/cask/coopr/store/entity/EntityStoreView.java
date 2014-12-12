@@ -178,7 +178,7 @@ public interface EntityStoreView {
    * Get the {@link co.cask.coopr.spec.template.ClusterTemplate} associated with the given unique name
    * or null if no such provider exists.
    *
-   * @param clusterTemplateName Unique name of the provider to get.
+   * @param clusterTemplateName Unique name of the template to get.
    * @return Cluster template matching the given name or null if no such provider exists.
    * @throws Exception
    */
@@ -213,36 +213,38 @@ public interface EntityStoreView {
    * Get the {@link co.cask.coopr.spec.template.PartialTemplate} associated with the given unique name
    * or null if no such provider exists.
    *
-   * @param partialTemplateName Unique name of the provider to get.
+   * @param partialTemplateName Unique name of the partial template to get.
+   * @param isMandatory Is partial template from mandatory collection
    * @return Partial template matching the given name or null if no such provider exists.
    * @throws Exception
    */
-  PartialTemplate getPartialTemplate(String partialTemplateName) throws IOException;
+  PartialTemplate getPartialTemplate(String partialTemplateName, boolean isMandatory) throws IOException;
 
   /**
    * Get all {@link co.cask.coopr.spec.template.PartialTemplate}s.
    *
+   * @param isMandatory Is partial template from mandatory collection
    * @return Collection of all partial templates.
    * @throws Exception
    */
-  Collection<PartialTemplate> getAllPartialTemplates() throws IOException;
+  Collection<PartialTemplate> getAllPartialTemplates(boolean isMandatory) throws IOException;
 
   /**
    * Write the given {@link co.cask.coopr.spec.template.PartialTemplate} to the store.
    * Will overwrite the existing {@link co.cask.coopr.spec.template.PartialTemplate} if it exists.
-   *
+   * @param isMandatory Is partial template from mandatory collection
    * @param partialTemplate Partial template to write.
    * @throws Exception
    */
-  void writePartialTemplate(PartialTemplate partialTemplate) throws IOException, IllegalAccessException;
+  void writePartialTemplate(PartialTemplate partialTemplate, boolean isMandatory) throws IOException, IllegalAccessException;
 
   /**
    * Delete the {@link co.cask.coopr.spec.template.PartialTemplate} associated with the given unique name.
-   *
+   * @param isMandatory Is partial template from mandatory collection
    * @param partialTemplateName Name of the partial template to delete.
    * @throws Exception
    */
-  void deletePartialTemplate(String partialTemplateName) throws IOException, IllegalAccessException;
+  void deletePartialTemplate(String partialTemplateName, boolean isMandatory) throws IOException, IllegalAccessException;
 
   /**
    * Get the {@link co.cask.coopr.spec.plugin.ProviderType} associated with the given unique name

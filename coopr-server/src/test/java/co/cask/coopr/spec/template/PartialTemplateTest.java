@@ -34,6 +34,8 @@ public class PartialTemplateTest extends BaseTest {
   private static PartialTemplate sensuPartial;
   private static PartialTemplate ldapPartial;
   private static PartialTemplate partialWithOverrides;
+  private static PartialTemplate mandatoryPartial1;
+  private static PartialTemplate mandatoryPartial2;
   private static ClusterTemplate templateWithOverridesInBody;
   private static ClusterTemplate templateWithOverridesInPartial;
 
@@ -43,12 +45,13 @@ public class PartialTemplateTest extends BaseTest {
 
   private static final Set<String> defaultsServices =
     Sets.newHashSet("cdap­security", "mysql­server", "continuuity­sensu­monitoring", "bob", "hive-metastore-database",
-                    "hive-metastore", "zookeeper­server", "cdap", "hive-server2", "ldap­internal");
+                    "hive-metastore", "zookeeper­server", "cdap", "hive-server2", "ldap­internal",
+                    "mandatory-first-service", "mandatory-second-service");
   private static final Set<String> compatibilitiesHardwaretypes = Sets.newHashSet("standard­large", "standard-xlarge");
   private static final Set<String> compatibilitiesImagetypes = Sets.newHashSet("centos6", "ubuntu12");
   private static final Set<String> compatibilitiesServices =
     Sets.newHashSet("mysql­server", "continuuity­sensu­monitoring", "kerberos­client", "zookeeper­server", "cdap",
-                    "ldap­internal");
+                    "ldap­internal", "mandatory-first-service", "mandatory-second-service");
   private static final Map<String, ServiceConstraint> serviceConstraints = Maps.newHashMap();
 
   @Override
@@ -84,6 +87,8 @@ public class PartialTemplateTest extends BaseTest {
     InputStream templateWithOverridesInPartialIn =
       classLoader.getResourceAsStream("partials/template-with-overrides-in-partial.json");
     InputStream partialWithOverridesIn = classLoader.getResourceAsStream("partials/partial-immutable-overrides.json");
+    InputStream mandatoryPartial1In = classLoader.getResourceAsStream("partials/first-mandatory.json");
+    InputStream mandatoryPartial2In = classLoader.getResourceAsStream("partials/second-mandatory.json");
 
     insecureTemplate = gson.fromJson(IOUtils.toString(insecureIn), ClusterTemplate.class);
     distributedTemplate = gson.fromJson(IOUtils.toString(distributedIn), ClusterTemplate.class);
@@ -95,6 +100,8 @@ public class PartialTemplateTest extends BaseTest {
     sensuPartial = gson.fromJson(IOUtils.toString(sensuIn), PartialTemplate.class);
     ldapPartial = gson.fromJson(IOUtils.toString(ldapIn), PartialTemplate.class);
     partialWithOverrides = gson.fromJson(IOUtils.toString(partialWithOverridesIn), PartialTemplate.class);
+    mandatoryPartial1 = gson.fromJson(IOUtils.toString(mandatoryPartial1In), PartialTemplate.class);
+    mandatoryPartial2 = gson.fromJson(IOUtils.toString(mandatoryPartial2In), PartialTemplate.class);
 
     Assert.assertNotNull(insecureTemplate);
     Assert.assertNotNull(distributedTemplate);
@@ -102,13 +109,15 @@ public class PartialTemplateTest extends BaseTest {
     Assert.assertNotNull(sensuPartial);
     Assert.assertNotNull(ldapPartial);
     Assert.assertNotNull(partialWithOverrides);
+    Assert.assertNotNull(mandatoryPartial1);
     Assert.assertNotNull(templateWithOverridesInBody);
     Assert.assertNotNull(templateWithOverridesInPartial);
   }
 
   @Test
   public void test_02_persist() throws Exception {
-    int beforePartialsCount = entityStoreView.getAllPartialTemplates().size();
+    int beforePartialsCount = entityStoreView.getAllPartialTemplates(false).size();
+    int beforeMandatoryPartialsCount = entityStoreView.getAllPartialTemplates(true).size();
     int beforeClusterTemplatesCount = entityStoreView.getAllClusterTemplates().size();
 
     entityStoreView.writeClusterTemplate(insecureTemplate);
@@ -117,21 +126,25 @@ public class PartialTemplateTest extends BaseTest {
     entityStoreView.writeClusterTemplate(templateWithOverridesInBody);
     entityStoreView.writeClusterTemplate(templateWithOverridesInPartial);
 
-    entityStoreView.writePartialTemplate(sensuPartial);
-    entityStoreView.writePartialTemplate(ldapPartial);
-    entityStoreView.writePartialTemplate(partialWithOverrides);
+    entityStoreView.writePartialTemplate(sensuPartial, false);
+    entityStoreView.writePartialTemplate(ldapPartial, false);
+    entityStoreView.writePartialTemplate(partialWithOverrides, false);
+    entityStoreView.writePartialTemplate(mandatoryPartial1, true);
+    entityStoreView.writePartialTemplate(mandatoryPartial2, true);
 
-    int afterPartialsCount = entityStoreView.getAllPartialTemplates().size();
+    int afterPartialsCount = entityStoreView.getAllPartialTemplates(false).size();
+    int afterMandatoryPartialsCount = entityStoreView.getAllPartialTemplates(true).size();
     int afterClusterTemplatesCount = entityStoreView.getAllClusterTemplates().size();
 
     Assert.assertEquals(afterPartialsCount, beforePartialsCount + 3);
     Assert.assertEquals(afterClusterTemplatesCount, beforeClusterTemplatesCount + 5);
+    Assert.assertEquals(afterMandatoryPartialsCount, beforeMandatoryPartialsCount + 2);
   }
 
   @Test
   public void test_03_persistentTemplatesConsistence() throws Exception {
-    PartialTemplate ldapInternal = entityStoreView.getPartialTemplate("LDAP-internal");
-    PartialTemplate sensuInternal = entityStoreView.getPartialTemplate("sensu-internal");
+    PartialTemplate ldapInternal = entityStoreView.getPartialTemplate("LDAP-internal", false);
+    PartialTemplate sensuInternal = entityStoreView.getPartialTemplate("sensu-internal", false);
 
     ClusterTemplate cdapDistributedSecureHadoop = entityStoreView.getClusterTemplate("cdap-distributed-secure-hadoop");
     ClusterTemplate cdapDistributedInsecure = entityStoreView.getClusterTemplate("cdap-distributed-insecure");
@@ -183,7 +196,7 @@ public class PartialTemplateTest extends BaseTest {
     Assert.assertEquals(secureTemplate.getName(), rt.getName());
     Assert.assertEquals(secureTemplate.getDescription(), rt.getDescription());
     Assert.assertEquals(defaultsServices, rt.getClusterDefaults().getServices());
-    Assert.assertEquals(16, rt.getClusterDefaults().getConfig().entrySet().size());
+    Assert.assertEquals(17, rt.getClusterDefaults().getConfig().entrySet().size());
     Assert.assertEquals("rackspace", rt.getClusterDefaults().getProvider());
     Assert.assertEquals("standard­large", rt.getClusterDefaults().getHardwaretype());
     Assert.assertEquals("centos6", rt.getClusterDefaults().getImagetype());
@@ -199,20 +212,35 @@ public class PartialTemplateTest extends BaseTest {
     Assert.assertEquals(compatibilitiesHardwaretypes, rt.getCompatibilities().getHardwaretypes());
     Assert.assertEquals(compatibilitiesImagetypes, rt.getCompatibilities().getImagetypes());
     Assert.assertEquals(compatibilitiesServices, rt.getCompatibilities().getServices());
+
+    //overrides in second mandatory partial
+    Assert.assertEquals("ldap.correct.com", rt.getClusterDefaults().getConfig().get("ldap")
+      .getAsJsonObject().get("endpoint").getAsString());
+
+    //overrides in child
+    Assert.assertTrue(rt.getClusterDefaults().getConfig().get("security.server.ssl.enabled").getAsBoolean());
+
+    //overrides in first mandatory partial
+    Assert.assertEquals("mandatory config property",
+                        rt.getClusterDefaults().getConfig().get("mandatory-first-service").getAsString());
   }
 
   @Test
   public void test_07_deleteTemplate() throws Exception {
-    int beforePartialsCount = entityStoreView.getAllPartialTemplates().size();
+    int beforePartialsCount = entityStoreView.getAllPartialTemplates(false).size();
+    int beforeMandatoryPartialsCount = entityStoreView.getAllPartialTemplates(true).size();
     int beforeClusterTemplatesCount = entityStoreView.getAllClusterTemplates().size();
 
     entityStoreView.deleteClusterTemplate(insecureTemplate.getName());
-    entityStoreView.deletePartialTemplate(sensuPartial.getName());
+    entityStoreView.deletePartialTemplate(sensuPartial.getName(), false);
+    entityStoreView.deletePartialTemplate(mandatoryPartial1.getName(), true);
 
-    int afterPartialsCount = entityStoreView.getAllPartialTemplates().size();
+    int afterPartialsCount = entityStoreView.getAllPartialTemplates(false).size();
+    int afterMandatoryPartialsCount = entityStoreView.getAllPartialTemplates(true).size();
     int afterClusterTemplatesCount = entityStoreView.getAllClusterTemplates().size();
 
     Assert.assertEquals(afterPartialsCount, beforePartialsCount - 1);
     Assert.assertEquals(afterClusterTemplatesCount, beforeClusterTemplatesCount - 1);
+    Assert.assertEquals(afterMandatoryPartialsCount, beforeMandatoryPartialsCount - 1);
   }
 }

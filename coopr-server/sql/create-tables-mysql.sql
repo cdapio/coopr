@@ -117,6 +117,13 @@ CREATE TABLE IF NOT EXISTS clusterTemplates (
     PRIMARY KEY (tenant_id, name)
 ) ENGINE = InnoDB;
 
+CREATE TABLE IF NOT EXISTS mandatoryTemplates (
+    name VARCHAR(255),
+    tenant_id VARCHAR(64),
+    mandatoryTemplate MEDIUMBLOB,
+    PRIMARY KEY (tenant_id, name)
+) ENGINE = InnoDB;
+
 CREATE TABLE IF NOT EXISTS tenants (
     id VARCHAR(64),
     name VARCHAR(255),

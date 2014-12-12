@@ -1,0 +1,17 @@
+{
+    "name": "first-mandatory",
+    "description": "First mandatory partial template",
+    "defaults": {
+        "services": [
+            "mandatory-first-service"
+        ],
+        "config": {
+            "mandatory-first-service": "mandatory config property"
+        }
+    },
+    "compatibility": {
+        "services": [
+            "mandatory-first-service"
+        ]
+    }
+}

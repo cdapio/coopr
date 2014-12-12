@@ -50,6 +50,7 @@ import co.cask.coopr.spec.template.Include;
 import co.cask.coopr.spec.template.Parent;
 import co.cask.coopr.spec.template.PartialTemplate;
 import co.cask.coopr.spec.template.SizeConstraint;
+import co.cask.coopr.spec.template.TemplateImmutabilityException;
 import co.cask.coopr.spec.template.TemplateNotFoundException;
 import co.cask.coopr.store.cluster.ClusterStore;
 import co.cask.coopr.store.cluster.ClusterStoreService;
@@ -738,33 +739,56 @@ public class ClusterService {
     return cluster;
   }
 
-  public ClusterTemplate resolveTemplate(Account account, ClusterTemplate clusterTemplate) throws Exception {
+  /**
+   * Build cluster template from provided includes and parents.
+   *
+   * @param clusterTemplate Cluster template which can contains includes and parents.
+   * @param account Account of the user that is trying to resume a cluster job.
+   * @return Cluster Template with merged body from includes and parents.
+   * @throws IOException if there was some error writing to stores.
+   * @throws TemplateNotFoundException if template can't be found in store.
+   * @throws TemplateImmutabilityException if some template tries to override immutable template config.
+   */
+  public ClusterTemplate resolveTemplate(Account account, ClusterTemplate clusterTemplate)
+    throws TemplateNotFoundException, TemplateImmutabilityException, IOException {
     EntityStoreView entityStore = entityStoreService.getView(account);
     return resolveTemplate(entityStore, clusterTemplate);
   }
 
-  public ClusterTemplate resolveTemplate(Account account, String templateName) throws Exception {
+  /**
+   * Build cluster template from provided includes and parents.
+   *
+   * @param templateName Cluster template name.
+   * @param account Account of the user that is trying to resume a cluster job.
+   * @return Cluster Template with merged body from includes and parents.
+   * @throws IOException if there was some error writing to stores.
+   * @throws TemplateNotFoundException if template can't be found in store.
+   * @throws TemplateImmutabilityException if some template tries to override immutable template config.
+   */
+  public ClusterTemplate resolveTemplate(Account account, String templateName)
+    throws IOException, TemplateNotFoundException, TemplateImmutabilityException {
     EntityStoreView entityStore = entityStoreService.getView(account);
     ClusterTemplate clusterTemplate = entityStore.getClusterTemplate(templateName);
-    if  (clusterTemplate == null) {
+    if (clusterTemplate == null) {
       throw new TemplateNotFoundException("Cluster template " + templateName + " does not exist");
     }
     return resolveTemplate(entityStore, clusterTemplate);
   }
 
-  private ClusterTemplate resolveTemplate(EntityStoreView entityStore, ClusterTemplate clusterTemplate) throws Exception {
+  private ClusterTemplate resolveTemplate(EntityStoreView entityStore, ClusterTemplate clusterTemplate)
+    throws IOException, TemplateImmutabilityException, TemplateNotFoundException {
     Set<AbstractTemplate> mergeSet = getMergeCollection(entityStore, clusterTemplate);
+    //mandatory merge
+    mergeSet.addAll(entityStore.getAllPartialTemplates(true));
     return ClusterTemplate.builder()
       .merger().merge(mergeSet).setInitialTemplate(clusterTemplate)
       .builder().build();
   }
 
-  /*
-  Merging in order Parent Includes -> Parent -> Child Includes -> Child -> ...
-  TODO: merging with mandatory partials and user-level attributes(???)
-   */
+
+  //Merging in order: Parent Includes -> Parent -> Child Includes -> Child -> ...  -> Mandatory Partials
   private Set<AbstractTemplate> getMergeCollection(EntityStoreView entityStore, ClusterTemplate clusterTemplate)
-    throws Exception {
+    throws IOException, TemplateNotFoundException {
     Set<AbstractTemplate> forMerge;
     Parent parent = clusterTemplate.getParent();
     if (parent != null) {
@@ -779,16 +803,15 @@ public class ClusterService {
     Set<AbstractTemplate> includes = resolvePartialIncludes(entityStore, clusterTemplate.getIncludes());
     forMerge.addAll(includes);
     forMerge.add(clusterTemplate);
-
     return forMerge;
   }
 
   private Set<AbstractTemplate> resolvePartialIncludes(EntityStoreView entityStore, Set<Include> includes)
-    throws Exception {
+    throws IOException, TemplateNotFoundException {
     Set<AbstractTemplate> partials = Sets.newLinkedHashSet();
     if (includes != null) {
       for (Include include : includes) {
-        PartialTemplate partialTemplate = entityStore.getPartialTemplate(include.getName());
+        PartialTemplate partialTemplate = entityStore.getPartialTemplate(include.getName(), false);
         if (partialTemplate == null) {
           throw new TemplateNotFoundException(include.getName() + " partial template not found.");
         }

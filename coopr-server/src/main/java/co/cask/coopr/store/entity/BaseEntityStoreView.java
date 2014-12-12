@@ -112,6 +112,7 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
     SERVICE("service"),
     CLUSTER_TEMPLATE("clusterTemplate"),
     PARTIAL_TEMPLATE("partialTemplate"),
+    MANDATORY_TEMPLATE("mandatoryTemplate"),
     PROVIDER_TYPE("providerType"),
     AUTOMATOR_TYPE("automatorType");
     private final String id;
@@ -231,24 +232,30 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
   }
 
   @Override
-  public PartialTemplate getPartialTemplate(String partialTemplateName) throws IOException {
-    return get(EntityType.PARTIAL_TEMPLATE, partialTemplateName, partialTemplateTransform);
+  public PartialTemplate getPartialTemplate(String partialTemplateName, boolean isMandatory) throws IOException {
+    EntityType type = isMandatory ? EntityType.MANDATORY_TEMPLATE : EntityType.PARTIAL_TEMPLATE;
+    return get(type, partialTemplateName, partialTemplateTransform);
   }
 
   @Override
-  public Collection<PartialTemplate> getAllPartialTemplates() throws IOException {
-    return getAllEntities(EntityType.PARTIAL_TEMPLATE, partialTemplateTransform);
+  public Collection<PartialTemplate> getAllPartialTemplates(boolean isMandatory) throws IOException {
+    EntityType type = isMandatory ? EntityType.MANDATORY_TEMPLATE : EntityType.PARTIAL_TEMPLATE;
+    return getAllEntities(type, partialTemplateTransform);
   }
 
   @Override
-  public void writePartialTemplate(PartialTemplate partialTemplate) throws IOException, IllegalAccessException {
-    writeEntity(EntityType.PARTIAL_TEMPLATE, partialTemplate.getName(),
+  public void writePartialTemplate(PartialTemplate partialTemplate, boolean isMandatory) throws IOException,
+    IllegalAccessException {
+    EntityType type = isMandatory ? EntityType.MANDATORY_TEMPLATE : EntityType.PARTIAL_TEMPLATE;
+    writeEntity(type, partialTemplate.getName(),
                 serialize(partialTemplate, PartialTemplate.class));
   }
 
   @Override
-  public void deletePartialTemplate(String partialTemplateName) throws IOException, IllegalAccessException {
-    deleteEntity(EntityType.PARTIAL_TEMPLATE, partialTemplateName);
+  public void deletePartialTemplate(String partialTemplateName, boolean isMandatory) throws IOException,
+    IllegalAccessException {
+    EntityType type = isMandatory ? EntityType.MANDATORY_TEMPLATE : EntityType.PARTIAL_TEMPLATE;
+    deleteEntity(type, partialTemplateName);
   }
 
   @Override
