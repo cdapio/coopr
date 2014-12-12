@@ -952,7 +952,7 @@ public class AdminHandler extends AbstractAuthHandler {
     try {
       EntityStoreView view = entityStoreService.getView(account);
       if (view.getProvider(provider.getName()) != null) {
-        responder.sendError(HttpResponseStatus.BAD_REQUEST,
+        responder.sendError(HttpResponseStatus.CONFLICT,
                             "provider " + provider.getName() + " already exists");
       } else {
         view.writeProvider(provider);
@@ -991,7 +991,7 @@ public class AdminHandler extends AbstractAuthHandler {
     try {
       EntityStoreView view = entityStoreService.getView(account);
       if (view.getHardwareType(hardwareType.getName()) != null) {
-        responder.sendError(HttpResponseStatus.BAD_REQUEST,
+        responder.sendError(HttpResponseStatus.CONFLICT,
                             "hardware type " + hardwareType.getName() + " already exists");
       } else {
         view.writeHardwareType(hardwareType);
@@ -1030,7 +1030,7 @@ public class AdminHandler extends AbstractAuthHandler {
     try {
       EntityStoreView view = entityStoreService.getView(account);
       if (view.getImageType(imageType.getName()) != null) {
-        responder.sendError(HttpResponseStatus.BAD_REQUEST, "image type " + imageType.getName() + " already exists");
+        responder.sendError(HttpResponseStatus.CONFLICT, "image type " + imageType.getName() + " already exists");
       } else {
         view.writeImageType(imageType);
         responder.sendStatus(HttpResponseStatus.OK);
@@ -1068,7 +1068,7 @@ public class AdminHandler extends AbstractAuthHandler {
     try {
       EntityStoreView view = entityStoreService.getView(account);
       if (view.getService(service.getName()) != null) {
-        responder.sendError(HttpResponseStatus.BAD_REQUEST, "service " + service.getName() + " already exists");
+        responder.sendError(HttpResponseStatus.CONFLICT, "service " + service.getName() + " already exists");
       } else {
         view.writeService(service);
         responder.sendStatus(HttpResponseStatus.OK);
@@ -1106,7 +1106,7 @@ public class AdminHandler extends AbstractAuthHandler {
     try {
       EntityStoreView view = entityStoreService.getView(account);
       if (view.getClusterTemplate(clusterTemplate.getName()) != null) {
-        responder.sendError(HttpResponseStatus.BAD_REQUEST,
+        responder.sendError(HttpResponseStatus.CONFLICT,
                             "cluster template " + clusterTemplate.getName() + " already exists");
       } else {
         if (!validateTemplate(clusterTemplate, responder)) {
@@ -1149,7 +1149,7 @@ public class AdminHandler extends AbstractAuthHandler {
     try {
       EntityStoreView view = entityStoreService.getView(account);
       if (view.getPartialTemplate(partialTemplate.getName()) != null) {
-        responder.sendString(HttpResponseStatus.BAD_REQUEST,
+        responder.sendString(HttpResponseStatus.CONFLICT,
                              "partial template " + partialTemplate.getName() + " already exists");
       } else {
         if (!validateTemplate(partialTemplate, responder)) {

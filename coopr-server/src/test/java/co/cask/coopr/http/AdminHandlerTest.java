@@ -303,7 +303,7 @@ public class AdminHandlerTest extends ServiceTestBase {
     JsonObject result = new Gson().fromJson(reader, JsonObject.class);
     Assert.assertEquals(entity1, result);
     // make sure you can't overwrite the entity through post
-    assertResponseStatus(doPostExternalAPI(base, entity1.toString(), ADMIN_HEADERS), HttpResponseStatus.BAD_REQUEST);
+    assertResponseStatus(doPostExternalAPI(base, entity1.toString(), ADMIN_HEADERS), HttpResponseStatus.CONFLICT);
 
     // delete entity
     assertResponseStatus(doDeleteExternalAPI(entity1Path, ADMIN_HEADERS), HttpResponseStatus.OK);
