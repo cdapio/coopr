@@ -9,7 +9,7 @@ function ($scope, $state, $q, $alert, CrudFormBase, myApi, caskFocusManager, myH
 
   var id = $state.params.id;
 
-  $scope.model = new myApi.Cluster({id:id, clusterTemplate:'base', numMachines:1});
+  $scope.model = new myApi.Cluster({id:id, clusterTemplate:null, numMachines:1});
 
   $scope.showAdvanced = false;
   $scope.showConfig = !!id;
@@ -25,6 +25,15 @@ function ($scope, $state, $q, $alert, CrudFormBase, myApi, caskFocusManager, myH
   $scope.availableImages = [];
   $scope.availableServices = [];
 
+  /**
+   * We can not be sure that 'base' template would be always present.
+   */
+  $scope.$watch('availableTemplates', function (templates) {
+    if (templates && templates.length) {
+      $scope.model.clusterTemplate = $scope.availableTemplates[0];
+    }
+  }, true);
+
   $q.all([
     allHardware.$promise,
     allImages.$promise,
@@ -33,14 +42,12 @@ function ($scope, $state, $q, $alert, CrudFormBase, myApi, caskFocusManager, myH
     $scope.availableTemplates.$promise
   ]).then(function () {
 
-    $scope.$watch('model.clusterTemplate', function (name) {
-      if(!name) {
+    $scope.$watch('model.clusterTemplate', function (template) {
+      if(!template) {
         return;
       }
 
-      var chosen = $scope.availableTemplates.filter(function (tpl) {
-        return tpl.name === name;
-      })[0];
+      var chosen = template;
 
       $scope.chosenTemplate = chosen;
 
