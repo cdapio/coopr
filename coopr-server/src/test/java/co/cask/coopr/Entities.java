@@ -42,6 +42,7 @@ import co.cask.coopr.spec.template.Compatibilities;
 import co.cask.coopr.spec.template.Constraints;
 import co.cask.coopr.spec.template.LayoutConstraint;
 import co.cask.coopr.spec.template.LeaseDuration;
+import co.cask.coopr.spec.template.PartialTemplate;
 import co.cask.coopr.spec.template.ServiceConstraint;
 import co.cask.coopr.spec.template.SizeConstraint;
 import com.google.common.collect.ImmutableMap;
@@ -530,6 +531,39 @@ public class Entities {
           )
         ),
         SizeConstraint.EMPTY)).build();
+  }
+
+  public static class PartialTemplateExample {
+
+    public static final PartialTemplate TEST_PARTIAL1 = PartialTemplate.builder()
+      .setName("partial1")
+      .setDescription("test partial template number 1")
+      .setClusterDefaults(
+        ClusterDefaults.builder()
+          .setServices(
+            ServiceExample.HOSTS.getName(),
+            ServiceExample.NAMENODE.getName(),
+            ServiceExample.DATANODE.getName())
+          .setProvider("joyent").build())
+      .setCompatibilities(Compatibilities.builder().setServices(
+        ServiceExample.HOSTS.getName(),
+        ServiceExample.NAMENODE.getName(),
+        ServiceExample.DATANODE.getName()).build()).build();
+    public static final PartialTemplate TEST_PARTIAL2 = PartialTemplate.builder()
+      .setName("partial2")
+      .setDescription("test partial template number 2")
+      .setClusterDefaults(
+        ClusterDefaults.builder()
+          .setServices("firewall", "hosts", "datanode")
+          .setProvider("rackspace")
+          .setHardwaretype("medium")
+          .setImagetype("ubuntu12")
+          .build())
+      .setCompatibilities(
+        Compatibilities.builder()
+          .setHardwaretypes("small", "medium", "large")
+          .setImagetypes("centos6", "ubuntu12")
+          .setServices("firewall", "hosts", "datanode").build()).build();
   }
 
   public static class ClusterExample {

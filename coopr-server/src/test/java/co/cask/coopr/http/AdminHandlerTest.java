@@ -27,6 +27,7 @@ import co.cask.coopr.spec.Tenant;
 import co.cask.coopr.spec.TenantSpecification;
 import co.cask.coopr.spec.service.Service;
 import co.cask.coopr.spec.template.ClusterTemplate;
+import co.cask.coopr.spec.template.PartialTemplate;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
@@ -109,6 +110,18 @@ public class AdminHandlerTest extends ServiceTestBase {
   public void testClusterTemplatesBumpVersion() throws Exception {
     testRestAPIsBumpVersion("clustertemplates",
                             gson.toJsonTree(Entities.ClusterTemplateExample.HDFS).getAsJsonObject());
+  }
+
+  @Test
+  public void testPartialTemplates() throws Exception {
+    testRestAPIs("partialtemplates", gson.toJsonTree(Entities.PartialTemplateExample.TEST_PARTIAL1).getAsJsonObject(),
+            gson.toJsonTree(Entities.PartialTemplateExample.TEST_PARTIAL2).getAsJsonObject());
+  }
+
+  @Test
+  public void testPartialTemplatesBumpVersion() throws Exception {
+    testRestAPIsBumpVersion("partialtemplates",
+            gson.toJsonTree(Entities.PartialTemplateExample.TEST_PARTIAL1).getAsJsonObject());
   }
 
   @Test
@@ -200,6 +213,11 @@ public class AdminHandlerTest extends ServiceTestBase {
                                                    Entities.ClusterTemplateExample.REACTOR),
                                 new TypeToken<List<ClusterTemplate>>() {}.getType()));
 
+    import1.put(AdminHandler.PARTIAL_TEMPLATES,
+                gson.toJsonTree(Lists.newArrayList(Entities.PartialTemplateExample.TEST_PARTIAL1,
+                                                   Entities.PartialTemplateExample.TEST_PARTIAL2),
+                                new TypeToken<List<PartialTemplate>>() {}.getType()));
+
 
     // Verify import worked by exporting
     runImportExportTest(import1);
@@ -231,6 +249,11 @@ public class AdminHandlerTest extends ServiceTestBase {
                                 new TypeToken<List<ClusterTemplate>>() {
                                 }.getType()));
 
+    import2.put(AdminHandler.PARTIAL_TEMPLATES,
+                gson.toJsonTree(Lists.newArrayList(Entities.PartialTemplateExample.TEST_PARTIAL1,
+                                                   Entities.PartialTemplateExample.TEST_PARTIAL2),
+                                new TypeToken<List<PartialTemplate>>() {}.getType()));
+
     // Verify import worked by exporting
     runImportExportTest(import2);
 
@@ -241,6 +264,7 @@ public class AdminHandlerTest extends ServiceTestBase {
     import3.put(AdminHandler.IMAGE_TYPES, new JsonArray());
     import3.put(AdminHandler.SERVICES, new JsonArray());
     import3.put(AdminHandler.CLUSTER_TEMPLATES, new JsonArray());
+    import3.put(AdminHandler.PARTIAL_TEMPLATES, new JsonArray());
     // Verify import worked by exporting
     runImportExportTest(import3);
   }
@@ -260,6 +284,7 @@ public class AdminHandlerTest extends ServiceTestBase {
     assertImport(importJson, exportJson, AdminHandler.IMAGE_TYPES);
     assertImport(importJson, exportJson, AdminHandler.SERVICES);
     assertImport(importJson, exportJson, AdminHandler.CLUSTER_TEMPLATES);
+    assertImport(importJson, exportJson, AdminHandler.PARTIAL_TEMPLATES);
   }
 
   private void assertImport(Map<String, JsonElement> import1, Map<String, JsonElement> export1, String key) {
@@ -355,7 +380,7 @@ public class AdminHandlerTest extends ServiceTestBase {
     JsonObject result = new Gson().fromJson(reader, JsonObject.class);
     Assert.assertEquals(entity1, result);
     // make sure you can't overwrite the entity through post
-    assertResponseStatus(doPostExternalAPI(base, entity1.toString(), ADMIN_HEADERS), HttpResponseStatus.BAD_REQUEST);
+    assertResponseStatus(doPostExternalAPI(base, entity1.toString(), ADMIN_HEADERS), HttpResponseStatus.CONFLICT);
 
     // delete entity
     assertResponseStatus(doDeleteExternalAPI(entity1Path, ADMIN_HEADERS), HttpResponseStatus.OK);
