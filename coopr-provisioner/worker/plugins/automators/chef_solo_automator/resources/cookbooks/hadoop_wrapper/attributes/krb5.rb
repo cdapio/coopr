@@ -19,7 +19,8 @@ if node['hadoop'].key?('core_site') && node['hadoop']['core_site'].key?('hadoop.
   default['krb5_utils']['krb5_user_keytabs']['yarn'] = { 'owner' => 'yarn', 'group' => 'hadoop', 'mode' => '0640' }
 
   # container-executor.cfg
-  default['hadoop']['container_executor']['banned.users'] = 'hdfs,yarn,mapred,bin'
+  default['hadoop']['container_executor']['allowed.system.users'] = 'yarn'
+  default['hadoop']['container_executor']['banned.users'] = 'hdfs,mapred,bin'
   default['hadoop']['container_executor']['min.user.id'] = 500
   default['hadoop']['container_executor']['yarn.nodemanager.linux-container-executor.group'] = 'yarn'
   default['hadoop']['container_executor']['yarn.nodemanager.local-dirs'] =
@@ -34,12 +35,6 @@ if node['hadoop'].key?('core_site') && node['hadoop']['core_site'].key?('hadoop.
   default['hadoop']['container_executor']['yarn.nodemanager.container-executor.class'] = 'org.apache.hadoop.yarn.server.nodemanager.LinuxContainerExecutor'
 
   # hadoop-env.sh
-  default['hadoop']['hadoop_env']['jsvc_home'] =
-    if node['platform_family'] == 'debian'
-      '/usr/lib/bigtop-utils'
-    elsif node['platform_family'] == 'rhel'
-      '/usr/libexec/bigtop-utils'
-    end
   default['hadoop']['hadoop_env']['hadoop_secure_dn_user'] = 'hdfs'
   default['hadoop']['hadoop_env']['hadoop_secure_dn_pid_dir'] = '/var/run/hadoop-hdfs'
   default['hadoop']['hadoop_env']['hadoop_secure_dn_log_dir'] = '/var/log/hadoop-hdfs'

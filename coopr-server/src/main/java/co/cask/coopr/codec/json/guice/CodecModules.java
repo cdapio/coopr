@@ -39,6 +39,7 @@ import co.cask.coopr.codec.json.current.LeaseDurationCodec;
 import co.cask.coopr.codec.json.current.NodeCodec;
 import co.cask.coopr.codec.json.current.NodePropertiesRequestCodec;
 import co.cask.coopr.codec.json.current.ParametersSpecificationCodec;
+import co.cask.coopr.codec.json.current.PartialTemplateCodec;
 import co.cask.coopr.codec.json.current.PluginResourceMetaCodec;
 import co.cask.coopr.codec.json.current.ProviderCodec;
 import co.cask.coopr.codec.json.current.ProviderTypeCodec;
@@ -88,6 +89,7 @@ import co.cask.coopr.spec.template.ClusterTemplate;
 import co.cask.coopr.spec.template.Constraints;
 import co.cask.coopr.spec.template.LayoutConstraint;
 import co.cask.coopr.spec.template.LeaseDuration;
+import co.cask.coopr.spec.template.PartialTemplate;
 import co.cask.coopr.spec.template.ServiceConstraint;
 import co.cask.coopr.spec.template.SizeConstraint;
 import com.google.gson.Gson;
@@ -127,6 +129,7 @@ public class CodecModules {
       .registerTypeAdapter(ClusterDetails.class, new ClusterDetailsCodec())
       .registerTypeAdapter(ClusterOperationRequest.class, new ClusterOperationRequestCodec())
       .registerTypeAdapter(ClusterTemplate.class, new ClusterTemplateCodec())
+      .registerTypeAdapter(PartialTemplate.class, new PartialTemplateCodec())
       .registerTypeAdapter(Constraints.class, new ConstraintsCodec())
       .registerTypeAdapter(FieldSchema.class, new FieldSchemaCodec())
       .registerTypeAdapter(FinishTaskRequest.class, new FinishTaskRequestCodec())

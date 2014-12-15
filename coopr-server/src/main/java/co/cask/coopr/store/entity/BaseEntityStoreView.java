@@ -22,6 +22,7 @@ import co.cask.coopr.spec.plugin.AutomatorType;
 import co.cask.coopr.spec.plugin.ProviderType;
 import co.cask.coopr.spec.service.Service;
 import co.cask.coopr.spec.template.ClusterTemplate;
+import co.cask.coopr.spec.template.PartialTemplate;
 import com.google.common.base.Charsets;
 import com.google.common.base.Function;
 import com.google.gson.Gson;
@@ -76,6 +77,14 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
         return deserialize(input, ClusterTemplate.class);
       }
     };
+  private final Function<byte[], PartialTemplate> partialTemplateTransform =
+    new Function<byte[], PartialTemplate>() {
+      @Nullable
+      @Override
+      public PartialTemplate apply(@Nullable byte[] input) {
+        return deserialize(input, PartialTemplate.class);
+      }
+    };
   private final Function<byte[], ProviderType> providerTypeTransform =
     new Function<byte[], ProviderType>() {
       @Nullable
@@ -102,6 +111,7 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
     IMAGE_TYPE("imageType"),
     SERVICE("service"),
     CLUSTER_TEMPLATE("clusterTemplate"),
+    PARTIAL_TEMPLATE("partialTemplate"),
     PROVIDER_TYPE("providerType"),
     AUTOMATOR_TYPE("automatorType");
     private final String id;
@@ -218,6 +228,27 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
   @Override
   public void deleteClusterTemplate(String clusterTemplateName) throws IOException, IllegalAccessException {
     deleteEntity(EntityType.CLUSTER_TEMPLATE, clusterTemplateName);
+  }
+
+  @Override
+  public PartialTemplate getPartialTemplate(String partialTemplateName) throws IOException {
+    return get(EntityType.PARTIAL_TEMPLATE, partialTemplateName, partialTemplateTransform);
+  }
+
+  @Override
+  public Collection<PartialTemplate> getAllPartialTemplates() throws IOException {
+    return getAllEntities(EntityType.PARTIAL_TEMPLATE, partialTemplateTransform);
+  }
+
+  @Override
+  public void writePartialTemplate(PartialTemplate partialTemplate) throws IOException, IllegalAccessException {
+    writeEntity(EntityType.PARTIAL_TEMPLATE, partialTemplate.getName(),
+                serialize(partialTemplate, PartialTemplate.class));
+  }
+
+  @Override
+  public void deletePartialTemplate(String partialTemplateName) throws IOException, IllegalAccessException {
+    deleteEntity(EntityType.PARTIAL_TEMPLATE, partialTemplateName);
   }
 
   @Override

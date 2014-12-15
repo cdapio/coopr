@@ -1,0 +1,32 @@
+{
+    "name": "cdapDistributed",
+    "description": "Cask DAP (CDAP) with Security and Hadoop cluster with single master",
+    "extends": {
+        "name": "cdapDistributedInsecure"
+    },
+    "includes": [{
+        "name" : "sensuInternal"
+    }],
+    "defaults": {
+        "services": [
+            "cdap­security"
+        ],
+        "config": {
+            "security.enabled": "true",
+            "security.authentication.handlerClassName": "co.cask.cdap.security.server.LDAPAuthenticationHandler",
+            "security.authentication.loginmodule.className": "org.eclipse.jetty.plus.jaas.spi.LdapLoginModule",
+            "security.authentication.handler.debug": "true",
+            "security.authentication.handler.hostname": "ldap.example.com",
+            "security.authentication.handler.port": "389",
+            "security.authentication.handler.userBaseDn": "ou=people,dc=example,dc=com",
+            "security.authentication.handler.userRdnAttribute": "cn",
+            "security.authentication.handler.userObjectClass": "inetorgperson",
+            "security.server.ssl.enabled": "false"
+        }
+    },
+    "compatibility": {
+        "services": [
+            "cdap­security"
+        ]
+    }
+}
