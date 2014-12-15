@@ -138,13 +138,6 @@ proxy.on('error', function (err, req, res) {
   res.status(500).send('Proxy ' + (err.message || 'fail'));
 });
 
-/*
- // adds headers if necessary
- proxy.on('proxyReq', function (proxyReq, req, res, options) {
-
- });
- */
-
 // proxy requests to the backend
 app.all('/proxy/*', [
   httpProxyLogger,
