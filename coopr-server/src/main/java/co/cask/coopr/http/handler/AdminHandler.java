@@ -25,7 +25,9 @@ import co.cask.coopr.spec.Provider;
 import co.cask.coopr.spec.plugin.AutomatorType;
 import co.cask.coopr.spec.plugin.ProviderType;
 import co.cask.coopr.spec.service.Service;
+import co.cask.coopr.spec.template.AbstractTemplate;
 import co.cask.coopr.spec.template.ClusterTemplate;
+import co.cask.coopr.spec.template.PartialTemplate;
 import co.cask.coopr.store.entity.EntityStoreService;
 import co.cask.coopr.store.entity.EntityStoreView;
 import co.cask.coopr.store.tenant.TenantStore;
@@ -72,6 +74,7 @@ public class AdminHandler extends AbstractAuthHandler {
   public static final String HARDWARE_TYPES = "hardwaretypes";
   public static final String IMAGE_TYPES = "imagetypes";
   public static final String CLUSTER_TEMPLATES = "clustertemplates";
+  public static final String PARTIAL_TEMPLATES = "partialtemplates";
   public static final String SERVICES = "services";
 
   private final EntityStoreService entityStoreService;
@@ -237,6 +240,31 @@ public class AdminHandler extends AbstractAuthHandler {
     } catch (IOException e) {
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR,
                           "Exception getting cluster template " + clustertemplateId);
+    }
+  }
+
+  /**
+   * Get a specific {@link PartialTemplate} if readable by the user.
+   *
+   * @param request The request for the partial template.
+   * @param responder Responder for sending the response.
+   * @param partialtemplateId Id of the partial template to get.
+   */
+  @GET
+  @Path("/partialtemplates/{partialtemplate-id}")
+  public void getPartialTemplate(HttpRequest request, HttpResponder responder,
+                                 @PathParam("partialtemplate-id") String partialtemplateId) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+
+    try {
+      respondToGetEntity(entityStoreService.getView(account).getPartialTemplate(partialtemplateId), "partial template",
+                         partialtemplateId, PartialTemplate.class, responder);
+    } catch (IOException e) {
+      responder.sendString(HttpResponseStatus.INTERNAL_SERVER_ERROR,
+                           "Exception getting partial template " + partialtemplateId);
     }
   }
 
@@ -430,7 +458,7 @@ public class AdminHandler extends AbstractAuthHandler {
    */
   @GET
   @Path("/clustertemplates")
-  public void getClusterTemplate(HttpRequest request, HttpResponder responder) {
+  public void getClusterTemplates(HttpRequest request, HttpResponder responder) {
     Account account = getAndAuthenticateAccount(request, responder);
     if (account == null) {
       return;
@@ -441,6 +469,28 @@ public class AdminHandler extends AbstractAuthHandler {
                          new TypeToken<Collection<ClusterTemplate>>() { }.getType(), gson);
     } catch (IOException e) {
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception getting cluster templates");
+    }
+  }
+
+  /**
+   * Get all {@link PartialTemplate}s readable by the user.
+   *
+   * @param request The request for partial templates.
+   * @param responder Responder for sending the response.
+   */
+  @GET
+  @Path("/partialtemplates")
+  public void getPartialTemplates(HttpRequest request, HttpResponder responder) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+
+    try {
+      responder.sendJson(HttpResponseStatus.OK, entityStoreService.getView(account).getAllPartialTemplates(),
+                         new TypeToken<Collection<PartialTemplate>>() { }.getType(), gson);
+    } catch (IOException e) {
+      responder.sendString(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception getting partial templates");
     }
   }
 
@@ -592,6 +642,37 @@ public class AdminHandler extends AbstractAuthHandler {
                           "Exception deleting cluster template " + clustertemplateId);
     } catch (IllegalAccessException e) {
       responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized to delete cluster template.");
+    }
+  }
+
+  /**
+   * Delete a specific {@link PartialTemplate}. User must be admin or a 403 is returned.
+   *
+   * @param request The request to delete a partial template.
+   * @param responder Responder for sending the response.
+   * @param partialtemplateId Id of the partial template to delete.
+   */
+  @DELETE
+  @Path("/partialtemplates/{partialtemplate-id}")
+  public void deletePartialTemplate(HttpRequest request, HttpResponder responder,
+                                    @PathParam("partialtemplate-id") String partialtemplateId) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+    if (!account.isAdmin()) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized, must be admin.");
+      return;
+    }
+
+    try {
+      entityStoreService.getView(account).deletePartialTemplate(partialtemplateId);
+      responder.sendStatus(HttpResponseStatus.OK);
+    } catch (IOException e) {
+      responder.sendString(HttpResponseStatus.INTERNAL_SERVER_ERROR,
+                           "Exception deleting partial template " + partialtemplateId);
+    } catch (IllegalAccessException e) {
+      responder.sendString(HttpResponseStatus.FORBIDDEN, "user unauthorized to delete partial template.");
     }
   }
 
@@ -784,7 +865,7 @@ public class AdminHandler extends AbstractAuthHandler {
       return;
     }
 
-    if (!validateClusterTemplate(clusterTemplate, responder)) {
+    if (!validateTemplate(clusterTemplate, responder)) {
       return;
     }
 
@@ -796,6 +877,51 @@ public class AdminHandler extends AbstractAuthHandler {
                           "Exception writing cluster template " + clustertemplateId);
     } catch (IllegalAccessException e) {
       responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized to write cluster template.");
+    }
+  }
+
+  /**
+   * Writes a {@link PartialTemplate}. User must be admin or a 403 is returned. If the name in the path does not match
+   * the name in the put body, a 400 is returned.
+   *
+   * @param request Request to write partial template.
+   * @param responder Responder to send response.
+   * @param partialtemplateId Id of the partial template to write.
+   */
+  @PUT
+  @Path("/partialtemplates/{partialtemplate-id}")
+  public void putPartialTemplate(HttpRequest request, HttpResponder responder,
+                                 @PathParam("partialtemplate-id") String partialtemplateId) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+    if (!account.isAdmin()) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized, must be admin.");
+      return;
+    }
+
+    PartialTemplate partialTemplate = getEntityFromRequest(request, responder, PartialTemplate.class);
+    if (partialTemplate == null) {
+      // getEntityFromRequest writes to the responder if there was an issue.
+      return;
+    } else if (!partialTemplate.getName().equals(partialtemplateId)) {
+      responder.sendString(HttpResponseStatus.BAD_REQUEST, "mismatch between partial template name and name in path.");
+      return;
+    }
+
+    if (!validateTemplate(partialTemplate, responder)) {
+      return;
+    }
+
+    try {
+      entityStoreService.getView(account).writePartialTemplate(partialTemplate);
+      responder.sendStatus(HttpResponseStatus.OK);
+    } catch (IOException e) {
+      responder.sendString(HttpResponseStatus.INTERNAL_SERVER_ERROR,
+                           "Exception writing partial template " + partialtemplateId);
+    } catch (IllegalAccessException e) {
+      responder.sendString(HttpResponseStatus.FORBIDDEN, "user unauthorized to write partial template.");
     }
   }
 
@@ -826,7 +952,7 @@ public class AdminHandler extends AbstractAuthHandler {
     try {
       EntityStoreView view = entityStoreService.getView(account);
       if (view.getProvider(provider.getName()) != null) {
-        responder.sendError(HttpResponseStatus.BAD_REQUEST,
+        responder.sendError(HttpResponseStatus.CONFLICT,
                             "provider " + provider.getName() + " already exists");
       } else {
         view.writeProvider(provider);
@@ -865,7 +991,7 @@ public class AdminHandler extends AbstractAuthHandler {
     try {
       EntityStoreView view = entityStoreService.getView(account);
       if (view.getHardwareType(hardwareType.getName()) != null) {
-        responder.sendError(HttpResponseStatus.BAD_REQUEST,
+        responder.sendError(HttpResponseStatus.CONFLICT,
                             "hardware type " + hardwareType.getName() + " already exists");
       } else {
         view.writeHardwareType(hardwareType);
@@ -904,7 +1030,7 @@ public class AdminHandler extends AbstractAuthHandler {
     try {
       EntityStoreView view = entityStoreService.getView(account);
       if (view.getImageType(imageType.getName()) != null) {
-        responder.sendError(HttpResponseStatus.BAD_REQUEST, "image type " + imageType.getName() + " already exists");
+        responder.sendError(HttpResponseStatus.CONFLICT, "image type " + imageType.getName() + " already exists");
       } else {
         view.writeImageType(imageType);
         responder.sendStatus(HttpResponseStatus.OK);
@@ -942,7 +1068,7 @@ public class AdminHandler extends AbstractAuthHandler {
     try {
       EntityStoreView view = entityStoreService.getView(account);
       if (view.getService(service.getName()) != null) {
-        responder.sendError(HttpResponseStatus.BAD_REQUEST, "service " + service.getName() + " already exists");
+        responder.sendError(HttpResponseStatus.CONFLICT, "service " + service.getName() + " already exists");
       } else {
         view.writeService(service);
         responder.sendStatus(HttpResponseStatus.OK);
@@ -980,10 +1106,10 @@ public class AdminHandler extends AbstractAuthHandler {
     try {
       EntityStoreView view = entityStoreService.getView(account);
       if (view.getClusterTemplate(clusterTemplate.getName()) != null) {
-        responder.sendError(HttpResponseStatus.BAD_REQUEST,
+        responder.sendError(HttpResponseStatus.CONFLICT,
                             "cluster template " + clusterTemplate.getName() + " already exists");
       } else {
-        if (!validateClusterTemplate(clusterTemplate, responder)) {
+        if (!validateTemplate(clusterTemplate, responder)) {
           return;
         }
 
@@ -998,7 +1124,50 @@ public class AdminHandler extends AbstractAuthHandler {
   }
 
   /**
-   * Export all providers, hardware types, image types, services, and cluster templates.
+   * Add the specified {@link PartialTemplate}. User must be admin or a 403 is returned. Returns a 400 if the
+   * partial template already exists.
+   *
+   * @param request Request to add cluster template.
+   * @param responder Responder for sending response.
+   */
+  @POST
+  @Path("/partialtemplates")
+  public void postPartialTemplate(HttpRequest request, HttpResponder responder) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+    if (!account.isAdmin()) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized, must be admin.");
+      return;
+    }
+    PartialTemplate partialTemplate = getEntityFromRequest(request, responder, PartialTemplate.class);
+    if (partialTemplate == null) {
+      return;
+    }
+
+    try {
+      EntityStoreView view = entityStoreService.getView(account);
+      if (view.getPartialTemplate(partialTemplate.getName()) != null) {
+        responder.sendString(HttpResponseStatus.CONFLICT,
+                             "partial template " + partialTemplate.getName() + " already exists");
+      } else {
+        if (!validateTemplate(partialTemplate, responder)) {
+          return;
+        }
+
+        view.writePartialTemplate(partialTemplate);
+        responder.sendStatus(HttpResponseStatus.OK);
+      }
+    } catch (IllegalAccessException e) {
+      responder.sendString(HttpResponseStatus.FORBIDDEN, "user unauthorized to add partial template.");
+    } catch (IOException e) {
+      responder.sendString(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception adding partial template.");
+    }
+  }
+
+  /**
+   * Export all providers, hardware types, image types, services, cluster templates and partial templates.
    *
    * @param request Request to export admin definable entities.
    * @param responder Responder for sending response.
@@ -1034,14 +1203,20 @@ public class AdminHandler extends AbstractAuthHandler {
     LOG.debug("Exporting {} cluster templates", clusterTemplates.size());
     outJson.put(CLUSTER_TEMPLATES, gson.toJsonTree(clusterTemplates));
 
+    Collection<PartialTemplate> partialTemplates = view.getAllPartialTemplates();
+    LOG.debug("Exporting {} partial templates", partialTemplates.size());
+    outJson.put(PARTIAL_TEMPLATES, gson.toJsonTree(partialTemplates));
+
     LOG.trace("Exporting {}", outJson);
 
     responder.sendJson(HttpResponseStatus.OK, outJson);
   }
 
   /**
-   * Imports all providers, image types, hardware types, services, and cluster templates from a file. All existing
-   * providers, image types, hardware types, services, and cluster templates will be deleted.
+   * Imports all providers, image types, hardware types, services, cluster templates and partial templates
+   * from a file.
+   * All existing providers, image types, hardware types, services, cluster templates abd partial templates
+   * will be deleted.
    *
    * @param request Request to import admin definable entities.
    * @param responder Responder for sending response.
@@ -1054,7 +1229,7 @@ public class AdminHandler extends AbstractAuthHandler {
       return;
     }
     if (!account.isAdmin()) {
-      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized, must be admin.");
+      responder.sendString(HttpResponseStatus.FORBIDDEN, "user unauthorized, must be admin.");
       return;
     }
     // Parse incoming json
@@ -1063,6 +1238,7 @@ public class AdminHandler extends AbstractAuthHandler {
     List<ImageType> newImageTypes;
     List<Service> newServices;
     List<ClusterTemplate> newClusterTemplates;
+    List<PartialTemplate> newPartialTemplates;
     List<AutomatorType> newAutomatorTypes;
     List<ProviderType> newProviderTypes;
 
@@ -1092,12 +1268,17 @@ public class AdminHandler extends AbstractAuthHandler {
       newClusterTemplates = !inJson.containsKey(CLUSTER_TEMPLATES) ?
         ImmutableList.<ClusterTemplate>of() :
         gson.<List<ClusterTemplate>>fromJson(inJson.get(CLUSTER_TEMPLATES),
-                                                        new TypeToken<List<ClusterTemplate>>() { }.getType());
+                                             new TypeToken<List<ClusterTemplate>>() { }.getType());
+
+      newPartialTemplates = !inJson.containsKey(PARTIAL_TEMPLATES) ?
+        ImmutableList.<PartialTemplate>of() :
+        gson.<List<PartialTemplate>>fromJson(inJson.get(PARTIAL_TEMPLATES),
+                                             new TypeToken<List<PartialTemplate>>() { }.getType());
 
 
     } catch (JsonSyntaxException e) {
       LOG.error("Got exception while importing config", e);
-      responder.sendError(HttpResponseStatus.BAD_REQUEST, "Json syntax error");
+      responder.sendString(HttpResponseStatus.BAD_REQUEST, "Json syntax error");
       return;
     }
 
@@ -1122,6 +1303,10 @@ public class AdminHandler extends AbstractAuthHandler {
 
       for (ClusterTemplate clusterTemplate : view.getAllClusterTemplates()) {
         view.deleteClusterTemplate(clusterTemplate.getName());
+      }
+
+      for (PartialTemplate partialTemplate : view.getAllPartialTemplates()) {
+        view.deletePartialTemplate(partialTemplate.getName());
       }
 
       // Add new config data
@@ -1149,11 +1334,16 @@ public class AdminHandler extends AbstractAuthHandler {
       for (ClusterTemplate clusterTemplate : newClusterTemplates) {
         view.writeClusterTemplate(clusterTemplate);
       }
+
+      LOG.debug("Importing {} partial templates", newPartialTemplates.size());
+      for (PartialTemplate partialTemplate : newPartialTemplates) {
+        view.writePartialTemplate(partialTemplate);
+      }
       responder.sendStatus(HttpResponseStatus.OK);
     } catch (IllegalAccessException e) {
-      responder.sendError(HttpResponseStatus.FORBIDDEN, e.getMessage());
+      responder.sendString(HttpResponseStatus.FORBIDDEN, e.getMessage());
     } catch (IOException e) {
-      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception importing entities.");
+      responder.sendString(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception importing entities.");
     }
   }
 
@@ -1187,17 +1377,17 @@ public class AdminHandler extends AbstractAuthHandler {
     }
   }
 
-  private boolean validateClusterTemplate(ClusterTemplate clusterTemplate, HttpResponder responder) {
-    long initial = clusterTemplate.getAdministration().getLeaseDuration().getInitial();
+  private <T extends AbstractTemplate> boolean validateTemplate(T template, HttpResponder responder) {
+    long initial = template.getAdministration().getLeaseDuration().getInitial();
     initial = initial == 0 ? Long.MAX_VALUE : initial;
 
-    long max = clusterTemplate.getAdministration().getLeaseDuration().getMax();
+    long max = template.getAdministration().getLeaseDuration().getMax();
     max = max == 0 ? Long.MAX_VALUE : max;
 
     if (max < initial) {
-      responder.sendError(HttpResponseStatus.BAD_REQUEST,
-                          "Initial lease duration cannot be more than max lease duration for cluster template " +
-                            clusterTemplate.getName());
+      responder.sendString(HttpResponseStatus.BAD_REQUEST,
+                          "Initial lease duration cannot be more than max lease duration for template " +
+                            template.getName());
       return false;
     }
 
