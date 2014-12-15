@@ -147,6 +147,37 @@ public class AdminHandler extends AbstractAuthHandler {
   }
 
   /**
+   * Get a specific {@link Provider} if readable by the user.
+   *
+   * @param request The request for the provider.
+   * @param responder Responder for sending the response.
+   * @param providerId Id of the provider to get.
+   * @param versionStr Version of the provider to get.
+   */
+  @GET
+  @Path("/providers/{provider-id}/{version}")
+  public void getProvider(HttpRequest request, HttpResponder responder, @PathParam("provider-id") String providerId,
+                          @PathParam("version") String versionStr) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+
+    int version = getVersionFromString(responder, versionStr);
+    if (!validateVersion(version)) {
+      return;
+    }
+
+    try {
+      respondToGetEntity(entityStoreService.getView(account).getProvider(providerId, version), "provider",
+                         providerId, Provider.class, responder);
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR,
+                          "Exception getting provider " + providerId + " with version " + versionStr);
+    }
+  }
+
+  /**
    * Get a specific {@link HardwareType} if readable by the user.
    *
    * @param request The request for the hardware type.
@@ -168,6 +199,38 @@ public class AdminHandler extends AbstractAuthHandler {
     } catch (IOException e) {
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR,
                           "Exception getting hardware type " + hardwaretypeId);
+    }
+  }
+
+  /**
+   * Get a specific {@link HardwareType} if readable by the user.
+   *
+   * @param request The request for the hardware type.
+   * @param responder Responder for sending the response.
+   * @param hardwaretypeId Id of the hardware type to get.
+   * @param versionStr Version of the hardware type to get.
+   */
+  @GET
+  @Path("/hardwaretypes/{hardwaretype-id}/{version}")
+  public void getHardwareType(HttpRequest request, HttpResponder responder,
+                              @PathParam("hardwaretype-id") String hardwaretypeId,
+                              @PathParam("version") String versionStr) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+
+    int version = getVersionFromString(responder, versionStr);
+    if (!validateVersion(version)) {
+      return;
+    }
+
+    try {
+      respondToGetEntity(entityStoreService.getView(account).getHardwareType(hardwaretypeId, version), "hardware type",
+                         hardwaretypeId, HardwareType.class, responder);
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR,
+                          "Exception getting hardware type " + hardwaretypeId + " with version " + versionStr);
     }
   }
 
@@ -196,6 +259,37 @@ public class AdminHandler extends AbstractAuthHandler {
   }
 
   /**
+   * Get a specific {@link ImageType} if readable by the user.
+   *
+   * @param request The request for the image type.
+   * @param responder Responder for sending the response.
+   * @param imagetypeId Id of the image type to get.
+   * @param versionStr Version of the image type to get.
+   */
+  @GET
+  @Path("/imagetypes/{imagetype-id}/{version}")
+  public void getImageType(HttpRequest request, HttpResponder responder,
+                           @PathParam("imagetype-id") String imagetypeId, @PathParam("version") String versionStr) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+
+    int version = getVersionFromString(responder, versionStr);
+    if (!validateVersion(version)) {
+      return;
+    }
+
+    try {
+      respondToGetEntity(entityStoreService.getView(account).getImageType(imagetypeId, version),
+                         "image type", imagetypeId, ImageType.class, responder);
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR,
+                          "Exception getting image type " + imagetypeId + " with version " + versionStr);
+    }
+  }
+
+  /**
    * Get a specific {@link Service} if readable by the user.
    *
    * @param request The request for the service.
@@ -215,6 +309,37 @@ public class AdminHandler extends AbstractAuthHandler {
                          serviceId, Service.class, responder);
     } catch (IOException e) {
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception getting service " + serviceId);
+    }
+  }
+
+  /**
+   * Get a specific {@link Service} if readable by the user.
+   *
+   * @param request The request for the service.
+   * @param responder Responder for sending the response.
+   * @param serviceId Id of the service to get.
+   * @param versionStr Version of the service to get.
+   */
+  @GET
+  @Path("/services/{service-id}/{version}")
+  public void getService(HttpRequest request, HttpResponder responder, @PathParam("service-id") String serviceId,
+                         @PathParam("version") String versionStr) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+
+    int version = getVersionFromString(responder, versionStr);
+    if (!validateVersion(version)) {
+      return;
+    }
+
+    try {
+      respondToGetEntity(entityStoreService.getView(account).getService(serviceId, version), "service",
+                         serviceId, Service.class, responder);
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR,
+                          "Exception getting service " + serviceId + " with version " + versionStr);
     }
   }
 
@@ -244,6 +369,38 @@ public class AdminHandler extends AbstractAuthHandler {
   }
 
   /**
+   * Get a specific {@link ClusterTemplate} if readable by the user.
+   *
+   * @param request The request for the cluster template.
+   * @param responder Responder for sending the response.
+   * @param clustertemplateId Id of the cluster template to get.
+   * @param versionStr Version of the cluster template to get.
+   */
+  @GET
+  @Path("/clustertemplates/{clustertemplate-id}/{version}")
+  public void getClusterTemplate(HttpRequest request, HttpResponder responder,
+                                 @PathParam("clustertemplate-id") String clustertemplateId,
+                                 @PathParam("version") String versionStr) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+
+    int version = getVersionFromString(responder, versionStr);
+    if (!validateVersion(version)) {
+      return;
+    }
+
+    try {
+      respondToGetEntity(entityStoreService.getView(account).getClusterTemplate(clustertemplateId, version),
+                         "cluster template", clustertemplateId, ClusterTemplate.class, responder);
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR,
+                          "Exception getting cluster template " + clustertemplateId + " with version " + versionStr);
+    }
+  }
+
+  /**
    * Get a specific {@link PartialTemplate} if readable by the user.
    *
    * @param request The request for the partial template.
@@ -261,10 +418,42 @@ public class AdminHandler extends AbstractAuthHandler {
 
     try {
       respondToGetEntity(entityStoreService.getView(account).getPartialTemplate(partialtemplateId), "partial template",
-                         partialtemplateId, PartialTemplate.class, responder);
+      partialtemplateId, PartialTemplate.class, responder);
     } catch (IOException e) {
       responder.sendString(HttpResponseStatus.INTERNAL_SERVER_ERROR,
-                           "Exception getting partial template " + partialtemplateId);
+              "Exception getting partial template " + partialtemplateId);
+    }
+  }
+
+  /**
+   * Get a specific {@link PartialTemplate} if readable by the user.
+   *
+   * @param request The request for the partial template.
+   * @param responder Responder for sending the response.
+   * @param partialtemplateId Id of the partial template to get.
+   * @param versionStr Version of the partial template to get.
+   */
+  @GET
+  @Path("/partialtemplates/{partialtemplate-id}/{version}")
+  public void getPartialTemplate(HttpRequest request, HttpResponder responder,
+                                 @PathParam("partialtemplate-id") String partialtemplateId,
+                                 @PathParam("version") String versionStr) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+
+    int version = getVersionFromString(responder, versionStr);
+    if (!validateVersion(version)) {
+      return;
+    }
+
+    try {
+      respondToGetEntity(entityStoreService.getView(account).getPartialTemplate(partialtemplateId, version),
+              "partial template", partialtemplateId, PartialTemplate.class, responder);
+    } catch (IOException e) {
+      responder.sendString(HttpResponseStatus.INTERNAL_SERVER_ERROR,
+              "Exception getting partial template " + partialtemplateId + " with version " + versionStr);
     }
   }
 
@@ -294,6 +483,38 @@ public class AdminHandler extends AbstractAuthHandler {
   }
 
   /**
+   * Get a specific {@link co.cask.coopr.spec.plugin.ProviderType} if readable by the user.
+   *
+   * @param request The request for the provider type.
+   * @param responder Responder for sending the response.
+   * @param providertypeId Id of the provider type to get.
+   * @param versionStr Version of the provider type to get.
+   */
+  @GET
+  @Path("/plugins/providertypes/{providertype-id}/{version}")
+  public void getProviderType(HttpRequest request, HttpResponder responder,
+                              @PathParam("providertype-id") String providertypeId,
+                              @PathParam("version") String versionStr) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+
+    int version = getVersionFromString(responder, versionStr);
+    if (!validateVersion(version)) {
+      return;
+    }
+
+    try {
+      respondToGetEntity(entityStoreService.getView(account).getProviderType(providertypeId, version),
+                         "provider type", providertypeId, ProviderType.class, responder);
+    } catch (IOException e) {
+      responder.sendString(HttpResponseStatus.INTERNAL_SERVER_ERROR,
+                          "Exception getting provider type " + providertypeId + " with version " + versionStr);
+    }
+  }
+
+  /**
    * Get a specific {@link co.cask.coopr.spec.plugin.AutomatorType} if readable by the user.
    *
    * @param request The request for the automator type.
@@ -315,6 +536,38 @@ public class AdminHandler extends AbstractAuthHandler {
     } catch (IOException e) {
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR,
                           "Exception getting automator type " + automatortypeId);
+    }
+  }
+
+  /**
+   * Get a specific {@link co.cask.coopr.spec.plugin.AutomatorType} if readable by the user.
+   *
+   * @param request The request for the automator type.
+   * @param responder Responder for sending the response.
+   * @param automatortypeId Id of the automator type to get.
+   * @param versionStr Version of the automator type to get.
+   */
+  @GET
+  @Path("/plugins/automatortypes/{automatortype-id}/{version}")
+  public void getAutomatorType(HttpRequest request, HttpResponder responder,
+                               @PathParam("automatortype-id") String automatortypeId,
+                               @PathParam("version") String versionStr) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+
+    int version = getVersionFromString(responder, versionStr);
+    if (!validateVersion(version)) {
+      return;
+    }
+
+    try {
+      respondToGetEntity(entityStoreService.getView(account).getAutomatorType(automatortypeId, version),
+                         "automator type", automatortypeId, AutomatorType.class, responder);
+    } catch (IOException e) {
+      responder.sendString(HttpResponseStatus.INTERNAL_SERVER_ERROR,
+                          "Exception getting automator type " + automatortypeId + " with version " + versionStr);
     }
   }
 
@@ -525,6 +778,43 @@ public class AdminHandler extends AbstractAuthHandler {
   }
 
   /**
+   * Delete a specific {@link Provider}. User must be admin or a 403 is returned.
+   *
+   * @param request The request to delete a provider.
+   * @param responder Responder for sending the response.
+   * @param providerId Id of the provider to delete.
+   * @param versionStr Version of the provider to delete.
+   */
+  @DELETE
+  @Path("/providers/{provider-id}/{version}")
+  public void deleteProvider(HttpRequest request, HttpResponder responder,
+                             @PathParam("provider-id") String providerId, @PathParam("version") String versionStr) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+    if (!account.isAdmin()) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized, must be admin.");
+      return;
+    }
+
+    int version = getVersionFromString(responder, versionStr);
+    if (!validateVersion(version)) {
+      return;
+    }
+
+    try {
+      entityStoreService.getView(account).deleteProvider(providerId, version);
+      responder.sendStatus(HttpResponseStatus.OK);
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR,
+                          "Exception deleting provider " + providerId + " with version " + versionStr);
+    } catch (IllegalAccessException e) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized to delete provider.");
+    }
+  }
+
+  /**
    * Delete a specific {@link HardwareType}. User must be admin or a 403 is returned.
    *
    * @param request The request to delete a hardware type.
@@ -550,6 +840,44 @@ public class AdminHandler extends AbstractAuthHandler {
     } catch (IOException e) {
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR,
                           "Exception deleting hardware type " + hardwaretypeId);
+    } catch (IllegalAccessException e) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized to delete hardware type.");
+    }
+  }
+
+  /**
+   * Delete a specific {@link HardwareType}. User must be admin or a 403 is returned.
+   *
+   * @param request The request to delete a hardware type.
+   * @param responder Responder for sending the response.
+   * @param hardwaretypeId Id of the hardware type to delete.
+   * @param versionStr Version of the hardware type to delete.
+   */
+  @DELETE
+  @Path("/hardwaretypes/{hardwaretype-id}/{version}")
+  public void deleteHardwareType(HttpRequest request, HttpResponder responder,
+                                 @PathParam("hardwaretype-id") String hardwaretypeId,
+                                 @PathParam("version") String versionStr) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+    if (!account.isAdmin()) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized, must be admin.");
+      return;
+    }
+
+    int version = getVersionFromString(responder, versionStr);
+    if (!validateVersion(version)) {
+      return;
+    }
+
+    try {
+      entityStoreService.getView(account).deleteHardwareType(hardwaretypeId, version);
+      responder.sendStatus(HttpResponseStatus.OK);
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR,
+                          "Exception deleting hardware type " + hardwaretypeId + " with version " + versionStr);
     } catch (IllegalAccessException e) {
       responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized to delete hardware type.");
     }
@@ -586,6 +914,43 @@ public class AdminHandler extends AbstractAuthHandler {
   }
 
   /**
+   * Delete a specific {@link ImageType}. User must be admin or a 403 is returned.
+   *
+   * @param request The request to delete a image type.
+   * @param responder Responder for sending the response.
+   * @param imagetypeId Id of the image type to delete.
+   * @param versionStr Version of the image type to delete.
+   */
+  @DELETE
+  @Path("/imagetypes/{imagetype-id}/{version}")
+  public void deleteImageType(HttpRequest request, HttpResponder responder,
+                              @PathParam("imagetype-id") String imagetypeId, @PathParam("version") String versionStr) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+    if (!account.isAdmin()) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized, must be admin.");
+      return;
+    }
+
+    int version = getVersionFromString(responder, versionStr);
+    if (!validateVersion(version)) {
+      return;
+    }
+
+    try {
+      entityStoreService.getView(account).deleteImageType(imagetypeId, version);
+      responder.sendStatus(HttpResponseStatus.OK);
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR,
+                          "Exception deleting image type " + imagetypeId + " with version " + versionStr);
+    } catch (IllegalAccessException e) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized to delete image type.");
+    }
+  }
+
+  /**
    * Delete a specific {@link Service}. User must be admin or a 403 is returned.
    *
    * @param request The request to delete a service.
@@ -609,6 +974,43 @@ public class AdminHandler extends AbstractAuthHandler {
       responder.sendStatus(HttpResponseStatus.OK);
     } catch (IOException e) {
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception deleting service " + serviceId);
+    } catch (IllegalAccessException e) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized to delete service.");
+    }
+  }
+
+  /**
+   * Delete a specific {@link Service}. User must be admin or a 403 is returned.
+   *
+   * @param request The request to delete a service.
+   * @param responder Responder for sending the response.
+   * @param serviceId Id of the service to delete.
+   * @param versionStr Version of the service to delete.
+   */
+  @DELETE
+  @Path("/services/{service-id}/{version}")
+  public void deleteService(HttpRequest request, HttpResponder responder,
+                            @PathParam("service-id") String serviceId, @PathParam("version") String versionStr) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+    if (!account.isAdmin()) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized, must be admin.");
+      return;
+    }
+
+    int version = getVersionFromString(responder, versionStr);
+    if (!validateVersion(version)) {
+      return;
+    }
+
+    try {
+      entityStoreService.getView(account).deleteService(serviceId, version);
+      responder.sendStatus(HttpResponseStatus.OK);
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR,
+                          "Exception deleting service " + serviceId + " with version " + versionStr);
     } catch (IllegalAccessException e) {
       responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized to delete service.");
     }
@@ -646,6 +1048,44 @@ public class AdminHandler extends AbstractAuthHandler {
   }
 
   /**
+   * Delete a specific {@link ClusterTemplate}. User must be admin or a 403 is returned.
+   *
+   * @param request The request to delete a cluster template.
+   * @param responder Responder for sending the response.
+   * @param clustertemplateId Id of the cluster template to delete.
+   * @param versionStr Version of the cluster template to delete.
+   */
+  @DELETE
+  @Path("/clustertemplates/{clustertemplate-id}/{version}")
+  public void deleteClusterTemplate(HttpRequest request, HttpResponder responder,
+                                    @PathParam("clustertemplate-id") String clustertemplateId,
+                                    @PathParam("version") String versionStr) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+    if (!account.isAdmin()) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized, must be admin.");
+      return;
+    }
+
+    int version = getVersionFromString(responder, versionStr);
+    if (!validateVersion(version)) {
+      return;
+    }
+
+    try {
+      entityStoreService.getView(account).deleteClusterTemplate(clustertemplateId, version);
+      responder.sendStatus(HttpResponseStatus.OK);
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR,
+                          "Exception deleting cluster template " + clustertemplateId + " with version " + versionStr);
+    } catch (IllegalAccessException e) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized to delete cluster template.");
+    }
+  }
+
+  /**
    * Delete a specific {@link PartialTemplate}. User must be admin or a 403 is returned.
    *
    * @param request The request to delete a partial template.
@@ -670,7 +1110,45 @@ public class AdminHandler extends AbstractAuthHandler {
       responder.sendStatus(HttpResponseStatus.OK);
     } catch (IOException e) {
       responder.sendString(HttpResponseStatus.INTERNAL_SERVER_ERROR,
-                           "Exception deleting partial template " + partialtemplateId);
+              "Exception deleting partial template " + partialtemplateId);
+    } catch (IllegalAccessException e) {
+      responder.sendString(HttpResponseStatus.FORBIDDEN, "user unauthorized to delete partial template.");
+    }
+  }
+
+  /**
+   * Delete a specific {@link PartialTemplate}. User must be admin or a 403 is returned.
+   *
+   * @param request The request to delete a partial template.
+   * @param responder Responder for sending the response.
+   * @param partialtemplateId Id of the partial template to delete.
+   * @param versionStr Version of the partial template to delete.
+   */
+  @DELETE
+  @Path("/partialtemplates/{partialtemplate-id}/{version}")
+  public void deletePartialTemplate(HttpRequest request, HttpResponder responder,
+                                    @PathParam("partialtemplate-id") String partialtemplateId,
+                                    @PathParam("version") String versionStr) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+    if (!account.isAdmin()) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized, must be admin.");
+      return;
+    }
+
+    int version = getVersionFromString(responder, versionStr);
+    if (!validateVersion(version)) {
+      return;
+    }
+
+    try {
+      entityStoreService.getView(account).deletePartialTemplate(partialtemplateId, version);
+      responder.sendStatus(HttpResponseStatus.OK);
+    } catch (IOException e) {
+      responder.sendString(HttpResponseStatus.INTERNAL_SERVER_ERROR,
+              "Exception deleting partial template " + partialtemplateId + " with vesrion " + versionStr);
     } catch (IllegalAccessException e) {
       responder.sendString(HttpResponseStatus.FORBIDDEN, "user unauthorized to delete partial template.");
     }
@@ -1345,6 +1823,24 @@ public class AdminHandler extends AbstractAuthHandler {
     } catch (IOException e) {
       responder.sendString(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception importing entities.");
     }
+  }
+
+  private int getVersionFromString(HttpResponder responder, String versionStr) {
+    int version;
+    try {
+      version = Integer.parseInt(versionStr);
+    } catch (NumberFormatException e) {
+      responder.sendString(HttpResponseStatus.BAD_REQUEST, "Version must be a number");
+      return 0;
+    }
+    if (!validateVersion(version)) {
+      responder.sendString(HttpResponseStatus.BAD_REQUEST, "Version must be higher then zero");
+    }
+    return version;
+  }
+
+  private boolean validateVersion(int version) {
+    return version > 0;
   }
 
   private <T> T getEntityFromRequest(HttpRequest request, HttpResponder responder, Type tClass) {

@@ -23,8 +23,6 @@ import co.cask.coopr.provisioner.Provisioner;
 import co.cask.coopr.provisioner.QuotaException;
 import co.cask.coopr.provisioner.TenantProvisionerService;
 import co.cask.coopr.spec.TenantSpecification;
-import co.cask.coopr.spec.plugin.AutomatorType;
-import co.cask.coopr.spec.plugin.ProviderType;
 import co.cask.coopr.store.entity.EntityStoreService;
 import co.cask.coopr.store.tenant.TenantStore;
 import co.cask.http.HttpResponder;
@@ -316,6 +314,7 @@ public class SuperadminHandler extends AbstractAuthHandler {
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception while getting provisioners");
     }
   }
+
   /**
    * Delete a specific {@link co.cask.coopr.spec.plugin.ProviderType}. User must be admin or a 403 is returned.
    *
@@ -348,6 +347,44 @@ public class SuperadminHandler extends AbstractAuthHandler {
   }
 
   /**
+   * Delete a specific {@link co.cask.coopr.spec.plugin.ProviderType}. User must be admin or a 403 is returned.
+   *
+   * @param request The request to delete a provider type.
+   * @param responder Responder for sending the response.
+   * @param providertypeId Id of the provider type to delete.
+   * @param versionStr Version of the provider type to delete.
+   */
+  @DELETE
+  @Path("/plugins/providertypes/{providertype-id}/{version}")
+  public void deleteProviderType(HttpRequest request, HttpResponder responder,
+                                 @PathParam("providertype-id") String providertypeId,
+                                 @PathParam("version") String versionStr) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+    if (!account.isSuperadmin()) {
+      responder.sendString(HttpResponseStatus.FORBIDDEN, "user unauthorized, must be superadmin.");
+      return;
+    }
+
+    int version = getVersionFromString(responder, versionStr);
+    if (!validateVersion(version)) {
+      return;
+    }
+
+    try {
+      entityStoreService.getView(account).deleteProviderType(providertypeId, version);
+      responder.sendStatus(HttpResponseStatus.OK);
+    } catch (IOException e) {
+      responder.sendString(HttpResponseStatus.INTERNAL_SERVER_ERROR,
+                          "Exception deleting provider type " + providertypeId + " with version " + versionStr);
+    } catch (IllegalAccessException e) {
+      responder.sendString(HttpResponseStatus.FORBIDDEN, "user unauthorized to delete provider type.");
+    }
+  }
+
+  /**
    * Delete a specific {@link co.cask.coopr.spec.plugin.AutomatorType}. User must be admin or a 403 is returned.
    *
    * @param request The request to delete an automator type.
@@ -376,6 +413,62 @@ public class SuperadminHandler extends AbstractAuthHandler {
     } catch (IllegalAccessException e) {
       responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized to delete automator type.");
     }
+  }
+
+  /**
+   * Delete a specific {@link co.cask.coopr.spec.plugin.AutomatorType}. User must be admin or a 403 is returned.
+   *
+   * @param request The request to delete an automator type.
+   * @param responder Responder for sending the response.
+   * @param automatortypeId Id of the automator type to delete.
+   * @param versionStr Version of the automator type to delete.
+   */
+  @DELETE
+  @Path("/plugins/automatortypes/{automatortype-id}/{version}")
+  public void deleteAutomatorType(HttpRequest request, HttpResponder responder,
+                                  @PathParam("automatortype-id") String automatortypeId,
+                                  @PathParam("version") String versionStr) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+    if (!account.isSuperadmin()) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized, must be superadmin.");
+      return;
+    }
+
+    int version = getVersionFromString(responder, versionStr);
+    if (!validateVersion(version)) {
+      return;
+    }
+
+    try {
+      entityStoreService.getView(account).deleteAutomatorType(automatortypeId, version);
+      responder.sendStatus(HttpResponseStatus.OK);
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR,
+                          "Exception deleting automator type " + automatortypeId);
+    } catch (IllegalAccessException e) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized to delete automator type.");
+    }
+  }
+
+  private int getVersionFromString(HttpResponder responder, String versionStr) {
+    int version;
+    try {
+      version = Integer.parseInt(versionStr);
+    } catch (NumberFormatException e) {
+      responder.sendString(HttpResponseStatus.BAD_REQUEST, "Version must be a number");
+      return 0;
+    }
+    if (!validateVersion(version)) {
+      responder.sendString(HttpResponseStatus.BAD_REQUEST, "Version must be higher then zero");
+    }
+    return version;
+  }
+
+  private boolean validateVersion(int version) {
+    return version > 0;
   }
 
   private <T> T getEntityFromRequest(HttpRequest request, HttpResponder responder, Type tClass) {

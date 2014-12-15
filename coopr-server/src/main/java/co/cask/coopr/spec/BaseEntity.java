@@ -15,6 +15,7 @@
  */
 package co.cask.coopr.spec;
 
+import co.cask.coopr.common.conf.Constants;
 import com.google.common.base.Objects;
 
 /**
@@ -24,12 +25,14 @@ public class BaseEntity extends NamedEntity {
   protected final String label;
   protected final String description;
   protected final String icon;
+  protected int version;
 
-  private BaseEntity(String name, String label, String description, String icon) {
+  private BaseEntity(String name, String label, String description, String icon, int version) {
     super(name);
     this.label = label;
     this.description = description;
     this.icon = icon;
+    this.version = version;
   }
 
   protected BaseEntity(Builder builder) {
@@ -37,6 +40,7 @@ public class BaseEntity extends NamedEntity {
     this.label = builder.label;
     this.description = builder.description;
     this.icon = builder.icon;
+    this.version = builder.version;
   }
 
   /**
@@ -67,13 +71,31 @@ public class BaseEntity extends NamedEntity {
   }
 
   /**
+   * Retrieves the version of the entity.
+   *
+   * @return the version of the entity.
+   */
+  public int getVersion() {
+    return version;
+  }
+
+  /**
+   * Sets the version of the entity.
+   *
+   * @param version the version
+   */
+  public void setVersion(int version) {
+    this.version = version;
+  }
+
+  /**
    * Create an admin entity from another admin entity.
    *
    * @param other entity to create from
    * @return admin entity created from the given entity
    */
   public static BaseEntity from(BaseEntity other) {
-    return new BaseEntity(other.name, other.label, other.getDescription(), other.icon);
+    return new BaseEntity(other.name, other.label, other.description, other.icon, other.version);
   }
 
   /**
@@ -84,6 +106,7 @@ public class BaseEntity extends NamedEntity {
     protected String label;
     protected String description;
     protected String icon;
+    protected int version = Constants.DEFAULT_VERSION;
 
     public Builder<T> setName(String name) {
       this.name = name;
@@ -105,11 +128,17 @@ public class BaseEntity extends NamedEntity {
       return this;
     }
 
-    public Builder<T> setBaseFields(String name, String label, String description, String icon) {
+    public Builder<T> setVersion(int version) {
+      this.version = version;
+      return this;
+    }
+
+    public Builder<T> setBaseFields(String name, String label, String description, String icon, int version) {
       this.name = name;
       this.label = label;
       this.description = description;
       this.icon = icon;
+      this.version = version;
       return this;
     }
 
@@ -130,12 +159,13 @@ public class BaseEntity extends NamedEntity {
     return super.equals(that) &&
       Objects.equal(label, that.label) &&
       Objects.equal(description, that.description) &&
-      Objects.equal(icon, that.icon);
+      Objects.equal(icon, that.icon) &&
+      Objects.equal(version, that.version);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(super.hashCode(), label, description, icon);
+    return Objects.hashCode(super.hashCode(), label, description, icon, version);
   }
 
   @Override
@@ -144,6 +174,7 @@ public class BaseEntity extends NamedEntity {
       .add("label", label)
       .add("description", description)
       .add("icon", icon)
+      .add("version", version)
       .toString();
   }
 }
