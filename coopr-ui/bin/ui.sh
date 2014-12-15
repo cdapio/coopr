@@ -45,19 +45,11 @@ check_before_start() {
   fi
 }
 
-create_dist() {
-  [ -d dist ] || {
-    echo "- Installing Coopr UI dependencies ..."
-    ${COOPR_NPM} install -g bower gulp && ${COOPR_NPM} run build && gulp distribute && ${COOPR_NPM} install --production
-  }
-}
-
 start ( ) {
   cd ${UI_PATH}
   check_before_start
 
   echo "Starting Coopr UI ..."
-  create_dist
 
   nohup nice -1 ${COOPR_NODE} ${UI_PATH}/server.js \
     >> ${COOPR_LOG_DIR}/${APP_NAME}.log 2>&1 < /dev/null &

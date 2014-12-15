@@ -34,13 +34,16 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Tests for getting and setting admin defined entities.  Test classes for different types of stores must set the
@@ -70,10 +73,16 @@ public abstract class EntityStoreServiceTest {
     Provider result = entityStore.getProvider(provider.getName());
     Assert.assertEquals(provider, result);
 
-    // overwrite should work
+    // bump version should work
     entityStore.writeProvider(provider);
-    result = entityStore.getProvider(provider.getName());
-    Assert.assertEquals(provider, result);
+    entityStore.writeProvider(provider);
+    Collection<Provider> providers = entityStore.getAllProviders();
+    Assert.assertEquals(3, providers.size());
+    Set<Integer> versions = Sets.newHashSet();
+    for (Provider provider1 : providers) {
+      versions.add(provider1.getVersion());
+    }
+    Assert.assertEquals(Sets.newHashSet(1, 2, 3), versions);
 
     // delete should work
     entityStore.deleteProvider(provider.getName());
@@ -92,10 +101,15 @@ public abstract class EntityStoreServiceTest {
     HardwareType result = entityStore.getHardwareType(hardwareTypeName);
     Assert.assertEquals(hardwareType, result);
 
-    // overwrite should work
+    // bump version should work
     entityStore.writeHardwareType(hardwareType);
-    result = entityStore.getHardwareType(hardwareTypeName);
+    result = entityStore.getHardwareType(hardwareTypeName, 2);
+    Assert.assertEquals(2, result.getVersion());
+    result = entityStore.getHardwareType(hardwareTypeName, 1);
     Assert.assertEquals(hardwareType, result);
+    Assert.assertEquals(1, result.getVersion());
+    result = entityStore.getHardwareType(hardwareTypeName, 3);
+    Assert.assertNull(result);
 
     // delete should work
     entityStore.deleteHardwareType(hardwareTypeName);
@@ -114,10 +128,11 @@ public abstract class EntityStoreServiceTest {
     ImageType result = entityStore.getImageType(imageTypeName);
     Assert.assertEquals(imageType, result);
 
-    // overwrite should work
+    // bump version should work
+    Assert.assertEquals(1, result.getVersion());
     entityStore.writeImageType(imageType);
     result = entityStore.getImageType(imageTypeName);
-    Assert.assertEquals(imageType, result);
+    Assert.assertEquals(2, result.getVersion());
 
     // delete should work
     entityStore.deleteImageType(imageTypeName);
@@ -136,13 +151,15 @@ public abstract class EntityStoreServiceTest {
     Service result = entityStore.getService(serviceName);
     Assert.assertEquals(service, result);
 
-    // overwrite should work
+    // bump version should work
     entityStore.writeService(service);
     result = entityStore.getService(serviceName);
-    Assert.assertEquals(service, result);
+    Assert.assertEquals(2, result.getVersion());
 
     // delete should work
-    entityStore.deleteService(serviceName);
+    entityStore.deleteService(serviceName, 2);
+    Assert.assertNotNull(entityStore.getService(serviceName));
+    entityStore.deleteService(serviceName, 1);
     Assert.assertNull(entityStore.getService(serviceName));
   }
 
@@ -158,10 +175,16 @@ public abstract class EntityStoreServiceTest {
     ClusterTemplate result = entityStore.getClusterTemplate(clusterTemplateName);
     Assert.assertEquals(clusterTemplate, result);
 
-    // overwrite should work
+    // bump version should work
     entityStore.writeClusterTemplate(clusterTemplate);
-    result = entityStore.getClusterTemplate(clusterTemplateName);
-    Assert.assertEquals(clusterTemplate, result);
+    entityStore.writeClusterTemplate(clusterTemplate);
+    Collection<ClusterTemplate> clusterTemplates = entityStore.getAllClusterTemplates();
+    Assert.assertEquals(3, clusterTemplates.size());
+    Set<Integer> versions = Sets.newHashSet();
+    for (ClusterTemplate clusterTemplate1 : clusterTemplates) {
+      versions.add(clusterTemplate1.getVersion());
+    }
+    Assert.assertEquals(Sets.newHashSet(1, 2, 3), versions);
 
     // delete should work
     entityStore.deleteClusterTemplate(clusterTemplateName);

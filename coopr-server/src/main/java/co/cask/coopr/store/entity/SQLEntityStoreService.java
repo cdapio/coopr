@@ -8,7 +8,6 @@ import co.cask.coopr.spec.service.Service;
 import co.cask.coopr.spec.template.ClusterTemplate;
 import co.cask.coopr.store.DBConnectionPool;
 import co.cask.coopr.store.DBHelper;
-import co.cask.coopr.store.DBQueryExecutor;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
@@ -23,13 +22,11 @@ import java.sql.Statement;
  */
 public class SQLEntityStoreService extends AbstractIdleService implements EntityStoreService {
   private final DBConnectionPool dbConnectionPool;
-  private final DBQueryExecutor dbQueryExecutor;
   private final Gson gson;
 
   @Inject
-  private SQLEntityStoreService(DBConnectionPool dbConnectionPool, DBQueryExecutor dbQueryExecutor, Gson gson) {
+  private SQLEntityStoreService(DBConnectionPool dbConnectionPool, Gson gson) {
     this.dbConnectionPool = dbConnectionPool;
-    this.dbQueryExecutor = dbQueryExecutor;
     this.gson = gson;
   }
 
@@ -57,7 +54,8 @@ public class SQLEntityStoreService extends AbstractIdleService implements Entity
         String entityName = entityType.getId();
         // immune to sql injection since it comes from the enum
         String createString = "CREATE TABLE " + entityName +
-          "s ( name VARCHAR(255), tenant_id VARCHAR(255), " + entityName + " BLOB, PRIMARY KEY (tenant_id, name))";
+          "s ( name VARCHAR(255), version BIGINT, tenant_id VARCHAR(255), " + entityName +
+          " BLOB, PRIMARY KEY (tenant_id, name, version))";
         DBHelper.createDerbyTableIfNotExists(createString, dbConnectionPool);
       }
     }
@@ -71,7 +69,7 @@ public class SQLEntityStoreService extends AbstractIdleService implements Entity
   @Override
   public EntityStoreView getView(Account account) {
     if (account.isAdmin()) {
-      return new SQLAdminEntityStoreView(account, dbConnectionPool, dbQueryExecutor, gson);
+      return new SQLAdminEntityStoreView(account, dbConnectionPool, gson);
     } else {
       return new SQLUserEntityStoreView(account, dbConnectionPool, gson);
     }

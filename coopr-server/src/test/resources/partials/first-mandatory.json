@@ -1,5 +1,6 @@
 {
     "name": "first-mandatory",
+    "version": "1",
     "description": "First mandatory partial template",
     "defaults": {
         "services": [

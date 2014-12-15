@@ -83,6 +83,7 @@ public final class ClusterTemplate extends AbstractTemplate {
    * Builder for creating cluster templates.
    */
   public static class Builder extends AbstractTemplate.Builder<ClusterTemplate, Builder> {
+
     private Parent parent;
     private Set<Include> includes = ImmutableSet.of();
 

@@ -1,0 +1,14 @@
+# This file is managed by Chef.
+# Do NOT modify this file directly.
+
+<% @command_aliases.each do |a| -%>
+Cmnd_Alias <%= a[:name].upcase %> = <%= a[:command_list].join(', ') %>
+<% end -%>
+
+<% @commands.each do |command| -%>
+<%= @sudoer %> <%= @host %>=(<%= @runas %>) <%= 'NOPASSWD:' if @nopasswd %><%= command %>
+<% end -%>
+
+<% unless @defaults.empty? %>
+Defaults:<%= @sudoer %> <%= @defaults.join(',') %>
+<% end -%>

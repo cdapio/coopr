@@ -1,5 +1,6 @@
 {
     "name": "cdap-distributed",
+    "version": "1",
     "description": "Cask DAP (CDAP) with Security and Hadoop cluster with single master",
     "extends": {
         "name": "cdap-distributed-insecure"

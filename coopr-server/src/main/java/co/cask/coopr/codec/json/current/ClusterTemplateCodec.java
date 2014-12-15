@@ -40,7 +40,6 @@ public class ClusterTemplateCodec extends AbstractTemplateCodec<ClusterTemplate>
   @Override
   protected void addChildFields(ClusterTemplate template, JsonObject jsonObj, JsonSerializationContext context) {
     super.addChildFields(template, jsonObj, context);
-
     jsonObj.add(EXTENDS_KEY, context.serialize(template.getParent()));
     jsonObj.add(INCLUDES_KEY, context.serialize(template.getIncludes()));
   }

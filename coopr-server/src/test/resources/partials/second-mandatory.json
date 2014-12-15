@@ -1,5 +1,6 @@
 {
     "name": "second-mandatory",
+    "version": "1",
     "description": "Second mandatory partial template",
     "defaults": {
         "services": [
