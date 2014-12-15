@@ -157,9 +157,9 @@ if [ "${COOPR_SSL}" == "true" ]; then
 
   COOPR_NODEJS_SSL_PATH=`read_property server.nodejs.ssl.path ${COOPR_SERVER_CONF}/coopr-security.xml`
   COOPR_NODEJS_SSL_KEY_FILENAME=`read_property server.nodejs.ssl.key ${COOPR_SERVER_CONF}/coopr-security.xml`
-  export COOPR_NODEJS_SSL_KEY=$COOPR_NODEJS_SSL_PATH/$COOPR_NODEJS_SSL_KEY_FILENAME
+  export COOPR_NODEJS_SSL_KEY=${COOPR_NODEJS_SSL_PATH}/${COOPR_NODEJS_SSL_KEY_FILENAME}
   COOPR_NODEJS_SSL_CRT_FILENAME=`read_property server.nodejs.ssl.crt ${COOPR_SERVER_CONF}/coopr-security.xml`
-  export COOPR_NODEJS_SSL_CRT=$COOPR_NODEJS_SSL_PATH/$COOPR_NODEJS_SSL_CRT_FILENAME
+  export COOPR_NODEJS_SSL_CRT=${COOPR_NODEJS_SSL_PATH}/${COOPR_NODEJS_SSL_CRT_FILENAME}
 fi
 
 export SECURITY_ENABLED=`read_property security.enabled ${COOPR_SERVER_CONF}/coopr-site.xml`
@@ -167,7 +167,7 @@ export COOPR_SERVER_URI=${COOPR_SERVER_URI:-${COOPR_PROTOCOL}://127.0.0.1:55054}
 export TRUST_CERT_PATH=`read_property server.ssl.trust.cert.path ${COOPR_SERVER_CONF}/coopr-security.xml`
 export TRUST_CERT_PASSWORD=`read_property server.ssl.trust.cert.password ${COOPR_SERVER_CONF}/coopr-security.xml`
 
-if [ -n TRUST_CERT_PATH ] && [ -n TRUST_CERT_PASSWORD ]; then
+if [ -n "${TRUST_CERT_PATH}" ] && [ -n "${TRUST_CERT_PASSWORD}" ]; then
   export CERT_PARAMETER="--cert ${TRUST_CERT_PATH}:${TRUST_CERT_PASSWORD}"
 fi
 
@@ -180,7 +180,7 @@ export keystore_path=`read_property server.ssl.trust.keystore.path ${COOPR_SERVE
 export keystore_password=`read_property server.ssl.trust.keystore.password ${COOPR_SERVER_CONF}/coopr-security.xml`
 
 COOPR_NODE_TLS_ENABLED="false"
-if [ -n keystore_path ] && [ -n keystore_password ]; then
+if [ -n "${keystore_path}" ] && [ -n "${keystore_password}" ]; then
   COOPR_NODE_TLS_ENABLED="true"
 
   nodejs_tls_path=`read_property server.nodejs.tls.cert.path ${COOPR_SERVER_CONF}/coopr-security.xml`
@@ -188,9 +188,9 @@ if [ -n keystore_path ] && [ -n keystore_password ]; then
   nodejs_tls_crt=`read_property server.nodejs.tls.crt ${COOPR_SERVER_CONF}/coopr-security.xml`
   nodejs_tls_ca=`read_property server.nodejs.tls.ca ${COOPR_SERVER_CONF}/coopr-security.xml`
   export COOPR_NODE_TLS_PASSWORD=`read_property server.nodejs.tls.password ${COOPR_SERVER_CONF}/coopr-security.xml`
-  export COOPR_NODE_TLS_KEY=$nodejs_tls_path/$nodejs_tls_key
-  export COOPR_NODE_TLS_CRT=$nodejs_tls_path/$nodejs_tls_crt
-  export COOPR_NODE_TLS_CA=$nodejs_tls_path/$nodejs_tls_ca
+  export COOPR_NODE_TLS_KEY=${nodejs_tls_path}/${nodejs_tls_key}
+  export COOPR_NODE_TLS_CRT=${nodejs_tls_path}/${nodejs_tls_crt}
+  export COOPR_NODE_TLS_CA=${nodejs_tls_path}/${nodejs_tls_ca}
 fi
 export COOPR_NODE_TLS_ENABLED
 
@@ -204,7 +204,7 @@ load_defaults () {
   wait_for_server
 
   echo "Loading default configuration..."
-  $COOPR_HOME/server/templates/bin/load-templates.sh && touch ${COOPR_DATA_DIR}/.load_defaults
+  ${COOPR_HOME}/server/templates/bin/load-templates.sh && touch ${COOPR_DATA_DIR}/.load_defaults
 
   # register the default plugins with the server
   provisioner register
