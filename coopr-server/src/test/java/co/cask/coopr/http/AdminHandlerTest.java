@@ -218,6 +218,11 @@ public class AdminHandlerTest extends ServiceTestBase {
                                                    Entities.PartialTemplateExample.TEST_PARTIAL2),
                                 new TypeToken<List<PartialTemplate>>() {}.getType()));
 
+    import1.put(AdminHandler.MANDATORY_PARTIALS,
+            gson.toJsonTree(Lists.newArrayList(Entities.PartialTemplateExample.TEST_PARTIAL1,
+                            Entities.PartialTemplateExample.TEST_PARTIAL2),
+                    new TypeToken<List<PartialTemplate>>() {}.getType()));
+
 
     // Verify import worked by exporting
     runImportExportTest(import1);
@@ -254,6 +259,11 @@ public class AdminHandlerTest extends ServiceTestBase {
                                                    Entities.PartialTemplateExample.TEST_PARTIAL2),
                                 new TypeToken<List<PartialTemplate>>() {}.getType()));
 
+    import2.put(AdminHandler.MANDATORY_PARTIALS,
+            gson.toJsonTree(Lists.newArrayList(Entities.PartialTemplateExample.TEST_PARTIAL1,
+                            Entities.PartialTemplateExample.TEST_PARTIAL2),
+                    new TypeToken<List<PartialTemplate>>() {}.getType()));
+
     // Verify import worked by exporting
     runImportExportTest(import2);
 
@@ -265,6 +275,7 @@ public class AdminHandlerTest extends ServiceTestBase {
     import3.put(AdminHandler.SERVICES, new JsonArray());
     import3.put(AdminHandler.CLUSTER_TEMPLATES, new JsonArray());
     import3.put(AdminHandler.PARTIAL_TEMPLATES, new JsonArray());
+    import3.put(AdminHandler.MANDATORY_PARTIALS, new JsonArray());
     // Verify import worked by exporting
     runImportExportTest(import3);
   }
