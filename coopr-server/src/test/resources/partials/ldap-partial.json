@@ -1,5 +1,6 @@
 {
     "name": "LDAPInternal",
+    "version": "1",
     "description": "Configure Example, Inc. LDAP services",
     "immutable": "true",
     "defaults": {

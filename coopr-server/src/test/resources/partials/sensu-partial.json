@@ -1,5 +1,6 @@
 {
     "name": "sensuInternal",
+    "version": "1",
     "description": "Configure Sensu clients to integrate with Cask internal monitoring infrastructure",
     "immutable": false,
     "defaults": {
