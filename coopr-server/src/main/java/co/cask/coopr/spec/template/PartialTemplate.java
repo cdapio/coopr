@@ -53,12 +53,12 @@ public final class PartialTemplate extends AbstractTemplate {
   /**
    * Builder for creating partial templates.
    */
-  public static class Builder extends AbstractTemplate.Builder {
+  public static class Builder extends AbstractTemplate.Builder<PartialTemplate, Builder> {
 
     private Boolean immutable;
 
     @Override
-    protected Builder getThis() {
+    protected PartialTemplate.Builder getThis() {
       return this;
     }
 

@@ -16,6 +16,7 @@
 package co.cask.coopr.http.handler;
 
 import co.cask.coopr.account.Account;
+import co.cask.coopr.cluster.ClusterService;
 import co.cask.coopr.common.conf.Constants;
 import co.cask.coopr.common.queue.QueueMetrics;
 import co.cask.coopr.scheduler.task.TaskQueueService;
@@ -26,6 +27,8 @@ import co.cask.coopr.spec.plugin.AutomatorType;
 import co.cask.coopr.spec.plugin.ProviderType;
 import co.cask.coopr.spec.service.Service;
 import co.cask.coopr.spec.template.ClusterTemplate;
+import co.cask.coopr.spec.template.TemplateImmutabilityException;
+import co.cask.coopr.spec.template.TemplateNotFoundException;
 import co.cask.coopr.store.entity.EntityStoreService;
 import co.cask.coopr.store.entity.EntityStoreView;
 import co.cask.coopr.store.tenant.TenantStore;
@@ -76,14 +79,16 @@ public class AdminHandler extends AbstractAuthHandler {
 
   private final EntityStoreService entityStoreService;
   private final TaskQueueService taskQueueService;
+  private final ClusterService clusterService;
   private final Gson gson;
 
   @Inject
   private AdminHandler(TenantStore tenantStore, EntityStoreService entityStoreService,
-                       TaskQueueService taskQueueService, Gson gson) {
+                       TaskQueueService taskQueueService, ClusterService clusterService, Gson gson) {
     super(tenantStore);
     this.taskQueueService = taskQueueService;
     this.entityStoreService = entityStoreService;
+    this.clusterService = clusterService;
     this.gson = gson;
   }
 
@@ -1155,6 +1160,39 @@ public class AdminHandler extends AbstractAuthHandler {
     } catch (IOException e) {
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception importing entities.");
     }
+  }
+
+  /**
+   * Resolve cluster template from template with includes and extends.
+   *
+   * @param request Request to export admin definable entities.
+   * @param responder Responder for sending response.
+   */
+  @GET
+  @Path("/resolve")
+  public void resolveTemplate(HttpRequest request, HttpResponder responder) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+    ClusterTemplate clusterTemplate = getEntityFromRequest(request, responder, ClusterTemplate.class);
+    if (clusterTemplate != null) {
+      try {
+        ClusterTemplate resolved = clusterService.resolveTemplate(account, clusterTemplate);
+        responder.sendJson(HttpResponseStatus.OK, resolved,
+                           new TypeToken<Collection<ClusterTemplate>>() {
+                           }.getType(), gson);
+      } catch (TemplateNotFoundException e) {
+        responder.sendError(HttpResponseStatus.NOT_FOUND, "Cluster template can't be found.");
+      } catch (TemplateImmutabilityException e) {
+        responder.sendError(HttpResponseStatus.BAD_REQUEST, e.getMessage());
+      } catch (IOException e) {
+        responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception processing template.");
+      }
+    } else {
+      responder.sendError(HttpResponseStatus.BAD_REQUEST, "Cluster template can't be read.");
+    }
+
   }
 
   private <T> T getEntityFromRequest(HttpRequest request, HttpResponder responder, Type tClass) {
