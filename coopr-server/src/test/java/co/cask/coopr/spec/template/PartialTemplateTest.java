@@ -203,6 +203,12 @@ public class PartialTemplateTest extends BaseTest {
     //overrides in child
     Assert.assertEquals("ldap.correct.com", rt.getClusterDefaults().getConfig().get("ldap")
       .getAsJsonObject().get("endpoint").getAsString());
+
+    Assert.assertNull(rt.getLabel());
+    Assert.assertNull(rt.getIcon());
+    Assert.assertEquals("cdap-distributed-secure-hadoop", rt.getName());
+    Assert.assertEquals("Cask DAP (CDAP) with Security and Secure Hadoop cluster with single master",
+                        rt.getDescription());
   }
 
   @Test

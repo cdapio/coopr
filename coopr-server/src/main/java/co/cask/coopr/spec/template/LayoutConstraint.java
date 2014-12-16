@@ -28,16 +28,16 @@ import java.util.Set;
  * together when solving for the layout of a cluster.
  */
 public final class LayoutConstraint {
-  private final Set<Set<String>> servicesThatMustCoexist;
-  private final Set<Set<String>> servicesThatMustNotCoexist;
+  Set<Set<String>> servicesThatMustCoexist;
+  Set<Set<String>> servicesThatMustNotCoexist;
   public static final LayoutConstraint EMPTY_LAYOUT_CONSTRAINT = new LayoutConstraint(null, null);
 
   public LayoutConstraint(Set<Set<String>> servicesThatMustCoexist,
                           Set<Set<String>> servicesThatMustNotCoexist) {
     this.servicesThatMustCoexist = servicesThatMustCoexist == null ?
-      Sets.<Set<String>>newHashSet() : servicesThatMustCoexist;
+      ImmutableSet.<Set<String>>of() : servicesThatMustCoexist;
     this.servicesThatMustNotCoexist = servicesThatMustNotCoexist == null ?
-      Sets.<Set<String>>newHashSet() : servicesThatMustNotCoexist;
+      ImmutableSet.<Set<String>>of() : servicesThatMustNotCoexist;
   }
 
   /**

@@ -51,6 +51,7 @@ import co.cask.coopr.spec.template.Parent;
 import co.cask.coopr.spec.template.PartialTemplate;
 import co.cask.coopr.spec.template.SizeConstraint;
 import co.cask.coopr.spec.template.TemplateImmutabilityException;
+import co.cask.coopr.spec.template.TemplateMerger;
 import co.cask.coopr.spec.template.TemplateNotFoundException;
 import co.cask.coopr.store.cluster.ClusterStore;
 import co.cask.coopr.store.cluster.ClusterStoreService;
@@ -92,6 +93,7 @@ public class ClusterService {
   private final QueueGroup clusterQueues;
   private final QueueGroup solverQueues;
   private final QueueGroup jobQueues;
+  private final TemplateMerger templateMerger;
 
   @Inject
   public ClusterService(ClusterStoreService clusterStoreService,
@@ -103,7 +105,7 @@ public class ClusterService {
                         Solver solver,
                         IdService idService,
                         CredentialStore credentialStore,
-                        Gson gson) {
+                        Gson gson, TemplateMerger templateMerger) {
     this.clusterStoreService = clusterStoreService;
     this.clusterStore = clusterStoreService.getSystemView();
     this.entityStoreService = entityStoreService;
@@ -117,6 +119,7 @@ public class ClusterService {
     this.clusterQueues = queueService.getQueueGroup(QueueType.CLUSTER);
     this.solverQueues = queueService.getQueueGroup(QueueType.SOLVER);
     this.jobQueues = queueService.getQueueGroup(QueueType.JOB);
+    this.templateMerger = templateMerger;
   }
 
   /**
@@ -778,9 +781,7 @@ public class ClusterService {
   private ClusterTemplate resolveTemplate(EntityStoreView entityStore, ClusterTemplate clusterTemplate)
     throws IOException, TemplateImmutabilityException, TemplateNotFoundException {
     Set<AbstractTemplate> mergeSet = getMergeCollection(entityStore, clusterTemplate);
-    return ClusterTemplate.builder()
-      .merger().merge(mergeSet).setInitialTemplate(clusterTemplate)
-      .builder().build();
+    return templateMerger.merge(mergeSet, clusterTemplate);
   }
 
   /*

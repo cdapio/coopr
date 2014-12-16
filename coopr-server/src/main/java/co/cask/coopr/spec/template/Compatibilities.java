@@ -16,10 +16,8 @@
 package co.cask.coopr.spec.template;
 
 import com.google.common.base.Objects;
-import com.google.common.collect.Sets;
+import com.google.common.collect.ImmutableSet;
 
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -27,14 +25,14 @@ import java.util.Set;
  */
 public final class Compatibilities {
   public static final Compatibilities EMPTY_COMPATIBILITIES = builder().build();
-  private final Set<String> hardwaretypes;
-  private final Set<String> imagetypes;
-  private final Set<String> services;
+  Set<String> hardwaretypes;
+  Set<String> imagetypes;
+  Set<String> services;
 
   private Compatibilities(Set<String> hardwaretypes, Set<String> imagetypes, Set<String> services) {
-    this.hardwaretypes = hardwaretypes;
-    this.imagetypes = imagetypes;
-    this.services = services;
+    this.hardwaretypes = hardwaretypes == null ? ImmutableSet.<String>of() : hardwaretypes;
+    this.imagetypes = imagetypes == null ? ImmutableSet.<String>of() : imagetypes;
+    this.services = services == null ? ImmutableSet.<String>of() : services;
   }
 
   /**
@@ -135,37 +133,37 @@ public final class Compatibilities {
    * Builder for creating Compatibilities.
    */
   public static class Builder {
-    private Set<String> hardwaretypes = Sets.newHashSet();
-    private Set<String> imagetypes = Sets.newHashSet();
-    private Set<String> services = Sets.newHashSet();
+    private Set<String> hardwaretypes = ImmutableSet.of();
+    private Set<String> imagetypes = ImmutableSet.of();
+    private Set<String> services = ImmutableSet.of();
 
     public Builder setHardwaretypes(Set<String> hardwaretypes) {
-      this.hardwaretypes = hardwaretypes == null ? Sets.<String>newHashSet() : hardwaretypes;
+      this.hardwaretypes = hardwaretypes == null ? ImmutableSet.<String>of() : hardwaretypes;
       return this;
     }
 
     public Builder setHardwaretypes(String... hardwaretypes) {
-      this.hardwaretypes = new HashSet<String>(Arrays.asList(hardwaretypes));
+      this.hardwaretypes = ImmutableSet.copyOf(hardwaretypes);
       return this;
     }
 
     public Builder setImagetypes(Set<String> imagetypes) {
-      this.imagetypes = imagetypes == null ? Sets.<String>newHashSet() : imagetypes;
+      this.imagetypes = imagetypes == null ? ImmutableSet.<String>of() : imagetypes;
       return this;
     }
 
     public Builder setImagetypes(String... imagetypes) {
-      this.imagetypes = new HashSet<String>(Arrays.asList(imagetypes));
+      this.imagetypes = ImmutableSet.copyOf(imagetypes);
       return this;
     }
 
     public Builder setServices(Set<String> services) {
-      this.services = services == null ? Sets.<String>newHashSet() : services;
+      this.services = services == null ? ImmutableSet.<String>of() : services;
       return this;
     }
 
     public Builder setServices(String... services) {
-      this.services = new HashSet<String>(Arrays.asList(services));
+      this.services = ImmutableSet.copyOf(services);
       return this;
     }
 

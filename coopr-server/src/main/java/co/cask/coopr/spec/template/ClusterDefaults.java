@@ -17,11 +17,9 @@
 package co.cask.coopr.spec.template;
 
 import com.google.common.base.Objects;
-import com.google.common.collect.Sets;
+import com.google.common.collect.ImmutableSet;
 import com.google.gson.JsonObject;
 
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -29,12 +27,12 @@ import java.util.Set;
  */
 public final class ClusterDefaults {
   public static final ClusterDefaults EMPTY_CLUSTER_DEFAULTS = builder().build();
-  private Set<String> services;
-  private String provider;
-  private String hardwaretype;
-  private String imagetype;
-  private String dnsSuffix;
-  private JsonObject config;
+  Set<String> services;
+  String provider;
+  String hardwaretype;
+  String imagetype;
+  String dnsSuffix;
+  JsonObject config;
 
   private ClusterDefaults(Set<String> services, String provider, String hardwaretype,
                           String imagetype, String dnsSuffix, JsonObject config) {
@@ -149,7 +147,7 @@ public final class ClusterDefaults {
    * Builder for creating cluster defaults.
    */
   public static class Builder {
-    private Set<String> services = Sets.newHashSet();
+    private Set<String> services = ImmutableSet.of();
     private String provider;
     private String hardwaretype;
     private String imagetype;
@@ -157,12 +155,12 @@ public final class ClusterDefaults {
     private JsonObject config = new JsonObject();
 
     public Builder setServices(Set<String> services) {
-      this.services = services == null ? Sets.<String>newHashSet() : services;
+      this.services = services == null ? ImmutableSet.<String>of() : services;
       return this;
     }
 
     public Builder setServices(String... services) {
-      this.services = new HashSet<String>(Arrays.asList(services));
+      this.services = ImmutableSet.copyOf(services);
       return this;
     }
 
