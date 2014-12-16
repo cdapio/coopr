@@ -1,5 +1,10 @@
 {
+<<<<<<< HEAD
     "name": "sensu-internal",
+=======
+    "name": "sensuInternal",
+    "version": "1",
+>>>>>>> upstream/develop
     "description": "Configure Sensu clients to integrate with Cask internal monitoring infrastructure",
     "immutable": true,
     "defaults": {

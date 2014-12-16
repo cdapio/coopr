@@ -54,5 +54,4 @@ describe 'Sinatra API' do
     delete 'v2/tenants/test_tenant2', 'CONTENT_TYPE' => 'application/json'
     expect(last_response).to be_ok
   end
-
 end

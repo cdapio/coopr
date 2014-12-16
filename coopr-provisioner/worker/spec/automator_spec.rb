@@ -2,7 +2,6 @@ require_relative 'spec_helper'
 require 'json'
 
 describe Automator do
-
   response = IO.read("#{File.dirname(__FILE__)}/task.json")
 
   # Set these up once
@@ -38,7 +37,6 @@ describe Automator do
 #        end
 #      end
 # rubocop:enable CommentIndentation
-
     end
   end
 end

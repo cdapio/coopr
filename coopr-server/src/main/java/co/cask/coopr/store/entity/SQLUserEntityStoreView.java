@@ -31,13 +31,21 @@ public class SQLUserEntityStoreView extends BaseSQLEntityStoreView {
   }
 
   @Override
-  protected void writeEntity(EntityType entityType, String entityName, byte[] data)
+  protected void writeEntity(EntityType entityType, String entityName, int version, byte[] data)
     throws IOException, IllegalAccessException {
     throw new IllegalAccessException("Non-admins are not allowed to write entities.");
   }
 
+
   @Override
-  protected void deleteEntity(EntityType entityType, String entityName) throws IOException, IllegalAccessException {
+  protected void deleteEntity(EntityType entityType, String entityName)
+    throws IOException, IllegalAccessException {
+    throw new IllegalAccessException("Non-admins are not allowed to delete entities.");
+  }
+
+  @Override
+  protected void deleteEntity(EntityType entityType, String entityName, int entityVersion)
+    throws IOException, IllegalAccessException {
     throw new IllegalAccessException("Non-admins are not allowed to delete entities.");
   }
 }
