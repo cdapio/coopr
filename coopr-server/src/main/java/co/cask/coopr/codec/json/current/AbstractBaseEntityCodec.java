@@ -17,6 +17,7 @@
 package co.cask.coopr.codec.json.current;
 
 import co.cask.coopr.codec.json.AbstractCodec;
+import co.cask.coopr.common.conf.Constants;
 import co.cask.coopr.spec.BaseEntity;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
@@ -53,7 +54,8 @@ public abstract class AbstractBaseEntityCodec<T extends BaseEntity> extends Abst
     String label = context.deserialize(jsonObj.get("label"), String.class);
     String icon = context.deserialize(jsonObj.get("icon"), String.class);
     String description = context.deserialize(jsonObj.get("description"), String.class);
-    int version = context.<Integer>deserialize(jsonObj.get("version"), Integer.class);
+    int version = jsonObj.has("version") ?
+      context.<Integer>deserialize(jsonObj.get("version"), Integer.class) : Constants.DEFAULT_VERSION;
 
     return getBuilder(jsonObj, context)
       .setBaseFields(name, label, description, icon, version)
