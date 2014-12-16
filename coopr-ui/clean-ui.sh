@@ -1,5 +1,5 @@
 #!/bin/sh
-echo "CLEAN UI TASK"
+
 COOPR_NODE=${COOPR_NODE:-node}
 COOPR_GULP='./node_modules/gulp/bin/gulp.js'
 
