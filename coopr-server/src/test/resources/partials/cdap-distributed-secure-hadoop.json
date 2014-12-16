@@ -1,10 +1,6 @@
 {
-<<<<<<< HEAD:coopr-server/src/test/resources/partials/cdap­distributed-secure­hadoop.json
     "name": "cdap-distributed-secure-hadoop",
-=======
-    "name": "cdapDistributedSecureHadoop",
     "version": "1",
->>>>>>> upstream/develop:coopr-server/src/test/resources/partials/cdap-distributed-secure-hadoop.json
     "description": "Cask DAP (CDAP) with Security and Secure Hadoop cluster with single master",
     "extends": {
         "name": "cdap-distributed"

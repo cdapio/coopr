@@ -1,10 +1,6 @@
 {
-<<<<<<< HEAD
     "name": "LDAP-internal",
-=======
-    "name": "LDAPInternal",
     "version": "1",
->>>>>>> upstream/develop
     "description": "Configure Example, Inc. LDAP services",
     "immutable": "false",
     "defaults": {
