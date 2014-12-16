@@ -4,7 +4,6 @@ require 'logger'
 include Logging
 
 describe PluginManager do
-
   # These run before each test
   before :each do
     @pluginmanager = PluginManager.new
@@ -18,5 +17,4 @@ describe PluginManager do
 #    end
 #  end
 # rubocop:enable CommentIndentation
-
 end
