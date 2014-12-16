@@ -131,7 +131,6 @@ public final class ServerMain extends DaemonMain {
       solverNumThreads = conf.getInt(Constants.SOLVER_NUM_THREADS);
     } catch (Exception e) {
       LOG.error("Exception initializing server", e);
-      System.exit(-1);
     }
   }
 
