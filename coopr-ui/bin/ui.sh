@@ -49,7 +49,7 @@ start ( ) {
   cd ${UI_PATH}
   check_before_start
 
-  echo "Starting Coopr UI ..."
+  echo "Starting UI ..."
 
   nohup nice -1 ${COOPR_NODE} ${UI_PATH}/server.js \
     >> ${COOPR_LOG_DIR}/${APP_NAME}.log 2>&1 < /dev/null &
@@ -57,7 +57,7 @@ start ( ) {
 }
 
 stop ( ) {
-  echo -n "Stopping Coopr UI ..."
+  echo -n "Stopping UI ..."
   if [ -f ${pid} ]; then
     pidToKill=`cat ${pid}`
     # kill -0 == see if the PID exists
