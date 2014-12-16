@@ -53,7 +53,8 @@ public abstract class AbstractBaseEntityCodec<T extends BaseEntity> extends Abst
     String label = context.deserialize(jsonObj.get("label"), String.class);
     String icon = context.deserialize(jsonObj.get("icon"), String.class);
     String description = context.deserialize(jsonObj.get("description"), String.class);
-    int version = context.<Integer>deserialize(jsonObj.get("version"), Integer.class);
+    int version =
+      jsonObj.get("version") != null ? context.<Integer>deserialize(jsonObj.get("version"), Integer.class) : 1;
 
     return getBuilder(jsonObj, context)
       .setBaseFields(name, label, description, icon, version)
