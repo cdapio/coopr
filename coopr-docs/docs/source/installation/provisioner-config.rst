@@ -58,6 +58,27 @@ Shown below is an example configuration with settings that you are most likely t
     </property>
   </configuration>
 
+Running Provisioner to use SSL
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+To configure the provisioner to support server with SSL, add this property to ``provisioner-site.xml``::
+
+    <property>
+      <name>provisioner.server.uri</name>
+      <value>https://localhost:55054</value>
+      <description>URI of server to connect to</description>
+    </property>
+
+To configure the provisioner to support server that uses mutual authentication with SSL,
+setup these environment variables:
+
+====================================     ==========================    =======================================
+   Environment variable                     Default Value                     Description
+====================================     ==========================    =======================================
+TRUST_CERT_PATH                             None                        Trusted certificate file location.
+TRUST_CERT_PASSWORD                         None                        Trusted certificate password.
+====================================     ==========================    =======================================
+
 Configuration
 ^^^^^^^^^^^^^
 
