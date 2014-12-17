@@ -1836,7 +1836,7 @@ public class AdminHandler extends AbstractAuthHandler {
    * @param request Request to export admin definable entities.
    * @param responder Responder for sending response.
    */
-  @GET
+  @POST
   @Path("/resolve")
   public void resolveTemplate(HttpRequest request, HttpResponder responder) {
     Account account = getAndAuthenticateAccount(request, responder);
