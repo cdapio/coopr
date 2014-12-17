@@ -74,9 +74,9 @@ public class PartialTemplateTest extends BaseTest {
   public void test_01_parse() throws Exception {
     //load json templates
     ClassLoader classLoader = PartialTemplateTest.class.getClassLoader();
-    InputStream insecureIn = classLoader.getResourceAsStream("partials/cdap-distributed­insecure.json");
-    InputStream distributedIn = classLoader.getResourceAsStream("partials/cdap­distributed.json");
-    InputStream secureIn = classLoader.getResourceAsStream("partials/cdap­distributed-secure­hadoop.json");
+    InputStream insecureIn = classLoader.getResourceAsStream("partials/cdap-distributed-insecure.json");
+    InputStream distributedIn = classLoader.getResourceAsStream("partials/cdap-distributed.json");
+    InputStream secureIn = classLoader.getResourceAsStream("partials/cdap-distributed-secure-hadoop.json");
     InputStream sensuIn = classLoader.getResourceAsStream("partials/sensu-partial.json");
     InputStream ldapIn = classLoader.getResourceAsStream("partials/ldap-partial.json");
     InputStream templateWithOverridesInBodyIn =
