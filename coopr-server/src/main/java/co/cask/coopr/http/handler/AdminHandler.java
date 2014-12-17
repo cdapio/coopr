@@ -1847,18 +1847,16 @@ public class AdminHandler extends AbstractAuthHandler {
     if (clusterTemplate != null) {
       try {
         ClusterTemplate resolved = clusterService.resolveTemplate(account, clusterTemplate);
-        responder.sendJson(HttpResponseStatus.OK, resolved,
-                           new TypeToken<Collection<ClusterTemplate>>() {
-                           }.getType(), gson);
+        responder.sendJson(HttpResponseStatus.OK, resolved, ClusterTemplate.class, gson);
       } catch (TemplateNotFoundException e) {
-        responder.sendError(HttpResponseStatus.NOT_FOUND, "Cluster template can't be found.");
+        responder.sendString(HttpResponseStatus.NOT_FOUND, "Cluster template can't be found.");
       } catch (TemplateImmutabilityException e) {
-        responder.sendError(HttpResponseStatus.BAD_REQUEST, e.getMessage());
+        responder.sendString(HttpResponseStatus.BAD_REQUEST, e.getMessage());
       } catch (IOException e) {
-        responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception processing template.");
+        responder.sendString(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception processing template.");
       }
     } else {
-      responder.sendError(HttpResponseStatus.BAD_REQUEST, "Cluster template can't be read.");
+      responder.sendString(HttpResponseStatus.BAD_REQUEST, "Cluster template can't be read.");
     }
   }
 

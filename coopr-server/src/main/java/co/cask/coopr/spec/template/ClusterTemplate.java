@@ -163,7 +163,8 @@ public final class ClusterTemplate extends AbstractTemplate {
           String name = fromConfigItem.getKey();
           JsonElement value = fromConfigItem.getValue();
           if (immutables.contains(name) && thisConfig.has(name)) {
-            throw new TemplateImmutabilityException(name + " can't be overridden due immutability. Overrides in " + from.getName());
+            throw new TemplateImmutabilityException(name + " can't be overridden due immutability. Overrides in " +
+                                                      from.getName());
           }
           thisConfig.add(name, value);
           if (isImmutable) {
