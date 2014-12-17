@@ -71,16 +71,6 @@ public class PartialTemplateTest extends BaseTest {
     serviceConstraints.put("zookeeper-server", new ServiceConstraint(null, null, 1, 1));
   }
 
-  @AfterClass
-  public static void clean() throws Exception {
-    for (ClusterTemplate clusterTemplate : entityStoreView.getAllClusterTemplates()) {
-      entityStoreView.deleteClusterTemplate(clusterTemplate.getName());
-    }
-    for (PartialTemplate partialTemplate : entityStoreView.getAllPartialTemplates()) {
-      entityStoreView.deletePartialTemplate(partialTemplate.getName());
-    }
-  }
-
   @Test
   public void test_01_parse() throws Exception {
     //load json templates
