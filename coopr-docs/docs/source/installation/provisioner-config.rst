@@ -61,7 +61,7 @@ Shown below is an example configuration with settings that you are most likely t
 Running Provisioner to use SSL
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-To configure the provisioner to support server with SSL, add this property to ``provisioner-site.xml``::
+To configure the provisioner to support server with SSL, add or update this property in ``provisioner-site.xml``::
 
     <property>
       <name>provisioner.server.uri</name>
