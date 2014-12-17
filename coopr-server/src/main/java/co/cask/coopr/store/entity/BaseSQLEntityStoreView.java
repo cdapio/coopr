@@ -46,12 +46,41 @@ public abstract class BaseSQLEntityStoreView extends BaseEntityStoreView {
   }
 
   @Override
-  protected byte[] getEntity(EntityType entityType, String entityName) throws IOException {
+  protected int getVersion(EntityType entityType, String entityName) throws IOException {
+    try {
+      Integer version = 1;
+      Connection conn = dbConnectionPool.getConnection();
+      try {
+        PreparedStatement statement = getSelectMaxVersionStatement(conn, entityType, entityName);
+        try {
+          ResultSet rs = statement.executeQuery();
+          try {
+            if (rs.next()) {
+              version += rs.getInt(1);
+            }
+          } finally {
+            rs.close();
+          }
+        } finally {
+          statement.close();
+        }
+      } finally {
+        conn.close();
+      }
+      return version;
+    } catch (SQLException e) {
+      throw new IOException("Exception getting highest version of entity of type " + entityType.name().toLowerCase()
+                              + " of name " + entityName + accountErrorSnippet);
+    }
+  }
+
+  @Override
+  protected byte[] getEntity(EntityType entityType, String entityName, int entityVersion) throws IOException {
     try {
       byte[] entityBytes = null;
       Connection conn = dbConnectionPool.getConnection();
       try {
-        PreparedStatement statement = getSelectStatement(conn, entityType, entityName);
+        PreparedStatement statement = getSelectStatement(conn, entityType, entityName, entityVersion);
         try {
           ResultSet rs = statement.executeQuery();
           try {
@@ -70,7 +99,7 @@ public abstract class BaseSQLEntityStoreView extends BaseEntityStoreView {
       return entityBytes;
     } catch (SQLException e) {
       throw new IOException("Exception getting entity of type " + entityType.name().toLowerCase()
-                              + " of name " + entityName + accountErrorSnippet);
+                              + " of name " + entityName + " of version " + entityVersion  + accountErrorSnippet);
     }
   }
 
@@ -103,8 +132,19 @@ public abstract class BaseSQLEntityStoreView extends BaseEntityStoreView {
     }
   }
 
+  protected PreparedStatement getSelectMaxVersionStatement(Connection conn, EntityType entityType,
+                                                           String entityName) throws SQLException {
+    String entityTypeId = entityType.getId();
+    // immune to sql injection since everything is an enum or constant
+    String query = "SELECT MAX(version) FROM " + entityTypeId + "s WHERE name=? AND tenant_id=?";
+    PreparedStatement statement = conn.prepareStatement(query);
+    statement.setString(1, entityName);
+    statement.setString(2, account.getTenantId());
+    return statement;
+  }
+
   protected PreparedStatement getSelectStatement(Connection conn, EntityType entityType,
-                                                 String entityName) throws SQLException {
+                                                 String entityName, int entityVersion) throws SQLException {
     String entityTypeId = entityType.getId();
     // immune to sql injection since everything is an enum or constant
     StringBuilder queryStr = new StringBuilder();
@@ -112,14 +152,23 @@ public abstract class BaseSQLEntityStoreView extends BaseEntityStoreView {
     queryStr.append(entityTypeId);
     queryStr.append(" FROM ");
     queryStr.append(entityTypeId);
-    queryStr.append("s WHERE name=? AND tenant_id=?");
-    // TODO: remove once types are defined through server instead of through provisioner
-    // automator and provider types are constant across tenants and defined only in the superadmin tenant.
+    queryStr.append("s WHERE name=? AND tenant_id=? AND version=");
+    if (entityVersion == Constants.FIND_MAX_VERSION) {
+      queryStr.append(String.format("(SELECT MAX(version) FROM %ss WHERE name=? AND tenant_id=?)", entityTypeId));
+    } else {
+      queryStr.append("?");
+    }
     String tenantId = (entityType == EntityType.AUTOMATOR_TYPE || entityType == EntityType.PROVIDER_TYPE) ?
       Constants.SUPERADMIN_TENANT : account.getTenantId();
     PreparedStatement statement = conn.prepareStatement(queryStr.toString());
     statement.setString(1, entityName);
     statement.setString(2, tenantId);
+    if (entityVersion == Constants.FIND_MAX_VERSION) {
+      statement.setString(3, entityName);
+      statement.setString(4, tenantId);
+    } else {
+      statement.setInt(3, entityVersion);
+    }
     return statement;
   }
 
@@ -131,7 +180,7 @@ public abstract class BaseSQLEntityStoreView extends BaseEntityStoreView {
     queryStr.append(entityTypeId);
     queryStr.append(" FROM ");
     queryStr.append(entityTypeId);
-    queryStr.append("s WHERE tenant_id=? ");
+    queryStr.append("s WHERE tenant_id=?");
     // TODO: remove once types are defined through server instead of through provisioner
     // automator and provider types are constant across tenants and defined only in the superadmin tenant.
     String tenantId = (entityType == EntityType.AUTOMATOR_TYPE || entityType == EntityType.PROVIDER_TYPE) ?

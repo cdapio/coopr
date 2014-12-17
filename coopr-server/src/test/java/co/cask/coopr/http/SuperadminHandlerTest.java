@@ -41,6 +41,7 @@ import co.cask.coopr.store.tenant.SQLTenantStore;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 import com.google.common.io.CharStreams;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -292,11 +293,11 @@ public class SuperadminHandlerTest extends ServiceTestBase {
     Tenant tenant = tenantStore.getTenantByName(name);
     Account account = new Account(Constants.ADMIN_USER, tenant.getId());
     EntityStoreView tenantView = entityStoreService.getView(account);
-    Assert.assertEquals(providers, ImmutableSet.copyOf(tenantView.getAllProviders()));
-    Assert.assertEquals(services, ImmutableSet.copyOf(tenantView.getAllServices()));
-    Assert.assertEquals(hardwareTypes, ImmutableSet.copyOf(tenantView.getAllHardwareTypes()));
-    Assert.assertEquals(imageTypes, ImmutableSet.copyOf(tenantView.getAllImageTypes()));
-    Assert.assertEquals(clusterTemplates, ImmutableSet.copyOf(tenantView.getAllClusterTemplates()));
+    Assert.assertEquals(Sets.newHashSet(providers), Sets.newHashSet(tenantView.getAllProviders()));
+    Assert.assertEquals(Sets.newHashSet(services), Sets.newHashSet(tenantView.getAllServices()));
+    Assert.assertEquals(Sets.newHashSet(hardwareTypes), Sets.newHashSet(tenantView.getAllHardwareTypes()));
+    Assert.assertEquals(Sets.newHashSet(imageTypes), Sets.newHashSet(tenantView.getAllImageTypes()));
+    Assert.assertEquals(Sets.newHashSet(clusterTemplates), Sets.newHashSet(tenantView.getAllClusterTemplates()));
     // check tenant account has copied superadmin plugin resources
     Assert.assertEquals(meta1,
                         metaStoreService.getResourceTypeView(account, type1).get(meta1.getName(), meta1.getVersion()));

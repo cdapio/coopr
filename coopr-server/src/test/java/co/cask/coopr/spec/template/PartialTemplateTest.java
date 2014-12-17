@@ -12,6 +12,7 @@ import co.cask.coopr.store.entity.EntityStoreView;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.apache.commons.io.IOUtils;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
@@ -70,13 +71,23 @@ public class PartialTemplateTest extends BaseTest {
     serviceConstraints.put("zookeeper-server", new ServiceConstraint(null, null, 1, 1));
   }
 
+  @AfterClass
+  public static void clean() throws Exception {
+    for (ClusterTemplate clusterTemplate : entityStoreView.getAllClusterTemplates()) {
+      entityStoreView.deleteClusterTemplate(clusterTemplate.getName());
+    }
+    for (PartialTemplate partialTemplate : entityStoreView.getAllPartialTemplates()) {
+      entityStoreView.deletePartialTemplate(partialTemplate.getName());
+    }
+  }
+
   @Test
   public void test_01_parse() throws Exception {
     //load json templates
     ClassLoader classLoader = PartialTemplateTest.class.getClassLoader();
-    InputStream insecureIn = classLoader.getResourceAsStream("partials/cdap-distributed­insecure.json");
-    InputStream distributedIn = classLoader.getResourceAsStream("partials/cdap­distributed.json");
-    InputStream secureIn = classLoader.getResourceAsStream("partials/cdap­distributed-secure­hadoop.json");
+    InputStream insecureIn = classLoader.getResourceAsStream("partials/cdap-distributed-insecure.json");
+    InputStream secureIn = classLoader.getResourceAsStream("partials/cdap-distributed-secure-hadoop.json");
+    InputStream distributedIn = classLoader.getResourceAsStream("partials/cdap-distributed.json");
     InputStream sensuIn = classLoader.getResourceAsStream("partials/sensu-partial.json");
     InputStream ldapIn = classLoader.getResourceAsStream("partials/ldap-partial.json");
     InputStream templateWithOverridesInBodyIn =

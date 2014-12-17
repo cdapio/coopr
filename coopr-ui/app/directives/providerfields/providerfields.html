@@ -7,14 +7,14 @@
           title="{{field.tip}}"
           ng-model="model[key]" />
         <small class="text-muted">
-          <strong>{{field.label}}</strong>
+          <strong ng-bind="field.label"></strong>
         </small>
       </label>
     </div>
 
     <div class="input-group input-group-sm" ng-if="field.type!='select' && field.type!='checkbox'">
       <label for="providerfield-{{$index}}" class="input-group-addon">
-        {{field.label}}
+        <span ng-bind="field.label"></span>
         <span class="fa fa-asterisk" ng-show="required[key]"></span>
       </label>
       <input id="providerfield-{{$index}}" type="{{field.type}}"

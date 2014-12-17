@@ -2,7 +2,6 @@ require_relative 'spec_helper'
 require 'json'
 
 describe Provider do
-
   response = IO.read("#{File.dirname(__FILE__)}/task.json")
 
   # Set these up once
