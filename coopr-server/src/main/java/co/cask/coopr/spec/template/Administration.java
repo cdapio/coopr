@@ -20,10 +20,10 @@ import com.google.common.base.Objects;
 /**
  * Defines settings for cluster administration like lease duration, etc.
  */
-public class Administration {
+public final class Administration {
   public static final Administration EMPTY_ADMINISTRATION = new Administration(LeaseDuration.FOREVER_LEASE_DURATION);
 
-  private final LeaseDuration leaseDuration;
+  final LeaseDuration leaseDuration;
 
   public Administration(LeaseDuration leaseDuration) {
     this.leaseDuration = leaseDuration;

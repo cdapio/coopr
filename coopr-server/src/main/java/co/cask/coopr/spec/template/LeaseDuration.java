@@ -22,7 +22,7 @@ import com.google.common.base.Preconditions;
 /**
  * Defines lease duration for a cluster. 0 for initial or max means forever;
  */
-public class LeaseDuration {
+public final class LeaseDuration {
   public static final LeaseDuration FOREVER_LEASE_DURATION = new LeaseDuration(0, 0, 0);
 
   private final long initial;

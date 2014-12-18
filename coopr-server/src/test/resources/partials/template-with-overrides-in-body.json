@@ -1,0 +1,17 @@
+{
+    "name": "template-with-overrides-in-body",
+    "description": "Template tries to overrides immutable partial config ('sensu_wrapper') from inner config",
+    "extends": {
+        "name": "cdap-distributed"
+    },
+    "defaults": {
+        "config": {
+            "sensu_wrapper": {
+                "additional_client_attributes": {
+                    "mail_to": "%cluster.owner%@cask.co"
+                },
+                "endpoint": "sensu­internal­server.cask.co"
+            }
+        }
+    }
+}

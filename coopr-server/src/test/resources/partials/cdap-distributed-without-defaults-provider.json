@@ -1,0 +1,15 @@
+{
+    "name": "cdap-distributed",
+    "version": "1",
+    "description": "Template without defaults provide",
+    "defaults": {
+        "hardwaretype": "standard­large",
+        "imagetype": "centos6",
+        "services": [
+            "ldap­internal"
+        ],
+        "config": {
+            "security.enabled": "true"
+        }
+    }
+}

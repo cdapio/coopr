@@ -16,33 +16,23 @@
 package co.cask.coopr.spec.template;
 
 /**
- * Includes for template
+ * Template exception can be caused by template immutability.
  */
-public final class Include {
-  private final String name;
+public class TemplateImmutabilityException extends Exception {
 
-  public Include(String name) {
-    this.name = name;
+  /**
+   * New exception with error message.
+   * @param message the error message
+   */
+  public TemplateImmutabilityException(String message) {
+    super(message);
   }
 
-  public String getName() {
-    return name;
+  public TemplateImmutabilityException(String message, Throwable cause) {
+    super(message, cause);
   }
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-
-    Include include = (Include) o;
-
-    if (name != null ? !name.equals(include.name) : include.name != null) return false;
-
-    return true;
-  }
-
-  @Override
-  public int hashCode() {
-    return name != null ? name.hashCode() : 0;
+  public TemplateImmutabilityException(Throwable cause) {
+    super(cause);
   }
 }
