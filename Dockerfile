@@ -38,6 +38,7 @@ RUN mkdir /Build /Software
 COPY *xml /Build/
 COPY coopr-cli /Build/coopr-cli
 COPY coopr-provisioner /Build/coopr-provisioner
+COPY coopr-rest-client /Build/coopr-rest-client
 COPY coopr-server /Build/coopr-server
 COPY coopr-standalone /Build/coopr-standalone
 COPY coopr-templates /Build/coopr-templates
