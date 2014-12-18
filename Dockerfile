@@ -24,7 +24,7 @@ RUN apt-get update && \
     apt-get install -y software-properties-common python-software-properties && \
     add-apt-repository ppa:chris-lea/node.js && \
     apt-get update && \
-    apt-get install -y curl nodejs maven unzip ruby1.9.3 libxml2-dev libxslt-dev && \
+    apt-get install -y curl nodejs maven unzip ruby1.9.3 libxml2-dev libxslt-dev build-essential && \
     apt-get install -y --no-install-recommends openjdk-7-jdk
 
 RUN gem install fog --version 1.21.0 && gem install sinatra --version 1.4.5 && \
