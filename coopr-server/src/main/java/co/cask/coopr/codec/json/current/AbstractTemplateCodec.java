@@ -36,24 +36,46 @@ public abstract class AbstractTemplateCodec<T extends AbstractTemplate> extends 
 
   protected static final Type LINKS_TYPE = new com.google.common.reflect.TypeToken<Set<Link>>() { }.getType();
 
+  private static final String DEFAULTS_KEY = "defaults";
+  private static final String COMPATIBILITY_KEY = "compatibility";
+  private static final String CONSTRAINTS_KEY = "constraints";
+  private static final String ADMINISTRATION_KEY = "administration";
+  private static final String LINKS_KEY = "links";
+
   @Override
   protected void addChildFields(T template, JsonObject jsonObj, JsonSerializationContext context) {
-    jsonObj.add("defaults", context.serialize(template.getClusterDefaults()));
-    jsonObj.add("compatibility", context.serialize(template.getCompatibilities()));
-    jsonObj.add("constraints", context.serialize(template.getConstraints()));
-    jsonObj.add("administration", context.serialize(template.getAdministration()));
-    jsonObj.add("links", context.serialize(template.getLinks()));
+
+    jsonObj.add(DEFAULTS_KEY, context.serialize(template.getClusterDefaults()));
+    jsonObj.add(COMPATIBILITY_KEY, context.serialize(template.getCompatibilities()));
+    jsonObj.add(CONSTRAINTS_KEY, context.serialize(template.getConstraints()));
+    jsonObj.add(ADMINISTRATION_KEY, context.serialize(template.getAdministration()));
+    jsonObj.add(LINKS_KEY, context.serialize(template.getLinks()));
   }
 
   @Override
   @SuppressWarnings("unchecked")
   protected BaseEntity.Builder<T> getBuilder(JsonObject jsonObj, JsonDeserializationContext context) {
+    Compatibilities compatibilities = jsonObj.get(COMPATIBILITY_KEY) != null ?
+      context.<Compatibilities>deserialize(jsonObj.get(COMPATIBILITY_KEY), Compatibilities.class) :
+      Compatibilities.EMPTY_COMPATIBILITIES;
+
+    ClusterDefaults clusterDefaults = jsonObj.get(DEFAULTS_KEY) != null ?
+      context.<ClusterDefaults>deserialize(jsonObj.get(DEFAULTS_KEY), ClusterDefaults.class) :
+      ClusterDefaults.EMPTY_CLUSTER_DEFAULTS;
+
+    Constraints constraints = jsonObj.get(CONSTRAINTS_KEY) != null ?
+      context.<Constraints>deserialize(jsonObj.get(CONSTRAINTS_KEY), Constraints.class) : Constraints.EMPTY_CONSTRAINTS;
+
+    Administration administration = jsonObj.get(ADMINISTRATION_KEY) != null ?
+      context.<Administration>deserialize(jsonObj.get(ADMINISTRATION_KEY), Administration.class) :
+      Administration.EMPTY_ADMINISTRATION;
+
     return getConcreteBuilder()
-      .setClusterDefaults(context.<ClusterDefaults>deserialize(jsonObj.get("defaults"), ClusterDefaults.class))
-      .setCompatibilities(context.<Compatibilities>deserialize(jsonObj.get("compatibility"), Compatibilities.class))
-      .setConstraints(context.<Constraints>deserialize(jsonObj.get("constraints"), Constraints.class))
-      .setAdministration(context.<Administration>deserialize(jsonObj.get("administration"), Administration.class))
-      .setLinks(context.<Set<Link>>deserialize(jsonObj.get("links"), LINKS_TYPE));
+      .setClusterDefaults(clusterDefaults)
+      .setCompatibilities(compatibilities)
+      .setConstraints(constraints)
+      .setAdministration(administration)
+      .setLinks(context.<Set<Link>>deserialize(jsonObj.get(LINKS_KEY), LINKS_TYPE));
   }
 
   protected abstract AbstractTemplate.Builder getConcreteBuilder();

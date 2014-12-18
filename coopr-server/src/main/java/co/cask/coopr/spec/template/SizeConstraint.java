@@ -21,7 +21,7 @@ import com.google.common.base.Objects;
 /**
  * A size constraint on the cluster, enforcing some min and/or max on the number of nodes in the cluster.
  */
-public class SizeConstraint {
+public final class SizeConstraint {
   public static final SizeConstraint EMPTY = new SizeConstraint(1, Integer.MAX_VALUE);
   private final int min;
   private final int max;
@@ -45,7 +45,8 @@ public class SizeConstraint {
    */
   public void verify(int numMachines) throws InvalidClusterException {
     if (numMachines < min || numMachines > max) {
-      throw new InvalidClusterException("Size must be at least " + min + " but not greater than " + max);
+      throw new InvalidClusterException(
+        "Size must be at least " + min + " but not greater than " + max + ". Now it's " + numMachines);
     }
   }
 

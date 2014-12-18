@@ -26,9 +26,9 @@ import java.util.Map;
  */
 public final class Constraints {
   public static final Constraints EMPTY_CONSTRAINTS = new Constraints(null, null, null);
-  private final Map<String, ServiceConstraint> serviceConstraints;
-  private final LayoutConstraint layoutConstraint;
-  private final SizeConstraint sizeConstraint;
+  final Map<String, ServiceConstraint> serviceConstraints;
+  final LayoutConstraint layoutConstraint;
+  final SizeConstraint sizeConstraint;
 
   public Constraints(Map<String, ServiceConstraint> serviceConstraints, LayoutConstraint layoutConstraint,
                      SizeConstraint sizeConstraint) {

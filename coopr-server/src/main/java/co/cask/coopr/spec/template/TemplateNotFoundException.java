@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2012-2014 Cask Data, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/**Package for helper classes.
- * 
+package co.cask.coopr.spec.template;
+
+/**
+ * Template exception can be caused by template missing.
  */
-package co.cask.coopr.test.utilities;
+public class TemplateNotFoundException extends Exception {
+  /**
+   * New exception with error message.
+   * @param message the error message
+   */
+  public TemplateNotFoundException(String message) {
+    super(message);
+  }
+
+  public TemplateNotFoundException(String message, Throwable cause) {
+    super(message, cause);
+  }
+
+  public TemplateNotFoundException(Throwable cause) {
+    super(cause);
+  }
+}

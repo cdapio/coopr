@@ -27,9 +27,9 @@ import java.util.Set;
  * together when solving for the layout of a cluster.
  */
 public final class LayoutConstraint {
-  private final Set<Set<String>> servicesThatMustCoexist;
-  private final Set<Set<String>> servicesThatMustNotCoexist;
   public static final LayoutConstraint EMPTY_LAYOUT_CONSTRAINT = new LayoutConstraint(null, null);
+  final Set<Set<String>> servicesThatMustCoexist;
+  final Set<Set<String>> servicesThatMustNotCoexist;
 
   public LayoutConstraint(Set<Set<String>> servicesThatMustCoexist,
                           Set<Set<String>> servicesThatMustNotCoexist) {

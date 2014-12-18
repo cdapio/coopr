@@ -24,15 +24,15 @@ import java.util.Set;
  * Defines hardwaretypes, imagetypes, and services that a cluster is compatible with.
  */
 public final class Compatibilities {
-  public static final Compatibilities EMPTY_COMPATIBILITIES = new Compatibilities(null, null, null);
-  private final Set<String> hardwaretypes;
-  private final Set<String> imagetypes;
-  private final Set<String> services;
+  public static final Compatibilities EMPTY_COMPATIBILITIES = builder().build();
+  final Set<String> hardwaretypes;
+  final Set<String> imagetypes;
+  final Set<String> services;
 
   private Compatibilities(Set<String> hardwaretypes, Set<String> imagetypes, Set<String> services) {
-    this.hardwaretypes = hardwaretypes;
-    this.imagetypes = imagetypes;
-    this.services = services;
+    this.hardwaretypes = hardwaretypes == null ? ImmutableSet.<String>of() : hardwaretypes;
+    this.imagetypes = imagetypes == null ? ImmutableSet.<String>of() : imagetypes;
+    this.services = services == null ? ImmutableSet.<String>of() : services;
   }
 
   /**
@@ -138,7 +138,7 @@ public final class Compatibilities {
     private Set<String> services = ImmutableSet.of();
 
     public Builder setHardwaretypes(Set<String> hardwaretypes) {
-      this.hardwaretypes = ImmutableSet.copyOf(hardwaretypes);
+      this.hardwaretypes = hardwaretypes == null ? ImmutableSet.<String>of() : hardwaretypes;
       return this;
     }
 
@@ -148,7 +148,7 @@ public final class Compatibilities {
     }
 
     public Builder setImagetypes(Set<String> imagetypes) {
-      this.imagetypes = ImmutableSet.copyOf(imagetypes);
+      this.imagetypes = imagetypes == null ? ImmutableSet.<String>of() : imagetypes;
       return this;
     }
 
@@ -158,7 +158,7 @@ public final class Compatibilities {
     }
 
     public Builder setServices(Set<String> services) {
-      this.services = ImmutableSet.copyOf(services);
+      this.services = services == null ? ImmutableSet.<String>of() : services;
       return this;
     }
 

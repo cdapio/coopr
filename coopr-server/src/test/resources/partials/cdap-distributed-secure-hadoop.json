@@ -1,12 +1,12 @@
 {
-    "name": "cdapDistributedSecureHadoop",
+    "name": "cdap-distributed-secure-hadoop",
     "version": "1",
     "description": "Cask DAP (CDAP) with Security and Secure Hadoop cluster with single master",
     "extends": {
-        "name": "cdapDistributed"
+        "name": "cdap-distributed"
     },
     "includes": [{
-        "name" : "LDAPInternal"
+        "name" : "LDAP-internal"
     }],
     "defaults": {
         "provider": "rackspace",
@@ -29,6 +29,9 @@
                     "hive.support.concurrency": "true",
                     "hive.zookeeper.quorum": "%join(map(host.service.zookeeper-server,'$'),',')%"
                 }
+            },
+            "ldap": {
+                "endpoint": "ldap.correct.com"
             }
         }
     },

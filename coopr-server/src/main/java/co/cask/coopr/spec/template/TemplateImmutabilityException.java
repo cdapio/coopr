@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2012-2014 Cask Data, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,33 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package co.cask.coopr.test.resetTests;
-
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import static co.cask.coopr.test.drivers.Global.globalDriver;
+package co.cask.coopr.spec.template;
 
 /**
- * Dummy test for closing the driver
+ * Template exception can be caused by template immutability.
  */
-public class CloseDriverTest {
-  @BeforeClass
-  public static void setUp(){
-  }
-  @Test
-  public void testClosing() {
-    System.out.println("Finishing tests");
-  }
-  @AfterClass
-  public static void tearDown() {
-    System.out.println("Closing driver");
-    if (globalDriver != null) {
-      globalDriver.quit();
-      globalDriver = null;
-    }
-  }
-  
+public class TemplateImmutabilityException extends Exception {
 
+  /**
+   * New exception with error message.
+   * @param message the error message
+   */
+  public TemplateImmutabilityException(String message) {
+    super(message);
+  }
+
+  public TemplateImmutabilityException(String message, Throwable cause) {
+    super(message, cause);
+  }
+
+  public TemplateImmutabilityException(Throwable cause) {
+    super(cause);
+  }
 }
