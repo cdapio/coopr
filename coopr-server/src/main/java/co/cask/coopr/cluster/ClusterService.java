@@ -746,10 +746,10 @@ public class ClusterService {
    * Build cluster template from provided includes and parents.
    *
    * @param clusterTemplate Cluster template which can contains includes and parents.
-   * @param account Account of the user that is trying to resume a cluster job.
+   * @param account Account of the user that is trying to resolve a cluster template.
    * @return Cluster Template with merged body from includes and parents.
    * @throws IOException if there was some error writing to stores.
-   * @throws TemplateNotFoundException if template can't be found in store.
+   * @throws TemplateNotFoundException if template is unknown type.
    * @throws TemplateImmutabilityException if some template tries to override immutable template config.
    */
   public ClusterTemplate resolveTemplate(Account account, ClusterTemplate clusterTemplate)
@@ -762,9 +762,9 @@ public class ClusterService {
    * Build cluster template from provided includes and parents.
    *
    * @param templateName Cluster template name.
-   * @param account Account of the user that is trying to resume a cluster job.
+   * @param account Account of the user that is trying to resolve a cluster template.
    * @return Cluster Template with merged body from includes and parents.
-   * @throws IOException if there was some error writing to stores.
+   * @throws IOException if there was some error reading from stores.
    * @throws TemplateNotFoundException if template can't be found in store.
    * @throws TemplateImmutabilityException if some template tries to override immutable template config.
    */

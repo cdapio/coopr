@@ -25,11 +25,11 @@ import java.util.Set;
 
 public abstract class AbstractTemplate extends BaseEntity {
 
-  protected final ClusterDefaults clusterDefaults;
-  protected final Constraints constraints;
-  protected final Compatibilities compatibilities;
-  protected final Administration administration;
-  protected final Set<Link> links;
+  protected ClusterDefaults clusterDefaults;
+  protected Constraints constraints;
+  protected Compatibilities compatibilities;
+  protected Administration administration;
+  protected Set<Link> links;
 
   protected AbstractTemplate(BaseEntity.Builder baseBuilder, ClusterDefaults clusterDefaults,
                           Compatibilities compatibilities, Constraints constraints, Administration administration,

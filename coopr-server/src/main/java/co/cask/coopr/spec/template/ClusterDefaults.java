@@ -27,12 +27,12 @@ import java.util.Set;
  */
 public final class ClusterDefaults {
   public static final ClusterDefaults EMPTY_CLUSTER_DEFAULTS = builder().build();
-  Set<String> services;
-  String provider;
-  String hardwaretype;
-  String imagetype;
-  String dnsSuffix;
-  JsonObject config;
+  final Set<String> services;
+  final String provider;
+  final String hardwaretype;
+  final String imagetype;
+  final String dnsSuffix;
+  final JsonObject config;
 
   private ClusterDefaults(Set<String> services, String provider, String hardwaretype,
                           String imagetype, String dnsSuffix, JsonObject config) {
@@ -100,38 +100,6 @@ public final class ClusterDefaults {
    */
   public JsonObject getConfig() {
     return config;
-  }
-
-  /**
-   * Set the provider for the cluster.
-   *
-   */
-  public void setProvider(String provider) {
-    this.provider = provider;
-  }
-
-  /**
-   * Set the hardware type for the cluster.
-   *
-   */
-  public void setHardwaretype(String hardwaretype) {
-    this.hardwaretype = hardwaretype;
-  }
-
-  /**
-   * Set the image type for the cluster.
-   *
-   */
-  public void setImagetype(String imagetype) {
-    this.imagetype = imagetype;
-  }
-
-  /**
-   * Set the dns suffix for the cluster.
-   *
-   */
-  public void setDnsSuffix(String dnsSuffix) {
-    this.dnsSuffix = dnsSuffix;
   }
 
   /**

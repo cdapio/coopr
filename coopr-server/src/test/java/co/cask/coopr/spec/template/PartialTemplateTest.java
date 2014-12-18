@@ -11,6 +11,7 @@ import co.cask.coopr.spec.TenantSpecification;
 import co.cask.coopr.store.entity.EntityStoreView;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.google.gson.JsonSyntaxException;
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -51,6 +52,8 @@ public class PartialTemplateTest extends BaseTest {
                     "ldap­internal");
   private static final Map<String, ServiceConstraint> serviceConstraints = Maps.newHashMap();
 
+  private static final ClassLoader classLoader = PartialTemplateTest.class.getClassLoader();
+
   @Override
   protected boolean shouldClearDataBetweenTests() {
     return false;
@@ -73,7 +76,6 @@ public class PartialTemplateTest extends BaseTest {
   @Test
   public void test_01_parse() throws Exception {
     //load json templates
-    ClassLoader classLoader = PartialTemplateTest.class.getClassLoader();
     InputStream insecureIn = classLoader.getResourceAsStream("partials/cdap-distributed-insecure.json");
     InputStream distributedIn = classLoader.getResourceAsStream("partials/cdap-distributed.json");
     InputStream secureIn = classLoader.getResourceAsStream("partials/cdap-distributed-secure-hadoop.json");
@@ -212,7 +214,57 @@ public class PartialTemplateTest extends BaseTest {
   }
 
   @Test
-  public void test_07_deleteTemplate() throws Exception {
+  public void test_07_not_persisted_resolveTemplate() throws Exception {
+    InputStream notPersistedIn = classLoader.getResourceAsStream("partials/cdap-not-persisted.json");
+    ClusterTemplate notPersisted = gson.fromJson(IOUtils.toString(notPersistedIn), ClusterTemplate.class);
+    ClusterTemplate rt = clusterService.resolveTemplate(account, notPersisted);
+
+    Assert.assertEquals(notPersisted.getIncludes(), rt.getIncludes());
+    Assert.assertEquals(notPersisted.getParent(), rt.getParent());
+    Assert.assertEquals(notPersisted.getName(), rt.getName());
+    Assert.assertEquals(notPersisted.getDescription(), rt.getDescription());
+    Assert.assertEquals(sensuPartial.getClusterDefaults().getServices(), rt.getClusterDefaults().getServices());
+    Assert.assertEquals(sensuPartial.getClusterDefaults().getConfig(), rt.getClusterDefaults().getConfig());
+    Assert.assertEquals(sensuPartial.getCompatibilities().getServices(), rt.getCompatibilities().getServices());
+  }
+
+  @Test(expected = TemplateImmutabilityException.class)
+  public void test_08_not_persisted_overrideImmutablePartial() throws Exception {
+    InputStream notPersistedIn = classLoader.getResourceAsStream("partials/cdap-not-persisted-overrides-partial.json");
+    ClusterTemplate notPersisted = gson.fromJson(IOUtils.toString(notPersistedIn), ClusterTemplate.class);
+    clusterService.resolveTemplate(account, notPersisted);
+  }
+
+  @Test(expected = TemplateImmutabilityException.class)
+  public void test_09_not_persisted_overrideImmutableParentPartial() throws Exception {
+    InputStream notPersistedIn = classLoader.getResourceAsStream("partials/cdap-not-persisted-overrides-parent.json");
+    ClusterTemplate notPersisted = gson.fromJson(IOUtils.toString(notPersistedIn), ClusterTemplate.class);
+    clusterService.resolveTemplate(account, notPersisted);
+  }
+
+  @Test(expected = JsonSyntaxException.class)
+  public void test_10_badJsonFormat() throws Exception {
+    InputStream badFormattedJsonIn = classLoader.getResourceAsStream("partials/cdap-bad-json-format.json");
+    ClusterTemplate notPersisted = gson.fromJson(IOUtils.toString(badFormattedJsonIn), ClusterTemplate.class);
+    clusterService.resolveTemplate(account, notPersisted);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void test_11_templateWithoutDefaultsServices() throws Exception {
+    InputStream templateWithoutDefaultsIn = classLoader.getResourceAsStream("partials/cdap-distributed-without-defaults-services.json");
+    ClusterTemplate template = gson.fromJson(IOUtils.toString(templateWithoutDefaultsIn), ClusterTemplate.class);
+    clusterService.resolveTemplate(account, template);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void test_12_templateWithoutDefaultsProvider() throws Exception {
+    InputStream templateWithoutDefaultsIn = classLoader.getResourceAsStream("partials/cdap-distributed-without-defaults-provider.json");
+    ClusterTemplate template = gson.fromJson(IOUtils.toString(templateWithoutDefaultsIn), ClusterTemplate.class);
+    clusterService.resolveTemplate(account, template);
+  }
+
+  @Test
+  public void test_13_deleteTemplate() throws Exception {
     int beforePartialsCount = entityStoreView.getAllPartialTemplates().size();
     int beforeClusterTemplatesCount = entityStoreView.getAllClusterTemplates().size();
 

@@ -134,7 +134,7 @@ public class ClusterServiceTest extends BaseTest {
     ClusterCreateRequest createRequest = ClusterCreateRequest.builder()
       .setName(name)
       .setClusterTemplateName(basicTemplate.getName())
-      .setNumMachines(3)
+      .setNumMachines(1)
       .setProviderFields(providerFields)
       .build();
     String clusterId = clusterService.requestClusterCreate(createRequest, account);
@@ -167,7 +167,7 @@ public class ClusterServiceTest extends BaseTest {
       .setName(name)
       .setClusterTemplateName(basicTemplate.getName())
       .setProviderName("not" + provider.getName())
-      .setNumMachines(3)
+      .setNumMachines(1)
       .setProviderFields(providerFields)
       .build();
     clusterService.requestClusterCreate(createRequest, account);

@@ -25,9 +25,9 @@ import java.util.Set;
  */
 public final class Compatibilities {
   public static final Compatibilities EMPTY_COMPATIBILITIES = builder().build();
-  Set<String> hardwaretypes;
-  Set<String> imagetypes;
-  Set<String> services;
+  final Set<String> hardwaretypes;
+  final Set<String> imagetypes;
+  final Set<String> services;
 
   private Compatibilities(Set<String> hardwaretypes, Set<String> imagetypes, Set<String> services) {
     this.hardwaretypes = hardwaretypes == null ? ImmutableSet.<String>of() : hardwaretypes;

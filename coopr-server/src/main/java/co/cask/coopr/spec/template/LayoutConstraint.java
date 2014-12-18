@@ -18,7 +18,6 @@ package co.cask.coopr.spec.template;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
 
 import java.util.Set;
 
@@ -28,9 +27,9 @@ import java.util.Set;
  * together when solving for the layout of a cluster.
  */
 public final class LayoutConstraint {
-  Set<Set<String>> servicesThatMustCoexist;
-  Set<Set<String>> servicesThatMustNotCoexist;
   public static final LayoutConstraint EMPTY_LAYOUT_CONSTRAINT = new LayoutConstraint(null, null);
+  final Set<Set<String>> servicesThatMustCoexist;
+  final Set<Set<String>> servicesThatMustNotCoexist;
 
   public LayoutConstraint(Set<Set<String>> servicesThatMustCoexist,
                           Set<Set<String>> servicesThatMustNotCoexist) {

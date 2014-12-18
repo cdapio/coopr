@@ -28,7 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.apache.commons.lang.StringUtils.isBlank;
 
 /**
  * A template merger used for construction cluster templates from includes and parent extends.
@@ -83,26 +83,27 @@ public class TemplateMerger {
   //for partial includes
   private void copyMainProps(AbstractTemplate from, AbstractTemplate to, Set<String> immutables, boolean isImmutable)
     throws TemplateImmutabilityException {
-    //merge defaults
-    to.clusterDefaults.services = mergeSet(to.clusterDefaults.services, from.clusterDefaults.services);
 
-    //merge defaults config
-    JsonObject fromDefaultsConfig = from.getClusterDefaults().getConfig();
-    for (Map.Entry<String, JsonElement> fromConfigItem : fromDefaultsConfig.entrySet()) {
-      JsonObject thisConfig = to.clusterDefaults.getConfig();
-      String name = fromConfigItem.getKey();
-      JsonElement value = fromConfigItem.getValue();
-      if (immutables.contains(name) && thisConfig.has(name)) {
-        throw new TemplateImmutabilityException(name + " can't be overridden due immutability. Overrides in "
-                                                  + from.getName());
-      }
-      thisConfig.add(name, value);
-      if (isImmutable) {
-        immutables.add(name);
-      }
+    //merge defaults
+    if(!from.clusterDefaults.equals(ClusterDefaults.EMPTY_CLUSTER_DEFAULTS)){
+      to.clusterDefaults = ClusterDefaults.builder()
+        .setServices(mergeSet(to.clusterDefaults.services, from.clusterDefaults.services))
+        .setConfig(mergeConfig(to.clusterDefaults.config, from.clusterDefaults.config, immutables, isImmutable))
+        .setDNSSuffix(mergeString(to.clusterDefaults.dnsSuffix, from.clusterDefaults.dnsSuffix))
+        .setHardwaretype(mergeString(to.clusterDefaults.hardwaretype, from.clusterDefaults.hardwaretype))
+        .setImagetype(mergeString(to.clusterDefaults.imagetype, from.clusterDefaults.imagetype))
+        .setProvider(mergeString(to.clusterDefaults.provider, from.clusterDefaults.provider))
+        .build();
     }
+
     //merge compatibilities services
-    to.compatibilities.services = mergeSet(to.compatibilities.services, from.compatibilities.services);
+    if(!from.compatibilities.equals(Compatibilities.EMPTY_COMPATIBILITIES)) {
+      to.compatibilities = Compatibilities.builder()
+        .setServices(mergeSet(to.compatibilities.services, from.compatibilities.services))
+        .setHardwaretypes(mergeSet(to.compatibilities.hardwaretypes, from.compatibilities.hardwaretypes))
+        .setImagetypes(mergeSet(to.compatibilities.imagetypes, from.compatibilities.imagetypes))
+        .build();
+    }
   }
 
   //for parent extension
@@ -110,31 +111,23 @@ public class TemplateMerger {
     throws TemplateImmutabilityException {
     copyMainProps(from, to, immutables, false);
 
-    //merge defaults options
-    ClusterDefaults fromDefaults = from.getClusterDefaults();
-    if(isNotBlank(fromDefaults.getDnsSuffix())) to.clusterDefaults.setDnsSuffix(fromDefaults.getDnsSuffix());
-    if(isNotBlank(fromDefaults.getHardwaretype())) to.clusterDefaults.setHardwaretype(fromDefaults.getHardwaretype());
-    if(isNotBlank(fromDefaults.getImagetype())) to.clusterDefaults.setImagetype(fromDefaults.getImagetype());
-    if(isNotBlank(fromDefaults.getProvider())) to.clusterDefaults.setProvider(fromDefaults.getProvider());
-
     //merge constraints
-    to.constraints.serviceConstraints = mergeMap(to.constraints.serviceConstraints, from.constraints.serviceConstraints);
-    to.constraints.layoutConstraint.servicesThatMustCoexist = mergeSet(to.constraints.layoutConstraint.servicesThatMustCoexist,
-             from.constraints.layoutConstraint.servicesThatMustCoexist);
-    to.constraints.layoutConstraint.servicesThatMustNotCoexist = mergeSet(to.constraints.layoutConstraint.servicesThatMustNotCoexist,
-               from.constraints.layoutConstraint.servicesThatMustNotCoexist);
-    if (!from.constraints.sizeConstraint.equals(SizeConstraint.EMPTY)) {
-      to.constraints.sizeConstraint = from.constraints.sizeConstraint;
+    if(!from.constraints.equals(Constraints.EMPTY_CONSTRAINTS)) {
+      Map<String, ServiceConstraint> serviceConstraint = mergeMap(to.constraints.serviceConstraints,
+                                                                  from.constraints.serviceConstraints);
+      Set<Set<String>> servicesThatMustCoexist = mergeSet(to.constraints.layoutConstraint.servicesThatMustCoexist,
+                                                          from.constraints.layoutConstraint.servicesThatMustCoexist);
+      Set<Set<String>> servicesThatMustNotCoexist = mergeSet(to.constraints.layoutConstraint.servicesThatMustNotCoexist,
+                                                             from.constraints.layoutConstraint.servicesThatMustNotCoexist);
+
+      to.constraints = new Constraints(serviceConstraint,
+                                       new LayoutConstraint(servicesThatMustCoexist, servicesThatMustNotCoexist),
+                                       from.constraints.sizeConstraint);
     }
 
-    //merge compatibilities
-    to.compatibilities.hardwaretypes = mergeSet(to.compatibilities.hardwaretypes, from.compatibilities.hardwaretypes);
-    to.compatibilities.imagetypes = mergeSet(to.compatibilities.imagetypes, from.compatibilities.imagetypes);
-    to.compatibilities.services = mergeSet(to.compatibilities.services, from.compatibilities.services);
-
     //merge admin lease duration
-    if (!from.administration.leaseDuration.equals(LeaseDuration.FOREVER_LEASE_DURATION)) {
-      to.administration.leaseDuration = from.administration.leaseDuration;
+    if (!from.administration.equals(Administration.EMPTY_ADMINISTRATION)) {
+      to.administration = from.administration;
     }
   }
 
@@ -156,5 +149,29 @@ public class TemplateMerger {
     } else {
       return first;
     }
+  }
+
+  private JsonObject mergeConfig(JsonObject to, JsonObject from, Set<String> immutables, boolean isImmutable) throws TemplateImmutabilityException {
+    //merge defaults config
+    JsonObject finalConfig = new JsonObject();
+    for (Map.Entry<String, JsonElement> config : to.entrySet()) {
+      finalConfig.add(config.getKey(), config.getValue());
+    }
+    for (Map.Entry<String, JsonElement> fromConfigItem : from.entrySet()) {
+      String name = fromConfigItem.getKey();
+      JsonElement value = fromConfigItem.getValue();
+      if (immutables.contains(name) && finalConfig.has(name)) {
+        throw new TemplateImmutabilityException(name + " can't be overridden due immutability.");
+      }
+      finalConfig.add(name, value);
+      if (isImmutable) {
+        immutables.add(name);
+      }
+    }
+    return finalConfig;
+  }
+
+  private String mergeString(String to, String from) {
+    return isBlank(from) ? to : from;
   }
 }
