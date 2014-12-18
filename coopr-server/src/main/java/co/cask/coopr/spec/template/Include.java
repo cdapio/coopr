@@ -18,10 +18,31 @@ package co.cask.coopr.spec.template;
 /**
  * Includes for template
  */
-public class Include {
-  private String name;
+public final class Include {
+  private final String name;
+
+  public Include(String name) {
+    this.name = name;
+  }
 
   public String getName() {
     return name;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    Include include = (Include) o;
+
+    if (name != null ? !name.equals(include.name) : include.name != null) return false;
+
+    return true;
+  }
+
+  @Override
+  public int hashCode() {
+    return name != null ? name.hashCode() : 0;
   }
 }

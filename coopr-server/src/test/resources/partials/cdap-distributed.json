@@ -1,13 +1,15 @@
 {
-    "name": "cdapDistributed",
+    "name": "cdap-distributed",
     "version": "1",
     "description": "Cask DAP (CDAP) with Security and Hadoop cluster with single master",
     "extends": {
-        "name": "cdapDistributedInsecure"
+        "name": "cdap-distributed-insecure"
     },
-    "includes": [{
-        "name" : "sensuInternal"
-    }],
+    "includes": [
+        {
+            "name": "sensu-internal"
+        }
+    ],
     "defaults": {
         "services": [
             "cdap­security"
@@ -24,10 +26,5 @@
             "security.authentication.handler.userObjectClass": "inetorgperson",
             "security.server.ssl.enabled": "false"
         }
-    },
-    "compatibility": {
-        "services": [
-            "cdap­security"
-        ]
     }
 }

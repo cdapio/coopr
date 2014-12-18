@@ -44,8 +44,15 @@ import co.cask.coopr.spec.plugin.FieldSchema;
 import co.cask.coopr.spec.plugin.ParameterType;
 import co.cask.coopr.spec.plugin.PluginFields;
 import co.cask.coopr.spec.plugin.ProviderType;
+import co.cask.coopr.spec.template.AbstractTemplate;
 import co.cask.coopr.spec.template.ClusterTemplate;
+import co.cask.coopr.spec.template.Include;
+import co.cask.coopr.spec.template.Parent;
+import co.cask.coopr.spec.template.PartialTemplate;
 import co.cask.coopr.spec.template.SizeConstraint;
+import co.cask.coopr.spec.template.TemplateImmutabilityException;
+import co.cask.coopr.spec.template.TemplateMerger;
+import co.cask.coopr.spec.template.TemplateNotFoundException;
 import co.cask.coopr.store.cluster.ClusterStore;
 import co.cask.coopr.store.cluster.ClusterStoreService;
 import co.cask.coopr.store.cluster.ClusterStoreView;
@@ -86,6 +93,7 @@ public class ClusterService {
   private final QueueGroup clusterQueues;
   private final QueueGroup solverQueues;
   private final QueueGroup jobQueues;
+  private final TemplateMerger templateMerger;
 
   @Inject
   public ClusterService(ClusterStoreService clusterStoreService,
@@ -97,7 +105,7 @@ public class ClusterService {
                         Solver solver,
                         IdService idService,
                         CredentialStore credentialStore,
-                        Gson gson) {
+                        Gson gson, TemplateMerger templateMerger) {
     this.clusterStoreService = clusterStoreService;
     this.clusterStore = clusterStoreService.getSystemView();
     this.entityStoreService = entityStoreService;
@@ -111,6 +119,7 @@ public class ClusterService {
     this.clusterQueues = queueService.getQueueGroup(QueueType.CLUSTER);
     this.solverQueues = queueService.getQueueGroup(QueueType.SOLVER);
     this.jobQueues = queueService.getQueueGroup(QueueType.JOB);
+    this.templateMerger = templateMerger;
   }
 
   /**
@@ -731,5 +740,86 @@ public class ClusterService {
       throw new MissingClusterException("cluster " + clusterId + " does not exist");
     }
     return cluster;
+  }
+
+  /**
+   * Build cluster template from provided includes and parents.
+   *
+   * @param clusterTemplate Cluster template which can contains includes and parents.
+   * @param account Account of the user that is trying to resolve a cluster template.
+   * @return Cluster Template with merged body from includes and parents.
+   * @throws IOException if there was some error writing to stores.
+   * @throws TemplateNotFoundException if template is unknown type.
+   * @throws TemplateImmutabilityException if some template tries to override immutable template config.
+   */
+  public ClusterTemplate resolveTemplate(Account account, ClusterTemplate clusterTemplate)
+    throws TemplateNotFoundException, TemplateImmutabilityException, IOException {
+    EntityStoreView entityStore = entityStoreService.getView(account);
+    return resolveTemplate(entityStore, clusterTemplate);
+  }
+
+  /**
+   * Build cluster template from provided includes and parents.
+   *
+   * @param templateName Cluster template name.
+   * @param account Account of the user that is trying to resolve a cluster template.
+   * @return Cluster Template with merged body from includes and parents.
+   * @throws IOException if there was some error reading from stores.
+   * @throws TemplateNotFoundException if template can't be found in store.
+   * @throws TemplateImmutabilityException if some template tries to override immutable template config.
+   */
+  public ClusterTemplate resolveTemplate(Account account, String templateName)
+    throws IOException, TemplateNotFoundException, TemplateImmutabilityException {
+    EntityStoreView entityStore = entityStoreService.getView(account);
+    ClusterTemplate clusterTemplate = entityStore.getClusterTemplate(templateName);
+    if  (clusterTemplate == null) {
+      throw new TemplateNotFoundException("Cluster template " + templateName + " does not exist");
+    }
+    return resolveTemplate(entityStore, clusterTemplate);
+  }
+
+  private ClusterTemplate resolveTemplate(EntityStoreView entityStore, ClusterTemplate clusterTemplate)
+    throws IOException, TemplateImmutabilityException, TemplateNotFoundException {
+    Set<AbstractTemplate> mergeSet = getMergeCollection(entityStore, clusterTemplate);
+    return templateMerger.merge(mergeSet, clusterTemplate);
+  }
+
+  /*
+  Merging in order Parent Includes -> Parent -> Child Includes -> Child -> ...
+  TODO: merging with mandatory partials and user-level attributes(???)
+   */
+  private Set<AbstractTemplate> getMergeCollection(EntityStoreView entityStore, ClusterTemplate clusterTemplate)
+    throws IOException, TemplateNotFoundException {
+    Set<AbstractTemplate> forMerge;
+    Parent parent = clusterTemplate.getParent();
+    if (parent != null) {
+      ClusterTemplate parentTemplate = entityStore.getClusterTemplate(parent.getName());
+      if (parentTemplate == null) {
+        throw new TemplateNotFoundException(parent.getName() + " parent template not found.");
+      }
+      forMerge = getMergeCollection(entityStore, parentTemplate);
+    } else {
+      forMerge = Sets.newLinkedHashSet();
+    }
+    Set<AbstractTemplate> includes = resolvePartialIncludes(entityStore, clusterTemplate.getIncludes());
+    forMerge.addAll(includes);
+    forMerge.add(clusterTemplate);
+
+    return forMerge;
+  }
+
+  private Set<AbstractTemplate> resolvePartialIncludes(EntityStoreView entityStore, Set<Include> includes)
+    throws IOException, TemplateNotFoundException {
+    Set<AbstractTemplate> partials = Sets.newLinkedHashSet();
+    if (includes != null) {
+      for (Include include : includes) {
+        PartialTemplate partialTemplate = entityStore.getPartialTemplate(include.getName());
+        if (partialTemplate == null) {
+          throw new TemplateNotFoundException(include.getName() + " partial template not found.");
+        }
+        partials.add(partialTemplate);
+      }
+    }
+    return partials;
   }
 }

@@ -27,17 +27,19 @@ import com.google.gson.JsonSerializationContext;
  */
 public class PartialTemplateCodec extends AbstractTemplateCodec<PartialTemplate> {
 
+  private static final String IMMUTABLE_KEY = "immutable";
+
   @Override
   protected void addChildFields(PartialTemplate template, JsonObject jsonObj, JsonSerializationContext context) {
     super.addChildFields(template, jsonObj, context);
-    jsonObj.add("immutable", context.serialize(template.isImmutable()));
+    jsonObj.add(IMMUTABLE_KEY, context.serialize(template.isImmutable()));
   }
 
   @Override
   protected BaseEntity.Builder<PartialTemplate> getBuilder(JsonObject jsonObj, JsonDeserializationContext context) {
     PartialTemplate.Builder builder = (PartialTemplate.Builder)
       super.getBuilder(jsonObj, context);
-    builder.setImmutable(context.<Boolean>deserialize(jsonObj.get("immutable"), Boolean.class));
+    builder.setImmutable(context.<Boolean>deserialize(jsonObj.get(IMMUTABLE_KEY), Boolean.class));
     return builder;
   }
 

@@ -21,7 +21,7 @@ import com.google.common.base.Objects;
 
 import java.util.Set;
 
-public class PartialTemplate extends AbstractTemplate {
+public final class PartialTemplate extends AbstractTemplate {
 
   private final boolean immutable;
 
@@ -66,8 +66,8 @@ public class PartialTemplate extends AbstractTemplate {
       return new PartialTemplate(this, clusterDefaults, compatibilities, constraints, administration, links, immutable);
     }
 
-    public PartialTemplate.Builder setImmutable(boolean immutable) {
-      this.immutable = immutable;
+    public Builder setImmutable(Boolean immutable) {
+      this.immutable = immutable == null ? false : immutable;
       return this;
     }
   }

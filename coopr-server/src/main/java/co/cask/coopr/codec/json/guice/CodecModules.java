@@ -29,6 +29,7 @@ import co.cask.coopr.codec.json.current.ClusterDefaultsCodec;
 import co.cask.coopr.codec.json.current.ClusterDetailsCodec;
 import co.cask.coopr.codec.json.current.ClusterOperationRequestCodec;
 import co.cask.coopr.codec.json.current.ClusterTemplateCodec;
+import co.cask.coopr.codec.json.current.CompatibilitiesCodec;
 import co.cask.coopr.codec.json.current.ConstraintsCodec;
 import co.cask.coopr.codec.json.current.FieldSchemaCodec;
 import co.cask.coopr.codec.json.current.FinishTaskRequestCodec;
@@ -156,6 +157,7 @@ public class CodecModules {
       .registerTypeAdapter(Tenant.class, new TenantCodec())
       .registerTypeAdapter(TenantSpecification.class, new TenantSpecificationCodec())
       .registerTypeAdapter(TenantWriteRequest.class, new TenantWriteRequestCodec())
+      .registerTypeAdapter(CompatibilitiesCodec.class, new CompatibilitiesCodec())
       .registerTypeAdapterFactory(new LowercaseEnumTypeAdapterFactory())
       .enableComplexMapKeySerialization();
   }

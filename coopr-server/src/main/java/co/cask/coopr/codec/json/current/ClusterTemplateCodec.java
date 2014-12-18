@@ -34,19 +34,23 @@ public class ClusterTemplateCodec extends AbstractTemplateCodec<ClusterTemplate>
 
   private static final Type INCLUDES_TYPE = new com.google.common.reflect.TypeToken<Set<Include>>() { }.getType();
 
+  private static final String EXTENDS_KEY = "extends";
+  private static final String INCLUDES_KEY = "includes";
+
   @Override
   protected void addChildFields(ClusterTemplate template, JsonObject jsonObj, JsonSerializationContext context) {
     super.addChildFields(template, jsonObj, context);
-    jsonObj.add("extends", context.serialize(template.getParent()));
-    jsonObj.add("includes", context.serialize(template.getIncludes()));
+
+    jsonObj.add(EXTENDS_KEY, context.serialize(template.getParent()));
+    jsonObj.add(INCLUDES_KEY, context.serialize(template.getIncludes()));
   }
 
   @Override
   protected BaseEntity.Builder<ClusterTemplate> getBuilder(JsonObject jsonObj, JsonDeserializationContext context) {
     ClusterTemplate.Builder builder = (ClusterTemplate.Builder)
       super.getBuilder(jsonObj, context);
-    builder.setParent(context.<Parent>deserialize(jsonObj.get("extends"), Parent.class))
-      .setIncludes(context.<Set<Include>>deserialize(jsonObj.get("includes"), INCLUDES_TYPE));
+    builder.setParent(context.<Parent>deserialize(jsonObj.get(EXTENDS_KEY), Parent.class))
+      .setIncludes(context.<Set<Include>>deserialize(jsonObj.get(INCLUDES_KEY), INCLUDES_TYPE));
     return builder;
   }
 
