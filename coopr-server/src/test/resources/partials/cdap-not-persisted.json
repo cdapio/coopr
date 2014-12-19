@@ -12,6 +12,6 @@
         "provider": "google",
         "hardwaretype": "standard­large",
         "imagetype": "centos6",
-        "dnsSuffix": "dev.continuuity.net"
+        "dnsSuffix": "example.com"
     }
 }

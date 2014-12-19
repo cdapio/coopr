@@ -11,13 +11,13 @@
         "provider": "google",
         "hardwaretype": "standard­large",
         "imagetype": "centos6",
-        "dnsSuffix": "dev.continuuity.net",
+        "dnsSuffix": "example.com",
         "config": {
             "sensu_wrapper": {
                 "additional_client_attributes": {
-                    "mail_to": "%cluster.owner%@cask.co"
+                    "mail_to": "%cluster.owner%@example.com"
                 },
-                "endpoint": "sensu­internal­server.cask.co"
+                "endpoint": "sensu­internal­server.example.com"
             }
         }
     }
