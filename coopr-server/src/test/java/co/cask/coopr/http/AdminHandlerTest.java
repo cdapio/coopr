@@ -16,12 +16,10 @@
 package co.cask.coopr.http;
 
 import co.cask.coopr.Entities;
-import co.cask.coopr.account.Account;
 import co.cask.coopr.common.conf.Constants;
 import co.cask.coopr.common.queue.Element;
 import co.cask.coopr.common.queue.QueueMetrics;
 import co.cask.coopr.http.handler.AdminHandler;
-import co.cask.coopr.metrics.TimeSeries;
 import co.cask.coopr.spec.HardwareType;
 import co.cask.coopr.spec.ImageType;
 import co.cask.coopr.spec.Provider;
@@ -44,15 +42,14 @@ import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.message.BasicHeader;
+import org.apache.http.util.EntityUtils;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -122,13 +119,13 @@ public class AdminHandlerTest extends ServiceTestBase {
   @Test
   public void testPartialTemplates() throws Exception {
     testRestAPIs("partialtemplates", gson.toJsonTree(Entities.PartialTemplateExample.TEST_PARTIAL1).getAsJsonObject(),
-            gson.toJsonTree(Entities.PartialTemplateExample.TEST_PARTIAL2).getAsJsonObject());
+                 gson.toJsonTree(Entities.PartialTemplateExample.TEST_PARTIAL2).getAsJsonObject());
   }
 
   @Test
   public void testPartialTemplatesBumpVersion() throws Exception {
     testRestAPIsBumpVersion("partialtemplates",
-            gson.toJsonTree(Entities.PartialTemplateExample.TEST_PARTIAL1).getAsJsonObject());
+                            gson.toJsonTree(Entities.PartialTemplateExample.TEST_PARTIAL1).getAsJsonObject());
   }
 
   @Test
@@ -153,33 +150,33 @@ public class AdminHandlerTest extends ServiceTestBase {
 
   @Test
   public void resolveTest() throws Exception {
-    String tenantId = "test_tenant";
-    tenantProvisionerService.writeTenantSpecification(new TenantSpecification(tenantId, 10, 1, 10));
-    Tenant tenant = tenantStore.getTenantByName(tenantId);
-    Account account = new Account(Constants.ADMIN_USER, tenant.getId());
-    Header[] header = {
-      new BasicHeader(Constants.USER_HEADER, Constants.ADMIN_USER),
-      new BasicHeader(Constants.TENANT_HEADER, tenantId)
-    };
-    EntityStoreView view = entityStoreService.getView(account);
-
+    EntityStoreView view = entityStoreService.getView(ADMIN_ACCOUNT);
     ClassLoader classLoader = AdminHandlerTest.class.getClassLoader();
-    InputStream inputStream1 = classLoader.getResourceAsStream("partials/sensu-partial.json");
-    InputStream inputStream2 = classLoader.getResourceAsStream("partials/cdap-distributed-insecure.json");
-    PartialTemplate partial = gson.fromJson(IOUtils.toString(inputStream1), PartialTemplate.class);
-    ClusterTemplate basic = gson.fromJson(IOUtils.toString(inputStream2), ClusterTemplate.class);
+    InputStream partialSensuIn = classLoader.getResourceAsStream("partials/sensu-partial.json");
+    InputStream clusterInsecureIn = classLoader.getResourceAsStream("partials/cdap-distributed-insecure.json");
+    PartialTemplate partial = gson.fromJson(IOUtils.toString(partialSensuIn), PartialTemplate.class);
+    ClusterTemplate basic = gson.fromJson(IOUtils.toString(clusterInsecureIn), ClusterTemplate.class);
     view.writePartialTemplate(partial);
     view.writeClusterTemplate(basic);
 
-    InputStream inputStream3 = classLoader.getResourceAsStream("partials/cdap-distributed-resolved.json");
-    ClusterTemplate expected = gson.fromJson(IOUtils.toString(inputStream3), ClusterTemplate.class);
+    InputStream clusterDistributedResolvedIn = classLoader.getResourceAsStream("partials/cdap-distributed-resolved.json");
+    ClusterTemplate expected = gson.fromJson(IOUtils.toString(clusterDistributedResolvedIn, Charsets.UTF_8), ClusterTemplate.class);
 
-
-    InputStream inputStream4 = classLoader.getResourceAsStream("partials/cdap-distributed.json");
-    HttpResponse response = doPostExternalAPI("/resolve", IOUtils.toString(inputStream4), header);
+    InputStream clusterDistributedIn = classLoader.getResourceAsStream("partials/cdap-distributed.json");
+    HttpResponse response = doPostExternalAPI("/resolve", IOUtils.toString(clusterDistributedIn), ADMIN_HEADERS);
     Reader reader = new InputStreamReader(response.getEntity().getContent(), Charsets.UTF_8);
     ClusterTemplate actual = gson.fromJson(reader, ClusterTemplate.class);
+
     Assert.assertEquals(expected, actual);
+  }
+
+  @Test
+  public void resolveWithErrorsTest() throws Exception {
+    ClassLoader classLoader = AdminHandlerTest.class.getClassLoader();
+    InputStream inputStream1 = classLoader.getResourceAsStream("partials/cdap-distributed-without-defaults-provider.json");
+    HttpResponse response = doPostExternalAPI("/resolve", IOUtils.toString(inputStream1), ADMIN_HEADERS);
+    String responseMessage = EntityUtils.toString(response.getEntity(), Charsets.UTF_8);
+    Assert.assertEquals("default provider must be specified", responseMessage);
   }
 
   @Test

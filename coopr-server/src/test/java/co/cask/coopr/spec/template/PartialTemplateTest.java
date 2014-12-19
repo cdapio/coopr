@@ -248,14 +248,14 @@ public class PartialTemplateTest extends BaseTest {
     clusterService.resolveTemplate(account, notPersisted);
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = TemplateValidationException.class)
   public void test_11_templateWithoutDefaultsServices() throws Exception {
     InputStream templateWithoutDefaultsIn = classLoader.getResourceAsStream("partials/cdap-distributed-without-defaults-services.json");
     ClusterTemplate template = gson.fromJson(IOUtils.toString(templateWithoutDefaultsIn), ClusterTemplate.class);
     clusterService.resolveTemplate(account, template);
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = TemplateValidationException.class)
   public void test_12_templateWithoutDefaultsProvider() throws Exception {
     InputStream templateWithoutDefaultsIn = classLoader.getResourceAsStream("partials/cdap-distributed-without-defaults-provider.json");
     ClusterTemplate template = gson.fromJson(IOUtils.toString(templateWithoutDefaultsIn), ClusterTemplate.class);

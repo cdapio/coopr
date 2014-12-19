@@ -31,6 +31,7 @@ import co.cask.coopr.spec.template.ClusterTemplate;
 import co.cask.coopr.spec.template.PartialTemplate;
 import co.cask.coopr.spec.template.TemplateImmutabilityException;
 import co.cask.coopr.spec.template.TemplateNotFoundException;
+import co.cask.coopr.spec.template.TemplateValidationException;
 import co.cask.coopr.store.entity.EntityStoreService;
 import co.cask.coopr.store.entity.EntityStoreView;
 import co.cask.coopr.store.tenant.TenantStore;
@@ -426,7 +427,7 @@ public class AdminHandler extends AbstractAuthHandler {
       partialtemplateId, PartialTemplate.class, responder);
     } catch (IOException e) {
       responder.sendString(HttpResponseStatus.INTERNAL_SERVER_ERROR,
-              "Exception getting partial template " + partialtemplateId);
+                           "Exception getting partial template " + partialtemplateId);
     }
   }
 
@@ -515,7 +516,7 @@ public class AdminHandler extends AbstractAuthHandler {
                          "provider type", providertypeId, ProviderType.class, responder);
     } catch (IOException e) {
       responder.sendString(HttpResponseStatus.INTERNAL_SERVER_ERROR,
-                          "Exception getting provider type " + providertypeId + " with version " + versionStr);
+                           "Exception getting provider type " + providertypeId + " with version " + versionStr);
     }
   }
 
@@ -572,7 +573,7 @@ public class AdminHandler extends AbstractAuthHandler {
                          "automator type", automatortypeId, AutomatorType.class, responder);
     } catch (IOException e) {
       responder.sendString(HttpResponseStatus.INTERNAL_SERVER_ERROR,
-                          "Exception getting automator type " + automatortypeId + " with version " + versionStr);
+                           "Exception getting automator type " + automatortypeId + " with version " + versionStr);
     }
   }
 
@@ -592,7 +593,8 @@ public class AdminHandler extends AbstractAuthHandler {
 
     try {
       responder.sendJson(HttpResponseStatus.OK, entityStoreService.getView(account).getAllProviders(),
-                         new TypeToken<Collection<Provider>>() { }.getType(), gson);
+                         new TypeToken<Collection<Provider>>() {
+                         }.getType(), gson);
     } catch (IOException e) {
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception getting providers");
     }
@@ -1115,7 +1117,7 @@ public class AdminHandler extends AbstractAuthHandler {
       responder.sendStatus(HttpResponseStatus.OK);
     } catch (IOException e) {
       responder.sendString(HttpResponseStatus.INTERNAL_SERVER_ERROR,
-              "Exception deleting partial template " + partialtemplateId);
+                           "Exception deleting partial template " + partialtemplateId);
     } catch (IllegalAccessException e) {
       responder.sendString(HttpResponseStatus.FORBIDDEN, "user unauthorized to delete partial template.");
     }
@@ -1854,6 +1856,8 @@ public class AdminHandler extends AbstractAuthHandler {
         responder.sendString(HttpResponseStatus.BAD_REQUEST, e.getMessage());
       } catch (IOException e) {
         responder.sendString(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception processing template.");
+      } catch (TemplateValidationException e) {
+        responder.sendString(HttpResponseStatus.BAD_REQUEST, e.getMessage());
       }
     } else {
       responder.sendString(HttpResponseStatus.BAD_REQUEST, "Cluster template can't be read.");
