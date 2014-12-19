@@ -1849,7 +1849,7 @@ public class AdminHandler extends AbstractAuthHandler {
         ClusterTemplate resolved = clusterService.resolveTemplate(account, clusterTemplate);
         responder.sendJson(HttpResponseStatus.OK, resolved, ClusterTemplate.class, gson);
       } catch (TemplateNotFoundException e) {
-        responder.sendString(HttpResponseStatus.NOT_FOUND, "Cluster template can't be found.");
+        responder.sendString(HttpResponseStatus.NOT_FOUND, e.getMessage());
       } catch (TemplateImmutabilityException e) {
         responder.sendString(HttpResponseStatus.BAD_REQUEST, e.getMessage());
       } catch (IOException e) {
