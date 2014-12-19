@@ -284,9 +284,9 @@ public class PartialTemplateTest extends BaseTest {
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void test_11_templateWithoutDefaultsServices() throws Exception {
+  public void test_11_templateWithIncorrectDns() throws Exception {
     InputStream templateWithoutDefaultsIn =
-      classLoader.getResourceAsStream("partials/cdap-distributed-without-defaults-services.json");
+      classLoader.getResourceAsStream("partials/cdap-distributed-with-incorrect-dns.json");
     ClusterTemplate template = gson.fromJson(IOUtils.toString(templateWithoutDefaultsIn), ClusterTemplate.class);
     clusterService.resolveTemplate(account, template);
   }

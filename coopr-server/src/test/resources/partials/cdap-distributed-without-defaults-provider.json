@@ -1,7 +1,7 @@
 {
-    "name": "cdap-distributed",
+    "name": "cdap-without-default-provider",
     "version": "1",
-    "description": "Template without defaults provide",
+    "description": "Template without defaults provider",
     "defaults": {
         "hardwaretype": "standard­large",
         "imagetype": "centos6",
