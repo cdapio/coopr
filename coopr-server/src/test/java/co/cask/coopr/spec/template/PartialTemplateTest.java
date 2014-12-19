@@ -11,6 +11,8 @@ import co.cask.coopr.spec.TenantSpecification;
 import co.cask.coopr.store.entity.EntityStoreView;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
@@ -215,7 +217,6 @@ public class PartialTemplateTest extends BaseTest {
     Assert.assertEquals(compatibilitiesImagetypes, rt.getCompatibilities().getImagetypes());
     Assert.assertEquals(compatibilitiesServices, rt.getCompatibilities().getServices());
 
-<<<<<<< HEAD
     //overrides in second mandatory partial
     Assert.assertEquals("ldap.correct.com", rt.getClusterDefaults().getConfig().get("ldap")
       .getAsJsonObject().get("endpoint").getAsString());
@@ -229,22 +230,6 @@ public class PartialTemplateTest extends BaseTest {
   }
 
   @Test
-  public void test_07_deleteTemplate() throws Exception {
-    int beforePartialsCount = entityStoreView.getAllPartialTemplates(false).size();
-    int beforeMandatoryPartialsCount = entityStoreView.getAllPartialTemplates(true).size();
-=======
-    //overrides in child
-    Assert.assertEquals("ldap.correct.com", rt.getClusterDefaults().getConfig().get("ldap")
-      .getAsJsonObject().get("endpoint").getAsString());
-
-    Assert.assertNull(rt.getLabel());
-    Assert.assertNull(rt.getIcon());
-    Assert.assertEquals("cdap-distributed-secure-hadoop", rt.getName());
-    Assert.assertEquals("Cask DAP (CDAP) with Security and Secure Hadoop cluster with single master",
-                        rt.getDescription());
-  }
-
-  @Test
   public void test_07_not_persisted_resolveTemplate() throws Exception {
     InputStream notPersistedIn = classLoader.getResourceAsStream("partials/cdap-not-persisted.json");
     ClusterTemplate notPersisted = gson.fromJson(IOUtils.toString(notPersistedIn), ClusterTemplate.class);
@@ -254,9 +239,27 @@ public class PartialTemplateTest extends BaseTest {
     Assert.assertEquals(notPersisted.getParent(), rt.getParent());
     Assert.assertEquals(notPersisted.getName(), rt.getName());
     Assert.assertEquals(notPersisted.getDescription(), rt.getDescription());
-    Assert.assertEquals(sensuPartial.getClusterDefaults().getServices(), rt.getClusterDefaults().getServices());
-    Assert.assertEquals(sensuPartial.getClusterDefaults().getConfig(), rt.getClusterDefaults().getConfig());
-    Assert.assertEquals(sensuPartial.getCompatibilities().getServices(), rt.getCompatibilities().getServices());
+
+    Set<String> expectedDefaultsServices = sensuPartial.getClusterDefaults().getServices();
+    Set<String> expectedCompatibilitiesServices = sensuPartial.getCompatibilities().getServices();
+    JsonObject expectedDefaultsConfig = sensuPartial.getClusterDefaults().getConfig();
+
+    expectedDefaultsServices.addAll(mandatoryPartial1.clusterDefaults.services);
+    expectedDefaultsServices.addAll(mandatoryPartial2.clusterDefaults.services);
+
+    expectedCompatibilitiesServices.addAll(mandatoryPartial1.compatibilities.services);
+    expectedCompatibilitiesServices.addAll(mandatoryPartial2.compatibilities.services);
+
+    for (JsonObject mandatoryConfig : Sets.newHashSet(mandatoryPartial1.clusterDefaults.config,
+                                                      mandatoryPartial2.clusterDefaults.config)) {
+      for (Map.Entry<String, JsonElement> config : mandatoryConfig.entrySet()) {
+        expectedDefaultsConfig.add(config.getKey(), config.getValue());
+      }
+    }
+
+    Assert.assertEquals(expectedDefaultsServices, rt.getClusterDefaults().getServices());
+    Assert.assertEquals(expectedCompatibilitiesServices, rt.getCompatibilities().getServices());
+    Assert.assertEquals(expectedDefaultsConfig, rt.getClusterDefaults().getConfig());
   }
 
   @Test(expected = TemplateImmutabilityException.class)
@@ -282,22 +285,24 @@ public class PartialTemplateTest extends BaseTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void test_11_templateWithoutDefaultsServices() throws Exception {
-    InputStream templateWithoutDefaultsIn = classLoader.getResourceAsStream("partials/cdap-distributed-without-defaults-services.json");
+    InputStream templateWithoutDefaultsIn =
+      classLoader.getResourceAsStream("partials/cdap-distributed-without-defaults-services.json");
     ClusterTemplate template = gson.fromJson(IOUtils.toString(templateWithoutDefaultsIn), ClusterTemplate.class);
     clusterService.resolveTemplate(account, template);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void test_12_templateWithoutDefaultsProvider() throws Exception {
-    InputStream templateWithoutDefaultsIn = classLoader.getResourceAsStream("partials/cdap-distributed-without-defaults-provider.json");
+    InputStream templateWithoutDefaultsIn =
+      classLoader.getResourceAsStream("partials/cdap-distributed-without-defaults-provider.json");
     ClusterTemplate template = gson.fromJson(IOUtils.toString(templateWithoutDefaultsIn), ClusterTemplate.class);
     clusterService.resolveTemplate(account, template);
   }
 
   @Test
   public void test_13_deleteTemplate() throws Exception {
-    int beforePartialsCount = entityStoreView.getAllPartialTemplates().size();
->>>>>>> upstream/develop
+    int beforePartialsCount = entityStoreView.getAllPartialTemplates(false).size();
+    int beforeMandatoryPartialsCount = entityStoreView.getAllPartialTemplates(true).size();
     int beforeClusterTemplatesCount = entityStoreView.getAllClusterTemplates().size();
 
     entityStoreView.deleteClusterTemplate(insecureTemplate.getName());

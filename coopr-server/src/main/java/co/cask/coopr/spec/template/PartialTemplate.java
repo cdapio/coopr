@@ -58,11 +58,7 @@ public final class PartialTemplate extends AbstractTemplate {
     private boolean immutable;
 
     @Override
-<<<<<<< HEAD
-    protected Builder getThis() {
-=======
     protected PartialTemplate.Builder getThis() {
->>>>>>> upstream/develop
       return this;
     }
 
@@ -70,13 +66,8 @@ public final class PartialTemplate extends AbstractTemplate {
       return new PartialTemplate(this, clusterDefaults, compatibilities, constraints, administration, links, immutable);
     }
 
-<<<<<<< HEAD
-    public Builder setImmutable(boolean immutable) {
-      this.immutable = immutable;
-=======
     public Builder setImmutable(Boolean immutable) {
       this.immutable = immutable == null ? false : immutable;
->>>>>>> upstream/develop
       return this;
     }
   }
