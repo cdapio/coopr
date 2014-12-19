@@ -1,0 +1,16 @@
+{
+    "name": "LDAP-internal",
+    "version": "1",
+    "description": "Bad formatted json template",
+    "immutable": "false",
+    "defaults":
+        [
+            "ldap­internal"
+        ],
+        "config": {
+            "ldap": {
+                "endpoint": "ldap.wrong.com"
+            }
+        }
+    }
+}

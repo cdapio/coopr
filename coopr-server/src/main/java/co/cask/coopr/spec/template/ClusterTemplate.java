@@ -15,22 +15,13 @@
  */
 package co.cask.coopr.spec.template;
 
-import co.cask.coopr.common.utils.StringUtils;
 import co.cask.coopr.spec.BaseEntity;
 import co.cask.coopr.spec.Link;
 import com.google.common.base.Objects;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 
-import static org.apache.commons.lang.StringUtils.isNotBlank;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Map;
 import java.util.Set;
+
 
 /**
  * A cluster template defines different types of clusters that will be available for users to create.  Templates
@@ -40,8 +31,8 @@ import java.util.Set;
  */
 public final class ClusterTemplate extends AbstractTemplate {
 
-  private final Parent parent;
-  private final Set<Include> includes;
+  Parent parent;
+  Set<Include> includes;
 
   protected ClusterTemplate(BaseEntity.Builder baseBuilder, ClusterDefaults clusterDefaults,
                             Compatibilities compatibilities, Constraints constraints, Administration administration,
@@ -83,12 +74,9 @@ public final class ClusterTemplate extends AbstractTemplate {
    * Builder for creating cluster templates.
    */
   public static class Builder extends AbstractTemplate.Builder<ClusterTemplate, Builder> {
+
     private Parent parent;
     private Set<Include> includes = ImmutableSet.of();
-
-    public Merger merger() {
-      return new Merger();
-    }
 
     @Override
     public ClusterTemplate build() {
@@ -110,6 +98,7 @@ public final class ClusterTemplate extends AbstractTemplate {
       this.includes = includes == null ? ImmutableSet.<Include>of() : ImmutableSet.copyOf(includes);
       return this;
     }
+<<<<<<< HEAD
 
     public class Merger {
       private final Set<String> immutables = Sets.newHashSet();
@@ -227,6 +216,8 @@ public final class ClusterTemplate extends AbstractTemplate {
         }
       }
     }
+=======
+>>>>>>> upstream/develop
   }
 
   @Override

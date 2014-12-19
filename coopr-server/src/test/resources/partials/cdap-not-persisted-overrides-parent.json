@@ -1,0 +1,22 @@
+{
+    "name": "cdap-not-persisted",
+    "version": "1",
+    "description": "User provided template",
+    "extends": {
+        "name": "cdap-distributed"
+    },
+    "defaults": {
+        "provider": "google",
+        "hardwaretype": "standard­large",
+        "imagetype": "centos6",
+        "dnsSuffix": "dev.continuuity.net",
+        "config": {
+            "sensu_wrapper": {
+                "additional_client_attributes": {
+                    "mail_to": "%cluster.owner%@cask.co"
+                },
+                "endpoint": "sensu­internal­server.cask.co"
+            }
+        }
+    }
+}

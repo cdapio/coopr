@@ -56,8 +56,9 @@ public class ClusterDefaultsCodec extends AbstractCodec<ClusterDefaults> {
   public ClusterDefaults deserialize(JsonElement json, Type type, JsonDeserializationContext context)
     throws JsonParseException {
     JsonObject jsonObj = json.getAsJsonObject();
-    JsonObject config = context.deserialize(jsonObj.get(CONFIG_KEY), JsonObject.class);
-    Set<String> services = Sets.newHashSet();
+    JsonObject config = jsonObj.get(CONFIG_KEY) != null ?
+      context.<JsonObject>deserialize(jsonObj.get(CONFIG_KEY), JsonObject.class) : new JsonObject();
+    Set<String> services = Sets.newLinkedHashSet();
 
     JsonElement rawServices = jsonObj.get(SERVICES_KEY);
     if(rawServices != null) {
