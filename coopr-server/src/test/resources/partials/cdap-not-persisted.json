@@ -1,0 +1,17 @@
+{
+    "name": "cdap-not-persisted",
+    "version": "1",
+    "description": "User provided template",
+
+    "includes": [
+        {
+            "name": "sensu-internal"
+        }
+    ],
+    "defaults": {
+        "provider": "google",
+        "hardwaretype": "standard­large",
+        "imagetype": "centos6",
+        "dnsSuffix": "dev.continuuity.net"
+    }
+}

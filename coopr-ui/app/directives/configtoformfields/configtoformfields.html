@@ -1,8 +1,6 @@
  <div class="form-group" ng-repeat="(name,fieldData) in config.fields">
 
-  <label class="col-xs-2 control-label">
-    {{fieldData.label}}
-  </label>
+  <label class="col-xs-2 control-label" ng-bind="fieldData.label"></label>
   
   <div class="col-xs-10">
 
@@ -13,7 +11,7 @@
           ng-model="model[name]"
           ng-disabled="allowOverride && !fieldData.override"
         />
-        {{fieldData.tip}}
+        <span ng-bind="fieldData.tip"></span>
       </label>
     </div>
 

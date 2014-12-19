@@ -17,6 +17,7 @@ package co.cask.coopr.codec.json.current;
 
 import co.cask.coopr.codec.json.AbstractCodec;
 import co.cask.coopr.spec.template.Compatibilities;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
@@ -31,6 +32,8 @@ import java.util.Set;
  * Codec for serializing/deserializing a {@link Compatibilities}.
  */
 public class CompatibilitiesCodec extends AbstractCodec<Compatibilities> {
+
+  private static final Type typeToken = new TypeToken<Set<String>>() {}.getType();
 
   @Override
   public JsonElement serialize(Compatibilities compatibilities, Type type, JsonSerializationContext context) {
@@ -48,13 +51,17 @@ public class CompatibilitiesCodec extends AbstractCodec<Compatibilities> {
     throws JsonParseException {
     JsonObject jsonObj = json.getAsJsonObject();
 
+    Set<String> hardwaretypes = jsonObj.get("hardwaretypes") != null ?
+      context.<Set<String>>deserialize(jsonObj.get("hardwaretypes"), typeToken) : ImmutableSet.<String>of();
+    Set<String> imagetypes = jsonObj.get("imagetypes") != null ?
+      context.<Set<String>>deserialize(jsonObj.get("imagetypes"), typeToken) : ImmutableSet.<String>of();
+    Set<String> services = jsonObj.get("services") != null ?
+      context.<Set<String>>deserialize(jsonObj.get("services"), typeToken) : ImmutableSet.<String>of();
+
     return Compatibilities.builder()
-      .setHardwaretypes(context.<Set<String>>deserialize(jsonObj.get("hardwaretypes"),
-                                                         new TypeToken<Set<String>>() { }.getType()))
-      .setImagetypes(context.<Set<String>>deserialize(jsonObj.get("imagetypes"),
-                                                      new TypeToken<Set<String>>() { }.getType()))
-      .setServices(context.<Set<String>>deserialize(jsonObj.get("services"),
-                                                    new TypeToken<Set<String>>() { }.getType()))
+      .setHardwaretypes(hardwaretypes)
+      .setImagetypes(imagetypes)
+      .setServices(services)
       .build();
   }
 }

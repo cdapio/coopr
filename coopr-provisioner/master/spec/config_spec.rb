@@ -20,7 +20,6 @@ require File.dirname(__FILE__) + '/../lib/provisioner/config.rb'
 require File.dirname(__FILE__) + '/../lib/provisioner/constants.rb'
 
 describe 'Coopr::Config' do
-
   before do
     @config = Coopr::Config.new({})
   end
@@ -29,5 +28,4 @@ describe 'Coopr::Config' do
     @config.load_file("#{File.dirname(__FILE__)}/provisioner-default.xml")
     expect(@config.get(Coopr::PROVISIONER_BIND_IP)).to eq('0.0.0.0')
   end
-
 end
