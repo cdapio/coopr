@@ -13,7 +13,6 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.gson.JsonSyntaxException;
 import org.apache.commons.io.IOUtils;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
@@ -52,7 +51,6 @@ public class PartialTemplateTest extends BaseTest {
     Sets.newHashSet("mysql­server", "continuuity­sensu­monitoring", "kerberos­client", "zookeeper­server", "cdap",
                     "ldap­internal");
   private static final Map<String, ServiceConstraint> serviceConstraints = Maps.newHashMap();
-
   private static final ClassLoader classLoader = PartialTemplateTest.class.getClassLoader();
 
   @Override
@@ -77,16 +75,9 @@ public class PartialTemplateTest extends BaseTest {
   @Test
   public void test_01_parse() throws Exception {
     //load json templates
-<<<<<<< HEAD
-    ClassLoader classLoader = PartialTemplateTest.class.getClassLoader();
-=======
->>>>>>> upstream/develop
     InputStream insecureIn = classLoader.getResourceAsStream("partials/cdap-distributed-insecure.json");
     InputStream distributedIn = classLoader.getResourceAsStream("partials/cdap-distributed.json");
-<<<<<<< HEAD
-=======
     InputStream secureIn = classLoader.getResourceAsStream("partials/cdap-distributed-secure-hadoop.json");
->>>>>>> upstream/develop
     InputStream sensuIn = classLoader.getResourceAsStream("partials/sensu-partial.json");
     InputStream ldapIn = classLoader.getResourceAsStream("partials/ldap-partial.json");
     InputStream templateWithOverridesInBodyIn =

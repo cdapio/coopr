@@ -22,7 +22,6 @@ import com.google.common.collect.ImmutableSet;
 
 import java.util.Set;
 
-
 /**
  * A cluster template defines different types of clusters that will be available for users to create.  Templates
  * define a set of services that are allowed to be placed on the cluster plus some service and layout constraints that
@@ -98,126 +97,6 @@ public final class ClusterTemplate extends AbstractTemplate {
       this.includes = includes == null ? ImmutableSet.<Include>of() : ImmutableSet.copyOf(includes);
       return this;
     }
-<<<<<<< HEAD
-
-    public class Merger {
-      private final Set<String> immutables = Sets.newHashSet();
-
-      public Merger setInitialTemplate(ClusterTemplate initialTemplate) {
-        parent = initialTemplate.parent;
-        includes = initialTemplate.includes;
-
-        return this;
-      }
-
-      public Merger merge(Collection<AbstractTemplate> templates) throws TemplateImmutabilityException {
-        for (AbstractTemplate template : templates) {
-          if (template instanceof ClusterTemplate) {
-            copyFullProps(template);
-          } else {
-            Boolean immutable = ((PartialTemplate) template).isImmutable();
-            copyMainProps(template, immutable);
-          }
-        }
-        return this;
-      }
-
-      public ClusterTemplate.Builder builder(){
-        validateFields();
-        return Builder.this;
-      }
-
-      public Merger merge(AbstractTemplate template) throws Exception {
-        return merge(Arrays.asList(template));
-      }
-
-      private void validateFields() {
-        Preconditions.checkArgument(clusterDefaults.getServices() != null && !clusterDefaults.getServices().isEmpty(),
-                                    "default services must be specified");
-        Preconditions.checkArgument(clusterDefaults.getProvider() != null, "default provider must be specified");
-        Preconditions.checkArgument(clusterDefaults.getDnsSuffix() == null ||
-                                      StringUtils.isValidDNSSuffix(clusterDefaults.getDnsSuffix()),
-                                    clusterDefaults.getDnsSuffix() + " is an invalid DNS suffix.");
-      }
-
-      //for partial includes
-      private void copyMainProps(AbstractTemplate from, boolean isImmutable) throws TemplateImmutabilityException {
-        //merge defaults
-        mergeSet(clusterDefaults.getServices(), from.getClusterDefaults().getServices());
-
-        //merge defaults config
-        JsonObject fromDefaultsConfig = from.getClusterDefaults().getConfig();
-        for (Map.Entry<String, JsonElement> fromConfigItem : fromDefaultsConfig.entrySet()) {
-          JsonObject thisConfig = clusterDefaults.getConfig();
-          String name = fromConfigItem.getKey();
-          JsonElement value = fromConfigItem.getValue();
-          if (immutables.contains(name) && thisConfig.has(name)) {
-            throw new TemplateImmutabilityException(name + " can't be overridden due immutability. Overrides in " +
-                                                      from.getName());
-          }
-          thisConfig.add(name, value);
-          if (isImmutable) {
-            immutables.add(name);
-          }
-        }
-        //merge compatibilities services
-        mergeSet(compatibilities.getServices(), from.getCompatibilities().getServices());
-      }
-
-      //for parent extension
-      private void copyFullProps(AbstractTemplate from) throws TemplateImmutabilityException {
-        copyMainProps(from, false);
-
-        //merge defaults options
-        ClusterDefaults fromDefaults = from.getClusterDefaults();
-        if(isNotBlank(fromDefaults.getDnsSuffix())) clusterDefaults.setDnsSuffix(fromDefaults.getDnsSuffix());
-        if(isNotBlank(fromDefaults.getHardwaretype())) clusterDefaults.setHardwaretype(fromDefaults.getHardwaretype());
-        if(isNotBlank(fromDefaults.getImagetype())) clusterDefaults.setImagetype(fromDefaults.getImagetype());
-        if(isNotBlank(fromDefaults.getProvider())) clusterDefaults.setProvider(fromDefaults.getProvider());
-
-        //merge constraints
-        mergeMap(constraints.getServiceConstraints(), from.getConstraints().getServiceConstraints());
-        mergeSet(constraints.getLayoutConstraint().getServicesThatMustCoexist(),
-                 from.getConstraints().getLayoutConstraint().getServicesThatMustCoexist());
-        mergeSet(constraints.getLayoutConstraint().getServicesThatMustNotCoexist(),
-                 from.getConstraints().getLayoutConstraint().getServicesThatMustNotCoexist());
-        if (!from.getConstraints().getSizeConstraint().equals(SizeConstraint.EMPTY)) {
-          constraints.sizeConstraint = from.getConstraints().getSizeConstraint();
-        }
-
-        //merge compatibilities
-        mergeSet(compatibilities.getHardwaretypes(), from.getCompatibilities().getHardwaretypes());
-        mergeSet(compatibilities.getImagetypes(), from.getCompatibilities().getImagetypes());
-        mergeSet(compatibilities.getServices(), from.getCompatibilities().getServices());
-
-        //merge admin lease duration
-        if (!from.getAdministration().getLeaseDuration().equals(LeaseDuration.FOREVER_LEASE_DURATION)) {
-          administration.leaseDuration = from.getAdministration().getLeaseDuration();
-        }
-
-        //merge base entity properties
-        if (isNotBlank(from.getName())) name = from.getName();
-        if (isNotBlank(from.getLabel())) label = from.getLabel();
-        if (isNotBlank(from.getIcon())) icon = from.getIcon();
-        if (isNotBlank(from.getDescription())) description = from.getDescription();
-      }
-
-      @SuppressWarnings("unchecked")
-      private void mergeSet(Set dest, Set from) {
-        if (dest != null && from != null) {
-          dest.addAll(from);
-        }
-      }
-
-      @SuppressWarnings("unchecked")
-      private void mergeMap(Map dest, Map from) {
-        if (dest != null && from != null) {
-          dest.putAll(from);
-        }
-      }
-    }
-=======
->>>>>>> upstream/develop
   }
 
   @Override
