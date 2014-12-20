@@ -5,7 +5,7 @@
     "immutable": "false",
     "defaults":
         [
-            "ldap­internal"
+            "ldap-internal"
         ],
         "config": {
             "ldap": {

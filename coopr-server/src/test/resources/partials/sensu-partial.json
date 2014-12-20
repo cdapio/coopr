@@ -1,24 +1,24 @@
 {
     "name": "sensu-internal",
     "version": "1",
-    "description": "Configure Sensu clients to integrate with Cask internal monitoring infrastructure",
+    "description": "Configure Sensu clients to integrate with example internal monitoring infrastructure",
     "immutable": true,
     "defaults": {
         "services": [
-            "continuuity­sensu­monitoring"
+            "sensu-monitoring"
         ],
         "config": {
             "sensu_wrapper": {
                 "additional_client_attributes": {
-                    "mail_to": "%cluster.owner%@cask.co"
+                    "mail_to": "%cluster.owner%@example.com"
                 },
-                "endpoint": "sensu­internal­server.cask.co"
+                "endpoint": "sensu-internal-server.example.com"
             }
         }
     },
     "compatibility": {
         "services": [
-            "continuuity­sensu­monitoring"
+            "sensu-monitoring"
         ]
     }
 }
