@@ -5,26 +5,19 @@ TIMEOUT=3
 export COOPR_API_USER=${COOPR_API_USER:-admin}
 export COOPR_API_KEY=${COOPR_API_KEY:-1234567890abcdef}
 export COOPR_TENANT=${COOPR_TENANT:-superadmin}
+export COOPR_SERVER_URI=${COOPR_SERVER_URI:-http://localhost:55054}
 export COOPR_HOME=${COOPR_HOME:-/opt/coopr}
-export COOPR_SERVER_CONF=${COOPR_SERVER_CONF:-"${COOPR_HOME}/server/conf"}
-export COOPR_RUBY=${COOPR_RUBY:-"${COOPR_HOME}/provisioner/embedded/bin/ruby"}
+export COOPR_RUBY=${COOPR_RUBY:-${COOPR_HOME}/provisioner/embedded/bin/ruby}
 
 export COOPR_PROVISIONER_PLUGIN_DIR=${COOPR_HOME}/provisioner/worker/plugins
 
-export COOPR_SERVER_URI=${COOPR_SERVER_URI:-http://localhost:55054}
-
-if [ -n ${TRUST_CERT_PATH} ] && [ -n ${TRUST_CERT_PASSWORD} ]; then
+if [ -r "${TRUST_CERT_PATH}" ] && [ -n "${TRUST_CERT_PASSWORD}" ]; then
   export CERT_PARAMETER="--cert ${TRUST_CERT_PATH}:${TRUST_CERT_PASSWORD}"
 fi
 
 if [ "${COOPR_PROTOCOL}" == "https" ]; then
   export CURL_PARAMETER="--insecure"
 fi
-
-# TODO: steps
-# - register
-# - loop through upload scripts
-# - sync
 
 wait_for_plugin_registration () {
   RETRIES=0
