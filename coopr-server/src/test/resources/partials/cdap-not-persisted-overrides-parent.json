@@ -7,7 +7,7 @@
     },
     "defaults": {
         "provider": "google",
-        "hardwaretype": "standard­large",
+        "hardwaretype": "standard-large",
         "imagetype": "centos6",
         "dnsSuffix": "example.com",
         "config": {
@@ -15,7 +15,7 @@
                 "additional_client_attributes": {
                     "mail_to": "%cluster.owner%@example.com"
                 },
-                "endpoint": "sensu­internal­server.example.com"
+                "endpoint": "sensu-internal-server.example.com"
             }
         }
     }

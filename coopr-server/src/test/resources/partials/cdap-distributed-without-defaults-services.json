@@ -4,7 +4,7 @@
     "description": "Template without defaults services",
     "defaults": {
         "provider": "google",
-        "hardwaretype": "standard­large",
+        "hardwaretype": "standard-large",
         "imagetype": "centos6",
         "dnsSuffix": "example.com",
         "config": {

@@ -5,20 +5,20 @@
     "immutable": true,
     "defaults": {
         "services": [
-            "sensu­monitoring"
+            "sensu-monitoring"
         ],
         "config": {
             "sensu_wrapper": {
                 "additional_client_attributes": {
                     "mail_to": "%cluster.owner%@example.com"
                 },
-                "endpoint": "sensu­internal­server.example.com"
+                "endpoint": "sensu-internal-server.example.com"
             }
         }
     },
     "compatibility": {
         "services": [
-            "sensu­monitoring"
+            "sensu-monitoring"
         ]
     }
 }
