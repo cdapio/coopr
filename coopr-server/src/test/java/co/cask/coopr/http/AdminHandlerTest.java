@@ -159,8 +159,10 @@ public class AdminHandlerTest extends ServiceTestBase {
     view.writePartialTemplate(partial);
     view.writeClusterTemplate(basic);
 
-    InputStream clusterDistributedResolvedIn = classLoader.getResourceAsStream("partials/cdap-distributed-resolved.json");
-    ClusterTemplate expected = gson.fromJson(IOUtils.toString(clusterDistributedResolvedIn, Charsets.UTF_8), ClusterTemplate.class);
+    InputStream clusterDistributedResolvedIn =
+      classLoader.getResourceAsStream("partials/cdap-distributed-resolved.json");
+    ClusterTemplate expected = gson.fromJson(IOUtils.toString(clusterDistributedResolvedIn, Charsets.UTF_8),
+                                             ClusterTemplate.class);
 
     InputStream clusterDistributedIn = classLoader.getResourceAsStream("partials/cdap-distributed.json");
     HttpResponse response = doPostExternalAPI("/resolve", IOUtils.toString(clusterDistributedIn), ADMIN_HEADERS);
