@@ -297,6 +297,15 @@ gulp.task('watch', ['build'], function() {
 gulp.task('develop-server', function () {
   plug.nodemon({
     script: 'server.js',
+    ext: 'js',
+    ignore: [
+      './app/*',
+      './dist/*',
+      './test/*',
+      './bower_components',
+      './node_modules',
+      'Gulpfile.js'
+    ],
     env: {
       'NODE_ENV': 'development'
     },
