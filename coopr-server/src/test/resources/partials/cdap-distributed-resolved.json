@@ -4,17 +4,17 @@
   "version": "1",
   "defaults": {
     "services": [
-      "mysql­server",
-      "continuuity­sensu­monitoring",
-      "cdap-security",
+      "zookeeper-server",
+      "mysql-server",
+      "cdap",
       "bob",
-      "zookeeper­server",
-      "cdap"
+      "sensu-monitoring",
+      "cdap-security"
     ],
     "provider": "google",
-    "hardwaretype": "standard­large",
+    "hardwaretype": "standard-large",
     "imagetype": "centos6",
-    "dnsSuffix": "dev.continuuity.net",
+    "dnsSuffix": "example.com",
     "config": {
       "mysql": {
         "server_debian_password": "somedefaultpassword",
@@ -38,9 +38,9 @@
       },
       "sensu_wrapper": {
         "additional_client_attributes": {
-          "mail_to":"%cluster.owner%@cask.co"
+          "mail_to":"%cluster.owner%@example.com"
         },
-        "endpoint": "sensu­internal­server.cask.co"
+        "endpoint": "sensu-internal-server.example.com"
       },
       "security.enabled": "true",
       "security.authentication.handlerClassName": "co.cask.cdap.security.server.LDAPAuthenticationHandler",
@@ -56,7 +56,7 @@
   },
   "compatibility": {
     "hardwaretypes": [
-      "standard­large",
+      "standard-large",
       "standard-xlarge"
     ],
     "imagetypes": [
@@ -64,32 +64,32 @@
      "ubuntu12"
     ],
     "services": [
-      "mysql­server",
-      "continuuity­sensu­monitoring",
-      "zookeeper­server",
-      "cdap"
+      "zookeeper-server",
+      "cdap",
+      "mysql-server",
+      "sensu-monitoring"
     ]
   },
   "constraints": {
     "layout": {
       "mustcoexist": [
         [
+          "hbase-regionserver"
+        ],
+        [
           "mysql-server",
           "zookeeper-server",
           "cdap"
-        ],
-        [
-          "hbase-regionserver"
         ]
       ],
       "cantcoexist": [
         [
-          "hadoop-hdfs-datanode",
-          "cdap"
-        ],
-        [
           "hadoop-hdfs-namenode",
           "hadoop-hdfs-datanode"
+        ],
+        [
+          "hadoop-hdfs-datanode",
+          "cdap"
         ]
       ]
     },
