@@ -3,10 +3,10 @@
     "version": "1",
     "description": "Template without defaults provider",
     "defaults": {
-        "hardwaretype": "standard­large",
+        "hardwaretype": "standard-large",
         "imagetype": "centos6",
         "services": [
-            "ldap­internal"
+            "ldap-internal"
         ],
         "config": {
             "security.enabled": "true"

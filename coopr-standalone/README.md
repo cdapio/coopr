@@ -13,7 +13,7 @@ mvn clean package assembly:single -DskipTests
 
 ## Install
 ```
-sudo gem install fog --version 1.21.0
+sudo gem install fog --version 1.26.0
 sudo gem install sinatra --version 1.4.5
 sudo gem install thin --version 1.6.2
 sudo gem install rest_client --version 1.7.3

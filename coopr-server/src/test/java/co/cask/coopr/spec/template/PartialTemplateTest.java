@@ -47,13 +47,13 @@ public class PartialTemplateTest extends BaseTest {
   private static Account account;
 
   private static final Set<String> defaultsServices =
-    Sets.newHashSet("cdap­security", "mysql­server", "continuuity­sensu­monitoring", "bob", "hive-metastore-database",
+    Sets.newHashSet("cdap­security", "mysql­server", "sensu­monitoring", "bob", "hive-metastore-database",
                     "hive-metastore", "zookeeper­server", "cdap", "hive-server2", "ldap­internal",
                     "mandatory-first-service", "mandatory-second-service");
   private static final Set<String> compatibilitiesHardwaretypes = Sets.newHashSet("standard­large", "standard-xlarge");
   private static final Set<String> compatibilitiesImagetypes = Sets.newHashSet("centos6", "ubuntu12");
   private static final Set<String> compatibilitiesServices =
-    Sets.newHashSet("mysql­server", "continuuity­sensu­monitoring", "kerberos­client", "zookeeper­server", "cdap",
+    Sets.newHashSet("mysql­server", "sensu­monitoring", "kerberos­client", "zookeeper­server", "cdap",
                     "ldap­internal", "mandatory-first-service", "mandatory-second-service");
   private static final Map<String, ServiceConstraint> serviceConstraints = Maps.newHashMap();
 
@@ -163,8 +163,8 @@ public class PartialTemplateTest extends BaseTest {
 
     Assert.assertEquals("Configure Example, Inc. LDAP services", ldapInternal.getDescription());
     Assert.assertEquals(true, sensuInternal.isImmutable());
-    Assert.assertEquals("ldap­internal", ldapInternal.clusterDefaults.getServices().iterator().next());
-    Assert.assertEquals("ldap­internal", ldapInternal.compatibilities.getServices().iterator().next());
+    Assert.assertEquals("ldap-internal", ldapInternal.clusterDefaults.getServices().iterator().next());
+    Assert.assertEquals("ldap-internal", ldapInternal.compatibilities.getServices().iterator().next());
     Assert.assertNotNull(ldapInternal.clusterDefaults.getConfig().get("ldap"));
     Assert.assertEquals("ldap.wrong.com", ldapInternal.clusterDefaults.getConfig().get("ldap")
       .getAsJsonObject().get("endpoint").getAsString());
@@ -177,7 +177,7 @@ public class PartialTemplateTest extends BaseTest {
     Assert.assertEquals("LDAP-internal", cdapDistributedSecureHadoop.getIncludes().iterator().next().getName());
     Assert.assertEquals(3, cdapDistributedSecureHadoop.clusterDefaults.getServices().size());
     Assert.assertNotNull(cdapDistributedSecureHadoop.getClusterDefaults().getConfig().get("hive"));
-    Assert.assertEquals("kerberos­client",
+    Assert.assertEquals("kerberos-client",
                         cdapDistributedSecureHadoop.getCompatibilities().getServices().iterator().next());
   }
 
@@ -202,9 +202,9 @@ public class PartialTemplateTest extends BaseTest {
     Assert.assertEquals(defaultsServices, rt.getClusterDefaults().getServices());
     Assert.assertEquals(17, rt.getClusterDefaults().getConfig().entrySet().size());
     Assert.assertEquals("rackspace", rt.getClusterDefaults().getProvider());
-    Assert.assertEquals("standard­large", rt.getClusterDefaults().getHardwaretype());
+    Assert.assertEquals("standard-large", rt.getClusterDefaults().getHardwaretype());
     Assert.assertEquals("centos6", rt.getClusterDefaults().getImagetype());
-    Assert.assertEquals("dev.continuuity.net", rt.getClusterDefaults().getDnsSuffix());
+    Assert.assertEquals("example.com", rt.getClusterDefaults().getDnsSuffix());
 
     Assert.assertEquals(2, rt.getConstraints().getLayoutConstraint().getServicesThatMustCoexist().size());
     Assert.assertEquals(2, rt.getConstraints().getLayoutConstraint().getServicesThatMustNotCoexist().size());

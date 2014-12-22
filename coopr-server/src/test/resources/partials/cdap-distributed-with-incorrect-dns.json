@@ -4,7 +4,7 @@
     "description": "Template with incorrect dns",
     "defaults": {
         "provider": "google",
-        "hardwaretype": "standard­large",
+        "hardwaretype": "standard-large",
         "imagetype": "centos6",
         "dnsSuffix": "de@1",
         "services": [

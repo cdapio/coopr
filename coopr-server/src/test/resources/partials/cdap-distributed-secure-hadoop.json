@@ -35,7 +35,7 @@
     },
     "compatibility": {
         "services": [
-            "kerberos­client"
+            "kerberos-client"
         ]
     }
 }
