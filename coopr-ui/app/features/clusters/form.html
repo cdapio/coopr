@@ -20,7 +20,11 @@
       <select id="inputClusterTemplate" name="template" class="form-control"
         ng-disabled="editing"
         ng-model="model.clusterTemplate"
-        ng-options="ctpl.name as ctpl.description for ctpl in availableTemplates" required>
+        required>
+          <option ng-repeat="ctpl in availableTemplates"
+            label="{{ ctpl.name }}"
+            value="{{ ctpl.name }}"
+            title="{{ ctpl.description }}"></option>
       </select>
     </div>
 
