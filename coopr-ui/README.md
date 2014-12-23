@@ -23,6 +23,8 @@ Local dependencies:
 
 then, each in their own tab:
 
+* `gulp watch` (autobuild + livereload)
+* `npm start` (http-server + cors-anywhere)
 * `gulp serve` (autobuild + livereload + http-server)
 * `npm test` (run karma for unit tests)
 * `open http://localhost:8080`

@@ -7,6 +7,7 @@
     "url": "http://github.com/caskdata/coopr.git"
   },
   "scripts": {
+    "start": "node ./server.js",
     "backend": "COOPR_USE_DUMMY_PROVISIONER=true COOPR_DISABLE_UI=true ../coopr-standalone/target/coopr-0.9.9-SNAPSHOT-standalone/bin/coopr.sh",
     "prebuild": "npm install && ./node_modules/bower/bin/bower update --config.interactive=false --allow-root",
     "build": "node ./node_modules/gulp/bin/gulp.js build",

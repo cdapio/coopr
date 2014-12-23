@@ -307,10 +307,10 @@ gulp.task('develop-server', function () {
       'Gulpfile.js'
     ],
     env: {
-      'NODE_ENV': 'development'
+
     },
     nodeArgs: ['--debug']
-  })
+  });
 });
 
 gulp.task('serve', ['watch', 'develop-server']);
