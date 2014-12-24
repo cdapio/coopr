@@ -16,6 +16,9 @@
 
 package co.cask.coopr.client.rest;
 
+import co.cask.cdap.security.authentication.client.AccessToken;
+import com.google.common.base.Supplier;
+
 /**
  * Container for REST client configuration properties.
  */
@@ -29,9 +32,11 @@ public class RestClientConnectionConfig {
   private final String userId;
   private final String tenantId;
   private final boolean verifySSLCert;
+  private Supplier<AccessToken> accessTokenSupplier;
 
   public RestClientConnectionConfig(String host, int port, String apiKey, boolean ssl, String version,
-                                    String userId, String tenantId, boolean verifySSLCert) {
+                                    String userId, String tenantId, boolean verifySSLCert,
+                                    Supplier<AccessToken> accessTokenSupplier) {
     this.host = host;
     this.port = port;
     this.apiKey = apiKey;
@@ -40,6 +45,7 @@ public class RestClientConnectionConfig {
     this.userId = userId;
     this.tenantId = tenantId;
     this.verifySSLCert = verifySSLCert;
+    this.accessTokenSupplier = accessTokenSupplier;
   }
 
   public String getHost() {
@@ -56,6 +62,13 @@ public class RestClientConnectionConfig {
 
   public String getAPIKey() {
     return apiKey;
+  }
+
+  public AccessToken getAccessToken() {
+    if (accessTokenSupplier == null) {
+      return null;
+    }
+    return accessTokenSupplier.get();
   }
 
   public int getPort() {

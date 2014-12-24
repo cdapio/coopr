@@ -17,8 +17,8 @@
 package co.cask.coopr.shell.command;
 
 import co.cask.common.cli.Arguments;
-import co.cask.common.cli.Command;
 import co.cask.coopr.client.PluginClient;
+import co.cask.coopr.shell.CLIConfig;
 import com.google.inject.Inject;
 
 import java.io.PrintStream;
@@ -26,17 +26,18 @@ import java.io.PrintStream;
 /**
  * Synchronize resources.
  */
-public class SyncResourcesCommand implements Command {
+public class SyncResourcesCommand extends AbstractAuthCommand {
 
   private final PluginClient pluginClient;
 
   @Inject
-  public SyncResourcesCommand(PluginClient pluginClient) {
+  public SyncResourcesCommand(PluginClient pluginClient, CLIConfig cliConfig) {
+    super(cliConfig);
     this.pluginClient = pluginClient;
   }
 
   @Override
-  public void execute(Arguments arguments, PrintStream printStream) throws Exception {
+  public void perform(Arguments arguments, PrintStream printStream) throws Exception {
     pluginClient.syncPlugins();
   }
 

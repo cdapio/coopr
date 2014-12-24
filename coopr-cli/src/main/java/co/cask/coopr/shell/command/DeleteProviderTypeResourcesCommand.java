@@ -18,8 +18,8 @@
 package co.cask.coopr.shell.command;
 
 import co.cask.common.cli.Arguments;
-import co.cask.common.cli.Command;
 import co.cask.coopr.client.PluginClient;
+import co.cask.coopr.shell.CLIConfig;
 import com.google.inject.Inject;
 
 import java.io.PrintStream;
@@ -32,17 +32,18 @@ import static co.cask.coopr.shell.util.Constants.RESOURCE_VERSION;
 /**
  * Delete provider type resource version.
  */
-public class DeleteProviderTypeResourcesCommand implements Command {
+public class DeleteProviderTypeResourcesCommand extends AbstractAuthCommand {
 
   private final PluginClient pluginClient;
 
   @Inject
-  public DeleteProviderTypeResourcesCommand(PluginClient pluginClient) {
+  public DeleteProviderTypeResourcesCommand(PluginClient pluginClient, CLIConfig cliConfig) {
+    super(cliConfig);
     this.pluginClient = pluginClient;
   }
 
   @Override
-  public void execute(Arguments arguments, PrintStream printStream) throws Exception {
+  public void perform(Arguments arguments, PrintStream printStream) throws Exception {
     String providerTypeId = arguments.get(PROVIDER_TYPE_ID);
     String resourceType = arguments.get(RESOURCE_TYPE);
     String resourceName = arguments.get(RESOURCE_NAME);

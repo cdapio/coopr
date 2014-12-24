@@ -17,8 +17,8 @@
 package co.cask.coopr.shell.command;
 
 import co.cask.common.cli.Arguments;
-import co.cask.common.cli.Command;
 import co.cask.coopr.client.ClusterClient;
+import co.cask.coopr.shell.CLIConfig;
 import com.google.inject.Inject;
 
 import java.io.PrintStream;
@@ -29,17 +29,18 @@ import static co.cask.coopr.shell.util.Constants.EXPIRE_TIME_KEY;
 /**
  * Sets the cluster expire time.
  */
-public class SetClusterExpireTimeCommand implements Command {
+public class SetClusterExpireTimeCommand extends AbstractAuthCommand {
 
   private final ClusterClient clusterClient;
 
   @Inject
-  private SetClusterExpireTimeCommand(ClusterClient clusterClient) {
+  private SetClusterExpireTimeCommand(ClusterClient clusterClient, CLIConfig cliConfig) {
+    super(cliConfig);
     this.clusterClient = clusterClient;
   }
 
   @Override
-  public void execute(Arguments arguments, PrintStream printStream) throws Exception {
+  public void perform(Arguments arguments, PrintStream printStream) throws Exception {
     String clusterId = arguments.get(CLUSTER_ID_KEY);
     long expireTime = arguments.getLong(EXPIRE_TIME_KEY);
     clusterClient.setClusterExpireTime(clusterId, expireTime);

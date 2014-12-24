@@ -272,6 +272,12 @@
             <version>1.9.13</version>
         </dependency>
 
+        <dependency>
+          <groupId>co.cask.cdap</groupId>
+          <artifactId>cdap-authentication-client</artifactId>
+          <version>1.1.0</version>
+        </dependency>
+
         <!-- Test dependencies -->
         <dependency>
             <groupId>junit</groupId>

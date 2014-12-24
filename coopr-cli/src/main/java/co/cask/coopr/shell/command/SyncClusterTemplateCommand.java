@@ -17,8 +17,8 @@
 package co.cask.coopr.shell.command;
 
 import co.cask.common.cli.Arguments;
-import co.cask.common.cli.Command;
 import co.cask.coopr.client.ClusterClient;
+import co.cask.coopr.shell.CLIConfig;
 import com.google.inject.Inject;
 
 import java.io.PrintStream;
@@ -28,17 +28,18 @@ import static co.cask.coopr.shell.util.Constants.CLUSTER_ID_KEY;
 /**
  * Synchronize the cluster template.
  */
-public class SyncClusterTemplateCommand implements Command {
+public class SyncClusterTemplateCommand extends AbstractAuthCommand {
 
   private final ClusterClient clusterClient;
 
   @Inject
-  private SyncClusterTemplateCommand(ClusterClient clusterClient) {
+  private SyncClusterTemplateCommand(ClusterClient clusterClient, CLIConfig cliConfig) {
+    super(cliConfig);
     this.clusterClient = clusterClient;
   }
 
   @Override
-  public void execute(Arguments arguments, PrintStream printStream) throws Exception {
+  public void perform(Arguments arguments, PrintStream printStream) throws Exception {
     String clusterId = arguments.get(CLUSTER_ID_KEY);
     clusterClient.syncClusterTemplate(clusterId);
   }

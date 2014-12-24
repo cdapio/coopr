@@ -17,8 +17,8 @@
 package co.cask.coopr.shell.command;
 
 import co.cask.common.cli.Arguments;
-import co.cask.common.cli.Command;
 import co.cask.coopr.client.TenantClient;
+import co.cask.coopr.shell.CLIConfig;
 import co.cask.coopr.shell.util.CliUtil;
 import com.google.inject.Inject;
 
@@ -29,17 +29,18 @@ import static co.cask.coopr.shell.util.Constants.NAME_KEY;
 /**
  * Gets the tenant.
  */
-public class GetTenantCommand implements Command {
+public class GetTenantCommand extends AbstractAuthCommand {
 
   private final TenantClient tenantClient;
 
   @Inject
-  private GetTenantCommand(TenantClient tenantClient) {
+  private GetTenantCommand(TenantClient tenantClient, CLIConfig cliConfig) {
+    super(cliConfig);
     this.tenantClient = tenantClient;
   }
 
   @Override
-  public void execute(Arguments arguments, PrintStream printStream) throws Exception {
+  public void perform(Arguments arguments, PrintStream printStream) throws Exception {
     String name = arguments.get(NAME_KEY);
     printStream.print(CliUtil.getPrettyJson(tenantClient.getTenant(name)));
   }

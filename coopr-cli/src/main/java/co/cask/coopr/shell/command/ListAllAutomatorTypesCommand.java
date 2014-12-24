@@ -18,8 +18,8 @@ package co.cask.coopr.shell.command;
 
 
 import co.cask.common.cli.Arguments;
-import co.cask.common.cli.Command;
 import co.cask.coopr.client.PluginClient;
+import co.cask.coopr.shell.CLIConfig;
 import co.cask.coopr.shell.util.CliUtil;
 import com.google.inject.Inject;
 
@@ -28,17 +28,18 @@ import java.io.PrintStream;
 /**
  * Lists all automator types.
  */
-public class ListAllAutomatorTypesCommand implements Command {
+public class ListAllAutomatorTypesCommand extends AbstractAuthCommand {
 
   private final PluginClient pluginClient;
 
   @Inject
-  public ListAllAutomatorTypesCommand(PluginClient pluginClient) {
+  public ListAllAutomatorTypesCommand(PluginClient pluginClient, CLIConfig cliConfig) {
+    super(cliConfig);
     this.pluginClient = pluginClient;
   }
 
   @Override
-  public void execute(Arguments arguments, PrintStream printStream) throws Exception {
+  public void perform(Arguments arguments, PrintStream printStream) throws Exception {
     printStream.print(CliUtil.getPrettyJson(pluginClient.getAllAutomatorTypes()));
   }
 

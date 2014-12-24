@@ -17,9 +17,9 @@
 package co.cask.coopr.shell.command;
 
 import co.cask.common.cli.Arguments;
-import co.cask.common.cli.Command;
 import co.cask.coopr.client.ClusterClient;
 import co.cask.coopr.http.request.ClusterOperationRequest;
+import co.cask.coopr.shell.CLIConfig;
 import co.cask.coopr.shell.util.CliUtil;
 import com.google.inject.Inject;
 
@@ -32,17 +32,18 @@ import static co.cask.coopr.shell.util.Constants.SERVICE_ID_KEY;
 /**
  * Starts service on cluster.
  */
-public class StartServiceOnClusterCommand implements Command {
+public class StartServiceOnClusterCommand extends AbstractAuthCommand {
 
   private final ClusterClient clusterClient;
 
   @Inject
-  private StartServiceOnClusterCommand(ClusterClient clusterClient) {
+  private StartServiceOnClusterCommand(ClusterClient clusterClient, CLIConfig cliConfig) {
+    super(cliConfig);
     this.clusterClient = clusterClient;
   }
 
   @Override
-  public void execute(Arguments arguments, PrintStream printStream) throws Exception {
+  public void perform(Arguments arguments, PrintStream printStream) throws Exception {
     String clusterId = arguments.get(CLUSTER_ID_KEY);
     String serviceId = arguments.get(SERVICE_ID_KEY);
     ClusterOperationRequest clusterOperationRequest = CliUtil.getObjectFromJson(arguments, PROVIDER_FIELDS_KEY,

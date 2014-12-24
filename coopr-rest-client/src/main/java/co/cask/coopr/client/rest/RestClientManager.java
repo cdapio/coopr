@@ -16,12 +16,14 @@
 
 package co.cask.coopr.client.rest;
 
+import co.cask.cdap.security.authentication.client.AccessToken;
 import co.cask.coopr.client.AdminClient;
 import co.cask.coopr.client.ClientManager;
 import co.cask.coopr.client.ClusterClient;
 import co.cask.coopr.client.PluginClient;
 import co.cask.coopr.client.ProvisionerClient;
 import co.cask.coopr.client.TenantClient;
+import com.google.common.base.Supplier;
 import com.google.gson.Gson;
 import org.apache.http.config.Registry;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
@@ -58,7 +60,8 @@ public class RestClientManager implements ClientManager {
   private RestClientManager(Builder builder) {
     RestClientConnectionConfig connectionConfig =
       new RestClientConnectionConfig(builder.host, builder.port, builder.apiKey, builder.ssl, builder.version,
-                                     builder.userId, builder.tenantId, builder.verifySSLCert);
+                                     builder.userId, builder.tenantId, builder.verifySSLCert,
+                                     builder.accessTokenSupplier);
     if (!builder.verifySSLCert) {
       try {
         connectionRegistry = RestUtil.getRegistryWithDisabledCertCheck();
@@ -142,6 +145,7 @@ public class RestClientManager implements ClientManager {
     private String userId;
     private String tenantId;
     private Gson gson = DEFAULT_GSON_INSTANCE;
+    private Supplier<AccessToken> accessTokenSupplier;
 
     public Builder(String host, int port) {
       this.host = host;
@@ -160,6 +164,11 @@ public class RestClientManager implements ClientManager {
 
     public Builder apiKey(String apiKey) {
       this.apiKey = apiKey;
+      return this;
+    }
+
+    public Builder accessToken(Supplier<AccessToken> accessTokenSupplier) {
+      this.accessTokenSupplier = accessTokenSupplier;
       return this;
     }
 

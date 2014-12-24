@@ -16,7 +16,9 @@
 
 package co.cask.coopr.client.rest;
 
+import co.cask.cdap.security.authentication.client.AccessToken;
 import co.cask.common.http.exception.HttpFailureException;
+import co.cask.coopr.client.rest.exception.UnauthorizedAccessTokenException;
 import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -34,6 +36,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
+import org.jboss.netty.handler.codec.http.HttpHeaders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,6 +61,7 @@ public class RestClient {
   private static final String COOPR_API_KEY_HEADER_NAME = "Coopr-ApiKey";
   private static final String COOPR_TENANT_ID_HEADER_NAME = "Coopr-TenantID";
   private static final String COOPR_USER_ID_HEADER_NAME = "Coopr-UserID";
+  private static final int NUMBER_OF_AUTH_HEADERS = 4;
 
   private final Gson gson;
   private final RestClientConnectionConfig config;
@@ -114,7 +118,7 @@ public class RestClient {
       case HttpStatus.SC_BAD_REQUEST:
         throw new HttpFailureException("Bad request HTTP code was received from the Coopr Server.", code);
       case HttpStatus.SC_UNAUTHORIZED:
-        throw new HttpFailureException(response.toString(), code);
+        throw new UnauthorizedAccessTokenException(response.toString());
       case HttpStatus.SC_FORBIDDEN:
         throw new HttpFailureException("Forbidden HTTP code was received from the Coopr Server", code);
       case HttpStatus.SC_METHOD_NOT_ALLOWED:
@@ -217,12 +221,18 @@ public class RestClient {
   }
 
   private Header[] getAuthHeaders() {
-    Header[] authHeaders = new Header[3];
-    authHeaders[0] = new BasicHeader(COOPR_USER_ID_HEADER_NAME, config.getUserId());
-    authHeaders[1] = new BasicHeader(COOPR_TENANT_ID_HEADER_NAME, config.getTenantId());
+    Header[] authHeaders = new Header[NUMBER_OF_AUTH_HEADERS];
+    int authHeaderIndex = 0;
+    authHeaders[authHeaderIndex++] = new BasicHeader(COOPR_USER_ID_HEADER_NAME, config.getUserId());
+    authHeaders[authHeaderIndex++] = new BasicHeader(COOPR_TENANT_ID_HEADER_NAME, config.getTenantId());
     //TODO: For now it is not a mandatory field
     if (!Strings.isNullOrEmpty(config.getAPIKey())) {
-      authHeaders[2] = new BasicHeader(COOPR_API_KEY_HEADER_NAME, config.getAPIKey());
+      authHeaders[authHeaderIndex++] = new BasicHeader(COOPR_API_KEY_HEADER_NAME, config.getAPIKey());
+    }
+    if (config.getAccessToken() != null) {
+      authHeaders[authHeaderIndex] = new BasicHeader(HttpHeaders.Names.AUTHORIZATION,
+                                                     String.format("%s: %s", config.getAccessToken().getTokenType(),
+                                                                   config.getAccessToken().getValue()));
     }
     return authHeaders;
   }
