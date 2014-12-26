@@ -22,7 +22,7 @@
         ng-model="model.clusterTemplate"
         required>
           <option ng-repeat="ctpl in availableTemplates"
-            label="{{ ctpl.name }}"
+            ng-bind="ctpl.name"
             value="{{ ctpl.name }}"
             title="{{ ctpl.description }}"></option>
       </select>
