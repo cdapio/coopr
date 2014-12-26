@@ -10,15 +10,18 @@ import org.junit.Test;
 public class LeaseDurationTest {
 
   @Test
-  public void testStringConstructor() {
+  public void testLeaseDuration() {
     LeaseDuration leaseDuration = new LeaseDuration("7d", "min", "min");
     Assert.assertEquals(604800000, leaseDuration.getInitial());
+    Assert.assertEquals(0, leaseDuration.getStep());
     leaseDuration = new LeaseDuration("3s", "min", "min");
     Assert.assertEquals(3000, leaseDuration.getInitial());
     leaseDuration = new LeaseDuration("5m", "min", "min");
     Assert.assertEquals(300000, leaseDuration.getInitial());
     leaseDuration = new LeaseDuration("10h", "min", "min");
     Assert.assertEquals(36000000, leaseDuration.getInitial());
+    leaseDuration = new LeaseDuration("max", "min", "min");
+    Assert.assertEquals(Long.MAX_VALUE, leaseDuration.getInitial());
   }
 
   @Test(expected = IllegalArgumentException.class)
