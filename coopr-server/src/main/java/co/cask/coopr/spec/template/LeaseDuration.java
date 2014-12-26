@@ -114,6 +114,20 @@ public final class LeaseDuration {
    * @throws InvalidClusterException if the requested lease is larger than the allowed initial lease, or if it is
    *                                 less than negative one.
    */
+  public long calcInitialLease(String requestedInitialLease) throws InvalidClusterException {
+    return calcInitialLease(getTimestamp(requestedInitialLease));
+  }
+
+  /**
+   * Calculate the initial lease to use given the initial lease here and a requested initial lease. The requested
+   * lease must be equal to or less than the initial lease here. Takes into account that a lease of 0 is an infinite
+   * lease.
+   *
+   * @param requestedInitialLease Requested initial lease.
+   * @return The smaller of the leases.
+   * @throws InvalidClusterException if the requested lease is larger than the allowed initial lease, or if it is
+   *                                 less than negative one.
+   */
   public long calcInitialLease(long requestedInitialLease) throws InvalidClusterException {
     // Determine valid lease duration for the cluster.
     // It has to be less than the initial lease duration set in template.

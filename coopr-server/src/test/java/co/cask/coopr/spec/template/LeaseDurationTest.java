@@ -39,7 +39,7 @@ public class LeaseDurationTest {
   @Test
   public void testCalcInitialLease() throws InvalidClusterException {
     LeaseDuration leaseDuration = new LeaseDuration("15m", "min", "min");
-    Assert.assertEquals(200, leaseDuration.calcInitialLease(200));
+    Assert.assertEquals(2000, leaseDuration.calcInitialLease("2s"));
   }
 
   @Test
@@ -63,6 +63,6 @@ public class LeaseDurationTest {
   @Test(expected = InvalidClusterException.class)
   public void testRequestedLeaseTooBig() throws InvalidClusterException {
     LeaseDuration leaseDuration = new LeaseDuration("5m", "0", "0");
-    leaseDuration.calcInitialLease(300001);
+    leaseDuration.calcInitialLease("6m");
   }
 }
