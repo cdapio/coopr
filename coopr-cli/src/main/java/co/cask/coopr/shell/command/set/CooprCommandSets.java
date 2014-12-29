@@ -28,6 +28,7 @@ import co.cask.coopr.shell.command.DeleteClusterCommand;
 import co.cask.coopr.shell.command.DeleteClusterTemplateCommand;
 import co.cask.coopr.shell.command.DeleteHardwareTypeCommand;
 import co.cask.coopr.shell.command.DeleteImageTypeCommand;
+import co.cask.coopr.shell.command.DeletePartialTemplateCommand;
 import co.cask.coopr.shell.command.DeleteProviderCommand;
 import co.cask.coopr.shell.command.DeleteProviderTypeResourcesCommand;
 import co.cask.coopr.shell.command.DeleteServiceCommand;
@@ -39,6 +40,7 @@ import co.cask.coopr.shell.command.GetClusterStatusCommand;
 import co.cask.coopr.shell.command.GetClusterTemplateCommand;
 import co.cask.coopr.shell.command.GetHardwareTypeCommand;
 import co.cask.coopr.shell.command.GetImageTypeCommand;
+import co.cask.coopr.shell.command.GetPartialTemplateCommand;
 import co.cask.coopr.shell.command.GetProviderCommand;
 import co.cask.coopr.shell.command.GetProviderTypeCommand;
 import co.cask.coopr.shell.command.GetProvisionerCommand;
@@ -52,6 +54,7 @@ import co.cask.coopr.shell.command.ListClusterTemplatesCommand;
 import co.cask.coopr.shell.command.ListClustersCommand;
 import co.cask.coopr.shell.command.ListHardwareTypesCommand;
 import co.cask.coopr.shell.command.ListImageTypesCommand;
+import co.cask.coopr.shell.command.ListPartialTemplatesCommand;
 import co.cask.coopr.shell.command.ListProviderTypeResourcesCommand;
 import co.cask.coopr.shell.command.ListProvidersCommand;
 import co.cask.coopr.shell.command.ListProvisionersCommand;
@@ -118,16 +121,19 @@ public class CooprCommandSets {
   private static CommandSet<Command> getAdminCommandSet(Injector injector) {
     List<Command> commands = ImmutableList.of(
       injector.getInstance(DeleteClusterTemplateCommand.class),
+      injector.getInstance(DeletePartialTemplateCommand.class),
       injector.getInstance(DeleteHardwareTypeCommand.class),
       injector.getInstance(DeleteImageTypeCommand.class),
       injector.getInstance(DeleteProviderCommand.class),
       injector.getInstance(DeleteServiceCommand.class),
       injector.getInstance(GetClusterTemplateCommand.class),
+      injector.getInstance(GetPartialTemplateCommand.class),
       injector.getInstance(GetHardwareTypeCommand.class),
       injector.getInstance(GetImageTypeCommand.class),
       injector.getInstance(GetProviderCommand.class),
       injector.getInstance(GetServiceCommand.class),
       injector.getInstance(ListClusterTemplatesCommand.class),
+      injector.getInstance(ListPartialTemplatesCommand.class),
       injector.getInstance(ListHardwareTypesCommand.class),
       injector.getInstance(ListImageTypesCommand.class),
       injector.getInstance(ListProvidersCommand.class),

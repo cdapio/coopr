@@ -134,6 +134,7 @@ public class RestClient {
   }
 
   protected <T> List<T> getAll(URI url, Type type) throws IOException {
+    System.out.println(url.toString());
     HttpGet getRequest = new HttpGet(url);
     CloseableHttpResponse httpResponse = execute(getRequest);
     List<T> resultList;
