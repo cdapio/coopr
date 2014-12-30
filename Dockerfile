@@ -24,7 +24,7 @@ RUN apt-get update && \
     apt-get install -y software-properties-common python-software-properties && \
     add-apt-repository ppa:chris-lea/node.js && \
     apt-get update && \
-    apt-get install -y curl nodejs maven unzip ruby1.9.3 build-essential && \
+    apt-get install -y curl nodejs maven unzip ruby1.9.3 build-essential git && \
     apt-get install -y --no-install-recommends openjdk-7-jdk
 
 RUN gem install fog --version 1.26.0 --no-rdoc --no-ri && gem install sinatra --version 1.4.5 --no-rdoc --no-ri && \
@@ -57,7 +57,7 @@ EXPOSE 8100
 EXPOSE 55054
 
 # Clean UP (reduce space usage of container as much as possible)
-RUN apt-get purge -y maven unzip build-essential && \
+RUN apt-get purge -y maven unzip build-essential git && \
     apt-get autoclean && \
     apt-get -y autoremove 
 
