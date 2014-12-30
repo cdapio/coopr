@@ -204,7 +204,7 @@ load_defaults () {
   wait_for_server
 
   echo "Loading default configuration..."
-  ${COOPR_HOME}/server/templates/bin/load-templates.sh && touch ${COOPR_DATA_DIR}/.load_defaults
+  ${COOPR_HOME}/server/templates/bin/load-templates.sh && touch ${COOPR_DATA_DIR}/.load_defaults || die "Couldn't upload templates"
 
   # register the default plugins with the server
   provisioner register
