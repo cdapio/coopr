@@ -4,8 +4,8 @@
     "description": "Cask DAP (CDAP) and Hadoop cluster with single master",
     "defaults": {
         "services": [
-            "zookeeper­server",
-            "mysql­server",
+            "zookeeper-server",
+            "mysql-server",
             "cdap",
             {
                 "name": "bob",
@@ -15,9 +15,9 @@
             }
         ],
         "provider": "google",
-        "hardwaretype": "standard­large",
+        "hardwaretype": "standard-large",
         "imagetype": "centos6",
-        "dnsSuffix": "dev.continuuity.net",
+        "dnsSuffix": "example.com",
         "config": {
             "mysql": {
                 "server_debian_password": "somedefaultpassword",
@@ -40,7 +40,7 @@
     },
     "compatibility": {
         "hardwaretypes": [
-            "standard­large",
+            "standard-large",
             "standard-xlarge"
         ],
         "imagetypes": [
@@ -48,9 +48,9 @@
             "ubuntu12"
         ],
         "services": [
-            "zookeeper­server",
+            "zookeeper-server",
             "cdap",
-            "mysql­server"
+            "mysql-server"
         ]
     },
     "constraints": {
