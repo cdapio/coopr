@@ -36,6 +36,7 @@ RUN mkdir /Build /Software
 
 # copy the minimum needed software (to build it) to the container
 COPY *xml /Build/
+COPY LICENSE /Build/
 COPY coopr-cli /Build/coopr-cli
 COPY coopr-provisioner /Build/coopr-provisioner
 COPY coopr-rest-client /Build/coopr-rest-client
