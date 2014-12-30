@@ -47,7 +47,7 @@ COPY coopr-ui /Build/coopr-ui
 
 # build coopr-standalone zip file, copy it to container and extract it
 RUN cd Build/coopr-standalone && \
-    MAVEN_OPTS="-Xmx512m" mvn clean package assembly:single -DskipTests && \
+    MAVEN_OPTS="-Xmx512m" mvn package assembly:single -DskipTests && \
     unzip target/coopr-[0-9]*.[0-9]*.[0-9]*-standalone.zip -d /Software && \
     cd /Software && \
     rm -rf /Build /root/.m2 /var/cache/debconf/*-old /usr/share/{doc,man} \
