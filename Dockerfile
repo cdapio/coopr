@@ -24,8 +24,7 @@ RUN apt-get update && \
     apt-get install -y software-properties-common python-software-properties && \
     add-apt-repository ppa:chris-lea/node.js && \
     apt-get update && \
-    apt-get install -y curl nodejs maven unzip ruby1.9.3 build-essential git && \
-    apt-get install -y --no-install-recommends openjdk-7-jdk
+    apt-get install -y curl nodejs maven unzip ruby1.9.3 build-essential git
 
 RUN gem install fog --version 1.26.0 --no-rdoc --no-ri && gem install sinatra --version 1.4.5 --no-rdoc --no-ri && \
     gem install thin --version 1.6.2 --no-rdoc --no-ri && gem install rest_client --version 1.7.3 --no-rdoc --no-ri && \
