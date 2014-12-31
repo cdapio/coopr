@@ -64,6 +64,6 @@ RUN apt-get purge -y maven unzip build-essential git && \
 
 ENV JAVA_HOME /usr/lib/jvm/java-6-openjdk-amd64
 
-# start CDAP in the background and tail in the foreground
+# start COOPR in the background and tail in the foreground
 ENTRYPOINT /Software/coopr-[0-9]*.[0-9]*.[0-9]*-standalone/bin/coopr.sh start && \
     /usr/bin/tail -F /Software/coopr-[0-9]*.[0-9]*.[0-9]*-standalone/logs/*.log
