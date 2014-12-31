@@ -77,24 +77,26 @@ sed -i.old "s/COOPR_DATA_DIR/${SED_COOPR_DATA_DIR}/g" ${COOPR_SERVER_CONF}/coopr
 sed -i.old "s/COOPR_DATA_DIR/${SED_COOPR_DATA_DIR}/g" ${COOPR_PROVISIONER_CONF}/provisioner-site.xml
 
 # Determine the Java command to use to start the JVM.
-if [ -n ${JAVA_HOME} ]; then
-    if [ -x ${JAVA_HOME}/jre/sh/java ]; then
+if [ -n "${JAVA_HOME}" ]; then
+    if [ -x "${JAVA_HOME}/jre/sh/java" ]; then
         # IBM's JDK on AIX uses strange locations for the executables
         JAVACMD="${JAVA_HOME}/jre/sh/java"
     else
         JAVACMD="${JAVA_HOME}/bin/java"
     fi
-    if [ ! -x ${JAVACMD} ]; then
-        unset JAVACMD
-    fi
-fi
-
-JAVACMD=${JAVACMD:-`which java >/dev/null 2>&1`}
-
-test -x ${JAVACMD} >/dev/null 2>&1 || die "JAVA_HOME is not set and no 'java' command could be found in your PATH.
+    if [ ! -x "${JAVACMD}" ]; then
+        die "JAVA_HOME is set to an invalid directory: ${JAVA_HOME}
 
 Please set the JAVA_HOME variable in your environment to match the
 location of your Java installation."
+    fi
+else
+    JAVACMD="java"
+    which java >/dev/null 2>&1 || die "JAVA_HOME is not set and no 'java' command could be found in your PATH.
+
+Please set the JAVA_HOME variable in your environment to match the
+location of your Java installation."
+fi
 
 # java version check
 JAVA_VERSION=`${JAVACMD} -version 2>&1 | grep "java version" | awk '{print $3}' | awk -F '.' '{print $2}'`
