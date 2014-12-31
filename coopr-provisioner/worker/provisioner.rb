@@ -123,10 +123,15 @@ end
 @plugin_env = options
 
 def _run_plugin(clazz, env, cwd, task)
+  clusterId = task['clusterId']
+  taskName = task['taskName'].downcase
+  log.info "Performing CREATE task for cluster #{clusterId}" if taskName == 'create'
+
   object = clazz.new(env, task)
   FileUtils.mkdir_p(cwd)
   Dir.chdir(cwd) do
     result = object.runTask
+    log.info "#{clusterId} could not be deleted: #{result['message']}" if taskName == 'delete' && result['status'] != 0
   end
 end
 
