@@ -35,8 +35,7 @@ RUN gem install fog --version 1.26.0 --no-rdoc --no-ri && gem install sinatra --
 RUN mkdir /Build /Software
 
 # copy the minimum needed software (to build it) to the container
-COPY *xml /Build/
-COPY LICENSE /Build/
+COPY *xml LICENSE /Build/
 COPY coopr-cli /Build/coopr-cli
 COPY coopr-docs /Build/coopr-docs
 COPY coopr-provisioner /Build/coopr-provisioner
