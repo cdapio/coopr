@@ -85,18 +85,16 @@ if [ -n ${JAVA_HOME} ]; then
         JAVACMD="${JAVA_HOME}/bin/java"
     fi
     if [ ! -x ${JAVACMD} ]; then
-        die "JAVA_HOME is set to an invalid directory: ${JAVA_HOME}
-
-Please set the JAVA_HOME variable in your environment to match the
-location of your Java installation."
+        unset JAVACMD
     fi
-else
-    JAVACMD="java"
-    which ${JAVACMD} >/dev/null 2>&1 || die "JAVA_HOME is not set and no 'java' command could be found in your PATH.
+fi
+
+JAVACMD=${JAVACMD:-`which java >/dev/null 2>&1`}
+
+test -x ${JAVACMD} >/dev/null 2>&1 || die "JAVA_HOME is not set and no 'java' command could be found in your PATH.
 
 Please set the JAVA_HOME variable in your environment to match the
 location of your Java installation."
-fi
 
 # java version check
 JAVA_VERSION=`${JAVACMD} -version 2>&1 | grep "java version" | awk '{print $3}' | awk -F '.' '{print $2}'`
