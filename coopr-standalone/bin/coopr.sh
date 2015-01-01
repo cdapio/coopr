@@ -76,6 +76,15 @@ SED_COOPR_DATA_DIR=`echo ${COOPR_DATA_DIR} | sed 's:/:\\\/:g'`
 sed -i.old "s/COOPR_DATA_DIR/${SED_COOPR_DATA_DIR}/g" ${COOPR_SERVER_CONF}/coopr-site.xml
 sed -i.old "s/COOPR_DATA_DIR/${SED_COOPR_DATA_DIR}/g" ${COOPR_PROVISIONER_CONF}/provisioner-site.xml
 
+# Setup host
+if test -e /proc/1/cgroup && grep docker /proc/1/cgroup 2>&1 >/dev/null; then
+  SED_COOPR_HOST=`hostname -i`
+else
+  SED_COOPR_HOST='localhost'
+fi
+sed -i.old "s/COOPR_HOST/${SED_COOPR_HOST}/g" ${COOPR_SERVER_CONF}/coopr-site.xml
+sed -i.old "s/COOPR_HOST/${SED_COOPR_HOST}/g" ${COOPR_PROVISIONER_CONF}/provisioner-site.xml
+
 # Determine the Java command to use to start the JVM.
 if [ -n "${JAVA_HOME}" ]; then
     if [ -x "${JAVA_HOME}/jre/sh/java" ]; then
