@@ -124,14 +124,18 @@ end
 
 def _run_plugin(clazz, env, cwd, task)
   clusterId = task['clusterId']
+  hostname = task['config']['hostname']
+  provider = task['config']['provider']['description']
+  image = task['config']['image']
+  hardware = task['config']['hardwaretype']
   taskName = task['taskName'].downcase
-  log.info "Performing CREATE task for cluster #{clusterId}" if taskName == 'create'
+  log.info "Creating node #{hostname} on #{provider} for #{clusterId} using #{image} on #{hardware}"
 
   object = clazz.new(env, task)
   FileUtils.mkdir_p(cwd)
   Dir.chdir(cwd) do
     result = object.runTask
-    log.info "#{clusterId} could not be deleted: #{result['message']}" if taskName == 'delete' && result['status'] != 0
+    log.info "#{clusterId} on #{hostname} could not be deleted: #{result['message']}" if taskName == 'delete' && result['status'] != 0
   end
 end
 
