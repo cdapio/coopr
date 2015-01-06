@@ -1,5 +1,5 @@
 /*
- * Copyright © 2012-2014 Cask Data, Inc.
+ * Copyright © 2012-2015 Cask Data, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,6 +57,6 @@ public class RecallProviderTypeResourcesCommand implements Command {
 
   @Override
   public String getDescription() {
-    return "Recall a specific version of a provider type resource.";
+    return "Recall a specific version of a provider type resource";
   }
 }

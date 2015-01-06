@@ -1,5 +1,5 @@
 /*
- * Copyright © 2012-2014 Cask Data, Inc.
+ * Copyright © 2012-2015 Cask Data, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,11 +44,11 @@ public class ListAllAutomatorTypesCommand implements Command {
 
   @Override
   public String getPattern() {
-    return String.format("list all automatortypes");
+    return String.format("list automator types");
   }
 
   @Override
   public String getDescription() {
-    return "Lists all automator types";
+    return "List all automator types";
   }
 }
