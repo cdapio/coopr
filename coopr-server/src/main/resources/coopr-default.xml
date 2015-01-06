@@ -23,9 +23,9 @@
     </property>
 
     <property>
-      <name>server.tasks.port</name>
-      <value>55055</value>
-      <description>Specifies the port for internal API to bind to</description>
+        <name>server.tasks.port</name>
+        <value>55055</value>
+        <description>Specifies the port for internal API to bind to</description>
     </property>
 
     <property>
@@ -35,15 +35,15 @@
     </property>
 
     <property>
-      <name>server.ssl.enabled</name>
-      <value>false</value>
-      <description>Enable SSl for external API</description>
+        <name>server.ssl.enabled</name>
+        <value>false</value>
+        <description>Enable SSl for external API</description>
     </property>
 
     <property>
-      <name>server.tasks.ssl.enabled</name>
-      <value>false</value>
-      <description>Enable SSl for internal API</description>
+        <name>server.tasks.ssl.enabled</name>
+        <value>false</value>
+        <description>Enable SSl for internal API</description>
     </property>
 
     <property>
