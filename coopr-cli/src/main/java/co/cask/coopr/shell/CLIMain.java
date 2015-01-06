@@ -106,6 +106,7 @@ public class CLIMain {
     }
 
     CLIConfig config = new CLIConfig(host, port, userId, tenantId);
+    config.setDefaultConnection();
     CLIMain shell = new CLIMain(config);
 
     if (args.length == 0) {

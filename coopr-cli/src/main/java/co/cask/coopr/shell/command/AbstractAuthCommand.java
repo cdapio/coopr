@@ -17,38 +17,32 @@
 package co.cask.coopr.shell.command;
 
 import co.cask.common.cli.Arguments;
-import co.cask.coopr.client.AdminClient;
+import co.cask.common.cli.Command;
+import co.cask.coopr.client.rest.exception.UnauthorizedAccessTokenException;
 import co.cask.coopr.shell.CLIConfig;
-import co.cask.coopr.shell.util.CliUtil;
-import com.google.inject.Inject;
 
 import java.io.PrintStream;
 
 /**
- * Lists all services.
+ * Abstract command for updating {@link co.cask.cdap.security.authentication.client.AccessToken}.
  */
-public class ListServicesCommand extends AbstractAuthCommand {
+public abstract class AbstractAuthCommand implements Command {
 
-  private final AdminClient adminClient;
+  private final CLIConfig cliConfig;
 
-  @Inject
-  private ListServicesCommand(AdminClient adminClient, CLIConfig cliConfig) {
-    super(cliConfig);
-    this.adminClient = adminClient;
+  protected AbstractAuthCommand(CLIConfig cliConfig) {
+    this.cliConfig = cliConfig;
   }
 
   @Override
-  public void perform(Arguments arguments, PrintStream printStream) throws Exception {
-    printStream.print(CliUtil.getPrettyJson(adminClient.getAllServices()));
+  public void execute(Arguments arguments, PrintStream printStream) throws Exception {
+    try {
+      perform(arguments, printStream);
+    } catch (UnauthorizedAccessTokenException e) {
+      cliConfig.updateAccessToken();
+      perform(arguments, printStream);
+    }
   }
 
-  @Override
-  public String getPattern() {
-    return "list services";
-  }
-
-  @Override
-  public String getDescription() {
-    return "Lists all services";
-  }
+  abstract void perform(Arguments arguments, PrintStream printStream) throws Exception;
 }

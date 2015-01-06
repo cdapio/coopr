@@ -17,9 +17,9 @@
 package co.cask.coopr.shell.command;
 
 import co.cask.common.cli.Arguments;
-import co.cask.common.cli.Command;
 import co.cask.coopr.client.ClusterClient;
 import co.cask.coopr.http.request.ClusterConfigureRequest;
+import co.cask.coopr.shell.CLIConfig;
 import co.cask.coopr.shell.util.CliUtil;
 import com.google.inject.Inject;
 
@@ -31,17 +31,18 @@ import static co.cask.coopr.shell.util.Constants.CLUSTER_ID_KEY;
 /**
  * Sets the cluster config.
  */
-public class SetClusterConfigCommand implements Command {
+public class SetClusterConfigCommand extends AbstractAuthCommand {
 
   private final ClusterClient clusterClient;
 
   @Inject
-  private SetClusterConfigCommand(ClusterClient clusterClient) {
+  private SetClusterConfigCommand(ClusterClient clusterClient, CLIConfig cliConfig) {
+    super(cliConfig);
     this.clusterClient = clusterClient;
   }
 
   @Override
-  public void execute(Arguments arguments, PrintStream printStream) throws Exception {
+  public void perform(Arguments arguments, PrintStream printStream) throws Exception {
     String id = arguments.get(CLUSTER_ID_KEY);
     ClusterConfigureRequest clusterConfigureRequest = CliUtil.getObjectFromJson(arguments, CLUSTER_CONFIG_KEY,
                                                                                 ClusterConfigureRequest.class);

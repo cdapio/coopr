@@ -17,8 +17,8 @@
 package co.cask.coopr.shell.command;
 
 import co.cask.common.cli.Arguments;
-import co.cask.common.cli.Command;
 import co.cask.coopr.client.TenantClient;
+import co.cask.coopr.shell.CLIConfig;
 import co.cask.coopr.shell.util.CliUtil;
 import com.google.inject.Inject;
 
@@ -27,17 +27,18 @@ import java.io.PrintStream;
 /**
  * Lists all tenants.
  */
-public class ListTenantsCommand implements Command {
+public class ListTenantsCommand extends AbstractAuthCommand {
 
   private final TenantClient tenantClient;
 
   @Inject
-  private ListTenantsCommand(TenantClient tenantClient) {
+  private ListTenantsCommand(TenantClient tenantClient, CLIConfig cliConfig) {
+    super(cliConfig);
     this.tenantClient = tenantClient;
   }
 
   @Override
-  public void execute(Arguments arguments, PrintStream printStream) throws Exception {
+  public void perform(Arguments arguments, PrintStream printStream) throws Exception {
     printStream.print(CliUtil.getPrettyJson(tenantClient.getTenants()));
   }
 

@@ -17,8 +17,8 @@
 package co.cask.coopr.shell.command;
 
 import co.cask.common.cli.Arguments;
-import co.cask.common.cli.Command;
 import co.cask.coopr.client.TenantClient;
+import co.cask.coopr.shell.CLIConfig;
 import com.google.inject.Inject;
 
 import java.io.PrintStream;
@@ -28,17 +28,18 @@ import static co.cask.coopr.shell.util.Constants.NAME_KEY;
 /**
  * Deletes a tenant.
  */
-public class DeleteTenantCommand implements Command {
+public class DeleteTenantCommand extends AbstractAuthCommand {
 
   private final TenantClient tenantClient;
 
   @Inject
-  private DeleteTenantCommand(TenantClient tenantClient) {
+  private DeleteTenantCommand(TenantClient tenantClient, CLIConfig cliConfig) {
+    super(cliConfig);
     this.tenantClient = tenantClient;
   }
 
   @Override
-  public void execute(Arguments arguments, PrintStream printStream) throws Exception {
+  public void perform(Arguments arguments, PrintStream printStream) throws Exception {
     String name = arguments.get(NAME_KEY);
     tenantClient.deleteTenant(name);
   }

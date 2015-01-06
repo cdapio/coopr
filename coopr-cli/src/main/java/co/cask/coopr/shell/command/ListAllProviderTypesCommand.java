@@ -17,8 +17,8 @@
 package co.cask.coopr.shell.command;
 
 import co.cask.common.cli.Arguments;
-import co.cask.common.cli.Command;
 import co.cask.coopr.client.PluginClient;
+import co.cask.coopr.shell.CLIConfig;
 import co.cask.coopr.shell.util.CliUtil;
 import com.google.inject.Inject;
 
@@ -27,17 +27,18 @@ import java.io.PrintStream;
 /**
  * Lists all provider types.
  */
-public class ListAllProviderTypesCommand implements Command {
+public class ListAllProviderTypesCommand extends AbstractAuthCommand {
 
   private final PluginClient pluginClient;
 
   @Inject
-  public ListAllProviderTypesCommand(PluginClient pluginClient) {
+  public ListAllProviderTypesCommand(PluginClient pluginClient, CLIConfig cliConfig) {
+    super(cliConfig);
     this.pluginClient = pluginClient;
   }
 
   @Override
-  public void execute(Arguments arguments, PrintStream printStream) throws Exception {
+  public void perform(Arguments arguments, PrintStream printStream) throws Exception {
     printStream.print(CliUtil.getPrettyJson(pluginClient.getAllProviderTypes()));
   }
 

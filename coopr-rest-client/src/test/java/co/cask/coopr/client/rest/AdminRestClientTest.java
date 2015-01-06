@@ -19,6 +19,7 @@ package co.cask.coopr.client.rest;
 import co.cask.common.http.exception.HttpFailureException;
 import co.cask.coopr.Entities;
 import co.cask.coopr.client.AdminClient;
+import co.cask.coopr.client.rest.exception.UnauthorizedAccessTokenException;
 import co.cask.coopr.client.rest.handler.TestStatusUserId;
 import co.cask.coopr.spec.HardwareType;
 import co.cask.coopr.spec.ImageType;
@@ -231,9 +232,8 @@ public class AdminRestClientTest extends RestClientTest {
     adminClient = clientManager.getAdminClient();
     try {
       adminClient.getAllHardwareTypes();
-      Assert.fail("Expected HttpFailureException");
-    } catch (HttpFailureException e) {
-      Assert.assertEquals(HttpStatus.SC_UNAUTHORIZED, e.getStatusCode());
+      Assert.fail("Expected UnauthorizedAccessTokenException");
+    } catch (UnauthorizedAccessTokenException ignored) {
     }
   }
 

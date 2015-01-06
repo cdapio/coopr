@@ -18,6 +18,7 @@ package co.cask.coopr.client.rest;
 
 import co.cask.common.http.exception.HttpFailureException;
 import co.cask.coopr.client.TenantClient;
+import co.cask.coopr.client.rest.exception.UnauthorizedAccessTokenException;
 import co.cask.coopr.client.rest.handler.TestStatusUserId;
 import co.cask.coopr.spec.TenantSpecification;
 import com.google.common.collect.Lists;
@@ -72,9 +73,8 @@ public class TenantRestClientTest extends RestClientTest {
     tenantClient = clientManager.getTenantClient();
     try {
       tenantClient.getTenants();
-      Assert.fail("Expected HttpFailureException");
-    } catch (HttpFailureException e) {
-      Assert.assertEquals(HttpStatus.SC_UNAUTHORIZED, e.getStatusCode());
+      Assert.fail("Expected UnauthorizedAccessTokenException");
+    } catch (UnauthorizedAccessTokenException ignored) {
     }
   }
 
