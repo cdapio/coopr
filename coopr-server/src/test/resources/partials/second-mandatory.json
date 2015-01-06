@@ -1,0 +1,21 @@
+{
+    "name": "second-mandatory",
+    "version": "1",
+    "description": "Second mandatory partial template",
+    "defaults": {
+        "services": [
+            "mandatory-second-service"
+        ],
+        "config": {
+            "ldap": {
+                "endpoint": "ldap.correct.com"
+            }
+
+        }
+    },
+    "compatibility": {
+        "services": [
+            "mandatory-second-service"
+        ]
+    }
+}

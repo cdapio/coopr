@@ -1,12 +1,15 @@
 {
-    "name": "cdap-distributed",
+    "name": "cdap-with-incorrect-dns",
     "version": "1",
-    "description": "Template without defaults services",
+    "description": "Template with incorrect dns",
     "defaults": {
         "provider": "google",
         "hardwaretype": "standard-large",
         "imagetype": "centos6",
-        "dnsSuffix": "example.com",
+        "dnsSuffix": "de@1",
+        "services": [
+            "ldap­internal"
+        ],
         "config": {
             "security.enabled": "true"
         }

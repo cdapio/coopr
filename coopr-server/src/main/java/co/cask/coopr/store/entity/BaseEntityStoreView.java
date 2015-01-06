@@ -113,6 +113,7 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
     SERVICE("service"),
     CLUSTER_TEMPLATE("clusterTemplate"),
     PARTIAL_TEMPLATE("partialTemplate"),
+    MANDATORY_TEMPLATE("mandatoryTemplate"),
     PROVIDER_TYPE("providerType"),
     AUTOMATOR_TYPE("automatorType");
     private final String id;
@@ -301,37 +302,46 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
     deleteEntity(EntityType.CLUSTER_TEMPLATE, clusterTemplateName, version);
   }
 
-  public PartialTemplate getPartialTemplate(String partialTemplateName) throws IOException {
-    return get(EntityType.PARTIAL_TEMPLATE, partialTemplateName, Constants.FIND_MAX_VERSION, partialTemplateTransform);
+  @Override
+  public PartialTemplate getPartialTemplate(String partialTemplateName, boolean isMandatory) throws IOException {
+    EntityType type = isMandatory ? EntityType.MANDATORY_TEMPLATE : EntityType.PARTIAL_TEMPLATE;
+    return get(type, partialTemplateName, Constants.FIND_MAX_VERSION, partialTemplateTransform);
   }
 
-  public PartialTemplate getPartialTemplate(String partialTemplateName, int version) throws IOException {
-    return get(EntityType.PARTIAL_TEMPLATE, partialTemplateName, version, partialTemplateTransform);
+  public PartialTemplate getPartialTemplate(String partialTemplateName, int version, boolean isMandatory)
+          throws IOException {
+    EntityType type = isMandatory ? EntityType.MANDATORY_TEMPLATE : EntityType.PARTIAL_TEMPLATE;
+    return get(type, partialTemplateName, version, partialTemplateTransform);
   }
 
   @Override
-  public Collection<PartialTemplate> getAllPartialTemplates() throws IOException {
-    return getAllEntities(EntityType.PARTIAL_TEMPLATE, partialTemplateTransform);
+  public Collection<PartialTemplate> getAllPartialTemplates(boolean isMandatory) throws IOException {
+    EntityType type = isMandatory ? EntityType.MANDATORY_TEMPLATE : EntityType.PARTIAL_TEMPLATE;
+    return getAllEntities(type, partialTemplateTransform);
   }
 
   @Override
-  public void writePartialTemplate(PartialTemplate partialTemplate) throws IOException, IllegalAccessException {
-    int version = getVersion(EntityType.PARTIAL_TEMPLATE, partialTemplate.getName());
+  public void writePartialTemplate(PartialTemplate partialTemplate, boolean isMandatory) throws IOException,
+    IllegalAccessException {
+    EntityType type = isMandatory ? EntityType.MANDATORY_TEMPLATE : EntityType.PARTIAL_TEMPLATE;
+    int version = getVersion(type, partialTemplate.getName());
     partialTemplate.setVersion(version);
-    writeEntity(EntityType.PARTIAL_TEMPLATE, partialTemplate.getName(), version,
-                serialize(partialTemplate, PartialTemplate.class));
+    writeEntity(type, partialTemplate.getName(), version, serialize(partialTemplate, PartialTemplate.class));
     partialTemplate.setVersion(Constants.DEFAULT_VERSION);
   }
 
   @Override
-  public void deletePartialTemplate(String partialTemplateName) throws IOException, IllegalAccessException {
-    deleteEntity(EntityType.PARTIAL_TEMPLATE, partialTemplateName);
+  public void deletePartialTemplate(String partialTemplateName, boolean isMandatory) throws IOException,
+    IllegalAccessException {
+    EntityType type = isMandatory ? EntityType.MANDATORY_TEMPLATE : EntityType.PARTIAL_TEMPLATE;
+    deleteEntity(type, partialTemplateName);
   }
 
   @Override
-  public void deletePartialTemplate(String partialTemplateName, int version)
+  public void deletePartialTemplate(String partialTemplateName, int version, boolean isMandatory)
     throws IOException, IllegalAccessException {
-    deleteEntity(EntityType.PARTIAL_TEMPLATE, partialTemplateName, version);
+    EntityType type = isMandatory ? EntityType.MANDATORY_TEMPLATE : EntityType.PARTIAL_TEMPLATE;
+    deleteEntity(type, partialTemplateName, version);
   }
 
   @Override

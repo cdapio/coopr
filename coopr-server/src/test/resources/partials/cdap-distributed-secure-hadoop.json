@@ -30,9 +30,7 @@
                     "hive.zookeeper.quorum": "%join(map(host.service.zookeeper-server,'$'),',')%"
                 }
             },
-            "ldap": {
-                "endpoint": "ldap.correct.com"
-            }
+            "security.server.ssl.enabled": "true"
         }
     },
     "compatibility": {

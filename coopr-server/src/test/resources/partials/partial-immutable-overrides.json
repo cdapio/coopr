@@ -1,5 +1,6 @@
 {
     "name": "overrides-partial",
+    "version": "1",
     "description": "Tries to override immutable config property ('sensu_wrapper')",
     "immutable": false,
     "defaults": {

@@ -22,7 +22,6 @@ import com.google.common.collect.ImmutableSet;
 
 import java.util.Set;
 
-
 /**
  * A cluster template defines different types of clusters that will be available for users to create.  Templates
  * define a set of services that are allowed to be placed on the cluster plus some service and layout constraints that

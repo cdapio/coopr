@@ -18,6 +18,7 @@ package co.cask.coopr.http.handler;
 import co.cask.coopr.account.Account;
 import co.cask.coopr.common.conf.Constants;
 import co.cask.coopr.common.queue.QueueMetrics;
+import co.cask.coopr.http.request.PutMandatoryRequest;
 import co.cask.coopr.scheduler.task.TaskQueueService;
 import co.cask.coopr.spec.HardwareType;
 import co.cask.coopr.spec.ImageType;
@@ -36,6 +37,7 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -69,12 +71,15 @@ import javax.ws.rs.PathParam;
 @Path(Constants.API_BASE)
 public class AdminHandler extends AbstractAuthHandler {
   private static final Logger LOG  = LoggerFactory.getLogger(AdminHandler.class);
+  private static final boolean PARTIAL_IS_MANDATORY = false;
+  private static final boolean MANDATORY_IS_MANDATORY = true;
 
   public static final String PROVIDERS = "providers";
   public static final String HARDWARE_TYPES = "hardwaretypes";
   public static final String IMAGE_TYPES = "imagetypes";
   public static final String CLUSTER_TEMPLATES = "clustertemplates";
   public static final String PARTIAL_TEMPLATES = "partialtemplates";
+  public static final String MANDATORY_PARTIALS = "mandatorypartials";
   public static final String SERVICES = "services";
 
   private final EntityStoreService entityStoreService;
@@ -417,8 +422,8 @@ public class AdminHandler extends AbstractAuthHandler {
     }
 
     try {
-      respondToGetEntity(entityStoreService.getView(account).getPartialTemplate(partialtemplateId), "partial template",
-      partialtemplateId, PartialTemplate.class, responder);
+      respondToGetEntity(entityStoreService.getView(account).getPartialTemplate(partialtemplateId,
+                      PARTIAL_IS_MANDATORY), "partial template", partialtemplateId, PartialTemplate.class, responder);
     } catch (IOException e) {
       responder.sendString(HttpResponseStatus.INTERNAL_SERVER_ERROR,
               "Exception getting partial template " + partialtemplateId);
@@ -449,7 +454,8 @@ public class AdminHandler extends AbstractAuthHandler {
     }
 
     try {
-      respondToGetEntity(entityStoreService.getView(account).getPartialTemplate(partialtemplateId, version),
+      respondToGetEntity(entityStoreService.getView(account).getPartialTemplate(partialtemplateId, version,
+                      PARTIAL_IS_MANDATORY),
               "partial template", partialtemplateId, PartialTemplate.class, responder);
     } catch (IOException e) {
       responder.sendString(HttpResponseStatus.INTERNAL_SERVER_ERROR,
@@ -740,10 +746,34 @@ public class AdminHandler extends AbstractAuthHandler {
     }
 
     try {
-      responder.sendJson(HttpResponseStatus.OK, entityStoreService.getView(account).getAllPartialTemplates(),
+      responder.sendJson(HttpResponseStatus.OK, entityStoreService.getView(account)
+                      .getAllPartialTemplates(PARTIAL_IS_MANDATORY),
                          new TypeToken<Collection<PartialTemplate>>() { }.getType(), gson);
     } catch (IOException e) {
       responder.sendString(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception getting partial templates");
+    }
+  }
+
+  /**
+   * Get all mandatory-partials readable by the user.
+   *
+   * @param request The request for mandatory-partials.
+   * @param responder Responder for sending the response.
+   */
+  @GET
+  @Path("/mandatory-partials")
+  public void getMandatoryPartials(HttpRequest request, HttpResponder responder) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+
+    try {
+      responder.sendJson(HttpResponseStatus.OK, entityStoreService.getView(account)
+                      .getAllPartialTemplates(MANDATORY_IS_MANDATORY),
+              new TypeToken<Collection<PartialTemplate>>() { }.getType(), gson);
+    } catch (IOException e) {
+      responder.sendString(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception getting mandatory partials");
     }
   }
 
@@ -1106,7 +1136,7 @@ public class AdminHandler extends AbstractAuthHandler {
     }
 
     try {
-      entityStoreService.getView(account).deletePartialTemplate(partialtemplateId);
+      entityStoreService.getView(account).deletePartialTemplate(partialtemplateId, PARTIAL_IS_MANDATORY);
       responder.sendStatus(HttpResponseStatus.OK);
     } catch (IOException e) {
       responder.sendString(HttpResponseStatus.INTERNAL_SERVER_ERROR,
@@ -1144,13 +1174,44 @@ public class AdminHandler extends AbstractAuthHandler {
     }
 
     try {
-      entityStoreService.getView(account).deletePartialTemplate(partialtemplateId, version);
+      entityStoreService.getView(account).deletePartialTemplate(partialtemplateId, version, PARTIAL_IS_MANDATORY);
       responder.sendStatus(HttpResponseStatus.OK);
     } catch (IOException e) {
       responder.sendString(HttpResponseStatus.INTERNAL_SERVER_ERROR,
               "Exception deleting partial template " + partialtemplateId + " with vesrion " + versionStr);
     } catch (IllegalAccessException e) {
       responder.sendString(HttpResponseStatus.FORBIDDEN, "user unauthorized to delete partial template.");
+    }
+  }
+
+  /**
+   * Delete a specific mandatory-partial. User must be admin or a 403 is returned.
+   *
+   * @param request The request to delete a mandatory-partial.
+   * @param responder Responder for sending the response.
+   * @param mandatorypartialId Id of the mandatory-partial to delete.
+   */
+  @DELETE
+  @Path("/mandatory-partials/{mandatory-partial-id}")
+  public void deleteMandatoryPartial(HttpRequest request, HttpResponder responder,
+                                    @PathParam("mandatory-partial-id") String mandatorypartialId) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+    if (!account.isAdmin()) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized, must be admin.");
+      return;
+    }
+
+    try {
+      entityStoreService.getView(account).deletePartialTemplate(mandatorypartialId, MANDATORY_IS_MANDATORY);
+      responder.sendStatus(HttpResponseStatus.OK);
+    } catch (IOException e) {
+      responder.sendString(HttpResponseStatus.INTERNAL_SERVER_ERROR,
+              "Exception deleting mandatory partial " + mandatorypartialId);
+    } catch (IllegalAccessException e) {
+      responder.sendString(HttpResponseStatus.FORBIDDEN, "user unauthorized to delete mandatory partial.");
     }
   }
 
@@ -1393,11 +1454,67 @@ public class AdminHandler extends AbstractAuthHandler {
     }
 
     try {
-      entityStoreService.getView(account).writePartialTemplate(partialTemplate);
+      entityStoreService.getView(account).writePartialTemplate(partialTemplate, PARTIAL_IS_MANDATORY);
       responder.sendStatus(HttpResponseStatus.OK);
     } catch (IOException e) {
       responder.sendString(HttpResponseStatus.INTERNAL_SERVER_ERROR,
                            "Exception writing partial template " + partialtemplateId);
+    } catch (IllegalAccessException e) {
+      responder.sendString(HttpResponseStatus.FORBIDDEN, "user unauthorized to write partial template.");
+    }
+  }
+
+  /**
+   * Writes a mandatory-partial. User must be admin or a 403 is returned. If the name of partial template
+   * does not match the name in the put body, a 400 is returned.
+   *
+   * @param request Request to write mandatory-partials.
+   * @param responder Responder to send response.
+   */
+  @PUT
+  @Path("/mandatory-partials")
+  public void putMandatoryPartials(HttpRequest request, HttpResponder responder) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+    if (!account.isAdmin()) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized, must be admin.");
+      return;
+    }
+
+    List<PutMandatoryRequest> putMandatoryRequests = getEntityFromRequest(request, responder,
+            new TypeToken<List<PutMandatoryRequest>>() { }.getType());
+    if (putMandatoryRequests == null) {
+      // getEntityFromRequest writes to the responder if there was an issue.
+      return;
+    }
+
+    try {
+      EntityStoreView view = entityStoreService.getView(account);
+      List<PartialTemplate> mandatoryPartials = Lists.newArrayList();
+      for (PutMandatoryRequest putMandatoryRequest : putMandatoryRequests) {
+        PartialTemplate mandatoryPartial = view.getPartialTemplate(putMandatoryRequest.getName(),
+                putMandatoryRequest.getVersion(), PARTIAL_IS_MANDATORY);
+        if (mandatoryPartial == null) {
+          responder.sendString(HttpResponseStatus.BAD_REQUEST, "no such partial exists: " +
+                  putMandatoryRequest.getName() + " with version " + putMandatoryRequest.getVersion());
+          return;
+        }
+
+        if (!validateTemplate(mandatoryPartial, responder)) {
+          return;
+        }
+        mandatoryPartials.add(mandatoryPartial);
+      }
+
+      for (PartialTemplate mandatoryPartial : mandatoryPartials) {
+        view.writePartialTemplate(mandatoryPartial, MANDATORY_IS_MANDATORY);
+      }
+      responder.sendStatus(HttpResponseStatus.OK);
+    } catch (IOException e) {
+      responder.sendString(HttpResponseStatus.INTERNAL_SERVER_ERROR,
+              "Exception writing mandatory partials " + putMandatoryRequests);
     } catch (IllegalAccessException e) {
       responder.sendString(HttpResponseStatus.FORBIDDEN, "user unauthorized to write partial template.");
     }
@@ -1626,7 +1743,7 @@ public class AdminHandler extends AbstractAuthHandler {
 
     try {
       EntityStoreView view = entityStoreService.getView(account);
-      if (view.getPartialTemplate(partialTemplate.getName()) != null) {
+      if (view.getPartialTemplate(partialTemplate.getName(), PARTIAL_IS_MANDATORY) != null) {
         responder.sendString(HttpResponseStatus.CONFLICT,
                              "partial template " + partialTemplate.getName() + " already exists");
       } else {
@@ -1634,7 +1751,7 @@ public class AdminHandler extends AbstractAuthHandler {
           return;
         }
 
-        view.writePartialTemplate(partialTemplate);
+        view.writePartialTemplate(partialTemplate, PARTIAL_IS_MANDATORY);
         responder.sendStatus(HttpResponseStatus.OK);
       }
     } catch (IllegalAccessException e) {
@@ -1681,9 +1798,13 @@ public class AdminHandler extends AbstractAuthHandler {
     LOG.debug("Exporting {} cluster templates", clusterTemplates.size());
     outJson.put(CLUSTER_TEMPLATES, gson.toJsonTree(clusterTemplates));
 
-    Collection<PartialTemplate> partialTemplates = view.getAllPartialTemplates();
+    Collection<PartialTemplate> partialTemplates = view.getAllPartialTemplates(PARTIAL_IS_MANDATORY);
     LOG.debug("Exporting {} partial templates", partialTemplates.size());
     outJson.put(PARTIAL_TEMPLATES, gson.toJsonTree(partialTemplates));
+
+    Collection<PartialTemplate> mandatoryPartials = view.getAllPartialTemplates(MANDATORY_IS_MANDATORY);
+    LOG.debug("Exporting {} mandatory partials", mandatoryPartials.size());
+    outJson.put(MANDATORY_PARTIALS, gson.toJsonTree(mandatoryPartials));
 
     LOG.trace("Exporting {}", outJson);
 
@@ -1717,6 +1838,7 @@ public class AdminHandler extends AbstractAuthHandler {
     List<Service> newServices;
     List<ClusterTemplate> newClusterTemplates;
     List<PartialTemplate> newPartialTemplates;
+    List<PartialTemplate> newMandatoryPartials;
     List<AutomatorType> newAutomatorTypes;
     List<ProviderType> newProviderTypes;
 
@@ -1753,6 +1875,11 @@ public class AdminHandler extends AbstractAuthHandler {
         gson.<List<PartialTemplate>>fromJson(inJson.get(PARTIAL_TEMPLATES),
                                              new TypeToken<List<PartialTemplate>>() { }.getType());
 
+      newMandatoryPartials = !inJson.containsKey(MANDATORY_PARTIALS) ?
+        ImmutableList.<PartialTemplate>of() :
+        gson.<List<PartialTemplate>>fromJson(inJson.get(MANDATORY_PARTIALS),
+                 new TypeToken<List<PartialTemplate>>() { }.getType());
+
 
     } catch (JsonSyntaxException e) {
       LOG.error("Got exception while importing config", e);
@@ -1783,8 +1910,12 @@ public class AdminHandler extends AbstractAuthHandler {
         view.deleteClusterTemplate(clusterTemplate.getName());
       }
 
-      for (PartialTemplate partialTemplate : view.getAllPartialTemplates()) {
-        view.deletePartialTemplate(partialTemplate.getName());
+      for (PartialTemplate partialTemplate : view.getAllPartialTemplates(PARTIAL_IS_MANDATORY)) {
+        view.deletePartialTemplate(partialTemplate.getName(), PARTIAL_IS_MANDATORY);
+      }
+
+      for (PartialTemplate mandatoryPartial : view.getAllPartialTemplates(MANDATORY_IS_MANDATORY)) {
+        view.deletePartialTemplate(mandatoryPartial.getName(), MANDATORY_IS_MANDATORY);
       }
 
       // Add new config data
@@ -1815,7 +1946,12 @@ public class AdminHandler extends AbstractAuthHandler {
 
       LOG.debug("Importing {} partial templates", newPartialTemplates.size());
       for (PartialTemplate partialTemplate : newPartialTemplates) {
-        view.writePartialTemplate(partialTemplate);
+        view.writePartialTemplate(partialTemplate, PARTIAL_IS_MANDATORY);
+      }
+
+      LOG.debug("Importing {} mandatory partials", newMandatoryPartials.size());
+      for (PartialTemplate mandatoryPartial : newMandatoryPartials) {
+        view.writePartialTemplate(mandatoryPartial, MANDATORY_IS_MANDATORY);
       }
       responder.sendStatus(HttpResponseStatus.OK);
     } catch (IllegalAccessException e) {

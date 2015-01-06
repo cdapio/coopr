@@ -1,5 +1,6 @@
 {
     "name": "template-with-overrides-in-partial",
+    "version": "1",
     "description": "Template tries to overrides immutable partial config ('sensu_wrapper') from partial ('overrides-partial')",
     "extends": {
         "name": "cdap-distributed"

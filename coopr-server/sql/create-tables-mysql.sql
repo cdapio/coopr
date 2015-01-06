@@ -132,6 +132,14 @@ CREATE TABLE IF NOT EXISTS partialTemplate (
     PRIMARY KEY (tenant_id, name, version)
 ) ENGINE = InnoDB;
 
+CREATE TABLE IF NOT EXISTS mandatoryTemplates (
+    name VARCHAR(255),
+    version BIGINT,
+    tenant_id VARCHAR(64),
+    mandatoryTemplate MEDIUMBLOB,
+    PRIMARY KEY (tenant_id, name, version)
+) ENGINE = InnoDB;
+
 CREATE TABLE IF NOT EXISTS tenants (
     id VARCHAR(64),
     name VARCHAR(255),
