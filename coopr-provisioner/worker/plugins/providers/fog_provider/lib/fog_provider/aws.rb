@@ -134,8 +134,15 @@ class FogProviderAWS < Provider
       # login with pseudotty and turn off sudo requiretty option
       log.debug "Attempting to ssh to #{bootstrap_ip} as #{@task['config']['ssh-auth']['user']} with credentials: #{@credentials} and pseudotty"
       Net::SSH.start(bootstrap_ip, @task['config']['ssh-auth']['user'], @credentials) do |ssh|
+        sudoers = true
+        begin
+          ssh_exec!(ssh, 'test -e /etc/sudoers', 'Checking for /etc/sudoers')
+        rescue CommandExecutionError
+          log.debug 'No /etc/sudoers file present'
+          sudoers = false
+        end
         cmd = "#{sudo} sed -i -e '/^Defaults[[:space:]]*requiretty/ s/^/#/' /etc/sudoers"
-        ssh_exec!(ssh, cmd, 'Disabling requiretty via pseudotty session', true)
+        ssh_exec!(ssh, cmd, 'Disabling requiretty via pseudotty session', true) if sudoers
       end
 
       # Validate connectivity
