@@ -18,7 +18,6 @@ package co.cask.coopr.shell.command;
 
 import co.cask.common.cli.Arguments;
 import co.cask.common.cli.Command;
-import co.cask.coopr.client.rest.RestClient;
 import co.cask.coopr.client.rest.exception.UnauthorizedAccessTokenException;
 import co.cask.coopr.shell.CLIConfig;
 
@@ -31,7 +30,7 @@ public abstract class AbstractAuthCommand implements Command {
 
   private final CLIConfig cliConfig;
 
-  AbstractAuthCommand(CLIConfig cliConfig) {
+  protected AbstractAuthCommand(CLIConfig cliConfig) {
     this.cliConfig = cliConfig;
   }
 

@@ -24,7 +24,7 @@ import co.cask.coopr.client.rest.RestClientManager;
 import co.cask.coopr.codec.json.guice.CodecModules;
 import co.cask.coopr.common.conf.Constants;
 import com.google.common.base.Objects;
-import com.google.common.base.Supplier;
+import com.google.common.base.Suppliers;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.inject.Guice;
@@ -127,12 +127,7 @@ public class CLIConfig {
     RestClientManager.Builder builder = RestClientManager.builder(host, port);
     builder.ssl(ssl);
     accessToken = getAccessToken(host, port, ssl);
-    builder.accessToken(new Supplier<AccessToken>() {
-      @Override
-      public AccessToken get() {
-        return accessToken;
-      }
-    });
+    builder.accessToken(Suppliers.ofInstance(accessToken));
     this.userId = userId;
     this.tenantId = tenantId;
     builder.userId(userId);

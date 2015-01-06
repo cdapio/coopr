@@ -16,12 +16,12 @@
 
 package co.cask.coopr.client.rest;
 
-import co.cask.cdap.security.authentication.client.AccessToken;
 import co.cask.common.http.exception.HttpFailureException;
 import co.cask.coopr.client.rest.exception.UnauthorizedAccessTokenException;
 import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
@@ -67,7 +67,7 @@ public class RestClient {
   private final RestClientConnectionConfig config;
   private final URI baseUrl;
   private final CloseableHttpClient httpClient;
-  private final Header[] authHeaders;
+  private final Set<Header> authHeaders;
 
   public RestClient(RestClientConnectionConfig config, CloseableHttpClient httpClient) {
     this(config, httpClient, new Gson());
@@ -220,19 +220,18 @@ public class RestClient {
     return URI.create(baseUrl + postfix);
   }
 
-  private Header[] getAuthHeaders() {
-    Header[] authHeaders = new Header[NUMBER_OF_AUTH_HEADERS];
-    int authHeaderIndex = 0;
-    authHeaders[authHeaderIndex++] = new BasicHeader(COOPR_USER_ID_HEADER_NAME, config.getUserId());
-    authHeaders[authHeaderIndex++] = new BasicHeader(COOPR_TENANT_ID_HEADER_NAME, config.getTenantId());
+  private Set<Header> getAuthHeaders() {
+    Set<Header> authHeaders = Sets.newLinkedHashSet();
+    authHeaders.add(new BasicHeader(COOPR_USER_ID_HEADER_NAME, config.getUserId()));
+    authHeaders.add(new BasicHeader(COOPR_TENANT_ID_HEADER_NAME, config.getTenantId()));
     //TODO: For now it is not a mandatory field
     if (!Strings.isNullOrEmpty(config.getAPIKey())) {
-      authHeaders[authHeaderIndex++] = new BasicHeader(COOPR_API_KEY_HEADER_NAME, config.getAPIKey());
+      authHeaders.add(new BasicHeader(COOPR_API_KEY_HEADER_NAME, config.getAPIKey()));
     }
     if (config.getAccessToken() != null) {
-      authHeaders[authHeaderIndex] = new BasicHeader(HttpHeaders.Names.AUTHORIZATION,
+      authHeaders.add(new BasicHeader(HttpHeaders.Names.AUTHORIZATION,
                                                      String.format("%s: %s", config.getAccessToken().getTokenType(),
-                                                                   config.getAccessToken().getValue()));
+                                                                   config.getAccessToken().getValue())));
     }
     return authHeaders;
   }
