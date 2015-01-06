@@ -146,7 +146,7 @@ Unreleased
 - NGUI - ddtc dropdown text labels - adds labels to textfields in dropdown-text-combo directive ( Issues: #640 )
 - NGUI - rev-tagged static assets, scaffolding for "service" crud, update dependencies, use gulp-rev to tag statics assets in production ( Issues: #642 )
 
-- Update coopr-provisioner submodule ( Issues: #880 caskdata/coopr-provisioner#1 caskdata/coopr-provisioner#2 caskdata/coopr-provisioner#3 )
+- Update coopr-provisioner submodule ( Issues: #880 #883 caskdata/coopr-provisioner#1 caskdata/coopr-provisioner#2 caskdata/coopr-provisioner#3 )
 
 v0.9.8 (09/26/14)
 -----------------
