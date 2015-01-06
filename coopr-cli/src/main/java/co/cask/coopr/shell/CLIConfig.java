@@ -26,11 +26,8 @@ import co.cask.coopr.common.conf.Constants;
 import co.cask.coopr.shell.command.VersionCommand;
 import com.google.common.base.Charsets;
 import com.google.common.base.Objects;
-<<<<<<< HEAD
 import com.google.common.base.Suppliers;
-=======
 import com.google.common.base.Throwables;
->>>>>>> remotes/upstream/develop
 import com.google.common.collect.Lists;
 import com.google.common.io.CharStreams;
 import com.google.common.io.InputSupplier;
@@ -61,7 +58,6 @@ public class CLIConfig {
   );
 
   private final String version;
-
   private RestClientManager clientManager;
   private String host;
   private String userId;
@@ -196,13 +192,6 @@ public class CLIConfig {
     return uri;
   }
 
-  /**
-   * Listener to reconnect to a Coopr instance.
-   */
-  public interface ReconnectListener {
-    void onReconnect() throws IOException;
-  }
-
   private String loadVersion() {
     try {
       InputSupplier<? extends InputStream> versionFileSupplier = new InputSupplier<InputStream>() {
@@ -215,5 +204,12 @@ public class CLIConfig {
     } catch (IOException e) {
       throw Throwables.propagate(e);
     }
+  }
+
+  /**
+   * Listener to reconnect to a Coopr instance.
+   */
+  public interface ReconnectListener {
+    void onReconnect() throws IOException;
   }
 }
