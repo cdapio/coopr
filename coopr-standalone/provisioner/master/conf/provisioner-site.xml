@@ -5,6 +5,10 @@
     <description>Routable IP for the server to call back to this provisioner</description>
   </property>
   <property>
+    <name>provisioner.server.uri</name>
+    <value>http://COOPR_HOST:55055</value>
+  </property>
+  <property>
     <name>provisioner.data.dir</name>
     <value>COOPR_DATA_DIR</value>
     <description>Provisioner storage directory for plugin data resources</description>

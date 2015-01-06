@@ -293,3 +293,24 @@ gulp.task('watch', ['build'], function() {
   gulp.watch('./app/img/**/*', ['img']);
 
 });
+
+gulp.task('develop-server', function () {
+  plug.nodemon({
+    script: 'server.js',
+    ext: 'js',
+    ignore: [
+      './app/*',
+      './dist/*',
+      './test/*',
+      './bower_components',
+      './node_modules',
+      'Gulpfile.js'
+    ],
+    env: {
+
+    },
+    nodeArgs: ['--debug']
+  });
+});
+
+gulp.task('serve', ['watch', 'develop-server']);

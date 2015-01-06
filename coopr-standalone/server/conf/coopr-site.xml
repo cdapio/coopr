@@ -25,4 +25,8 @@
     <name>server.plugin.store.localfilestore.data.dir</name>
     <value>COOPR_DATA_DIR/plugins/resources</value>
   </property>
+  <property>
+    <name>server.host</name>
+    <value>COOPR_HOST</value>
+  </property>
 </configuration>
