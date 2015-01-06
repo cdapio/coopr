@@ -76,6 +76,15 @@ SED_COOPR_DATA_DIR=`echo ${COOPR_DATA_DIR} | sed 's:/:\\\/:g'`
 sed -i.old "s/COOPR_DATA_DIR/${SED_COOPR_DATA_DIR}/g" ${COOPR_SERVER_CONF}/coopr-site.xml
 sed -i.old "s/COOPR_DATA_DIR/${SED_COOPR_DATA_DIR}/g" ${COOPR_PROVISIONER_CONF}/provisioner-site.xml
 
+# Setup host
+if test -e /proc/1/cgroup && grep docker /proc/1/cgroup 2>&1 >/dev/null; then
+  SED_COOPR_HOST=`hostname -i`
+else
+  SED_COOPR_HOST='localhost'
+fi
+sed -i.old "s/COOPR_HOST/${SED_COOPR_HOST}/g" ${COOPR_SERVER_CONF}/coopr-site.xml
+sed -i.old "s/COOPR_HOST/${SED_COOPR_HOST}/g" ${COOPR_PROVISIONER_CONF}/provisioner-site.xml
+
 # Determine the Java command to use to start the JVM.
 if [ -n "${JAVA_HOME}" ]; then
     if [ -x "${JAVA_HOME}/jre/sh/java" ]; then
@@ -163,7 +172,7 @@ if [ "${COOPR_SSL}" == "true" ]; then
 fi
 
 export SECURITY_ENABLED=`read_property security.enabled ${COOPR_SERVER_CONF}/coopr-site.xml`
-export COOPR_SERVER_URI=${COOPR_SERVER_URI:-${COOPR_PROTOCOL}://127.0.0.1:55054}
+export COOPR_SERVER_URI=${COOPR_SERVER_URI:-${COOPR_PROTOCOL}://${SED_COOPR_HOST}:55054}
 export TRUST_CERT_PATH=`read_property server.ssl.trust.cert.path ${COOPR_SERVER_CONF}/coopr-security.xml`
 export TRUST_CERT_PASSWORD=`read_property server.ssl.trust.cert.password ${COOPR_SERVER_CONF}/coopr-security.xml`
 
@@ -204,7 +213,7 @@ load_defaults () {
   wait_for_server
 
   echo "Loading default configuration..."
-  ${COOPR_HOME}/server/templates/bin/load-templates.sh && touch ${COOPR_DATA_DIR}/.load_defaults
+  ${COOPR_HOME}/server/templates/bin/load-templates.sh && touch ${COOPR_DATA_DIR}/.load_defaults || die "Couldn't upload templates"
 
   # register the default plugins with the server
   provisioner register

@@ -23,15 +23,24 @@ import co.cask.cdap.security.authentication.client.basic.BasicAuthenticationClie
 import co.cask.coopr.client.rest.RestClientManager;
 import co.cask.coopr.codec.json.guice.CodecModules;
 import co.cask.coopr.common.conf.Constants;
+import co.cask.coopr.shell.command.VersionCommand;
+import com.google.common.base.Charsets;
 import com.google.common.base.Objects;
+<<<<<<< HEAD
 import com.google.common.base.Suppliers;
+=======
+import com.google.common.base.Throwables;
+>>>>>>> remotes/upstream/develop
 import com.google.common.collect.Lists;
+import com.google.common.io.CharStreams;
+import com.google.common.io.InputSupplier;
 import com.google.gson.Gson;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import jline.console.ConsoleReader;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.util.List;
 import java.util.Properties;
@@ -50,6 +59,8 @@ public class CLIConfig {
   private static final Injector injector = Guice.createInjector(
     new CodecModules().getModule()
   );
+
+  private final String version;
 
   private RestClientManager clientManager;
   private String host;
@@ -70,6 +81,7 @@ public class CLIConfig {
    * @param tenantId the admin id
    */
   public CLIConfig(String host, Integer port, String userId, String tenantId) {
+    version = loadVersion();
     this.host = Objects.firstNonNull(host, "localhost");
     this.port = Objects.firstNonNull(port, DEFAULT_PORT);
     this.userId = Objects.firstNonNull(userId, DEFAULT_USER_ID);
@@ -77,6 +89,10 @@ public class CLIConfig {
     this.ssl = DEFAULT_SSL;
     this.sslPort = DEFAULT_SSL_PORT;
     this.reconnectListeners = Lists.newArrayList();
+  }
+
+  public String getVersion() {
+    return version;
   }
 
   public String getHost() {
@@ -185,5 +201,19 @@ public class CLIConfig {
    */
   public interface ReconnectListener {
     void onReconnect() throws IOException;
+  }
+
+  private String loadVersion() {
+    try {
+      InputSupplier<? extends InputStream> versionFileSupplier = new InputSupplier<InputStream>() {
+        @Override
+        public InputStream getInput() throws IOException {
+          return VersionCommand.class.getClassLoader().getResourceAsStream("VERSION");
+        }
+      };
+      return CharStreams.toString(CharStreams.newReaderSupplier(versionFileSupplier, Charsets.UTF_8));
+    } catch (IOException e) {
+      throw Throwables.propagate(e);
+    }
   }
 }

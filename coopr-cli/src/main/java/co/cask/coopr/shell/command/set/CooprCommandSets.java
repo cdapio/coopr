@@ -68,6 +68,7 @@ import co.cask.coopr.shell.command.StartServiceOnClusterCommand;
 import co.cask.coopr.shell.command.StopServiceOnClusterCommand;
 import co.cask.coopr.shell.command.SyncClusterTemplateCommand;
 import co.cask.coopr.shell.command.SyncResourcesCommand;
+import co.cask.coopr.shell.command.VersionCommand;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Injector;
 
@@ -111,6 +112,7 @@ public class CooprCommandSets {
     return ImmutableList.of(
       injector.getInstance(ConnectCommand.class),
       injector.getInstance(ExitCommand.class),
+      injector.getInstance(VersionCommand.class),
       injector.getInstance(QuitCommand.class)
     );
   }
