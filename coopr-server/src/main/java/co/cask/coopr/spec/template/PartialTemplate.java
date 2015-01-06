@@ -66,8 +66,8 @@ public final class PartialTemplate extends AbstractTemplate {
       return new PartialTemplate(this, clusterDefaults, compatibilities, constraints, administration, links, immutable);
     }
 
-    public Builder setImmutable(Boolean immutable) {
-      this.immutable = immutable == null ? false : immutable;
+    public Builder setImmutable(boolean immutable) {
+      this.immutable = immutable;
       return this;
     }
   }

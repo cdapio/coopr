@@ -16,6 +16,7 @@
 package co.cask.coopr.http.handler;
 
 import co.cask.coopr.account.Account;
+import co.cask.coopr.cluster.ClusterService;
 import co.cask.coopr.common.conf.Constants;
 import co.cask.coopr.common.queue.QueueMetrics;
 import co.cask.coopr.scheduler.task.TaskQueueService;
@@ -28,6 +29,9 @@ import co.cask.coopr.spec.service.Service;
 import co.cask.coopr.spec.template.AbstractTemplate;
 import co.cask.coopr.spec.template.ClusterTemplate;
 import co.cask.coopr.spec.template.PartialTemplate;
+import co.cask.coopr.spec.template.TemplateImmutabilityException;
+import co.cask.coopr.spec.template.TemplateNotFoundException;
+import co.cask.coopr.spec.template.TemplateValidationException;
 import co.cask.coopr.store.entity.EntityStoreService;
 import co.cask.coopr.store.entity.EntityStoreView;
 import co.cask.coopr.store.tenant.TenantStore;
@@ -79,14 +83,16 @@ public class AdminHandler extends AbstractAuthHandler {
 
   private final EntityStoreService entityStoreService;
   private final TaskQueueService taskQueueService;
+  private final ClusterService clusterService;
   private final Gson gson;
 
   @Inject
   private AdminHandler(TenantStore tenantStore, EntityStoreService entityStoreService,
-                       TaskQueueService taskQueueService, Gson gson) {
+                       TaskQueueService taskQueueService, ClusterService clusterService, Gson gson) {
     super(tenantStore);
     this.taskQueueService = taskQueueService;
     this.entityStoreService = entityStoreService;
+    this.clusterService = clusterService;
     this.gson = gson;
   }
 
@@ -421,7 +427,7 @@ public class AdminHandler extends AbstractAuthHandler {
       partialtemplateId, PartialTemplate.class, responder);
     } catch (IOException e) {
       responder.sendString(HttpResponseStatus.INTERNAL_SERVER_ERROR,
-              "Exception getting partial template " + partialtemplateId);
+                           "Exception getting partial template " + partialtemplateId);
     }
   }
 
@@ -510,7 +516,7 @@ public class AdminHandler extends AbstractAuthHandler {
                          "provider type", providertypeId, ProviderType.class, responder);
     } catch (IOException e) {
       responder.sendString(HttpResponseStatus.INTERNAL_SERVER_ERROR,
-                          "Exception getting provider type " + providertypeId + " with version " + versionStr);
+                           "Exception getting provider type " + providertypeId + " with version " + versionStr);
     }
   }
 
@@ -567,7 +573,7 @@ public class AdminHandler extends AbstractAuthHandler {
                          "automator type", automatortypeId, AutomatorType.class, responder);
     } catch (IOException e) {
       responder.sendString(HttpResponseStatus.INTERNAL_SERVER_ERROR,
-                          "Exception getting automator type " + automatortypeId + " with version " + versionStr);
+                           "Exception getting automator type " + automatortypeId + " with version " + versionStr);
     }
   }
 
@@ -1110,7 +1116,7 @@ public class AdminHandler extends AbstractAuthHandler {
       responder.sendStatus(HttpResponseStatus.OK);
     } catch (IOException e) {
       responder.sendString(HttpResponseStatus.INTERNAL_SERVER_ERROR,
-              "Exception deleting partial template " + partialtemplateId);
+                           "Exception deleting partial template " + partialtemplateId);
     } catch (IllegalAccessException e) {
       responder.sendString(HttpResponseStatus.FORBIDDEN, "user unauthorized to delete partial template.");
     }
@@ -1822,6 +1828,38 @@ public class AdminHandler extends AbstractAuthHandler {
       responder.sendString(HttpResponseStatus.FORBIDDEN, e.getMessage());
     } catch (IOException e) {
       responder.sendString(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception importing entities.");
+    }
+  }
+
+  /**
+   * Resolve cluster template from template with includes and extends.
+   *
+   * @param request Request to export admin definable entities.
+   * @param responder Responder for sending response.
+   */
+  @POST
+  @Path("/resolve")
+  public void resolveTemplate(HttpRequest request, HttpResponder responder) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+    ClusterTemplate clusterTemplate = getEntityFromRequest(request, responder, ClusterTemplate.class);
+    if (clusterTemplate != null) {
+      try {
+        ClusterTemplate resolved = clusterService.resolveTemplate(account, clusterTemplate);
+        responder.sendJson(HttpResponseStatus.OK, resolved, ClusterTemplate.class, gson);
+      } catch (TemplateNotFoundException e) {
+        responder.sendString(HttpResponseStatus.NOT_FOUND, e.getMessage());
+      } catch (TemplateImmutabilityException e) {
+        responder.sendString(HttpResponseStatus.BAD_REQUEST, e.getMessage());
+      } catch (IOException e) {
+        responder.sendString(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception processing template.");
+      } catch (TemplateValidationException e) {
+        responder.sendString(HttpResponseStatus.BAD_REQUEST, e.getMessage());
+      }
+    } else {
+      responder.sendString(HttpResponseStatus.BAD_REQUEST, "Cluster template can't be read.");
     }
   }
 

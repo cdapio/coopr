@@ -28,6 +28,7 @@ import co.cask.coopr.spec.TenantSpecification;
 import co.cask.coopr.spec.service.Service;
 import co.cask.coopr.spec.template.ClusterTemplate;
 import co.cask.coopr.spec.template.PartialTemplate;
+import co.cask.coopr.store.entity.EntityStoreView;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
@@ -37,13 +38,16 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
+import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.message.BasicHeader;
+import org.apache.http.util.EntityUtils;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.List;
@@ -115,13 +119,13 @@ public class AdminHandlerTest extends ServiceTestBase {
   @Test
   public void testPartialTemplates() throws Exception {
     testRestAPIs("partialtemplates", gson.toJsonTree(Entities.PartialTemplateExample.TEST_PARTIAL1).getAsJsonObject(),
-            gson.toJsonTree(Entities.PartialTemplateExample.TEST_PARTIAL2).getAsJsonObject());
+                 gson.toJsonTree(Entities.PartialTemplateExample.TEST_PARTIAL2).getAsJsonObject());
   }
 
   @Test
   public void testPartialTemplatesBumpVersion() throws Exception {
     testRestAPIsBumpVersion("partialtemplates",
-            gson.toJsonTree(Entities.PartialTemplateExample.TEST_PARTIAL1).getAsJsonObject());
+                            gson.toJsonTree(Entities.PartialTemplateExample.TEST_PARTIAL1).getAsJsonObject());
   }
 
   @Test
@@ -142,6 +146,39 @@ public class AdminHandlerTest extends ServiceTestBase {
     tenantStore.writeTenant(
       new Tenant(UUID.randomUUID().toString(), new TenantSpecification(USER1_ACCOUNT.getTenantId(), 10, 10, 100)));
     assertResponseStatus(doGetExternalAPI("/metrics/queues", USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
+  }
+
+  @Test
+  public void resolveTest() throws Exception {
+    EntityStoreView view = entityStoreService.getView(ADMIN_ACCOUNT);
+    ClassLoader classLoader = AdminHandlerTest.class.getClassLoader();
+    InputStream partialSensuIn = classLoader.getResourceAsStream("partials/sensu-partial.json");
+    InputStream clusterInsecureIn = classLoader.getResourceAsStream("partials/cdap-distributed-insecure.json");
+    PartialTemplate partial = gson.fromJson(IOUtils.toString(partialSensuIn), PartialTemplate.class);
+    ClusterTemplate basic = gson.fromJson(IOUtils.toString(clusterInsecureIn), ClusterTemplate.class);
+    view.writePartialTemplate(partial);
+    view.writeClusterTemplate(basic);
+
+    InputStream clusterDistributedResolvedIn =
+      classLoader.getResourceAsStream("partials/cdap-distributed-resolved.json");
+    ClusterTemplate expected = gson.fromJson(IOUtils.toString(clusterDistributedResolvedIn, Charsets.UTF_8),
+                                             ClusterTemplate.class);
+
+    InputStream clusterDistributedIn = classLoader.getResourceAsStream("partials/cdap-distributed.json");
+    HttpResponse response = doPostExternalAPI("/resolve", IOUtils.toString(clusterDistributedIn), ADMIN_HEADERS);
+    Reader reader = new InputStreamReader(response.getEntity().getContent(), Charsets.UTF_8);
+    ClusterTemplate actual = gson.fromJson(reader, ClusterTemplate.class);
+
+    Assert.assertEquals(expected, actual);
+  }
+
+  @Test
+  public void resolveWithErrorsTest() throws Exception {
+    ClassLoader classLoader = AdminHandlerTest.class.getClassLoader();
+    InputStream inputStream1 = classLoader.getResourceAsStream("partials/cdap-distributed-without-defaults-provider.json");
+    HttpResponse response = doPostExternalAPI("/resolve", IOUtils.toString(inputStream1), ADMIN_HEADERS);
+    String responseMessage = EntityUtils.toString(response.getEntity(), Charsets.UTF_8);
+    Assert.assertEquals("default provider must be specified", responseMessage);
   }
 
   @Test
