@@ -136,8 +136,8 @@ def _run_plugin(clazz, env, cwd, task)
   Dir.chdir(cwd) do
     result = object.runTask
     log.info "#{clusterId} on #{hostname} could not be deleted: #{result['message']}" if taskName == 'delete' && result['status'] != 0
+    result
   end
-  result
 end
 
 def delegate_task(task, pluginmanager)
