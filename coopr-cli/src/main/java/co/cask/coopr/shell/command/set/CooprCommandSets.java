@@ -119,7 +119,7 @@ public class CooprCommandSets {
 
   private static CommandSet<Command> getAdminCommandSet(Injector injector) {
     List<Command> commands = ImmutableList.of(
-      injector.getInstance(DeleteClusterTemplateCommand.class),
+      (Command) injector.getInstance(DeleteClusterTemplateCommand.class),
       injector.getInstance(DeleteHardwareTypeCommand.class),
       injector.getInstance(DeleteImageTypeCommand.class),
       injector.getInstance(DeleteProviderCommand.class),
@@ -140,7 +140,7 @@ public class CooprCommandSets {
 
   private static CommandSet<Command> getClusterCommandSet(Injector injector) {
     List<Command> commands = ImmutableList.of(
-      injector.getInstance(AddServicesOnClusterCommand.class),
+      (Command) injector.getInstance(AddServicesOnClusterCommand.class),
       injector.getInstance(CreateClusterCommand.class),
       injector.getInstance(DeleteClusterCommand.class),
       injector.getInstance(GetClusterCommand.class),
@@ -160,7 +160,7 @@ public class CooprCommandSets {
 
   private static CommandSet<Command> getPluginCommandSet(Injector injector) {
     List<Command> commands = ImmutableList.of(
-      injector.getInstance(DeleteAutomatorTypeResourcesCommand.class),
+      (Command) injector.getInstance(DeleteAutomatorTypeResourcesCommand.class),
       injector.getInstance(DeleteProviderTypeResourcesCommand.class),
       injector.getInstance(GetAutomatorTypeCommand.class),
       injector.getInstance(GetProviderTypeCommand.class),
@@ -179,7 +179,7 @@ public class CooprCommandSets {
 
   private static CommandSet<Command> getTenantCommandSet(Injector injector) {
     List<Command> commands = ImmutableList.of(
-      injector.getInstance(DeleteTenantCommand.class),
+      (Command) injector.getInstance(DeleteTenantCommand.class),
       injector.getInstance(GetTenantCommand.class),
       injector.getInstance(ListTenantsCommand.class)
     );
@@ -188,7 +188,7 @@ public class CooprCommandSets {
 
   private static CommandSet<Command> getProvisionerCommandSet(Injector injector) {
     List<Command> commands = ImmutableList.of(
-      injector.getInstance(GetProvisionerCommand.class),
+      (Command) injector.getInstance(GetProvisionerCommand.class),
       injector.getInstance(ListProvisionersCommand.class)
     );
     return new CommandSet<Command>(commands);

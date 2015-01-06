@@ -16,12 +16,17 @@
 
 package co.cask.coopr.shell;
 
+import co.cask.cdap.security.authentication.client.AccessToken;
+import co.cask.cdap.security.authentication.client.AuthenticationClient;
+import co.cask.cdap.security.authentication.client.Credential;
+import co.cask.cdap.security.authentication.client.basic.BasicAuthenticationClient;
 import co.cask.coopr.client.rest.RestClientManager;
 import co.cask.coopr.codec.json.guice.CodecModules;
 import co.cask.coopr.common.conf.Constants;
 import co.cask.coopr.shell.command.VersionCommand;
 import com.google.common.base.Charsets;
 import com.google.common.base.Objects;
+import com.google.common.base.Suppliers;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.io.CharStreams;
@@ -29,11 +34,13 @@ import com.google.common.io.InputSupplier;
 import com.google.gson.Gson;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import jline.console.ConsoleReader;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.List;
+import java.util.Properties;
 
 import static co.cask.coopr.shell.util.Constants.DEFAULT_PORT;
 import static co.cask.coopr.shell.util.Constants.DEFAULT_SSL;
@@ -51,7 +58,6 @@ public class CLIConfig {
   );
 
   private final String version;
-
   private RestClientManager clientManager;
   private String host;
   private String userId;
@@ -59,7 +65,9 @@ public class CLIConfig {
   private List<ReconnectListener> reconnectListeners;
   private int port;
   private int sslPort;
+  private boolean ssl;
   private URI uri;
+  private AccessToken accessToken;
 
   /**
    *
@@ -74,14 +82,8 @@ public class CLIConfig {
     this.port = Objects.firstNonNull(port, DEFAULT_PORT);
     this.userId = Objects.firstNonNull(userId, DEFAULT_USER_ID);
     this.tenantId = Objects.firstNonNull(tenantId, DEFAULT_TENANT_ID);
-    this.uri = URI.create(String.format("http://%s:%d", this.host, this.port));
+    this.ssl = DEFAULT_SSL;
     this.sslPort = DEFAULT_SSL_PORT;
-    RestClientManager.Builder builder = RestClientManager.builder(this.host, this.port);
-    builder.ssl(DEFAULT_SSL);
-    builder.userId(this.userId);
-    builder.tenantId(this.tenantId);
-    builder.gson(injector.getInstance(Gson.class));
-    this.clientManager = builder.build();
     this.reconnectListeners = Lists.newArrayList();
   }
 
@@ -121,6 +123,10 @@ public class CLIConfig {
     return clientManager;
   }
 
+  public void setDefaultConnection() throws IOException {
+    setConnection(host, port, DEFAULT_SSL, userId, tenantId);
+  }
+
   public void setConnection(String host, int port, boolean ssl, String userId, String tenantId) throws IOException {
     this.host = host;
     if (ssl) {
@@ -128,9 +134,12 @@ public class CLIConfig {
     } else {
       this.port = port;
     }
+    this.ssl = ssl;
     this.uri = URI.create(String.format("%s://%s:%d", ssl ? "https" : "http", host, port));
     RestClientManager.Builder builder = RestClientManager.builder(host, port);
-    builder.ssl(DEFAULT_SSL);
+    builder.ssl(ssl);
+    accessToken = getAccessToken(host, port, ssl);
+    builder.accessToken(Suppliers.ofInstance(accessToken));
     this.userId = userId;
     this.tenantId = tenantId;
     builder.userId(userId);
@@ -142,19 +151,45 @@ public class CLIConfig {
     }
   }
 
+  public void updateAccessToken() throws IOException {
+    accessToken = getAccessToken(host, port, ssl);
+  }
+
+  private AccessToken getAccessToken(String host, int port, boolean ssl) throws IOException {
+    AuthenticationClient authenticationClient = getAuthenticationClient(host, port, ssl);
+    if (!authenticationClient.isAuthEnabled()) {
+      return null;
+    }
+
+    Properties properties = new Properties();
+    ConsoleReader reader = new ConsoleReader();
+    for (Credential credential : authenticationClient.getRequiredCredentials()) {
+      String prompt = "Please, specify " + credential.getDescription() + "> ";
+      String credentialValue;
+      if (credential.isSecret()) {
+        credentialValue = reader.readLine(prompt, '*');
+      } else {
+        credentialValue = reader.readLine(prompt);
+      }
+      properties.put(credential.getName(), credentialValue);
+    }
+
+    authenticationClient.configure(properties);
+    return authenticationClient.getAccessToken();
+  }
+
+  private AuthenticationClient getAuthenticationClient(String host, int port, boolean ssl) {
+    AuthenticationClient authenticationClient = new BasicAuthenticationClient();
+    authenticationClient.setConnectionInfo(host, port, ssl);
+    return authenticationClient;
+  }
+
   public void addReconnectListener(ReconnectListener listener) {
     this.reconnectListeners.add(listener);
   }
 
   public URI getURI() {
     return uri;
-  }
-
-  /**
-   * Listener to reconnect to a Coopr instance.
-   */
-  public interface ReconnectListener {
-    void onReconnect() throws IOException;
   }
 
   private String loadVersion() {
@@ -169,5 +204,12 @@ public class CLIConfig {
     } catch (IOException e) {
       throw Throwables.propagate(e);
     }
+  }
+
+  /**
+   * Listener to reconnect to a Coopr instance.
+   */
+  public interface ReconnectListener {
+    void onReconnect() throws IOException;
   }
 }

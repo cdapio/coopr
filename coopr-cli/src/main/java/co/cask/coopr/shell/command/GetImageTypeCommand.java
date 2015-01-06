@@ -17,8 +17,8 @@
 package co.cask.coopr.shell.command;
 
 import co.cask.common.cli.Arguments;
-import co.cask.common.cli.Command;
 import co.cask.coopr.client.AdminClient;
+import co.cask.coopr.shell.CLIConfig;
 import co.cask.coopr.shell.util.CliUtil;
 import com.google.inject.Inject;
 
@@ -29,17 +29,18 @@ import static co.cask.coopr.shell.util.Constants.NAME_KEY;
 /**
  * Gets the image type.
  */
-public class GetImageTypeCommand implements Command {
+public class GetImageTypeCommand extends AbstractAuthCommand {
 
   private final AdminClient adminClient;
 
   @Inject
-  private GetImageTypeCommand(AdminClient adminClient) {
+  private GetImageTypeCommand(AdminClient adminClient, CLIConfig cliConfig) {
+    super(cliConfig);
     this.adminClient = adminClient;
   }
 
   @Override
-  public void execute(Arguments arguments, PrintStream printStream) throws Exception {
+  public void perform(Arguments arguments, PrintStream printStream) throws Exception {
     String name = arguments.get(NAME_KEY);
     printStream.print(CliUtil.getPrettyJson(adminClient.getImageType(name)));
   }
