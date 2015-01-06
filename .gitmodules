@@ -3,4 +3,4 @@
 	url = https://github.com/caskdata/coopr-templates.git
 [submodule "coopr-provisioner"]
 	path = coopr-provisioner
-	url = git@github.com:caskdata/coopr-provisioner.git
+	url = https://github.com/caskdata/coopr-provisioner.git
