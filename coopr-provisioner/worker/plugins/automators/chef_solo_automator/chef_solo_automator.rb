@@ -170,11 +170,11 @@ class ChefSoloAutomator < Automator
           ssh_exec!(ssh, 'which scp')
         rescue CommandExecutionError
           log.warn 'scp not found, attempting to install openssh-client'
-          scp_install_cmd = "#{sudo} yum -qy install openssh-clients"
+          scp_install_cmd = "#{sudo} yum -q -y install openssh-clients"
           begin
             ssh_exec!(ssh, 'which yum')
           rescue CommandExecutionError
-            scp_install_cmd = "#{sudo} apt-get -qy install openssh-client"
+            scp_install_cmd = "#{sudo} apt-get -q -y install openssh-client"
           end
           ssh_exec!(ssh, scp_install_cmd, "installing openssh-client via #{scp_install_cmd}")
         else
@@ -301,11 +301,11 @@ class ChefSoloAutomator < Automator
 
         # try installing via package manager
         begin
-          ssh_exec!(ssh, "which yum && #{sudo} yum -qy install chef", 'Attempting Chef install via YUM')
+          ssh_exec!(ssh, "which yum && #{sudo} yum -q -y install chef", 'Attempting Chef install via YUM')
           return
         rescue CommandExecutionError
           begin
-            ssh_exec!(ssh, "which apt-get && #{sudo} apt-get -qy install chef", 'Attempting Chef install via apt-get')
+            ssh_exec!(ssh, "which apt-get && #{sudo} apt-get -q -y install chef", 'Attempting Chef install via apt-get')
             return
           rescue
             log.debug 'No Chef packages found for installation'
