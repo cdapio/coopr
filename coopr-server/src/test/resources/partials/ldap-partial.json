@@ -5,7 +5,7 @@
     "immutable": "false",
     "defaults": {
         "services": [
-            "ldap­internal"
+            "ldap-internal"
         ],
         "config": {
             "ldap": {
@@ -15,7 +15,7 @@
     },
     "compatibility": {
         "services": [
-            "ldap­internal"
+            "ldap-internal"
         ]
     }
 }

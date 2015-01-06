@@ -123,11 +123,21 @@ end
 @plugin_env = options
 
 def _run_plugin(clazz, env, cwd, task)
+  clusterId = task['clusterId']
+  hostname = task['config']['hostname']
+  provider = task['config']['provider']['description']
+  image = task['config']['image']
+  hardware = task['config']['hardwaretype']
+  taskName = task['taskName'].downcase
+  log.info "Creating node #{hostname} on #{provider} for #{clusterId} using #{image} on #{hardware}"
+
   object = clazz.new(env, task)
   FileUtils.mkdir_p(cwd)
   Dir.chdir(cwd) do
     result = object.runTask
+    log.info "#{clusterId} on #{hostname} could not be deleted: #{result['message']}" if taskName == 'delete' && result['status'] != 0
   end
+  result
 end
 
 def delegate_task(task, pluginmanager)

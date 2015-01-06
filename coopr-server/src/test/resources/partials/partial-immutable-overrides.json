@@ -8,7 +8,7 @@
                 "additional_client_attributes": {
                     "mail_to": "%cluster.owner%@cask.co"
                 },
-                "endpoint": "sensu­internal­server.cask.co"
+                "endpoint": "sensu-internal-server.cask.co"
             }
         }
     }
