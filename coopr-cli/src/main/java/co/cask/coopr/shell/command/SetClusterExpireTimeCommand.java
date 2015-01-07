@@ -1,5 +1,5 @@
 /*
- * Copyright © 2012-2014 Cask Data, Inc.
+ * Copyright © 2012-2015 Cask Data, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,6 +53,6 @@ public class SetClusterExpireTimeCommand extends AbstractAuthCommand {
 
   @Override
   public String getDescription() {
-    return "Sets the cluster expire time";
+    return "Set the cluster expire time";
   }
 }

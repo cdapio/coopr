@@ -1,5 +1,5 @@
 /*
- * Copyright © 2012-2014 Cask Data, Inc.
+ * Copyright © 2012-2015 Cask Data, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,6 +52,6 @@ public class GetProvisionerCommand extends AbstractAuthCommand {
 
   @Override
   public String getDescription() {
-    return "Gets the provisioner";
+    return "Get the provisioner by id";
   }
 }

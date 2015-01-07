@@ -1,5 +1,5 @@
 /*
- * Copyright © 2012-2014 Cask Data, Inc.
+ * Copyright © 2012-2015 Cask Data, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,11 +47,11 @@ public class GetAutomatorTypeCommand extends AbstractAuthCommand {
 
   @Override
   public String getPattern() {
-    return String.format("get automatortype <%s>", AUTOMATOR_TYPE_ID);
+    return String.format("get automator-type <%s>", AUTOMATOR_TYPE_ID);
   }
 
   @Override
   public String getDescription() {
-    return "Get automator type by id";
+    return "Get the automator type by id";
   }
 }
