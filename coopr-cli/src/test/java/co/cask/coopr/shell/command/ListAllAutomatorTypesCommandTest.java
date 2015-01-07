@@ -25,7 +25,7 @@ import org.mockito.Mockito;
 public class ListAllAutomatorTypesCommandTest extends AbstractTest {
 
   private static final String INPUT =
-    String.format("list all automatortypes");
+    String.format("list automator types");
 
   @Test
   public void testExecute() throws Exception {
