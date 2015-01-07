@@ -48,7 +48,7 @@ before_script:
   - 'npm start > /dev/null &'
   - 'cd ..'
   - 'if [ -n "$BROWSER_STACK_ACCESS_KEY" ]; then cd coopr-server; fi'
-  - 'if [ -n "$BROWSER_STACK_ACCESS_KEY" ]; then mvn clean package assembly:single -DskipTests; fi'
+  - 'if [ -n "$BROWSER_STACK_ACCESS_KEY" ]; then mvn package assembly:single -DskipTests; fi'
   - 'if [ -n "$BROWSER_STACK_ACCESS_KEY" ]; then cd ..; fi'
   - 'if [ -n "$BROWSER_STACK_ACCESS_KEY" ]; then java -cp coopr-server/target/*:coopr-e2e/config co.cask.coopr.runtime.ServerMain; fi >/dev/null 2>&1 &'
   - 'if [ -n "$BROWSER_STACK_ACCESS_KEY" ]; then java -cp coopr-server/target/*:coopr-e2e/config co.cask.coopr.runtime.MockProvisionerMain -p 55054; fi >/dev/null 2>&1 &'
