@@ -51,16 +51,7 @@ public final class LeaseDuration {
    * @return Timestamp in milliseconds
    */
   private static long getTimestamp(String base) {
-    if (base.equals("min") || base.equals("0")) {
-      return 0L;
-    }
-
-    if (base.equals("max")) {
-      return Long.MAX_VALUE;
-    }
-
     if (base.matches("^[0-9]+$")) {
-      // only numbers, no time unit: millisecond format
       return Long.parseLong(base);
     }
 

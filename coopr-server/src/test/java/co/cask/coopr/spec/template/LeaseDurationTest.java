@@ -16,24 +16,24 @@ public class LeaseDurationTest {
 
   @Test
   public void testLeaseDuration() {
-    LeaseDuration leaseDuration = new LeaseDuration("7d", "min", "min");
+    LeaseDuration leaseDuration = new LeaseDuration("7d", "0", "0");
     Assert.assertEquals(604800000, leaseDuration.getInitial());
     Assert.assertEquals(0, leaseDuration.getStep());
-    leaseDuration = new LeaseDuration("3s", "min", "min");
+    leaseDuration = new LeaseDuration("3s", "0", "0");
     Assert.assertEquals(3000, leaseDuration.getInitial());
-    leaseDuration = new LeaseDuration("5m", "min", "min");
+    leaseDuration = new LeaseDuration("5m", "0", "0");
     Assert.assertEquals(300000, leaseDuration.getInitial());
-    leaseDuration = new LeaseDuration("10h", "min", "min");
+    leaseDuration = new LeaseDuration("10h", "0", "0");
     Assert.assertEquals(36000000, leaseDuration.getInitial());
-    leaseDuration = new LeaseDuration("max", "min", "min");
-    Assert.assertEquals(Long.MAX_VALUE, leaseDuration.getInitial());
+    leaseDuration = new LeaseDuration("0", "0", "0");
+    Assert.assertEquals(0, leaseDuration.getInitial());
   }
 
   @Test
   public void testLeaseDurationJsonRelativeTime() {
-    LeaseDuration leaseDuration = new LeaseDuration("7d", "min", "min");
+    LeaseDuration leaseDuration = new LeaseDuration("7d", "0", "0");
     Assert.assertEquals(leaseDuration,
-                        GSON.fromJson("{\"initial\":\"7d\",\"max\":\"min\",\"step\":\"min\"}", LeaseDuration.class));
+                        GSON.fromJson("{\"initial\":\"7d\",\"max\":\"0\",\"step\":\"0\"}", LeaseDuration.class));
   }
 
   @Test
@@ -44,22 +44,22 @@ public class LeaseDurationTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void testNegativeArgStringConstructor() {
-    new LeaseDuration("-15s", "min", "min");
+    new LeaseDuration("-15s", "0", "0");
   }
 
   @Test(expected = RuntimeException.class)
   public void testUnsupportedArgStringConstructor() {
-    new LeaseDuration("1v", "min", "min");
+    new LeaseDuration("1v", "0", "0");
   }
 
   @Test(expected = RuntimeException.class)
   public void testInvalidArgStringConstructor() {
-    new LeaseDuration("invalidNumbers", "min", "min");
+    new LeaseDuration("invalidNumbers", "0", "0");
   }
 
   @Test
   public void testCalcInitialLease() throws InvalidClusterException {
-    LeaseDuration leaseDuration = new LeaseDuration("15m", "min", "min");
+    LeaseDuration leaseDuration = new LeaseDuration("15m", "0", "0");
     Assert.assertEquals(2000, leaseDuration.calcInitialLease("2s"));
   }
 
