@@ -1,5 +1,5 @@
 /*
- * Copyright © 2012-2014 Cask Data, Inc.
+ * Copyright © 2012-2015 Cask Data, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,11 +47,11 @@ public class GetProviderTypeCommand extends AbstractAuthCommand {
 
   @Override
   public String getPattern() {
-    return String.format("get providertype <%s>", PROVIDER_TYPE_ID);
+    return String.format("get provider-type <%s>", PROVIDER_TYPE_ID);
   }
 
   @Override
   public String getDescription() {
-    return "Get provider type";
+    return "Get the provider type by id";
   }
 }

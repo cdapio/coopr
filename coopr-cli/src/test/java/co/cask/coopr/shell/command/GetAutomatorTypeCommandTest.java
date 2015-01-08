@@ -25,7 +25,7 @@ import org.mockito.Mockito;
 public class GetAutomatorTypeCommandTest extends AbstractTest {
 
   private static final String INPUT =
-    String.format("get automatortype %s", TEST_PLUGIN_TYPE);
+    String.format("get automator-type %s", TEST_PLUGIN_TYPE);
 
   @Test
   public void testExecute() throws Exception {
