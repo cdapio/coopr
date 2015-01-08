@@ -23,14 +23,18 @@ import co.cask.coopr.spec.plugin.AutomatorType;
 import co.cask.coopr.spec.plugin.ProviderType;
 import co.cask.coopr.spec.service.Service;
 import co.cask.coopr.spec.template.ClusterTemplate;
+import co.cask.coopr.spec.template.MandatoryPartial;
 import co.cask.coopr.spec.template.PartialTemplate;
 import com.google.common.base.Charsets;
 import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 import javax.annotation.Nullable;
 
 /**
@@ -86,6 +90,14 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
         return deserialize(input, PartialTemplate.class);
       }
     };
+  private final Function<byte[], MandatoryPartial> mandatoryPartialTransform =
+    new Function<byte[], MandatoryPartial>() {
+      @Nullable
+      @Override
+      public MandatoryPartial apply(@Nullable byte[] input) {
+        return deserialize(input, MandatoryPartial.class);
+      }
+    };
   private final Function<byte[], ProviderType> providerTypeTransform =
     new Function<byte[], ProviderType>() {
       @Nullable
@@ -113,6 +125,7 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
     SERVICE("service"),
     CLUSTER_TEMPLATE("clusterTemplate"),
     PARTIAL_TEMPLATE("partialTemplate"),
+    MANDATORY_PARTIAL("mandatoryPartial"),
     PROVIDER_TYPE("providerType"),
     AUTOMATOR_TYPE("automatorType");
     private final String id;
@@ -301,10 +314,12 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
     deleteEntity(EntityType.CLUSTER_TEMPLATE, clusterTemplateName, version);
   }
 
+  @Override
   public PartialTemplate getPartialTemplate(String partialTemplateName) throws IOException {
     return get(EntityType.PARTIAL_TEMPLATE, partialTemplateName, Constants.FIND_MAX_VERSION, partialTemplateTransform);
   }
 
+  @Override
   public PartialTemplate getPartialTemplate(String partialTemplateName, int version) throws IOException {
     return get(EntityType.PARTIAL_TEMPLATE, partialTemplateName, version, partialTemplateTransform);
   }
@@ -474,4 +489,51 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
    */
   protected abstract void deleteEntity(EntityType entityType, String entityName, int entityVersion)
     throws IOException, IllegalAccessException;
+
+  @Override
+  public MandatoryPartial getMandatoryPartial(String mandatoryPartialName) throws IOException {
+    return get(EntityType.MANDATORY_PARTIAL, mandatoryPartialName, 0, mandatoryPartialTransform);
+  }
+
+  @Override
+  public PartialTemplate getMandatoryPartialAsPartialTemplate(String mandatoryPartialName) throws IOException {
+    MandatoryPartial mandatoryPartial = getMandatoryPartial(mandatoryPartialName);
+    return get(EntityType.PARTIAL_TEMPLATE, mandatoryPartial.getName(),
+               mandatoryPartial.getVersion(), partialTemplateTransform);
+  }
+
+  @Override
+  public void deleteMandatoryPartial(String mandatoryPartialName) throws IOException, IllegalAccessException {
+    deleteEntity(EntityType.MANDATORY_PARTIAL, mandatoryPartialName, 0);
+  }
+
+  @Override
+  public Collection<PartialTemplate> getAllMandatoryPartialsAsPartialTemplates() throws IOException {
+    // TODO: optimize this
+    Collection<MandatoryPartial> mandatoryPartials = getAllMandatoryPartials();
+    List<PartialTemplate> result = Lists.newArrayList();
+    for (MandatoryPartial mandatoryPartial : mandatoryPartials) {
+      result.add(getPartialTemplate(mandatoryPartial.getName(), mandatoryPartial.getVersion()));
+    }
+    return result;
+  }
+
+  @Override
+  public Collection<MandatoryPartial> getAllMandatoryPartials() throws IOException {
+    return getAllEntities(EntityType.MANDATORY_PARTIAL, mandatoryPartialTransform);
+  }
+
+  @Override
+  public void writeMandatoryPartialTemplate(MandatoryPartial mandatoryPartial)
+    throws IOException, IllegalAccessException {
+
+    // TODO: delete then write in a single transaction (?)
+    MandatoryPartial existingMandatoryPartial = getMandatoryPartial(mandatoryPartial.getName());
+    if (existingMandatoryPartial != null) {
+      deleteMandatoryPartial(mandatoryPartial.getName());
+    }
+
+    writeEntity(EntityType.MANDATORY_PARTIAL, mandatoryPartial.getName(), 0,
+                serialize(mandatoryPartial, MandatoryPartial.class));
+  }
 }

@@ -44,7 +44,6 @@ public abstract class AbstractTemplateCodec<T extends AbstractTemplate> extends 
 
   @Override
   protected void addChildFields(T template, JsonObject jsonObj, JsonSerializationContext context) {
-
     jsonObj.add(DEFAULTS_KEY, context.serialize(template.getClusterDefaults()));
     jsonObj.add(COMPATIBILITY_KEY, context.serialize(template.getCompatibilities()));
     jsonObj.add(CONSTRAINTS_KEY, context.serialize(template.getConstraints()));

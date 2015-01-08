@@ -775,7 +775,7 @@ public class ClusterService {
     throws IOException, TemplateNotFoundException, TemplateImmutabilityException, TemplateValidationException {
     EntityStoreView entityStore = entityStoreService.getView(account);
     ClusterTemplate clusterTemplate = entityStore.getClusterTemplate(templateName);
-    if  (clusterTemplate == null) {
+    if (clusterTemplate == null) {
       throw new TemplateNotFoundException("Cluster template " + templateName + " does not exist");
     }
     return resolveTemplate(entityStore, clusterTemplate);
@@ -784,12 +784,12 @@ public class ClusterService {
   private ClusterTemplate resolveTemplate(EntityStoreView entityStore, ClusterTemplate clusterTemplate)
     throws IOException, TemplateImmutabilityException, TemplateNotFoundException, TemplateValidationException {
     Set<AbstractTemplate> mergeSet = getMergeCollection(entityStore, clusterTemplate);
+    mergeSet.addAll(entityStore.getAllMandatoryPartialsAsPartialTemplates());
     return templateMerger.merge(mergeSet, clusterTemplate);
   }
 
-  /*
-  Merging in order Parent Includes -> Parent -> Child Includes -> Child -> ...
-  TODO: merging with mandatory partials and user-level attributes(???)
+  /**
+   * Merging in order: Parent Includes -> Parent -> Child Includes -> Child -> ...  -> Mandatory Partials
    */
   private Set<AbstractTemplate> getMergeCollection(EntityStoreView entityStore, ClusterTemplate clusterTemplate)
     throws IOException, TemplateNotFoundException {
