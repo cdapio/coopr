@@ -1,5 +1,5 @@
 /*
- * Copyright © 2012-2014 Cask Data, Inc.
+ * Copyright © 2012-2015 Cask Data, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@
 package co.cask.coopr.shell.command;
 
 import co.cask.common.cli.Arguments;
-import co.cask.common.cli.Command;
 import co.cask.coopr.client.PluginClient;
+import co.cask.coopr.shell.CLIConfig;
 import co.cask.coopr.shell.util.CliUtil;
 import com.google.inject.Inject;
 
@@ -29,28 +29,29 @@ import static co.cask.coopr.shell.util.Constants.PROVIDER_TYPE_ID;
 /**
  * Get provider type.
  */
-public class GetProviderTypeCommand implements Command {
+public class GetProviderTypeCommand extends AbstractAuthCommand {
 
   private final PluginClient pluginClient;
 
   @Inject
-  public GetProviderTypeCommand(PluginClient pluginClient) {
+  public GetProviderTypeCommand(PluginClient pluginClient, CLIConfig cliConfig) {
+    super(cliConfig);
     this.pluginClient = pluginClient;
   }
 
   @Override
-  public void execute(Arguments arguments, PrintStream printStream) throws Exception {
+  public void perform(Arguments arguments, PrintStream printStream) throws Exception {
     String id = arguments.get(PROVIDER_TYPE_ID);
     printStream.print(CliUtil.getPrettyJson(pluginClient.getProviderType(id)));
   }
 
   @Override
   public String getPattern() {
-    return String.format("get providertype <%s>", PROVIDER_TYPE_ID);
+    return String.format("get provider-type <%s>", PROVIDER_TYPE_ID);
   }
 
   @Override
   public String getDescription() {
-    return "Get provider type";
+    return "Get the provider type by id";
   }
 }

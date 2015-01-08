@@ -1,5 +1,5 @@
 /*
- * Copyright © 2012-2014 Cask Data, Inc.
+ * Copyright © 2012-2015 Cask Data, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@
 package co.cask.coopr.shell.command;
 
 import co.cask.common.cli.Arguments;
-import co.cask.common.cli.Command;
 import co.cask.coopr.client.ProvisionerClient;
+import co.cask.coopr.shell.CLIConfig;
 import co.cask.coopr.shell.util.CliUtil;
 import com.google.inject.Inject;
 
@@ -27,17 +27,18 @@ import java.io.PrintStream;
 /**
  * Lists all provisioners.
  */
-public class ListProvisionersCommand implements Command {
+public class ListProvisionersCommand extends AbstractAuthCommand {
 
 private final ProvisionerClient provisionerClient;
 
   @Inject
-  private ListProvisionersCommand(ProvisionerClient provisionerClient) {
+  private ListProvisionersCommand(ProvisionerClient provisionerClient, CLIConfig cliConfig) {
+    super(cliConfig);
     this.provisionerClient = provisionerClient;
   }
 
   @Override
-  public void execute(Arguments arguments, PrintStream printStream) throws Exception {
+  public void perform(Arguments arguments, PrintStream printStream) throws Exception {
     printStream.print(CliUtil.getPrettyJson(provisionerClient.getAllProvisioners()));
   }
 
@@ -48,6 +49,6 @@ private final ProvisionerClient provisionerClient;
 
   @Override
   public String getDescription() {
-    return "Lists all provisioners";
+    return "List all provisioners";
   }
 }

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,22 +14,14 @@
  * limitations under the License.
  */
 
-package co.cask.coopr.shell.command;
-
-import org.junit.Test;
-import org.mockito.Mockito;
+package co.cask.coopr.client.rest.exception;
 
 /**
- * {@link GetAutomatorTypeCommand} class test.
+ * Thrown when an access token is unauthorized.
  */
-public class GetAutomatorTypeCommandTest extends AbstractTest {
+public class UnauthorizedAccessTokenException extends RuntimeException {
 
-  private static final String INPUT =
-    String.format("get automator-type %s", TEST_PLUGIN_TYPE);
-
-  @Test
-  public void testExecute() throws Exception {
-    CLI.execute(INPUT, System.out);
-    Mockito.verify(PLUGIN_CLIENT).getAutomatorType(Mockito.eq(TEST_PLUGIN_TYPE));
+  public UnauthorizedAccessTokenException(String message) {
+    super(message);
   }
 }

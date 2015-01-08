@@ -1,5 +1,5 @@
 /*
- * Copyright © 2012-2015 Cask Data, Inc.
+ * Copyright © 2012-2014 Cask Data, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,38 +17,39 @@
 package co.cask.coopr.shell.command;
 
 import co.cask.common.cli.Arguments;
+import co.cask.common.cli.Command;
 import co.cask.coopr.client.AdminClient;
-import co.cask.coopr.shell.CLIConfig;
-import co.cask.coopr.shell.util.CliUtil;
 import com.google.inject.Inject;
 
 import java.io.PrintStream;
 
+import static co.cask.coopr.shell.util.Constants.NAME_KEY;
+
 /**
- * Lists all cluster templates.
+ * Deletes a partial template.
  */
-public class ListClusterTemplatesCommand extends AbstractAuthCommand {
+public class DeletePartialTemplateCommand implements Command {
 
   private final AdminClient adminClient;
 
   @Inject
-  private ListClusterTemplatesCommand(AdminClient adminClient, CLIConfig cliConfig) {
-    super(cliConfig);
+  private DeletePartialTemplateCommand(AdminClient adminClient) {
     this.adminClient = adminClient;
   }
 
   @Override
-  public void perform(Arguments arguments, PrintStream printStream) throws Exception {
-    printStream.print(CliUtil.getPrettyJson(adminClient.getAllClusterTemplates()));
+  public void execute(Arguments arguments, PrintStream printStream) throws Exception {
+    String name = arguments.get(NAME_KEY);
+    adminClient.deletePartialTemplate(name);
   }
 
   @Override
   public String getPattern() {
-    return "list templates";
+    return String.format("delete partial template <%s>", NAME_KEY);
   }
 
   @Override
   public String getDescription() {
-    return "List all templates";
+    return "Deletes a partial template";
   }
 }

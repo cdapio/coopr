@@ -19,12 +19,14 @@ package co.cask.coopr.client.rest;
 import co.cask.common.http.exception.HttpFailureException;
 import co.cask.coopr.Entities;
 import co.cask.coopr.client.AdminClient;
+import co.cask.coopr.client.rest.exception.UnauthorizedAccessTokenException;
 import co.cask.coopr.client.rest.handler.TestStatusUserId;
 import co.cask.coopr.spec.HardwareType;
 import co.cask.coopr.spec.ImageType;
 import co.cask.coopr.spec.Provider;
 import co.cask.coopr.spec.service.Service;
 import co.cask.coopr.spec.template.ClusterTemplate;
+import co.cask.coopr.spec.template.PartialTemplate;
 import org.apache.http.HttpStatus;
 import org.junit.After;
 import org.junit.Assert;
@@ -41,6 +43,7 @@ public class AdminRestClientTest extends RestClientTest {
   private AdminClient adminClient;
 
   public static final String HADOOP_DISTRIBUTED_NAME = "hadoop-distributed";
+  public static final String TEST_PARTIAL1_NAME = "partial1";
   public static final String JOYENT_PROVIDER_NAME = "joyent";
   public static final String DATA_NODE_SERVICE_NAME = "datanode";
   public static final String LARGE_HARDWARE_TYPE_NAME = "large";
@@ -102,6 +105,60 @@ public class AdminRestClientTest extends RestClientTest {
     adminClient = clientManager.getAdminClient();
     try {
       adminClient.deleteClusterTemplate(HADOOP_DISTRIBUTED_NAME);
+      Assert.fail("Expected HttpFailureException");
+    } catch (HttpFailureException e) {
+      Assert.assertEquals(HttpStatus.SC_NOT_FOUND, e.getStatusCode());
+    }
+  }
+
+  @Test
+  public void testGetAllPartialTemplatesSuccess() throws IOException {
+    List<PartialTemplate> result = adminClient.getAllPartialTemplates();
+    assertTrue(result.contains(Entities.PartialTemplateExample.TEST_PARTIAL1));
+    assertTrue(result.contains(Entities.PartialTemplateExample.TEST_PARTIAL2));
+  }
+
+  @Test
+  public void testGetAllPartialTemplatesBadRequest() throws IOException {
+    clientManager = createClientManager(TestStatusUserId.BAD_REQUEST_STATUS_USER_ID.getValue());
+    adminClient = clientManager.getAdminClient();
+    try {
+      adminClient.getAllPartialTemplates();
+      Assert.fail("Expected HttpFailureException");
+    } catch (HttpFailureException e) {
+      Assert.assertEquals(HttpStatus.SC_BAD_REQUEST, e.getStatusCode());
+    }
+  }
+
+  @Test
+  public void testGetPartialTemplateSuccess() throws IOException {
+    PartialTemplate result = adminClient.getPartialTemplate(TEST_PARTIAL1_NAME);
+    assertTrue(result.equals(Entities.PartialTemplateExample.TEST_PARTIAL1));
+  }
+
+  @Test
+  public void testGetPartialTemplateNotFound() throws IOException {
+    clientManager = createClientManager(TestStatusUserId.NOT_FOUND_STATUS_USER_ID.getValue());
+    adminClient = clientManager.getAdminClient();
+    try {
+      adminClient.getPartialTemplate(TEST_PARTIAL1_NAME);
+      Assert.fail("Expected HttpFailureException");
+    } catch (HttpFailureException e) {
+      Assert.assertEquals(HttpStatus.SC_NOT_FOUND, e.getStatusCode());
+    }
+  }
+
+  @Test
+  public void testDeletePartialTemplateSuccess() throws IOException {
+    adminClient.deletePartialTemplate(TEST_PARTIAL1_NAME);
+  }
+
+  @Test
+  public void testDeletePartialTemplateNotFound() throws IOException {
+    clientManager = createClientManager(TestStatusUserId.NOT_FOUND_STATUS_USER_ID.getValue());
+    adminClient = clientManager.getAdminClient();
+    try {
+      adminClient.deletePartialTemplate(TEST_PARTIAL1_NAME);
       Assert.fail("Expected HttpFailureException");
     } catch (HttpFailureException e) {
       Assert.assertEquals(HttpStatus.SC_NOT_FOUND, e.getStatusCode());
@@ -231,9 +288,8 @@ public class AdminRestClientTest extends RestClientTest {
     adminClient = clientManager.getAdminClient();
     try {
       adminClient.getAllHardwareTypes();
-      Assert.fail("Expected HttpFailureException");
-    } catch (HttpFailureException e) {
-      Assert.assertEquals(HttpStatus.SC_UNAUTHORIZED, e.getStatusCode());
+      Assert.fail("Expected UnauthorizedAccessTokenException");
+    } catch (UnauthorizedAccessTokenException ignored) {
     }
   }
 

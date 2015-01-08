@@ -19,6 +19,7 @@ package co.cask.coopr.client.rest;
 import co.cask.common.http.exception.HttpFailureException;
 import co.cask.coopr.Entities;
 import co.cask.coopr.client.ClusterClient;
+import co.cask.coopr.client.rest.exception.UnauthorizedAccessTokenException;
 import co.cask.coopr.client.rest.handler.TestStatusUserId;
 import co.cask.coopr.cluster.ClusterDetails;
 import co.cask.coopr.cluster.ClusterSummary;
@@ -140,9 +141,8 @@ public class ClusterRestClientTest extends RestClientTest {
     clusterClient = clientManager.getClusterClient();
     try {
       clusterClient.getClusterStatus(TEST_CLUSTER_ID);
-      Assert.fail("Expected HttpFailureException");
-    } catch (HttpFailureException e) {
-      Assert.assertEquals(HttpStatus.SC_UNAUTHORIZED, e.getStatusCode());
+      Assert.fail("Expected UnauthorizedAccessTokenException");
+    } catch (UnauthorizedAccessTokenException ignored) {
     }
   }
 

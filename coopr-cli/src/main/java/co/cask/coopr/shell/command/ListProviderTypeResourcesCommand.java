@@ -1,5 +1,5 @@
 /*
- * Copyright © 2012-2014 Cask Data, Inc.
+ * Copyright © 2012-2015 Cask Data, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@
 package co.cask.coopr.shell.command;
 
 import co.cask.common.cli.Arguments;
-import co.cask.common.cli.Command;
 import co.cask.coopr.client.PluginClient;
 import co.cask.coopr.provisioner.plugin.ResourceStatus;
+import co.cask.coopr.shell.CLIConfig;
 import co.cask.coopr.shell.util.CliUtil;
 import com.google.inject.Inject;
 
@@ -32,17 +32,18 @@ import static co.cask.coopr.shell.util.Constants.RESOURCE_TYPE;
 /**
  * Lists provider type resources.
  */
-public class ListProviderTypeResourcesCommand implements Command {
+public class ListProviderTypeResourcesCommand extends AbstractAuthCommand {
 
   private final PluginClient pluginClient;
 
   @Inject
-  public ListProviderTypeResourcesCommand(PluginClient pluginClient) {
+  public ListProviderTypeResourcesCommand(PluginClient pluginClient, CLIConfig cliConfig) {
+    super(cliConfig);
     this.pluginClient = pluginClient;
   }
 
   @Override
-  public void execute(Arguments arguments, PrintStream printStream) throws Exception {
+  public void perform(Arguments arguments, PrintStream printStream) throws Exception {
     String providerTypeId = arguments.get(PROVIDER_TYPE_ID);
     String resourceType = arguments.get(RESOURCE_TYPE);
     String statusStr = arguments.get(RESOURCE_STATUS, "");
@@ -62,6 +63,6 @@ public class ListProviderTypeResourcesCommand implements Command {
 
   @Override
   public String getDescription() {
-    return "Lists provider type resources.";
+    return "List a specific type of provider type resources";
   }
 }

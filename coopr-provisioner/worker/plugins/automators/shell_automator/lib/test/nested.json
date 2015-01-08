@@ -1,8 +1,0 @@
-{
-    "config": {
-        "cluster": {
-            "foo": "bar",
-            "bar": "baz"
-        }
-    }
-}

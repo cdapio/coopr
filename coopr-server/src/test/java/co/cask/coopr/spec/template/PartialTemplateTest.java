@@ -51,7 +51,6 @@ public class PartialTemplateTest extends BaseTest {
     Sets.newHashSet("mysql-server", "sensu-monitoring", "kerberos-client", "zookeeper-server", "cdap",
                     "ldap-internal");
   private static final Map<String, ServiceConstraint> serviceConstraints = Maps.newHashMap();
-
   private static final ClassLoader classLoader = PartialTemplateTest.class.getClassLoader();
 
   @Override
@@ -249,14 +248,14 @@ public class PartialTemplateTest extends BaseTest {
     clusterService.resolveTemplate(account, notPersisted);
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = TemplateValidationException.class)
   public void test_11_templateWithoutDefaultsServices() throws Exception {
     InputStream templateWithoutDefaultsIn = classLoader.getResourceAsStream("partials/cdap-distributed-without-defaults-services.json");
     ClusterTemplate template = gson.fromJson(IOUtils.toString(templateWithoutDefaultsIn), ClusterTemplate.class);
     clusterService.resolveTemplate(account, template);
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = TemplateValidationException.class)
   public void test_12_templateWithoutDefaultsProvider() throws Exception {
     InputStream templateWithoutDefaultsIn = classLoader.getResourceAsStream("partials/cdap-distributed-without-defaults-provider.json");
     ClusterTemplate template = gson.fromJson(IOUtils.toString(templateWithoutDefaultsIn), ClusterTemplate.class);

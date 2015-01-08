@@ -1,5 +1,5 @@
 /*
- * Copyright © 2012-2014 Cask Data, Inc.
+ * Copyright © 2012-2015 Cask Data, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@
 package co.cask.coopr.shell.command;
 
 import co.cask.common.cli.Arguments;
-import co.cask.common.cli.Command;
 import co.cask.coopr.client.AdminClient;
+import co.cask.coopr.shell.CLIConfig;
 import co.cask.coopr.shell.util.CliUtil;
 import com.google.inject.Inject;
 
@@ -27,17 +27,18 @@ import java.io.PrintStream;
 /**
  * Lists all hardware types.
  */
-public class ListHardwareTypesCommand implements Command {
+public class ListHardwareTypesCommand extends AbstractAuthCommand {
 
   private final AdminClient adminClient;
 
   @Inject
-  private ListHardwareTypesCommand(AdminClient adminClient) {
+  private ListHardwareTypesCommand(AdminClient adminClient, CLIConfig cliConfig) {
+    super(cliConfig);
     this.adminClient = adminClient;
   }
 
   @Override
-  public void execute(Arguments arguments, PrintStream printStream) throws Exception {
+  public void perform(Arguments arguments, PrintStream printStream) throws Exception {
     printStream.print(CliUtil.getPrettyJson(adminClient.getAllHardwareTypes()));
   }
 
@@ -48,6 +49,6 @@ public class ListHardwareTypesCommand implements Command {
 
   @Override
   public String getDescription() {
-    return "Lists all cluster hardware types";
+    return "List all hardware types";
   }
 }

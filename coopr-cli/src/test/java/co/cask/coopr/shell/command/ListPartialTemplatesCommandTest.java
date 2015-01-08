@@ -16,20 +16,23 @@
 
 package co.cask.coopr.shell.command;
 
+import co.cask.common.cli.exception.InvalidCommandException;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-/**
- * {@link GetAutomatorTypeCommand} class test.
- */
-public class GetAutomatorTypeCommandTest extends AbstractTest {
+import java.io.IOException;
 
-  private static final String INPUT =
-    String.format("get automator-type %s", TEST_PLUGIN_TYPE);
+/**
+ * {@link ListPartialTemplatesCommand} class test.
+ */
+public class ListPartialTemplatesCommandTest extends AbstractTest {
+
+  private static final String INPUT = "list partial templates";
 
   @Test
-  public void testExecute() throws Exception {
+  public void executeTest() throws IOException, InvalidCommandException {
     CLI.execute(INPUT, System.out);
-    Mockito.verify(PLUGIN_CLIENT).getAutomatorType(Mockito.eq(TEST_PLUGIN_TYPE));
+
+    Mockito.verify(ADMIN_CLIENT).getAllPartialTemplates();
   }
 }

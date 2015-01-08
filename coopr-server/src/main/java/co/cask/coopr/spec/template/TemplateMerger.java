@@ -47,7 +47,7 @@ public class TemplateMerger {
    * @throws TemplateNotFoundException if template is unknown type.
    */
   public ClusterTemplate merge(Collection<AbstractTemplate> templates, ClusterTemplate initialTemplate)
-    throws TemplateImmutabilityException, TemplateNotFoundException {
+    throws TemplateImmutabilityException, TemplateNotFoundException, TemplateValidationException {
     Set<String> immutables = Sets.newHashSet();
     ClusterTemplate toTemplate = ClusterTemplate.builder()
       .setName(initialTemplate.getName())
@@ -67,7 +67,12 @@ public class TemplateMerger {
         throw new TemplateNotFoundException("Template not partial and not cluster.");
       }
     }
-    validateFields(toTemplate);
+    try {
+      validateFields(toTemplate);
+    } catch (IllegalArgumentException e){
+      throw new TemplateValidationException(e.getMessage(), e);
+    }
+
     return toTemplate;
   }
 

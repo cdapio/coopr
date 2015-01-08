@@ -1,0 +1,135 @@
+{
+  "name": "cdap-distributed",
+  "description": "Cask DAP (CDAP) with Security and Hadoop cluster with single master",
+  "version": "1",
+  "defaults": {
+    "services": [
+      "zookeeper-server",
+      "mysql-server",
+      "cdap",
+      "bob",
+      "sensu-monitoring",
+      "cdap-security"
+    ],
+    "provider": "google",
+    "hardwaretype": "standard-large",
+    "imagetype": "centos6",
+    "dnsSuffix": "example.com",
+    "config": {
+      "mysql": {
+        "server_debian_password": "somedefaultpassword",
+        "server_root_password": "somedefaultpassword",
+        "server_repl_password": "somedefaultpassword",
+        "data_dir": "/data/mysql",
+        "server": {
+          "directories": {
+            "log_dir": "/data/mysql"
+          }
+        },
+        "bind_address": "%ip.bind_v4.service.mysql-server%"
+      },
+      "zookeeper": {
+        "zookeeper_env": {
+          "zookeeper_log_dir": "/data/logs/zookeeper"
+        }
+      },
+      "bob": {
+        "bob_address": "somewhere"
+      },
+      "sensu_wrapper": {
+        "additional_client_attributes": {
+          "mail_to":"%cluster.owner%@example.com"
+        },
+        "endpoint": "sensu-internal-server.example.com"
+      },
+      "security.enabled": "true",
+      "security.authentication.handlerClassName": "co.cask.cdap.security.server.LDAPAuthenticationHandler",
+      "security.authentication.loginmodule.className": "org.eclipse.jetty.plus.jaas.spi.LdapLoginModule",
+      "security.authentication.handler.debug": "true",
+      "security.authentication.handler.hostname": "ldap.example.com",
+      "security.authentication.handler.port": "389",
+      "security.authentication.handler.userBaseDn": "ou=people,dc=example,dc=com",
+      "security.authentication.handler.userRdnAttribute": "cn",
+      "security.authentication.handler.userObjectClass": "inetorgperson",
+      "security.server.ssl.enabled": "false"
+    }
+  },
+  "compatibility": {
+    "hardwaretypes": [
+      "standard-large",
+      "standard-xlarge"
+    ],
+    "imagetypes": [
+     "centos6",
+     "ubuntu12"
+    ],
+    "services": [
+      "zookeeper-server",
+      "cdap",
+      "mysql-server",
+      "sensu-monitoring"
+    ]
+  },
+  "constraints": {
+    "layout": {
+      "mustcoexist": [
+        [
+          "hbase-regionserver"
+        ],
+        [
+          "mysql-server",
+          "zookeeper-server",
+          "cdap"
+        ]
+      ],
+      "cantcoexist": [
+        [
+          "hadoop-hdfs-namenode",
+          "hadoop-hdfs-datanode"
+        ],
+        [
+          "hadoop-hdfs-datanode",
+          "cdap"
+        ]
+      ]
+    },
+    "services": {
+      "mysql-server": {
+        "hardwaretypes":[],
+        "imagetypes":[],
+        "quantities": {
+          "min":1,
+          "max":1
+        }
+      },
+      "zookeeper-server": {
+        "hardwaretypes":[],
+        "imagetypes":[],
+        "quantities": {
+          "min":1,
+          "max":1
+        }
+      }
+    },
+    "size": {
+      "min": "3",
+      "max": "100"
+    }
+  },
+  "administration": {
+    "leaseduration": {
+      "initial": "43200000",
+      "max": "0",
+      "step":"43200000"
+    }
+  },
+  "links":[],
+  "extends": {
+    "name": "cdap-distributed-insecure"
+  },
+  "includes": [
+    {
+      "name": "sensu-internal"
+    }
+  ]
+}

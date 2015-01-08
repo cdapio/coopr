@@ -1,9 +1,0 @@
-inherit_from: .rubocop_todo.yml
-AllCops:
-  Exclude:
-    - worker/plugins/**/*
-    # Uncomment the following and comment above to only ignore cookbooks
-    # - worker/plugins/automators/chef_solo_automator/resources/cookbooks/**/*
-# Disable specific cops below
-AsciiComments:
-  Enabled: false

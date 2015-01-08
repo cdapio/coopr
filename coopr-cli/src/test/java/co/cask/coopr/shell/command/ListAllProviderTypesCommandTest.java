@@ -25,7 +25,7 @@ import org.mockito.Mockito;
 public class ListAllProviderTypesCommandTest extends AbstractTest {
 
   private static final String INPUT =
-    String.format("list all providertypes");
+    String.format("list provider-types");
 
   @Test
   public void testExecute() throws Exception {

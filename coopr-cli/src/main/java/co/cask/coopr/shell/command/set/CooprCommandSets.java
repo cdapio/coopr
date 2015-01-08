@@ -28,6 +28,7 @@ import co.cask.coopr.shell.command.DeleteClusterCommand;
 import co.cask.coopr.shell.command.DeleteClusterTemplateCommand;
 import co.cask.coopr.shell.command.DeleteHardwareTypeCommand;
 import co.cask.coopr.shell.command.DeleteImageTypeCommand;
+import co.cask.coopr.shell.command.DeletePartialTemplateCommand;
 import co.cask.coopr.shell.command.DeleteProviderCommand;
 import co.cask.coopr.shell.command.DeleteProviderTypeResourcesCommand;
 import co.cask.coopr.shell.command.DeleteServiceCommand;
@@ -39,6 +40,7 @@ import co.cask.coopr.shell.command.GetClusterStatusCommand;
 import co.cask.coopr.shell.command.GetClusterTemplateCommand;
 import co.cask.coopr.shell.command.GetHardwareTypeCommand;
 import co.cask.coopr.shell.command.GetImageTypeCommand;
+import co.cask.coopr.shell.command.GetPartialTemplateCommand;
 import co.cask.coopr.shell.command.GetProviderCommand;
 import co.cask.coopr.shell.command.GetProviderTypeCommand;
 import co.cask.coopr.shell.command.GetProvisionerCommand;
@@ -52,6 +54,7 @@ import co.cask.coopr.shell.command.ListClusterTemplatesCommand;
 import co.cask.coopr.shell.command.ListClustersCommand;
 import co.cask.coopr.shell.command.ListHardwareTypesCommand;
 import co.cask.coopr.shell.command.ListImageTypesCommand;
+import co.cask.coopr.shell.command.ListPartialTemplatesCommand;
 import co.cask.coopr.shell.command.ListProviderTypeResourcesCommand;
 import co.cask.coopr.shell.command.ListProvidersCommand;
 import co.cask.coopr.shell.command.ListProvisionersCommand;
@@ -119,19 +122,22 @@ public class CooprCommandSets {
 
   private static CommandSet<Command> getAdminCommandSet(Injector injector) {
     List<Command> commands = ImmutableList.of(
-      injector.getInstance(DeleteClusterTemplateCommand.class),
+      (Command) injector.getInstance(DeleteClusterTemplateCommand.class),
       injector.getInstance(DeleteHardwareTypeCommand.class),
       injector.getInstance(DeleteImageTypeCommand.class),
+      injector.getInstance(DeletePartialTemplateCommand.class),
       injector.getInstance(DeleteProviderCommand.class),
       injector.getInstance(DeleteServiceCommand.class),
       injector.getInstance(GetClusterTemplateCommand.class),
       injector.getInstance(GetHardwareTypeCommand.class),
       injector.getInstance(GetImageTypeCommand.class),
+      injector.getInstance(GetPartialTemplateCommand.class),
       injector.getInstance(GetProviderCommand.class),
       injector.getInstance(GetServiceCommand.class),
       injector.getInstance(ListClusterTemplatesCommand.class),
       injector.getInstance(ListHardwareTypesCommand.class),
       injector.getInstance(ListImageTypesCommand.class),
+      injector.getInstance(ListPartialTemplatesCommand.class),
       injector.getInstance(ListProvidersCommand.class),
       injector.getInstance(ListServicesCommand.class)
     );
@@ -140,7 +146,7 @@ public class CooprCommandSets {
 
   private static CommandSet<Command> getClusterCommandSet(Injector injector) {
     List<Command> commands = ImmutableList.of(
-      injector.getInstance(AddServicesOnClusterCommand.class),
+      (Command) injector.getInstance(AddServicesOnClusterCommand.class),
       injector.getInstance(CreateClusterCommand.class),
       injector.getInstance(DeleteClusterCommand.class),
       injector.getInstance(GetClusterCommand.class),
@@ -160,7 +166,7 @@ public class CooprCommandSets {
 
   private static CommandSet<Command> getPluginCommandSet(Injector injector) {
     List<Command> commands = ImmutableList.of(
-      injector.getInstance(DeleteAutomatorTypeResourcesCommand.class),
+      (Command) injector.getInstance(DeleteAutomatorTypeResourcesCommand.class),
       injector.getInstance(DeleteProviderTypeResourcesCommand.class),
       injector.getInstance(GetAutomatorTypeCommand.class),
       injector.getInstance(GetProviderTypeCommand.class),
@@ -179,7 +185,7 @@ public class CooprCommandSets {
 
   private static CommandSet<Command> getTenantCommandSet(Injector injector) {
     List<Command> commands = ImmutableList.of(
-      injector.getInstance(DeleteTenantCommand.class),
+      (Command) injector.getInstance(DeleteTenantCommand.class),
       injector.getInstance(GetTenantCommand.class),
       injector.getInstance(ListTenantsCommand.class)
     );
@@ -188,7 +194,7 @@ public class CooprCommandSets {
 
   private static CommandSet<Command> getProvisionerCommandSet(Injector injector) {
     List<Command> commands = ImmutableList.of(
-      injector.getInstance(GetProvisionerCommand.class),
+      (Command) injector.getInstance(GetProvisionerCommand.class),
       injector.getInstance(ListProvisionersCommand.class)
     );
     return new CommandSet<Command>(commands);

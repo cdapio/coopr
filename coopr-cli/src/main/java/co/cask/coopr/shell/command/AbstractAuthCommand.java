@@ -17,37 +17,32 @@
 package co.cask.coopr.shell.command;
 
 import co.cask.common.cli.Arguments;
-import co.cask.coopr.client.PluginClient;
+import co.cask.common.cli.Command;
+import co.cask.coopr.client.rest.exception.UnauthorizedAccessTokenException;
 import co.cask.coopr.shell.CLIConfig;
-import com.google.inject.Inject;
 
 import java.io.PrintStream;
 
 /**
- * Synchronize resources.
+ * Abstract command for updating {@link co.cask.cdap.security.authentication.client.AccessToken}.
  */
-public class SyncResourcesCommand extends AbstractAuthCommand {
+public abstract class AbstractAuthCommand implements Command {
 
-  private final PluginClient pluginClient;
+  private final CLIConfig cliConfig;
 
-  @Inject
-  public SyncResourcesCommand(PluginClient pluginClient, CLIConfig cliConfig) {
-    super(cliConfig);
-    this.pluginClient = pluginClient;
+  protected AbstractAuthCommand(CLIConfig cliConfig) {
+    this.cliConfig = cliConfig;
   }
 
   @Override
-  public void perform(Arguments arguments, PrintStream printStream) throws Exception {
-    pluginClient.syncPlugins();
+  public void execute(Arguments arguments, PrintStream printStream) throws Exception {
+    try {
+      perform(arguments, printStream);
+    } catch (UnauthorizedAccessTokenException e) {
+      cliConfig.updateAccessToken();
+      perform(arguments, printStream);
+    }
   }
 
-  @Override
-  public String getPattern() {
-    return String.format("sync resources");
-  }
-
-  @Override
-  public String getDescription() {
-    return "Synchronize resources";
-  }
+  abstract void perform(Arguments arguments, PrintStream printStream) throws Exception;
 }

@@ -53,6 +53,7 @@ import co.cask.coopr.spec.template.SizeConstraint;
 import co.cask.coopr.spec.template.TemplateImmutabilityException;
 import co.cask.coopr.spec.template.TemplateMerger;
 import co.cask.coopr.spec.template.TemplateNotFoundException;
+import co.cask.coopr.spec.template.TemplateValidationException;
 import co.cask.coopr.store.cluster.ClusterStore;
 import co.cask.coopr.store.cluster.ClusterStoreService;
 import co.cask.coopr.store.cluster.ClusterStoreView;
@@ -751,9 +752,10 @@ public class ClusterService {
    * @throws IOException if there was some error writing to stores.
    * @throws TemplateNotFoundException if template is unknown type.
    * @throws TemplateImmutabilityException if some template tries to override immutable template config.
+   * @throws TemplateValidationException if template after merge does not has some required fields.
    */
   public ClusterTemplate resolveTemplate(Account account, ClusterTemplate clusterTemplate)
-    throws TemplateNotFoundException, TemplateImmutabilityException, IOException {
+    throws TemplateNotFoundException, TemplateImmutabilityException, IOException, TemplateValidationException {
     EntityStoreView entityStore = entityStoreService.getView(account);
     return resolveTemplate(entityStore, clusterTemplate);
   }
@@ -767,9 +769,10 @@ public class ClusterService {
    * @throws IOException if there was some error reading from stores.
    * @throws TemplateNotFoundException if template can't be found in store.
    * @throws TemplateImmutabilityException if some template tries to override immutable template config.
+   * @throws TemplateValidationException if template after merge does not has some required fields.
    */
   public ClusterTemplate resolveTemplate(Account account, String templateName)
-    throws IOException, TemplateNotFoundException, TemplateImmutabilityException {
+    throws IOException, TemplateNotFoundException, TemplateImmutabilityException, TemplateValidationException {
     EntityStoreView entityStore = entityStoreService.getView(account);
     ClusterTemplate clusterTemplate = entityStore.getClusterTemplate(templateName);
     if  (clusterTemplate == null) {
@@ -779,7 +782,7 @@ public class ClusterService {
   }
 
   private ClusterTemplate resolveTemplate(EntityStoreView entityStore, ClusterTemplate clusterTemplate)
-    throws IOException, TemplateImmutabilityException, TemplateNotFoundException {
+    throws IOException, TemplateImmutabilityException, TemplateNotFoundException, TemplateValidationException {
     Set<AbstractTemplate> mergeSet = getMergeCollection(entityStore, clusterTemplate);
     return templateMerger.merge(mergeSet, clusterTemplate);
   }
