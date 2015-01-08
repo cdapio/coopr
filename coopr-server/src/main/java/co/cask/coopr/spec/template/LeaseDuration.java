@@ -224,7 +224,7 @@ public final class LeaseDuration {
      * @return this
      */
     public Builder setInitial(String initial) {
-      this.initial = getTimestamp(initial);
+      this.initial = getTimestamp(Objects.firstNonNull(initial, "0"));
       return this;
     }
 
@@ -235,7 +235,7 @@ public final class LeaseDuration {
      * @return this
      */
     public Builder setMax(String max) {
-      this.max = getTimestamp(max);
+      this.max = getTimestamp(Objects.firstNonNull(max, "0"));
       return this;
     }
 
@@ -246,7 +246,7 @@ public final class LeaseDuration {
      * @return this
      */
     public Builder setStep(String step) {
-      this.step = getTimestamp(step);
+      this.step = getTimestamp(Objects.firstNonNull(step, "0"));
       return this;
     }
 
