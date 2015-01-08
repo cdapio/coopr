@@ -16,11 +16,13 @@
 package co.cask.coopr.http;
 
 import co.cask.coopr.Entities;
+import co.cask.coopr.account.Account;
 import co.cask.coopr.common.conf.Constants;
 import co.cask.coopr.provisioner.plugin.PluginType;
 import co.cask.coopr.provisioner.plugin.ResourceMeta;
 import co.cask.coopr.provisioner.plugin.ResourceStatus;
 import co.cask.coopr.provisioner.plugin.ResourceType;
+import co.cask.coopr.store.provisioner.PluginResourceTypeView;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
@@ -146,19 +148,24 @@ public class PluginHandlerTest extends ServiceTestBase {
     ResourceMeta dev1 = new ResourceMeta("dev", 1, ResourceStatus.INACTIVE);
     ResourceMeta dev2 = new ResourceMeta("dev", 2, ResourceStatus.ACTIVE);
     ResourceMeta research1 = new ResourceMeta("research", 1, ResourceStatus.INACTIVE);
+    PluginResourceTypeView automatorTypeView = metaStoreService.getResourceTypeView(ADMIN_ACCOUNT, cookbooks);
+    PluginResourceTypeView providerTypeView = metaStoreService.getResourceTypeView(ADMIN_ACCOUNT, keys);
 
-    // upload 3 versions of hadoop cookbook
-    assertSendContents("hadoop contents 1", cookbooks, "hadoop");
-    assertSendContents("hadoop contents 2", cookbooks, "hadoop");
-    assertSendContents("hadoop contents 3", cookbooks, "hadoop");
-    // upload 2 versions of mysql cookbook
-    assertSendContents("mysql contents 1", cookbooks, "mysql");
-    assertSendContents("mysql contents 2", cookbooks, "mysql");
-    // upload 2 versions of dev keys
-    assertSendContents("dev keys 1", keys, "dev");
-    assertSendContents("dev keys 2", keys, "dev");
-    // upload 1 version of research keys
-    assertSendContents("research keys 1", keys, "research");
+    // add 3 versions of hadoop cookbook
+    automatorTypeView.add(new ResourceMeta("hadoop", 1));
+    automatorTypeView.add(new ResourceMeta("hadoop", 2));
+    automatorTypeView.add(new ResourceMeta("hadoop", 3));
+
+    // add 2 versions of mysql cookbook
+    automatorTypeView.add(new ResourceMeta("mysql", 1));
+    automatorTypeView.add(new ResourceMeta("mysql", 2));
+
+    // add 2 versions of dev keys
+    providerTypeView.add(new ResourceMeta("dev", 1));
+    providerTypeView.add(new ResourceMeta("dev", 2));
+
+    // add 1 version of research keys
+    providerTypeView.add(new ResourceMeta("research", 1));
 
     // stage version 2 of hadoop
     assertResponseStatus(doPostExternalAPI(getVersionedPath(cookbooks, "hadoop", 2) + "/stage", "", ADMIN_HEADERS),
@@ -178,8 +185,8 @@ public class PluginHandlerTest extends ServiceTestBase {
     assertResponseStatus(response, HttpResponseStatus.OK);
     Map<String, Set<ResourceMeta>> actual = bodyToMetaMap(response);
     Map<String, Set<ResourceMeta>> expected = ImmutableMap.<String, Set<ResourceMeta>>of(
-      "hadoop", ImmutableSet.<ResourceMeta>of(hadoop1, hadoop2, hadoop3),
-      "mysql", ImmutableSet.<ResourceMeta>of(mysql1, mysql2)
+      "hadoop", ImmutableSet.of(hadoop1, hadoop2, hadoop3),
+      "mysql", ImmutableSet.of(mysql1, mysql2)
     );
     Assert.assertEquals(expected, actual);
     // check keys
@@ -187,8 +194,8 @@ public class PluginHandlerTest extends ServiceTestBase {
     assertResponseStatus(response, HttpResponseStatus.OK);
     actual = bodyToMetaMap(response);
     expected = ImmutableMap.<String, Set<ResourceMeta>>of(
-      "dev", ImmutableSet.<ResourceMeta>of(dev1, dev2),
-      "research", ImmutableSet.<ResourceMeta>of(research1)
+      "dev", ImmutableSet.of(dev1, dev2),
+      "research", ImmutableSet.of(research1)
     );
     Assert.assertEquals(expected, actual);
 
@@ -200,7 +207,6 @@ public class PluginHandlerTest extends ServiceTestBase {
                          HttpResponseStatus.OK);
     response = doGetExternalAPI(getTypePath(cookbooks), ADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
-    actual = bodyToMetaMap(response);
 
     // sync
     assertResponseStatus(doPostExternalAPI("/plugins/sync", "", ADMIN_HEADERS), HttpResponseStatus.OK);
@@ -213,8 +219,8 @@ public class PluginHandlerTest extends ServiceTestBase {
     hadoop3 = new ResourceMeta("hadoop", 3, ResourceStatus.ACTIVE);
     mysql1 = new ResourceMeta("mysql", 1, ResourceStatus.INACTIVE);
     expected = ImmutableMap.<String, Set<ResourceMeta>>of(
-      "hadoop", ImmutableSet.<ResourceMeta>of(hadoop1, hadoop2, hadoop3),
-      "mysql", ImmutableSet.<ResourceMeta>of(mysql1, mysql2)
+      "hadoop", ImmutableSet.of(hadoop1, hadoop2, hadoop3),
+      "mysql", ImmutableSet.of(mysql1, mysql2)
     );
     Assert.assertEquals(expected, actual);
   }
@@ -225,13 +231,20 @@ public class PluginHandlerTest extends ServiceTestBase {
   }
 
   private void assertSendContents(String contents, ResourceType type, String name) throws Exception {
+    assertSendContents(contents, type, name, HttpResponseStatus.OK);
+  }
+
+  private void assertSendContents(String contents, ResourceType type,
+                                  String name, HttpResponseStatus status) throws Exception {
     String path = getNamePath(type, name);
     HttpResponse response = doPostExternalAPI(path, contents, ADMIN_HEADERS);
-    assertResponseStatus(response, HttpResponseStatus.OK);
-    Reader reader = new InputStreamReader(response.getEntity().getContent());
-    ResourceMeta responseMeta = gson.fromJson(reader, ResourceMeta.class);
-    Assert.assertEquals(name, responseMeta.getName());
-    Assert.assertEquals(ResourceStatus.INACTIVE, responseMeta.getStatus());
+    assertResponseStatus(response, status);
+    if (status == HttpResponseStatus.OK) {
+      Reader reader = new InputStreamReader(response.getEntity().getContent());
+      ResourceMeta responseMeta = gson.fromJson(reader, ResourceMeta.class);
+      Assert.assertEquals(name, responseMeta.getName());
+      Assert.assertEquals(ResourceStatus.INACTIVE, responseMeta.getStatus());
+    }
   }
 
   private void testPutAndGet(PluginType type, String pluginName, String resourceType) throws Exception {
@@ -265,34 +278,35 @@ public class PluginHandlerTest extends ServiceTestBase {
     String contents = "some contents";
     ResourceType pluginResourceType = new ResourceType(type, pluginName, resourceType);
     ResourceMeta meta1 = new ResourceMeta("name", 1, ResourceStatus.INACTIVE);
-    ResourceMeta meta2 = new ResourceMeta("name", 2, ResourceStatus.INACTIVE);
     assertSendContents(contents, pluginResourceType, meta1.getName());
-    assertSendContents(contents, pluginResourceType, meta2.getName());
 
     // stage version2
-    meta2 = new ResourceMeta(meta2.getName(), meta2.getVersion(), ResourceStatus.STAGED);
-    assertResponseStatus(doPostExternalAPI(getVersionedPath(pluginResourceType, meta2) + "/stage", "", ADMIN_HEADERS),
+    meta1 = new ResourceMeta(meta1.getName(), meta1.getVersion(), ResourceStatus.STAGED);
+    assertResponseStatus(doPostExternalAPI(getVersionedPath(pluginResourceType, meta1) + "/stage", "", ADMIN_HEADERS),
                          HttpResponseStatus.OK);
     // should still see both versions when getting all versions of the resource name
-    HttpResponse response = doGetExternalAPI(getNamePath(pluginResourceType, meta2.getName()), ADMIN_HEADERS);
+    HttpResponse response = doGetExternalAPI(getNamePath(pluginResourceType, meta1.getName()), ADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
-    Assert.assertEquals(Sets.newHashSet(meta1, meta2), bodyToMetaSet(response));
+    Assert.assertEquals(Sets.newHashSet(meta1, meta1), bodyToMetaSet(response));
     // check get staged versions of the resources
     response = doGetExternalAPI(getTypePath(pluginResourceType) + "?status=staged", ADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     Assert.assertEquals(
-      ImmutableMap.<String, Set<ResourceMeta>>of("name", ImmutableSet.<ResourceMeta>of(meta2)),
+      ImmutableMap.<String, Set<ResourceMeta>>of("name", ImmutableSet.of(meta1)),
       bodyToMetaMap(response)
     );
     // check get staged version of the specific resource
-    response = doGetExternalAPI(getNamePath(pluginResourceType, meta2.getName()) + "?status=staged", ADMIN_HEADERS);
+    response = doGetExternalAPI(getNamePath(pluginResourceType, meta1.getName()) + "?status=staged", ADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
-    Assert.assertEquals(Sets.newHashSet(meta2), bodyToMetaSet(response));
+    Assert.assertEquals(Sets.newHashSet(meta1), bodyToMetaSet(response));
+
+    ResourceMeta meta2 = new ResourceMeta("name", 2, ResourceStatus.INACTIVE);
+    assertSendContents(contents, pluginResourceType, meta2.getName());
 
     // stage version1
-    meta1 = new ResourceMeta(meta1.getName(), meta1.getVersion(), ResourceStatus.STAGED);
-    meta2 = new ResourceMeta(meta2.getName(), meta2.getVersion(), ResourceStatus.INACTIVE);
-    assertResponseStatus(doPostExternalAPI(getVersionedPath(pluginResourceType, meta1) + "/stage", "", ADMIN_HEADERS),
+    meta1 = new ResourceMeta(meta1.getName(), meta1.getVersion(), ResourceStatus.INACTIVE);
+    meta2 = new ResourceMeta(meta2.getName(), meta2.getVersion(), ResourceStatus.STAGED);
+    assertResponseStatus(doPostExternalAPI(getVersionedPath(pluginResourceType, meta2) + "/stage", "", ADMIN_HEADERS),
                          HttpResponseStatus.OK);
     // should still see both versions when getting all versions of the resource name
     response = doGetExternalAPI(getNamePath(pluginResourceType, meta1.getName()), ADMIN_HEADERS);
@@ -302,22 +316,22 @@ public class PluginHandlerTest extends ServiceTestBase {
     response = doGetExternalAPI(getTypePath(pluginResourceType) + "?status=staged", ADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     Assert.assertEquals(
-      ImmutableMap.<String, Set<ResourceMeta>>of("name", ImmutableSet.<ResourceMeta>of(meta1)),
+      ImmutableMap.<String, Set<ResourceMeta>>of("name", ImmutableSet.of(meta2)),
       bodyToMetaMap(response)
     );
     // check get staged versions of the specific resource
     response = doGetExternalAPI(getNamePath(pluginResourceType, meta1.getName()) + "?status=staged", ADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
-    Assert.assertEquals(Sets.newHashSet(meta1), bodyToMetaSet(response));
+    Assert.assertEquals(Sets.newHashSet(meta2), bodyToMetaSet(response));
 
     // recall
-    meta1 = new ResourceMeta(meta1.getName(), meta1.getVersion(), ResourceStatus.INACTIVE);
-    assertResponseStatus(doPostExternalAPI(getVersionedPath(pluginResourceType, meta1) + "/recall", "", ADMIN_HEADERS),
+    meta2 = new ResourceMeta(meta2.getName(), meta2.getVersion(), ResourceStatus.INACTIVE);
+    assertResponseStatus(doPostExternalAPI(getVersionedPath(pluginResourceType, meta2) + "/recall", "", ADMIN_HEADERS),
                          HttpResponseStatus.OK);
     // should still see both versions when getting all versions of the resource name
     response = doGetExternalAPI(getNamePath(pluginResourceType, meta1.getName()), ADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
-    Assert.assertEquals(ImmutableSet.<ResourceMeta>of(meta1, meta2), bodyToMetaSet(response));
+    Assert.assertEquals(ImmutableSet.of(meta1, meta2), bodyToMetaSet(response));
     // staged filter should return an empty map
     response = doGetExternalAPI(getTypePath(pluginResourceType) + "?status=staged", ADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
@@ -335,7 +349,7 @@ public class PluginHandlerTest extends ServiceTestBase {
     ResourceMeta meta3 = new ResourceMeta("name2", 1, ResourceStatus.INACTIVE);
     ResourceMeta meta4 = new ResourceMeta("name3", 1, ResourceStatus.INACTIVE);
     assertSendContents(contents, type, meta1.getName());
-    assertSendContents(contents, type, meta2.getName());
+    assertSendContents(contents, type, meta2.getName(), HttpResponseStatus.BAD_REQUEST);
     assertSendContents(contents, type, meta3.getName());
     assertSendContents(contents, type, meta4.getName());
 
@@ -343,9 +357,9 @@ public class PluginHandlerTest extends ServiceTestBase {
     assertResponseStatus(response, HttpResponseStatus.OK);
     Assert.assertEquals(
       ImmutableMap.<String, Set<ResourceMeta>>of(
-        "name1", ImmutableSet.<ResourceMeta>of(meta1, meta2),
-        "name2", ImmutableSet.<ResourceMeta>of(meta3),
-        "name3", ImmutableSet.<ResourceMeta>of(meta4)),
+        "name1", ImmutableSet.of(meta1),
+        "name2", ImmutableSet.of(meta3),
+        "name3", ImmutableSet.of(meta4)),
       bodyToMetaMap(response)
     );
 
@@ -355,8 +369,8 @@ public class PluginHandlerTest extends ServiceTestBase {
     assertResponseStatus(response, HttpResponseStatus.OK);
     Assert.assertEquals(
       ImmutableMap.<String, Set<ResourceMeta>>of(
-        "name1", ImmutableSet.<ResourceMeta>of(meta1, meta2),
-        "name3", ImmutableSet.<ResourceMeta>of(meta4)),
+        "name1", ImmutableSet.of(meta1),
+        "name3", ImmutableSet.of(meta4)),
       bodyToMetaMap(response)
     );
   }
