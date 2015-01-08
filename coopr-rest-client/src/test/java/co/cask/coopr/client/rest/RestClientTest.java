@@ -21,6 +21,7 @@ import co.cask.coopr.client.rest.handler.ClusterHandler;
 import co.cask.coopr.client.rest.handler.ClusterTemplateHandler;
 import co.cask.coopr.client.rest.handler.HardwareTypeHandler;
 import co.cask.coopr.client.rest.handler.ImageTypeHandler;
+import co.cask.coopr.client.rest.handler.PartialTemplateHandler;
 import co.cask.coopr.client.rest.handler.ProviderHandler;
 import co.cask.coopr.client.rest.handler.ProvisionerHandler;
 import co.cask.coopr.client.rest.handler.ServiceHandler;
@@ -52,6 +53,7 @@ public class RestClientTest {
   private LocalTestServer localTestServer;
 
   private ClusterTemplateHandler clusterTemplatesHandler = new ClusterTemplateHandler();
+  private PartialTemplateHandler partialTemplatesHandler = new PartialTemplateHandler();
   private ProviderHandler providerHandler = new ProviderHandler();
   private ServiceHandler serviceHandler = new ServiceHandler();
   private HardwareTypeHandler hardwareTypeHandler = new HardwareTypeHandler();
@@ -83,6 +85,7 @@ public class RestClientTest {
     }
 
     localTestServer.register("/v2/clustertemplates*", clusterTemplatesHandler);
+    localTestServer.register("/v2/partialtemplates*", partialTemplatesHandler);
     localTestServer.register("/v2/providers*", providerHandler);
     localTestServer.register("/v2/services*", serviceHandler);
     localTestServer.register("/v2/hardwaretypes*", hardwareTypeHandler);
