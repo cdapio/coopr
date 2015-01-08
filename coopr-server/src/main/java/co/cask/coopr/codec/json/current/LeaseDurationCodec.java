@@ -21,6 +21,7 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 
 import java.lang.reflect.Type;
@@ -34,11 +35,44 @@ public class LeaseDurationCodec extends AbstractCodec<LeaseDuration> {
     throws JsonParseException {
     JsonObject jsonObj = json.getAsJsonObject();
 
-    Long initial = context.deserialize(jsonObj.get("initial"), Long.class);
-    Long max = context.deserialize(jsonObj.get("max"), Long.class);
-    Long step = context.deserialize(jsonObj.get("step"), Long.class);
+    if (jsonObj.has("initial") && jsonObj.get("initial").isJsonPrimitive() &&
+      jsonObj.has("max") && jsonObj.get("max").isJsonPrimitive() &&
+      jsonObj.has("step") && jsonObj.get("step").isJsonPrimitive()) {
 
-    return new LeaseDuration(initial, max, step);
+      JsonPrimitive initial = jsonObj.getAsJsonPrimitive("initial");
+      JsonPrimitive max = jsonObj.getAsJsonPrimitive("max");
+      JsonPrimitive step = jsonObj.getAsJsonPrimitive("step");
+
+      LeaseDuration.Builder builder = new LeaseDuration.Builder();
+
+      if (initial.isNumber()) {
+        builder.setInitial(initial.getAsNumber().longValue());
+      } else if (initial.isString()) {
+        builder.setInitial(initial.getAsString());
+      } else {
+        throw new IllegalArgumentException("Invalid format for leaseDuration: " + jsonObj.toString());
+      }
+
+      if (max.isNumber()) {
+        builder.setMax(max.getAsNumber().longValue());
+      } else if (max.isString()) {
+        builder.setMax(max.getAsString());
+      } else {
+        throw new IllegalArgumentException("Invalid format for leaseDuration: " + jsonObj.toString());
+      }
+
+      if (step.isNumber()) {
+        builder.setStep(step.getAsNumber().longValue());
+      } else if (step.isString()) {
+        builder.setStep(step.getAsString());
+      } else {
+        throw new IllegalArgumentException("Invalid format for leaseDuration: " + jsonObj.toString());
+      }
+
+      return builder.build();
+    }
+
+    throw new IllegalArgumentException("Invalid format for leaseDuration: " + jsonObj.toString());
   }
 
   @Override

@@ -19,6 +19,8 @@ import co.cask.coopr.layout.InvalidClusterException;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * Defines lease duration for a cluster. 0 for initial or max means forever;
  */
@@ -36,6 +38,50 @@ public final class LeaseDuration {
     this.initial = initial;
     this.max = max;
     this.step = step;
+  }
+
+  public LeaseDuration(String initial, String max, String step) {
+    this(getTimestamp(initial), getTimestamp(max), getTimestamp(step));
+  }
+
+  /**
+   * Returns a timestamp in milliseconds.
+   *
+   * @param base The string argument user provided.
+   * @return Timestamp in milliseconds
+   */
+  private static long getTimestamp(String base) {
+    if (base.equals("min") || base.equals("0")) {
+      return 0L;
+    }
+
+    if (base.equals("max")) {
+      return Long.MAX_VALUE;
+    }
+
+    if (base.matches("^[0-9]+$")) {
+      // only numbers, no time unit: millisecond format
+      return Long.parseLong(base);
+    }
+
+    try {
+      char type = base.charAt(base.length() - 1);
+      int offset = Integer.parseInt(base.substring(0, base.length() - 1));
+      switch (type) {
+        case 's':
+          return TimeUnit.SECONDS.toMillis(offset);
+        case 'm':
+          return TimeUnit.MINUTES.toMillis(offset);
+        case 'h':
+          return TimeUnit.HOURS.toMillis(offset);
+        case 'd':
+          return TimeUnit.DAYS.toMillis(offset);
+        default:
+          throw new RuntimeException("Unsupported relative time format: " + type);
+      }
+    } catch (NumberFormatException e) {
+      throw new RuntimeException("Invalid number value: " + base + ". Reason: " + e.getMessage());
+    }
   }
 
   /**
@@ -73,7 +119,21 @@ public final class LeaseDuration {
    * @param requestedInitialLease Requested initial lease.
    * @return The smaller of the leases.
    * @throws InvalidClusterException if the requested lease is larger than the allowed initial lease, or if it is
-   *                                  less than negative one.
+   *                                 less than negative one.
+   */
+  public long calcInitialLease(String requestedInitialLease) throws InvalidClusterException {
+    return calcInitialLease(getTimestamp(requestedInitialLease));
+  }
+
+  /**
+   * Calculate the initial lease to use given the initial lease here and a requested initial lease. The requested
+   * lease must be equal to or less than the initial lease here. Takes into account that a lease of 0 is an infinite
+   * lease.
+   *
+   * @param requestedInitialLease Requested initial lease.
+   * @return The smaller of the leases.
+   * @throws InvalidClusterException if the requested lease is larger than the allowed initial lease, or if it is
+   *                                 less than negative one.
    */
   public long calcInitialLease(long requestedInitialLease) throws InvalidClusterException {
     // Determine valid lease duration for the cluster.
@@ -129,5 +189,49 @@ public final class LeaseDuration {
   @Override
   public int hashCode() {
     return Objects.hashCode(initial, max, step);
+  }
+
+  /**
+   * Builder for {@link LeaseDuration}.
+   */
+  public static final class Builder {
+
+    private long initial;
+    private long max;
+    private long step;
+
+    public Builder setInitial(long initial) {
+      this.initial = initial;
+      return this;
+    }
+
+    public Builder setMax(long max) {
+      this.max = max;
+      return this;
+    }
+
+    public Builder setStep(long step) {
+      this.step = step;
+      return this;
+    }
+
+    public Builder setInitial(String initial) {
+      this.initial = getTimestamp(initial);
+      return this;
+    }
+
+    public Builder setMax(String max) {
+      this.max = getTimestamp(max);
+      return this;
+    }
+
+    public Builder setStep(String step) {
+      this.step = getTimestamp(step);
+      return this;
+    }
+
+    public LeaseDuration build() {
+      return new LeaseDuration(initial, max, step);
+    }
   }
 }

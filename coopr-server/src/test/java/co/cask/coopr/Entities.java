@@ -450,7 +450,7 @@ public class Entities {
           )
         ),
         SizeConstraint.EMPTY))
-      .setAdministration(new Administration(new LeaseDuration(10000, 900000, 1000))).build();
+      .setAdministration(new Administration(new LeaseDuration("10s", "15m", "1s"))).build();
     public static final ClusterTemplate HADOOP_DISTRIBUTED = ClusterTemplate.builder()
       .setName("hadoop-distributed")
       .setDescription("Hadoop cluster without high-availability")
@@ -490,7 +490,7 @@ public class Entities {
           )
         ),
         SizeConstraint.EMPTY))
-      .setAdministration(new Administration(new LeaseDuration(0, 0, 0))).build();
+      .setAdministration(new Administration(new LeaseDuration("0", "0", "0"))).build();
     public static final ClusterTemplate REACTOR2 = ClusterTemplate.builder()
       .setName("reactor")
       .setDescription("Hadoop cluster without high-availability and with Continuuity Reactor")
