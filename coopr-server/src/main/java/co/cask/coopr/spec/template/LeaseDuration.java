@@ -31,7 +31,7 @@ public final class LeaseDuration {
   private final long max;
   private final long step;
 
-  public LeaseDuration(long initial, long max, long step) {
+  private LeaseDuration(long initial, long max, long step) {
     Preconditions.checkArgument(initial >= 0, "initial lease duration should be >=0");
     Preconditions.checkArgument(max >= 0, "max lease duration should be >=0");
     Preconditions.checkArgument(step >= 0, "step should be >=0");
@@ -40,12 +40,23 @@ public final class LeaseDuration {
     this.step = step;
   }
 
-  public LeaseDuration(String initial, String max, String step) {
-    this(getTimestamp(initial), getTimestamp(max), getTimestamp(step));
+  public static Builder builder() {
+    return new Builder();
+  }
+
+  public static LeaseDuration of(String initial, String max, String step) {
+    return builder().setInitial(initial).setMax(max).setStep(step).build();
+  }
+
+  public static LeaseDuration of(long initial, long max, long step) {
+    return builder().setInitial(initial).setMax(max).setStep(step).build();
   }
 
   /**
-   * Returns a timestamp in milliseconds.
+   * Converts a timestamp to milliseconds.
+   * The timestamp may either be in seconds (s), minutes (m), hours (h), or days (d).
+   * If the time unit is not present, we assume milliseconds.
+   * For example, "23s" would mean 23 seconds and "23" would mean 23 milliseconds.
    *
    * @param base The string argument user provided.
    * @return Timestamp in milliseconds
@@ -206,16 +217,34 @@ public final class LeaseDuration {
       return this;
     }
 
+    /**
+     * Sets initial using timestamp format specified in {@link #getTimestamp(String)}.
+     *
+     * @param initial timestamp
+     * @return this
+     */
     public Builder setInitial(String initial) {
       this.initial = getTimestamp(initial);
       return this;
     }
 
+    /**
+     * Sets max using timestamp format specified in {@link #getTimestamp(String)}.
+     *
+     * @param max timestamp
+     * @return this
+     */
     public Builder setMax(String max) {
       this.max = getTimestamp(max);
       return this;
     }
 
+    /**
+     * Sets step using timestamp format specified in {@link #getTimestamp(String)}.
+     *
+     * @param step timestamp
+     * @return this
+     */
     public Builder setStep(String step) {
       this.step = getTimestamp(step);
       return this;
