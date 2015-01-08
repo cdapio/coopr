@@ -19,6 +19,7 @@ import co.cask.cdap.common.conf.CConfiguration;
 import co.cask.cdap.common.guice.ConfigModule;
 import co.cask.cdap.common.guice.DiscoveryRuntimeModule;
 import co.cask.cdap.common.guice.IOModule;
+import co.cask.cdap.common.kerberos.SecurityUtil;
 import co.cask.cdap.security.guice.SecurityModules;
 import co.cask.cdap.security.server.ExternalAuthenticationServer;
 import co.cask.coopr.codec.json.guice.CodecModules;
@@ -80,6 +81,7 @@ public final class ServerMain extends DaemonMain {
   private InternalHandlerServer internalHandlerServer;
   private Scheduler scheduler;
   private Configuration conf;
+  private CConfiguration cConf;
   private int solverNumThreads;
   private ListeningExecutorService solverExecutorService;
   private ListeningExecutorService callbackExecutorService;
@@ -105,6 +107,17 @@ public final class ServerMain extends DaemonMain {
     try {
       conf = Configuration.create();
 
+      cConf = CConfiguration.create();
+      cConf.addResource("coopr-default.xml");
+      cConf.addResource("coopr-site.xml");
+
+      securityEnabled = conf.getBoolean(co.cask.cdap.common.conf.Constants.Security.ENABLED);
+
+      if (securityEnabled) {
+        // Enable Kerberos login
+        SecurityUtil.enableKerberosLogin(cConf);
+      }
+
       String zkQuorum = conf.get(Constants.ZOOKEEPER_QUORUM);
       if (zkQuorum == null) {
         String dataPath = conf.get(Constants.LOCAL_DATA_DIR) + "/zookeeper";
@@ -116,7 +129,6 @@ public final class ServerMain extends DaemonMain {
       }
 
       solverNumThreads = conf.getInt(Constants.SOLVER_NUM_THREADS);
-      securityEnabled = conf.getBoolean(co.cask.cdap.common.conf.Constants.Security.ENABLED);
     } catch (Exception e) {
       LOG.error("Exception initializing server", e);
     }
@@ -145,10 +157,6 @@ public final class ServerMain extends DaemonMain {
                                       .setDaemon(true)
                                       .build()));
 
-    CConfiguration cConfiguration = CConfiguration.create();
-    cConfiguration.addResource("coopr-default.xml");
-    cConfiguration.addResource("coopr-site.xml");
-
     try {
       // this is here instead of in init because when it runs with in-process zookeeper, the zk client service
       // cannot be created until the server is started (needs connection string)
@@ -165,7 +173,7 @@ public final class ServerMain extends DaemonMain {
         new IOModule(),
         new DiscoveryRuntimeModule().getStandaloneModules(),
         new SecurityModules().getStandaloneModules(),
-        new ConfigModule(cConfiguration)
+        new ConfigModule(cConf)
       );
 
       idService = injector.getInstance(IdService.class);
