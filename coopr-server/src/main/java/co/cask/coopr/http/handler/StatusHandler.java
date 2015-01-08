@@ -17,6 +17,7 @@ package co.cask.coopr.http.handler;
 
 import co.cask.http.AbstractHttpHandler;
 import co.cask.http.HttpResponder;
+import com.google.common.collect.ImmutableMultimap;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 
@@ -37,6 +38,6 @@ public class StatusHandler extends AbstractHttpHandler {
   @Path("/status")
   @GET
   public void status(@SuppressWarnings("UnusedParameters") HttpRequest request, HttpResponder responder) {
-    responder.sendString(HttpResponseStatus.OK, "OK\n");
+    responder.sendString(HttpResponseStatus.OK, "OK\n", ImmutableMultimap.of("Connection", "close"));
   }
 }
