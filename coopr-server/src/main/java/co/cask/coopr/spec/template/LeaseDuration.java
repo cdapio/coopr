@@ -82,7 +82,7 @@ public final class LeaseDuration {
           throw new RuntimeException("Unsupported relative time format: " + type);
       }
     } catch (NumberFormatException e) {
-      throw new RuntimeException("Invalid number value: " + base + ". Reason: " + e.getMessage());
+      throw new IllegalArgumentException("Invalid number value: " + base + ". Reason: " + e.getMessage());
     }
   }
 
