@@ -215,9 +215,6 @@ load_defaults () {
   echo "Loading default configuration..."
   ${COOPR_HOME}/server/templates/bin/load-templates.sh && touch ${COOPR_DATA_DIR}/.load_defaults || die "Couldn't upload templates"
 
-  # register the default plugins with the server
-  provisioner register
-
   # load the initial plugin bundled data
   stage_default_data
 
@@ -345,7 +342,7 @@ greeting () {
 
 stop () { provisioner stop; server stop; ui stop; }
 
-start () { server start && ui start && provisioner start && load_defaults && greeting; }
+start () { server start && ui start && provisioner register && provisioner start && load_defaults && greeting; }
 
 # Main
 case ${1} in
