@@ -22,6 +22,7 @@ import co.cask.coopr.spec.ImageType;
 import co.cask.coopr.spec.Provider;
 import co.cask.coopr.spec.service.Service;
 import co.cask.coopr.spec.template.ClusterTemplate;
+import co.cask.coopr.spec.template.PartialTemplate;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -37,12 +38,14 @@ import java.util.List;
 public class AdminRestClient extends RestClient implements AdminClient {
 
   private static final String CLUSTER_TEMPLATES_URL_SUFFIX = "clustertemplates";
+  private static final String PARTIAL_TEMPLATES_URL_SUFFIX = "partialtemplates";
   private static final String PROVIDERS_URL_SUFFIX = "providers";
   private static final String SERVICES_URL_SUFFIX = "services";
   private static final String HARDWARE_TYPES_URL_SUFFIX = "hardwaretypes";
   private static final String IMAGE_TYPES_URL_SUFFIX = "imagetypes";
   // Constant types
   private static final Type CLUSTER_TEMPLATES_LIST_TYPE = new TypeToken<List<ClusterTemplate>>() { }.getType();
+  private static final Type PARTIAL_TEMPLATES_LIST_TYPE = new TypeToken<List<PartialTemplate>>() { }.getType();
   private static final Type PROVIDERS_LIST_TYPE = new TypeToken<List<Provider>>() { }.getType();
   private static final Type SERVICES_LIST_TYPE = new TypeToken<List<Service>>() { }.getType();
   private static final Type HARDWARE_TYPES_LIST_TYPE = new TypeToken<List<HardwareType>>() { }.getType();
@@ -69,6 +72,21 @@ public class AdminRestClient extends RestClient implements AdminClient {
   @Override
   public void deleteClusterTemplate(String name) throws IOException {
     delete(CLUSTER_TEMPLATES_URL_SUFFIX, name);
+  }
+
+  @Override
+  public List<PartialTemplate> getAllPartialTemplates() throws IOException {
+    return getAll(PARTIAL_TEMPLATES_URL_SUFFIX, PARTIAL_TEMPLATES_LIST_TYPE);
+  }
+
+  @Override
+  public PartialTemplate getPartialTemplate(String name) throws IOException {
+    return getSingle(PARTIAL_TEMPLATES_URL_SUFFIX, name, PartialTemplate.class);
+  }
+
+  @Override
+  public void deletePartialTemplate(String name) throws IOException {
+    delete(PARTIAL_TEMPLATES_URL_SUFFIX, name);
   }
 
   @Override

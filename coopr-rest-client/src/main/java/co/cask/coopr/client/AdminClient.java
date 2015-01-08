@@ -21,6 +21,7 @@ import co.cask.coopr.spec.ImageType;
 import co.cask.coopr.spec.Provider;
 import co.cask.coopr.spec.service.Service;
 import co.cask.coopr.spec.template.ClusterTemplate;
+import co.cask.coopr.spec.template.PartialTemplate;
 
 import java.io.IOException;
 import java.util.List;
@@ -52,6 +53,29 @@ public interface AdminClient {
    * @throws IOException in case of a problem or the connection was aborted
    */
   void deleteClusterTemplate(String name) throws IOException;
+
+  /**
+   * Retrieves the list of all the partial templates. If no templates exist, returns an empty list.
+   *
+   * @return List of {@link PartialTemplate} objects
+   * @throws IOException in case of a problem or the connection was aborted
+   */
+  List<PartialTemplate> getAllPartialTemplates() throws IOException;
+
+  /**
+   * Retrieves details about a partial template by the name.
+   *
+   * @return {@link PartialTemplate} object
+   * @throws IOException in case of a problem or the connection was aborted
+   */
+  PartialTemplate getPartialTemplate(String name) throws IOException;
+
+  /**
+   * Deletes a partial template by the name.
+   *
+   * @throws IOException in case of a problem or the connection was aborted
+   */
+  void deletePartialTemplate(String name) throws IOException;
 
 
   /**
