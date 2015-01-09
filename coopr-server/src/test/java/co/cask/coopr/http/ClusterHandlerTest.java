@@ -1381,7 +1381,7 @@ public class ClusterHandlerTest extends ServiceTestBase {
           .setServices("base")
           .setProvider("rackspace")
           .build())
-      .setAdministration(new Administration(new LeaseDuration(1000, 12000, 1000))).build();
+      .setAdministration(new Administration(LeaseDuration.of("1s", "12s", "1s"))).build();
 
     long currentTime = 10000;
     Cluster cluster = Cluster.builder()
@@ -1876,7 +1876,7 @@ public class ClusterHandlerTest extends ServiceTestBase {
           .setConfig(defaultClusterConfig)
           .build())
       .setCompatibilities(Compatibilities.builder().setServices("zookeeper").build())
-      .setAdministration(new Administration(new LeaseDuration(10000, 30000, 5000)))
+      .setAdministration(new Administration(LeaseDuration.of("10s", "30s", "5s")))
       .build();
 
     EntityStoreView adminView = entityStoreService.getView(ADMIN_ACCOUNT);

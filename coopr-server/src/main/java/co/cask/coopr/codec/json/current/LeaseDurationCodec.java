@@ -34,11 +34,12 @@ public class LeaseDurationCodec extends AbstractCodec<LeaseDuration> {
     throws JsonParseException {
     JsonObject jsonObj = json.getAsJsonObject();
 
-    Long initial = context.deserialize(jsonObj.get("initial"), Long.class);
-    Long max = context.deserialize(jsonObj.get("max"), Long.class);
-    Long step = context.deserialize(jsonObj.get("step"), Long.class);
+    LeaseDuration.Builder builder = LeaseDuration.builder();
+    builder.setInitial((String) context.deserialize(jsonObj.get("initial"), String.class));
+    builder.setMax((String) context.deserialize(jsonObj.get("max"), String.class));
+    builder.setStep((String) context.deserialize(jsonObj.get("step"), String.class));
 
-    return new LeaseDuration(initial, max, step);
+    return builder.build();
   }
 
   @Override

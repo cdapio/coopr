@@ -63,7 +63,7 @@ public class RPCHandlerTest extends ServiceTestBase {
           .setConfig(defaultClusterConfig)
           .build())
       .setCompatibilities(Compatibilities.builder().setServices("zookeeper").build())
-      .setAdministration(new Administration(new LeaseDuration(10000, 30000, 5000)))
+      .setAdministration(new Administration(LeaseDuration.of("10s", "30s", "5s")))
       .build();
   }
 
