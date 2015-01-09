@@ -1,5 +1,5 @@
 ..
-   Copyright © 2012-2014 Cask Data, Inc.
+   Copyright © 2012-2015 Cask Data, Inc.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -57,6 +57,27 @@ Shown below is an example configuration with settings that you are most likely t
       <description>Provisioner working directory</description>
     </property>
   </configuration>
+
+Running Provisioner to use SSL
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+To configure the provisioner to support server with SSL, add or update this property in ``provisioner-site.xml``::
+
+    <property>
+      <name>provisioner.server.uri</name>
+      <value>https://localhost:55054</value>
+      <description>URI of server to connect to</description>
+    </property>
+
+To configure the provisioner to support server that uses mutual authentication with SSL,
+setup these environment variables:
+
+====================================     ==========================    =======================================
+   Environment variable                     Default Value                     Description
+====================================     ==========================    =======================================
+TRUST_CERT_PATH                             None                        Trusted certificate file location.
+TRUST_CERT_PASSWORD                         None                        Trusted certificate password.
+====================================     ==========================    =======================================
 
 Configuration
 ^^^^^^^^^^^^^
