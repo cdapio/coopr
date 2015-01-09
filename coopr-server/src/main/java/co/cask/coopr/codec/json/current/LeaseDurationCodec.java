@@ -35,9 +35,9 @@ public class LeaseDurationCodec extends AbstractCodec<LeaseDuration> {
     JsonObject jsonObj = json.getAsJsonObject();
 
     LeaseDuration.Builder builder = LeaseDuration.builder();
-    builder.setInitial(jsonObj.getAsJsonPrimitive("initial").getAsString());
-    builder.setMax(jsonObj.getAsJsonPrimitive("max").getAsString());
-    builder.setStep(jsonObj.getAsJsonPrimitive("step").getAsString());
+    builder.setInitial((String) context.deserialize(jsonObj.get("initial"), String.class));
+    builder.setMax((String) context.deserialize(jsonObj.get("max"), String.class));
+    builder.setStep((String) context.deserialize(jsonObj.get("step"), String.class));
 
     return builder.build();
   }

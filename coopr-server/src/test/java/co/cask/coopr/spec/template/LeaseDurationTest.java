@@ -42,6 +42,12 @@ public class LeaseDurationTest {
     Assert.assertEquals(leaseDuration, GSON.fromJson("{\"initial\":123,\"max\":0,\"step\":1}", LeaseDuration.class));
   }
 
+  @Test
+  public void testLeaseDurationJsonMissingMax() {
+    LeaseDuration leaseDuration = LeaseDuration.of(123, 0, 1);
+    Assert.assertEquals(leaseDuration, GSON.fromJson("{\"initial\":123,\"step\":1}", LeaseDuration.class));
+  }
+
   @Test(expected = IllegalArgumentException.class)
   public void testNegativeArgStringConstructor() {
     LeaseDuration.of("-15s", "0", "0");
