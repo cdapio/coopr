@@ -146,6 +146,7 @@ Unreleased
 - Provisioner worker - Info log on CREATE, DELETE events for provisioner added COOPR-539 ( Issues: #873 )
 - Standalone - Dockerfile for coopr-standalone ( Issues: #874 )
 - Update coopr-provisioner submodule ( Issues: #880 #883 caskdata/coopr-provisioner#1 caskdata/coopr-provisioner#2 caskdata/coopr-provisioner#3 )
+- Update coopr-templates submodule ( Issues: #896 caskdata/coopr-templates#19 caskdata/coopr-templates#20 caskdata/coopr-templates#21 caskdata/coopr-templates#22 )
 
 v0.9.8 (09/26/14)
 -----------------
