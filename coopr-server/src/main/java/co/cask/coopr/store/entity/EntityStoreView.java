@@ -26,6 +26,7 @@ import co.cask.coopr.spec.template.PartialTemplate;
 
 import java.io.IOException;
 import java.util.Collection;
+import javax.annotation.Nullable;
 
 /**
  * A view of the entity store for adding, modifying, retrieving, and deleting entities that are accessible by
@@ -33,6 +34,33 @@ import java.util.Collection;
  * TODO: introduce concept of owner or group acls for these entities
  */
 public interface EntityStoreView {
+
+  /**
+   * Types of filters for listing entities.
+   */
+  public enum Filter {
+    ANY(""), LATEST("latest");
+
+    private final String rep;
+
+    Filter(String rep) {
+      this.rep = rep;
+    }
+
+    public static Filter valueOfRep(@Nullable String rep) {
+      if (rep == null) {
+        return ANY;
+      }
+
+      for (Filter filter : Filter.values()) {
+        if (rep.equals(filter.rep)) {
+          return filter;
+        }
+      }
+
+      return ANY;
+    }
+  }
 
   /**
    * Get the {@link co.cask.coopr.spec.Provider} associated with the given unique name
@@ -54,6 +82,15 @@ public interface EntityStoreView {
    * @throws Exception
    */
   Provider getProvider(String providerName, int version) throws IOException;
+
+  /**
+   * Get all {@link co.cask.coopr.spec.Provider}s filtered by the provided filter.
+   *
+   * @return Collection of all providers.
+   * @param filter Specifies how to filter the collection
+   * @throws Exception
+   */
+  Collection<Provider> getAllProviders(Filter filter) throws IOException;
 
   /**
    * Get all {@link co.cask.coopr.spec.Provider}s.
@@ -111,6 +148,15 @@ public interface EntityStoreView {
   HardwareType getHardwareType(String hardwareTypeName, int version) throws IOException;
 
   /**
+   * Get all {@link co.cask.coopr.spec.HardwareType}s filtered by the provided filter.
+   *
+   * @param filter Filter to use
+   * @return Collection of all hardware types.
+   * @throws Exception
+   */
+  Collection<HardwareType> getAllHardwareTypes(Filter filter) throws IOException;
+
+  /**
    * Get all {@link co.cask.coopr.spec.HardwareType}s.
    *
    * @return Collection of all hardware types.
@@ -164,6 +210,15 @@ public interface EntityStoreView {
    * @throws Exception
    */
   ImageType getImageType(String imageTypeName, int version) throws IOException;
+
+  /**
+   * Get all {@link co.cask.coopr.spec.ImageType}s filtered by the provided filter.
+   *
+   * @param filter Filter to use
+   * @return Collection of all image types.
+   * @throws Exception
+   */
+  Collection<ImageType> getAllImageTypes(Filter filter) throws IOException;
 
   /**
    * Get all {@link co.cask.coopr.spec.ImageType}s.
@@ -221,6 +276,15 @@ public interface EntityStoreView {
   Service getService(String serviceName, int version) throws IOException;
 
   /**
+   * Get all {@link co.cask.coopr.spec.service.Service}s filtered by the provided filter.
+   *
+   * @param filter Filter to use
+   * @return Collection of all services.
+   * @throws Exception
+   */
+  Collection<Service> getAllServices(Filter filter) throws IOException;
+
+  /**
    * Get all {@link co.cask.coopr.spec.service.Service}s.
    *
    * @return Collection of all services.
@@ -274,6 +338,15 @@ public interface EntityStoreView {
    * @throws Exception
    */
   ClusterTemplate getClusterTemplate(String clusterTemplateName, int version) throws IOException;
+
+  /**
+   * Get all {@link co.cask.coopr.spec.template.ClusterTemplate}s filtered by the provided filter.
+   *
+   * @param filter Filter to use
+   * @return Collection of all cluster templates.
+   * @throws Exception
+   */
+  Collection<ClusterTemplate> getAllClusterTemplates(Filter filter) throws IOException;
 
   /**
    * Get all {@link co.cask.coopr.spec.template.ClusterTemplate}s.
@@ -331,6 +404,15 @@ public interface EntityStoreView {
   PartialTemplate getPartialTemplate(String partialTemplateName, int version) throws IOException;
 
   /**
+   * Get all {@link co.cask.coopr.spec.template.PartialTemplate}s filtered by the provided filter.
+   *
+   * @param filter Filter to use
+   * @return Collection of all partial templates.
+   * @throws Exception
+   */
+  Collection<PartialTemplate> getAllPartialTemplates(Filter filter) throws IOException;
+
+  /**
    * Get all {@link co.cask.coopr.spec.template.PartialTemplate}s.
    *
    * @return Collection of all partial templates.
@@ -386,6 +468,15 @@ public interface EntityStoreView {
   ProviderType getProviderType(String providerTypeName, int version) throws IOException;
 
   /**
+   * Get all {@link co.cask.coopr.spec.plugin.ProviderType}s filtered by the provided filter.
+   *
+   * @param filter Filter to use
+   * @return Collection of all provider types.
+   * @throws Exception
+   */
+  Collection<ProviderType> getAllProviderTypes(Filter filter) throws IOException;
+
+  /**
    * Get all {@link co.cask.coopr.spec.plugin.ProviderType}s.
    *
    * @return Collection of all provider types.
@@ -439,6 +530,15 @@ public interface EntityStoreView {
    * @throws Exception
    */
   AutomatorType getAutomatorType(String automatorTypeName, int version) throws IOException;
+
+  /**
+   * Get all {@link co.cask.coopr.spec.plugin.AutomatorType}s filtered by the provided filter.
+   *
+   * @param filter Filter to use
+   * @return Collection of all automator types.
+   * @throws Exception
+   */
+  Collection<AutomatorType> getAllAutomatorTypes(Filter filter) throws IOException;
 
   /**
    * Get all {@link co.cask.coopr.spec.plugin.AutomatorType}s.

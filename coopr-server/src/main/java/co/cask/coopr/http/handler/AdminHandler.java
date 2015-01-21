@@ -65,6 +65,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
 
 /**
  * Handler for getting, adding, modifying, and deleting admin defined entities.
@@ -585,15 +586,16 @@ public class AdminHandler extends AbstractAuthHandler {
    */
   @GET
   @Path("/providers")
-  public void getProviders(HttpRequest request, HttpResponder responder) {
+  public void getProviders(@QueryParam("filter") String filter, HttpRequest request, HttpResponder responder) {
     Account account = getAndAuthenticateAccount(request, responder);
     if (account == null) {
       return;
     }
 
     try {
-      responder.sendJson(HttpResponseStatus.OK, entityStoreService.getView(account).getAllProviders(),
-                         new TypeToken<Collection<Provider>>() { }.getType(), gson);
+      Collection<Provider> providers = entityStoreService.getView(account)
+        .getAllProviders(EntityStoreView.Filter.valueOfRep(filter));
+      responder.sendJson(HttpResponseStatus.OK, providers, new TypeToken<Collection<Provider>>() { }.getType(), gson);
     } catch (IOException e) {
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception getting providers");
     }

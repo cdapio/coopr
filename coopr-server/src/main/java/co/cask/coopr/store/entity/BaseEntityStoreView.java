@@ -124,6 +124,14 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
     String getId() {
       return id;
     }
+
+    String getBlobColumn() {
+      return id;
+    }
+
+    String getTableName() {
+      return id + "s";
+    }
   }
 
   protected BaseEntityStoreView(Gson gson) {
@@ -141,8 +149,13 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
   }
 
   @Override
+  public Collection<Provider> getAllProviders(Filter filter) throws IOException {
+    return getAllEntities(EntityType.PROVIDER, providerTransform, filter);
+  }
+
+  @Override
   public Collection<Provider> getAllProviders() throws IOException {
-    return getAllEntities(EntityType.PROVIDER, providerTransform);
+    return getAllEntities(EntityType.PROVIDER, providerTransform, Filter.ANY);
   }
 
   @Override
@@ -175,8 +188,13 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
   }
 
   @Override
+  public Collection<HardwareType> getAllHardwareTypes(Filter filter) throws IOException {
+    return getAllEntities(EntityType.HARDWARE_TYPE, hardwareTypeTransform, filter);
+  }
+
+  @Override
   public Collection<HardwareType> getAllHardwareTypes() throws IOException {
-    return getAllEntities(EntityType.HARDWARE_TYPE, hardwareTypeTransform);
+    return getAllEntities(EntityType.HARDWARE_TYPE, hardwareTypeTransform, Filter.ANY);
   }
 
   @Override
@@ -209,8 +227,13 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
   }
 
   @Override
+  public Collection<ImageType> getAllImageTypes(Filter filter) throws IOException {
+    return getAllEntities(EntityType.IMAGE_TYPE, imageTypeTransform, filter);
+  }
+
+  @Override
   public Collection<ImageType> getAllImageTypes() throws IOException {
-    return getAllEntities(EntityType.IMAGE_TYPE, imageTypeTransform);
+    return getAllEntities(EntityType.IMAGE_TYPE, imageTypeTransform, Filter.ANY);
   }
 
   @Override
@@ -243,8 +266,13 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
   }
 
   @Override
+  public Collection<Service> getAllServices(Filter filter) throws IOException {
+    return getAllEntities(EntityType.SERVICE, serviceTransform, filter);
+  }
+
+  @Override
   public Collection<Service> getAllServices() throws IOException {
-    return getAllEntities(EntityType.SERVICE, serviceTransform);
+    return getAllEntities(EntityType.SERVICE, serviceTransform, Filter.ANY);
   }
 
   @Override
@@ -277,8 +305,13 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
   }
 
   @Override
+  public Collection<ClusterTemplate> getAllClusterTemplates(Filter filter) throws IOException {
+    return getAllEntities(EntityType.CLUSTER_TEMPLATE, clusterTemplateTransform, filter);
+  }
+
+  @Override
   public Collection<ClusterTemplate> getAllClusterTemplates() throws IOException {
-    return getAllEntities(EntityType.CLUSTER_TEMPLATE, clusterTemplateTransform);
+    return getAllEntities(EntityType.CLUSTER_TEMPLATE, clusterTemplateTransform, Filter.ANY);
   }
 
   @Override
@@ -310,8 +343,13 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
   }
 
   @Override
+  public Collection<PartialTemplate> getAllPartialTemplates(Filter filter) throws IOException {
+    return getAllEntities(EntityType.PARTIAL_TEMPLATE, partialTemplateTransform, filter);
+  }
+
+  @Override
   public Collection<PartialTemplate> getAllPartialTemplates() throws IOException {
-    return getAllEntities(EntityType.PARTIAL_TEMPLATE, partialTemplateTransform);
+    return getAllEntities(EntityType.PARTIAL_TEMPLATE, partialTemplateTransform, Filter.ANY);
   }
 
   @Override
@@ -345,8 +383,13 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
   }
 
   @Override
+  public Collection<ProviderType> getAllProviderTypes(Filter filter) throws IOException {
+    return getAllEntities(EntityType.PROVIDER_TYPE, providerTypeTransform, filter);
+  }
+
+  @Override
   public Collection<ProviderType> getAllProviderTypes() throws IOException {
-    return getAllEntities(EntityType.PROVIDER_TYPE, providerTypeTransform);
+    return getAllEntities(EntityType.PROVIDER_TYPE, providerTypeTransform, Filter.ANY);
   }
 
   @Override
@@ -379,8 +422,13 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
   }
 
   @Override
+  public Collection<AutomatorType> getAllAutomatorTypes(Filter filter) throws IOException {
+    return getAllEntities(EntityType.AUTOMATOR_TYPE, automatorTypeTransform, filter);
+  }
+
+  @Override
   public Collection<AutomatorType> getAllAutomatorTypes() throws IOException {
-    return getAllEntities(EntityType.AUTOMATOR_TYPE, automatorTypeTransform);
+    return getAllEntities(EntityType.AUTOMATOR_TYPE, automatorTypeTransform, Filter.ANY);
   }
 
   @Override
@@ -448,13 +496,14 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
   /**
    * Get all entities of the given type from persistent store.
    *
+   *
    * @param entityType Type of entity.
    * @param transform Function used to transform the entity as bytes into a java class.
-   * @param <T> Class of entity to get.
+   * @param filter
    * @return Collection of entities.
    */
-  protected abstract <T> Collection<T> getAllEntities(EntityType entityType,
-                                                      Function<byte[], T> transform) throws IOException;
+  protected abstract <T> Collection<T> getAllEntities(EntityType entityType, Function<byte[], T> transform,
+                                                      Filter filter) throws IOException;
 
   /**
    * Delete all entities of given type and name from persistent store.

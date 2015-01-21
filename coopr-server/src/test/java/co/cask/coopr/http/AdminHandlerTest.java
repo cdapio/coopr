@@ -365,16 +365,30 @@ public class AdminHandlerTest extends ServiceTestBase {
     Assert.assertEquals(HttpResponseStatus.OK.getCode(),
                         doPutExternalAPI(entityPath, entity.toString(), ADMIN_HEADERS).getStatusLine().getStatusCode());
 
+    // test filter=latest
+    HttpResponse response = doGetExternalAPI(base + "?filter=latest", ADMIN_HEADERS);
+    assertResponseStatus(response, HttpResponseStatus.OK);
+    Assert.assertEquals("application/json", response.getEntity().getContentType().getValue());
+    Reader reader = new InputStreamReader(response.getEntity().getContent(), Charsets.UTF_8);
+    JsonArray result = new Gson().fromJson(reader, JsonArray.class);
+    for (int i = 0; i < result.size(); i++) {
+      JsonObject object = result.get(i).getAsJsonObject();
+      if (entity.get("name").equals(object.get("name"))) {
+        Assert.assertEquals("Expected only version 2 of entity of type " + entityType,
+                            2, object.get("version").getAsInt());
+      }
+    }
+
     // bump version
     Assert.assertEquals(HttpResponseStatus.OK.getCode(),
                         doPutExternalAPI(entityPath, entity.toString(), ADMIN_HEADERS).getStatusLine().getStatusCode());
 
-    HttpResponse response = doGetExternalAPI(entityPath, ADMIN_HEADERS);
-    assertResponseStatus(response, HttpResponseStatus.OK);
-    Assert.assertEquals("application/json", response.getEntity().getContentType().getValue());
-    Reader reader = new InputStreamReader(response.getEntity().getContent(), Charsets.UTF_8);
-    JsonObject result = new Gson().fromJson(reader, JsonObject.class);
-    Assert.assertEquals(3, result.get("version").getAsInt());
+    HttpResponse response0 = doGetExternalAPI(entityPath, ADMIN_HEADERS);
+    assertResponseStatus(response0, HttpResponseStatus.OK);
+    Assert.assertEquals("application/json", response0.getEntity().getContentType().getValue());
+    Reader reader0 = new InputStreamReader(response0.getEntity().getContent(), Charsets.UTF_8);
+    JsonObject result0 = new Gson().fromJson(reader0, JsonObject.class);
+    Assert.assertEquals(3, result0.get("version").getAsInt());
 
     HttpResponse response1 = doGetExternalAPI(entityPath + "/2", ADMIN_HEADERS);
     assertResponseStatus(response1, HttpResponseStatus.OK);

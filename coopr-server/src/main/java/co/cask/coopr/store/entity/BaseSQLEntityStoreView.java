@@ -104,12 +104,13 @@ public abstract class BaseSQLEntityStoreView extends BaseEntityStoreView {
   }
 
   @Override
-  protected <T> Collection<T> getAllEntities(EntityType entityType, Function<byte[], T> transform) throws IOException {
+  protected <T> Collection<T> getAllEntities(EntityType entityType, Function<byte[], T> transform,
+                                             Filter filter) throws IOException {
     try {
       Connection conn = dbConnectionPool.getConnection();
       List<T> entities = Lists.newLinkedList();
       try {
-        PreparedStatement statement = getSelectAllStatement(conn, entityType);
+        PreparedStatement statement = getSelectAllStatement(conn, entityType, filter);
         try {
           ResultSet rs = statement.executeQuery();
           try {
@@ -172,21 +173,35 @@ public abstract class BaseSQLEntityStoreView extends BaseEntityStoreView {
     return statement;
   }
 
-  private PreparedStatement getSelectAllStatement(Connection conn, EntityType entityType) throws SQLException {
-    String entityTypeId = entityType.getId();
-    // immune to sql injection since everything is an enum or constant
-    StringBuilder queryStr = new StringBuilder();
-    queryStr.append("SELECT ");
-    queryStr.append(entityTypeId);
-    queryStr.append(" FROM ");
-    queryStr.append(entityTypeId);
-    queryStr.append("s WHERE tenant_id=?");
+  private PreparedStatement getSelectAllStatement(Connection conn, EntityType entityType,
+                                                  Filter filter) throws SQLException {
+    StringBuilder queryBuilder = new StringBuilder();
+    if (filter == Filter.ANY) {
+      // immune to sql injection since everything is an enum or constant
+      queryBuilder.append("SELECT ").append(entityType.getBlobColumn());
+      queryBuilder.append(" FROM ").append(entityType.getTableName());
+      queryBuilder.append(" WHERE tenant_id=?");
+    } else if (filter == Filter.LATEST) {
+      queryBuilder.append("SELECT ").append("t.").append(entityType.getBlobColumn()).append(", t.id, t.version");
+      queryBuilder.append(" FROM ").append(entityType.getTableName()).append(" t");
+      queryBuilder.append(" INNER JOIN(");
+      queryBuilder.append("   SELECT id, MAX(version) version");
+      queryBuilder.append("   FROM ").append(entityType.getTableName());
+      queryBuilder.append("   GROUP BY id");
+      queryBuilder.append(" ) ss on t.id = ss.id AND t.version = ss.version");
+      queryBuilder.append(" WHERE t.tenant_id=?");
+    } else {
+      throw new IllegalArgumentException("Invalid filter: " + filter);
+    }
+
+    String queryString = queryBuilder.toString();
+
     // TODO: remove once types are defined through server instead of through provisioner
     // automator and provider types are constant across tenants and defined only in the superadmin tenant.
     String tenantId = (entityType == EntityType.AUTOMATOR_TYPE || entityType == EntityType.PROVIDER_TYPE) ?
       Constants.SUPERADMIN_TENANT : account.getTenantId();
 
-    PreparedStatement statement = conn.prepareStatement(queryStr.toString());
+    PreparedStatement statement = conn.prepareStatement(queryString);
     statement.setString(1, tenantId);
     return statement;
   }
