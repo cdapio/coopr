@@ -115,14 +115,23 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
     PARTIAL_TEMPLATE("partialTemplate"),
     PROVIDER_TYPE("providerType"),
     AUTOMATOR_TYPE("automatorType");
+    
     private final String id;
 
     EntityType(String id) {
       this.id = id;
     }
 
-    String getId() {
+    public String getId() {
       return id;
+    }
+
+    public String getBlobColumn() {
+      return id;
+    }
+
+    public String getTableName() {
+      return id + "s";
     }
   }
 
@@ -142,7 +151,7 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
 
   @Override
   public Collection<Provider> getAllProviders() throws IOException {
-    return getAllEntities(EntityType.PROVIDER, providerTransform);
+    return getAllLatestEntities(EntityType.PROVIDER, providerTransform);
   }
 
   @Override
@@ -176,7 +185,7 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
 
   @Override
   public Collection<HardwareType> getAllHardwareTypes() throws IOException {
-    return getAllEntities(EntityType.HARDWARE_TYPE, hardwareTypeTransform);
+    return getAllLatestEntities(EntityType.HARDWARE_TYPE, hardwareTypeTransform);
   }
 
   @Override
@@ -210,7 +219,7 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
 
   @Override
   public Collection<ImageType> getAllImageTypes() throws IOException {
-    return getAllEntities(EntityType.IMAGE_TYPE, imageTypeTransform);
+    return getAllLatestEntities(EntityType.IMAGE_TYPE, imageTypeTransform);
   }
 
   @Override
@@ -244,7 +253,7 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
 
   @Override
   public Collection<Service> getAllServices() throws IOException {
-    return getAllEntities(EntityType.SERVICE, serviceTransform);
+    return getAllLatestEntities(EntityType.SERVICE, serviceTransform);
   }
 
   @Override
@@ -278,7 +287,7 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
 
   @Override
   public Collection<ClusterTemplate> getAllClusterTemplates() throws IOException {
-    return getAllEntities(EntityType.CLUSTER_TEMPLATE, clusterTemplateTransform);
+    return getAllLatestEntities(EntityType.CLUSTER_TEMPLATE, clusterTemplateTransform);
   }
 
   @Override
@@ -311,7 +320,7 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
 
   @Override
   public Collection<PartialTemplate> getAllPartialTemplates() throws IOException {
-    return getAllEntities(EntityType.PARTIAL_TEMPLATE, partialTemplateTransform);
+    return getAllLatestEntities(EntityType.PARTIAL_TEMPLATE, partialTemplateTransform);
   }
 
   @Override
@@ -346,7 +355,7 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
 
   @Override
   public Collection<ProviderType> getAllProviderTypes() throws IOException {
-    return getAllEntities(EntityType.PROVIDER_TYPE, providerTypeTransform);
+    return getAllLatestEntities(EntityType.PROVIDER_TYPE, providerTypeTransform);
   }
 
   @Override
@@ -380,7 +389,7 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
 
   @Override
   public Collection<AutomatorType> getAllAutomatorTypes() throws IOException {
-    return getAllEntities(EntityType.AUTOMATOR_TYPE, automatorTypeTransform);
+    return getAllLatestEntities(EntityType.AUTOMATOR_TYPE, automatorTypeTransform);
   }
 
   @Override
@@ -453,8 +462,8 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
    * @param <T> Class of entity to get.
    * @return Collection of entities.
    */
-  protected abstract <T> Collection<T> getAllEntities(EntityType entityType,
-                                                      Function<byte[], T> transform) throws IOException;
+  protected abstract <T> Collection<T> getAllLatestEntities(EntityType entityType,
+                                                            Function<byte[], T> transform) throws IOException;
 
   /**
    * Delete all entities of given type and name from persistent store.

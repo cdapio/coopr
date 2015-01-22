@@ -77,12 +77,12 @@ public abstract class EntityStoreServiceTest {
     entityStore.writeProvider(provider);
     entityStore.writeProvider(provider);
     Collection<Provider> providers = entityStore.getAllProviders();
-    Assert.assertEquals(3, providers.size());
+    Assert.assertEquals(1, providers.size());
     Set<Integer> versions = Sets.newHashSet();
     for (Provider provider1 : providers) {
       versions.add(provider1.getVersion());
     }
-    Assert.assertEquals(Sets.newHashSet(1, 2, 3), versions);
+    Assert.assertEquals(Sets.newHashSet(3), versions);
 
     // delete should work
     entityStore.deleteProvider(provider.getName());
@@ -179,12 +179,12 @@ public abstract class EntityStoreServiceTest {
     entityStore.writeClusterTemplate(clusterTemplate);
     entityStore.writeClusterTemplate(clusterTemplate);
     Collection<ClusterTemplate> clusterTemplates = entityStore.getAllClusterTemplates();
-    Assert.assertEquals(3, clusterTemplates.size());
+    Assert.assertEquals(1, clusterTemplates.size());
     Set<Integer> versions = Sets.newHashSet();
     for (ClusterTemplate clusterTemplate1 : clusterTemplates) {
       versions.add(clusterTemplate1.getVersion());
     }
-    Assert.assertEquals(Sets.newHashSet(1, 2, 3), versions);
+    Assert.assertEquals(Sets.newHashSet(3), versions);
 
     // delete should work
     entityStore.deleteClusterTemplate(clusterTemplateName);
