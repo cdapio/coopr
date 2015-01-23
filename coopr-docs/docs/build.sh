@@ -1,39 +1,44 @@
 #!/usr/bin/env bash
 
+# Copyright © 2014-2015 Cask Data, Inc.
+# 
+# Licensed under the Apache License, Version 2.0 (the "License"); you may not
+# use this file except in compliance with the License. You may obtain a copy of
+# the License at
+# 
+# http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations under
+# the License.
+  
 # Build script for docs
-# Builds the docs (all except javadocs and PDFs) from the .rst source files using Sphinx
+# Builds the docs (all except javadocs) from the .rst source files using Sphinx
 # Builds the javadocs and copies them into place
 # Zips everything up so it can be staged
-# REST PDF is built as a separate target and checked in, as it is only used in SDK and not website
-# Target for building the SDK
-# Targets for both a limited and complete set of javadocs
-# Targets not included in usage are intended for internal usage by script
 
-DATE_STAMP=`date`
 SCRIPT=`basename $0`
 
 SOURCE="source"
 BUILD="build"
-BUILD_PDF="build-pdf"
 HTML="html"
 API="coopr-server"
 APIDOCS="apidocs"
 JAVADOCS="javadocs"
 LICENSES="licenses"
-LICENSES_PDF="licenses-pdf"
 PROJECT="coopr"
 PROJECT_CAPS="Coopr"
 
 SCRIPT_PATH=`pwd`
 
 SOURCE_PATH="$SCRIPT_PATH/$SOURCE"
+
 BUILD_PATH="$SCRIPT_PATH/$BUILD"
 HTML_PATH="$BUILD_PATH/$HTML"
 
-DOCS_PY="$SCRIPT_PATH/../tools/doc-gen.py"
-
-REST_SOURCE="$SOURCE_PATH/rest.rst"
-REST_PDF="$SCRIPT_PATH/$BUILD_PDF/rest.pdf"
+LICENSES_SOURCE="$SCRIPT_PATH/../../$LICENSES"
 
 if [ "x$2" == "x" ]; then
   PROJECT_PATH="$SCRIPT_PATH/../../"
@@ -54,6 +59,22 @@ WEB="web"
 GOOGLE_ANALYTICS_GITHUB="UA-55081520-3"
 GITHUB="github"
 
+REDIRECT_EN_HTML=`cat <<EOF
+<!DOCTYPE HTML>
+<html lang="en-US">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="refresh" content="0;url=en/index.html">
+        <script type="text/javascript">
+            window.location.href = "en/index.html"
+        </script>
+        <title></title>
+    </head>
+    <body>
+    </body>
+</html>
+EOF`
+
 function usage() {
   cd $PROJECT_PATH
   PROJECT_PATH=`pwd`
@@ -61,6 +82,7 @@ function usage() {
   echo "Usage: $SCRIPT < option > [source]"
   echo ""
   echo "  Options (select one)"
+  echo "    all           Clean build of everything: HTML docs and Javadocs, GitHub and Web versions"
   echo "    build         Clean build of javadocs and HTML docs, copy javadocs and PDFs into place, zip results"
   echo "    build-github  Clean build and zip for placing on GitHub"
   echo "    build-web     Clean build and zip for placing on docs.cask.co webserver"
@@ -68,15 +90,36 @@ function usage() {
   echo "    docs          Clean build of docs"
   echo "    javadocs      Clean build of javadocs (api module only) for SDK and website"
   echo "    javadocs-full Clean build of javadocs for all modules"
-  echo "    rest-pdf      Clean build of REST PDF"
   echo "    zip           Zips docs into $ZIP"
   echo ""
   echo "    depends       Build Site listing dependencies"
   echo "    sdk           Build SDK"
+  echo ""
   echo "  with"
   echo "    source        Path to $PROJECT source for javadocs, if not $PROJECT_PATH"
-  echo " "
+  echo ""
   exit 1
+}
+
+function run_command() {
+  case "$1" in
+    all )               build_all; exit 1;;
+    build )             build; exit 1;;
+    build-web )         build_web; exit 1;;
+    build-github )      build_github; exit 1;;
+    docs )              build_docs; exit 1;;
+    build-standalone )  build_standalone; exit 1;;
+    copy-javadocs )     copy_javadocs_sdk; exit 1;;
+    copy-licenses )     copy_licenses; exit 1;;
+    javadocs )          build_javadocs_sdk; exit 1;;
+    javadocs-full )     build_javadocs_full; exit 1;;
+    depends )           build_dependencies; exit 1;;
+    sdk )               build_sdk; exit 1;;
+    version )           print_version; exit 1;;
+    test )              test; exit 1;;
+    zip )               make_zip; exit 1;;
+    * )                 usage; exit 1;;
+  esac
 }
 
 function clean() {
@@ -113,9 +156,11 @@ function copy_javadocs_sdk() {
   mv -f $APIDOCS $JAVADOCS
 }
 
-function copy_license_pdfs() {
-  cd $BUILD_PATH/$HTML/$LICENSES
-  cp $SCRIPT_PATH/$LICENSES_PDF/* .
+function copy_licenses() {
+  cd $BUILD_PATH/$HTML
+  mkdir $LICENSES
+  cd $LICENSES
+  cp $LICENSES_SOURCE/* .
 }
 
 function make_zip_html() {
@@ -148,11 +193,15 @@ function make_zip_localized() {
   zip -r $ZIP_DIR_NAME.zip $PROJECT_VERSION/*
 }
 
+function build_all() {
+  echo "Not implemented"
+}
+
 function build() {
   build_docs
   build_javadocs_sdk
   copy_javadocs_sdk
-  copy_license_pdfs
+  copy_licenses
   make_zip
 }
 
@@ -164,7 +213,6 @@ function build_docs_google() {
 
 function build_web() {
 # This is used to stage files
-# desired path is 2.5.0-SNAPSHOT/en/*
   build_docs_google $GOOGLE_ANALYTICS_WEB
   build_javadocs_sdk
   copy_javadocs_sdk
@@ -183,13 +231,6 @@ function build_github() {
   zip $ZIP_DIR_NAME.zip $ZIP_DIR_NAME/.nojekyll
 }
 
-function build_rest_pdf() {
-  cd $SCRIPT_PATH
-#   version # version is not needed because the renaming is done by the pom.xml file
-  rm -rf $SCRIPT_PATH/$BUILD_PDF
-  mkdir $SCRIPT_PATH/$BUILD_PDF
-  python $DOCS_PY -g pdf -o $REST_PDF $REST_SOURCE
-}
 
 function build_standalone() {
   cd $PROJECT_PATH
@@ -198,8 +239,7 @@ function build_standalone() {
 }
 
 function build_sdk() {
-  build_rest_pdf
-  build_standalone
+  echo "Not implemented"
 }
 
 function build_dependencies() {
@@ -230,8 +270,6 @@ function test() {
   print_version
   echo "Build all docs..."
   build
-  echo "Build SDK..."
-  build_sdk
   echo "Test completed."
 }
 
@@ -248,21 +286,4 @@ if [ $# -lt 1 ]; then
   exit 1
 fi
 
-case "$1" in
-  build )             build; exit 1;;
-  build-web )         build_web; exit 1;;
-  build-github )      build_github; exit 1;;
-  docs )              build_docs; exit 1;;
-  build-standalone )  build_standalone; exit 1;;
-  copy-javadocs )     copy_javadocs_sdk; exit 1;;
-  copy-license-pdfs ) copy_license_pdfs; exit 1;;
-  javadocs )          build_javadocs_sdk; exit 1;;
-  javadocs-full )     build_javadocs_full; exit 1;;
-  depends )           build_dependencies; exit 1;;
-  rest-pdf )          build_rest_pdf; exit 1;;
-  sdk )               build_sdk; exit 1;;
-  version )           print_version; exit 1;;
-  test )              test; exit 1;;
-  zip )               make_zip; exit 1;;
-  * )                 usage; exit 1;;
-esac
+run_command  $1
