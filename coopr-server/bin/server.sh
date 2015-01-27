@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Copyright © 2012-2014 Cask Data, Inc.
+# Copyright © 2012-2015 Cask Data, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,8 +18,7 @@
 export COOPR_LOG_DIR=${COOPR_LOG_DIR:-/var/log/coopr}
 export COOPR_HOME=${COOPR_HOME:-/opt/coopr}
 
-### TODO: make this suck less (COOPR-545)
-[ -d /opt/coopr ] && DEFAULT_JVM_OPTS="-Xmx3072m" || DEFAULT_JVM_OPTS="-Xmx1024m"
+DEFAULT_JVM_OPTS=${DEFAULT_JVM_OPTS:--Xmx3072m}
 
 die() { echo; echo "ERROR: ${*}"; echo; exit 1; }
 
