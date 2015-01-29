@@ -124,7 +124,7 @@ CREATE TABLE IF NOT EXISTS clusterTemplates (
     PRIMARY KEY (tenant_id, name, version)
 ) ENGINE = InnoDB;
 
-CREATE TABLE IF NOT EXISTS partialTemplate (
+CREATE TABLE IF NOT EXISTS partialTemplates (
     name VARCHAR(255),
     version BIGINT,
     tenant_id VARCHAR(64),
