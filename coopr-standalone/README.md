@@ -6,8 +6,8 @@
 
 ## Build
 ```
-git submodule init (if you've never done it before)
-git submodule update (to make sure coopr-templates is updated)
+git submodule init
+git submodule update
 mvn clean package assembly:single -DskipTests
 ```
 
