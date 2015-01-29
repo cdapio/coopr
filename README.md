@@ -20,6 +20,8 @@ You can build a standalone version of Coopr that will run on your machine. It re
 ```
   > git clone https://github.com/caskdata/coopr.git
   > cd coopr/coopr-standalone
+  > git submodule init
+  > git submodule update
   > mvn clean package assembly:single -DskipTests
 ```
 
