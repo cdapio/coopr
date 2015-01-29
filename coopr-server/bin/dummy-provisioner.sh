@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Copyright © 2012-2014 Cask Data, Inc.
+# Copyright © 2012-2015 Cask Data, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 export COOPR_LOG_DIR=${COOPR_LOG_DIR:-/var/log/coopr}
 export COOPR_HOME=${COOPR_HOME:-/opt/coopr}
 
-die ( ) { echo; echo "ERROR: ${*}"; echo; exit 1; }
+die() { echo; echo "ERROR: ${*}"; echo; exit 1; }
 
 APP_NAME="coopr-dummy-provisioner"
 PID_DIR=${PID_DIR:-/var/run/coopr}
@@ -34,7 +34,7 @@ check_before_start() {
   fi
 }
 
-start ( ) {
+start() {
   cd ${COOPR_HOME}
   check_before_start
 
@@ -44,7 +44,7 @@ start ( ) {
   echo ${!} > ${pid}
 }
 
-stop ( ) {
+stop() {
   echo "Stopping Dummy Provisioner ..."
   if [ -f ${pid} ] ; then
     pidToKill=`cat ${pid}`

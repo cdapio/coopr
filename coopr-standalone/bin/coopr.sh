@@ -320,7 +320,7 @@ provisioner () {
     echo "Waiting for server to start before running provisioner..."
     wait_for_server
     if [ "${COOPR_USE_DUMMY_PROVISIONER}" == "true" ]; then
-      ${COOPR_HOME}/server/templates/mock/load-mock.sh
+      COOPR_SERVER_URI=http://localhost:55055 ${COOPR_HOME}/server/templates/mock/load-mock.sh
     fi
   fi
   if [ "${COOPR_USE_DUMMY_PROVISIONER}" == "true" ]; then
