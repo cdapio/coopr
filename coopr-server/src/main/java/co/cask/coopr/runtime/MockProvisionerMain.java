@@ -53,7 +53,7 @@ public final class MockProvisionerMain extends DaemonMain {
       }
       String id = cmd.hasOption('i') ? cmd.getOptionValue('i') : "dummy";
       String host = cmd.hasOption('s') ? cmd.getOptionValue('s') : "localhost";
-      int port = cmd.hasOption('p') ? Integer.valueOf(cmd.getOptionValue('p')) : 55054;
+      int port = cmd.hasOption('p') ? Integer.valueOf(cmd.getOptionValue('p')) : 55055;
       int capacity = cmd.hasOption('c') ? Integer.valueOf(cmd.getOptionValue('c')) : 10;
       long msBetweenTasks = cmd.hasOption('r') ? Long.valueOf(cmd.getOptionValue('r')) : 1000;
       long taskMs = cmd.hasOption('d') ? Long.valueOf(cmd.getOptionValue('d')) : 1000;
