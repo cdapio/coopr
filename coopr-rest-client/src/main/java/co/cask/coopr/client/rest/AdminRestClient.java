@@ -23,6 +23,7 @@ import co.cask.coopr.spec.Provider;
 import co.cask.coopr.spec.service.Service;
 import co.cask.coopr.spec.template.ClusterTemplate;
 import co.cask.coopr.spec.template.PartialTemplate;
+import com.google.common.base.Supplier;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -51,11 +52,11 @@ public class AdminRestClient extends RestClient implements AdminClient {
   private static final Type HARDWARE_TYPES_LIST_TYPE = new TypeToken<List<HardwareType>>() { }.getType();
   private static final Type IMAGE_TYPES_LIST_TYPE = new TypeToken<List<ImageType>>() { }.getType();
 
-  public AdminRestClient(RestClientConnectionConfig config, CloseableHttpClient httpClient) {
+  public AdminRestClient(Supplier<RestClientConnectionConfig> config, CloseableHttpClient httpClient) {
     super(config, httpClient);
   }
 
-  public AdminRestClient(RestClientConnectionConfig config, CloseableHttpClient httpClient, Gson gson) {
+  public AdminRestClient(Supplier<RestClientConnectionConfig> config, CloseableHttpClient httpClient, Gson gson) {
     super(config, httpClient, gson);
   }
 

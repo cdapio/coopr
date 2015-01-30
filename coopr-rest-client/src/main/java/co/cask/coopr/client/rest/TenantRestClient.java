@@ -18,6 +18,7 @@ package co.cask.coopr.client.rest;
 
 import co.cask.coopr.client.TenantClient;
 import co.cask.coopr.spec.TenantSpecification;
+import com.google.common.base.Supplier;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -35,11 +36,11 @@ public class TenantRestClient extends RestClient implements TenantClient {
   private static final String TENANT_URL_SUFFIX = "tenants";
   private static final Type TENANTS_LIST_TYPE = new TypeToken<List<TenantSpecification>>() { }.getType();
 
-  public TenantRestClient(RestClientConnectionConfig config, CloseableHttpClient httpClient) {
+  public TenantRestClient(Supplier<RestClientConnectionConfig> config, CloseableHttpClient httpClient) {
     super(config, httpClient);
   }
 
-  public TenantRestClient(RestClientConnectionConfig config, CloseableHttpClient httpClient, Gson gson) {
+  public TenantRestClient(Supplier<RestClientConnectionConfig> config, CloseableHttpClient httpClient, Gson gson) {
     super(config, httpClient, gson);
   }
 

@@ -21,7 +21,7 @@ import co.cask.coopr.provisioner.plugin.ResourceMeta;
 import co.cask.coopr.provisioner.plugin.ResourceStatus;
 import co.cask.coopr.spec.plugin.AutomatorType;
 import co.cask.coopr.spec.plugin.ProviderType;
-
+import com.google.common.base.Supplier;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -45,35 +45,35 @@ public class PluginRestClient extends RestClient implements PluginClient {
   private static final Type PROVIDER_TYPE_LIST = new TypeToken<List<ProviderType>>() { }.getType();
   private static final Type RESOURCE_TYPE_MAP = new TypeToken<Map<String, Set<ResourceMeta>>>() { }.getType();
 
-  public PluginRestClient(RestClientConnectionConfig config, CloseableHttpClient httpClient) {
+  public PluginRestClient(Supplier<RestClientConnectionConfig> config, CloseableHttpClient httpClient) {
     super(config, httpClient);
   }
 
-  public PluginRestClient(RestClientConnectionConfig config, CloseableHttpClient httpClient, Gson gson) {
+  public PluginRestClient(Supplier<RestClientConnectionConfig> config, CloseableHttpClient httpClient, Gson gson) {
     super(config, httpClient, gson);
   }
 
   @Override
   public List<AutomatorType> getAllAutomatorTypes() throws IOException {
-    URI getUri = buildFullURL(String.format("/plugins/%s", AUTOMATOR_TYPE_STR));
+    URI getUri = resolveURL(String.format("/plugins/%s", AUTOMATOR_TYPE_STR));
     return getAll(getUri, AUTOMATOR_TYPE_LIST);
   }
 
   @Override
   public AutomatorType getAutomatorType(String id) throws IOException {
-    URI getUri = buildFullURL(String.format("/plugins/%s/%s", AUTOMATOR_TYPE_STR, id));
+    URI getUri = resolveURL(String.format("/plugins/%s/%s", AUTOMATOR_TYPE_STR, id));
     return getSingle(getUri, AutomatorType.class);
   }
 
   @Override
   public List<ProviderType> getAllProviderTypes() throws IOException {
-    URI getUri = buildFullURL(String.format("/plugins/%s", PROVIDER_TYPE_STR));
+    URI getUri = resolveURL(String.format("/plugins/%s", PROVIDER_TYPE_STR));
     return getAll(getUri, PROVIDER_TYPE_LIST);
   }
 
   @Override
   public ProviderType getProviderType(String id) throws IOException {
-    URI getUri = buildFullURL(String.format("/plugins/%s/%s", PROVIDER_TYPE_STR, id));
+    URI getUri = resolveURL(String.format("/plugins/%s/%s", PROVIDER_TYPE_STR, id));
     return getSingle(getUri, ProviderType.class);
   }
 
@@ -100,33 +100,25 @@ public class PluginRestClient extends RestClient implements PluginClient {
   @Override
   public void stageAutomatorTypeResource(String id, String resourceType, String resourceName, String version)
     throws IOException {
-    execPost(buildFullURL(String.format("/plugins/%s/%s/%s/%s/versions/%s/stage",
-                                        AUTOMATOR_TYPE_STR, id, resourceType,
-                                        resourceName, version)));
+    execPost(resolveURL(String.format("/plugins/%s/%s/%s/%s/versions/%s/stage", AUTOMATOR_TYPE_STR, id, resourceType, resourceName, version)));
   }
 
   @Override
   public void stageProviderTypeResource(String id, String resourceType, String resourceName, String version)
     throws IOException {
-    execPost(buildFullURL(String.format("/plugins/%s/%s/%s/%s/versions/%s/stage",
-                                        PROVIDER_TYPE_STR, id, resourceType,
-                                        resourceName, version)));
+    execPost(resolveURL(String.format("/plugins/%s/%s/%s/%s/versions/%s/stage", PROVIDER_TYPE_STR, id, resourceType, resourceName, version)));
   }
 
   @Override
   public void recallAutomatorTypeResource(String id, String resourceType, String resourceName, String version)
     throws IOException {
-    execPost(buildFullURL(String.format("/plugins/%s/%s/%s/%s/versions/%s/recall",
-                                        AUTOMATOR_TYPE_STR, id, resourceType,
-                                        resourceName, version)));
+    execPost(resolveURL(String.format("/plugins/%s/%s/%s/%s/versions/%s/recall", AUTOMATOR_TYPE_STR, id, resourceType, resourceName, version)));
   }
 
   @Override
   public void recallProviderTypeResource(String id, String resourceType, String resourceName, String version)
     throws IOException {
-    execPost(buildFullURL(String.format("/plugins/%s/%s/%s/%s/versions/%s/recall",
-                                        PROVIDER_TYPE_STR, id, resourceType,
-                                        resourceName, version)));
+    execPost(resolveURL(String.format("/plugins/%s/%s/%s/%s/versions/%s/recall", PROVIDER_TYPE_STR, id, resourceType, resourceName, version)));
   }
 
   @Override
@@ -145,7 +137,7 @@ public class PluginRestClient extends RestClient implements PluginClient {
 
   @Override
   public void syncPlugins() throws IOException {
-    execPost(buildFullURL("/plugins/sync"));
+    execPost(resolveURL("/plugins/sync"));
 
   }
 }

@@ -20,18 +20,19 @@ import co.cask.cdap.security.authentication.client.AccessToken;
 import co.cask.cdap.security.authentication.client.AuthenticationClient;
 import co.cask.cdap.security.authentication.client.Credential;
 import co.cask.cdap.security.authentication.client.basic.BasicAuthenticationClient;
+import co.cask.coopr.client.rest.RestClientConnectionConfig;
 import co.cask.coopr.client.rest.RestClientManager;
 import co.cask.coopr.codec.json.guice.CodecModules;
 import co.cask.coopr.common.conf.Constants;
 import co.cask.coopr.shell.command.VersionCommand;
 import com.google.common.base.Charsets;
 import com.google.common.base.Objects;
+import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.io.CharStreams;
 import com.google.common.io.InputSupplier;
-import com.google.gson.Gson;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import jline.console.ConsoleReader;
@@ -58,7 +59,9 @@ public class CLIConfig {
   );
 
   private final String version;
-  private RestClientManager clientManager;
+  private final RestClientManager clientManager;
+  private RestClientConnectionConfig clientConfig;
+
   private String host;
   private String userId;
   private String tenantId;
@@ -70,14 +73,13 @@ public class CLIConfig {
   private AccessToken accessToken;
 
   /**
-   *
-   * @param host the host of the Coopr server to interact with (e.g. "example.com")
-   * @param port the port for the Coopr server to interact with
-   * @param userId the user id
+   * @param host     the host of the Coopr server to interact with (e.g. "example.com")
+   * @param port     the port for the Coopr server to interact with
+   * @param userId   the user id
    * @param tenantId the admin id
    */
   public CLIConfig(String host, Integer port, String userId, String tenantId) {
-    version = loadVersion();
+    this.version = loadVersion();
     this.host = Objects.firstNonNull(host, "localhost");
     this.port = Objects.firstNonNull(port, DEFAULT_PORT);
     this.userId = Objects.firstNonNull(userId, DEFAULT_USER_ID);
@@ -85,6 +87,14 @@ public class CLIConfig {
     this.ssl = DEFAULT_SSL;
     this.sslPort = DEFAULT_SSL_PORT;
     this.reconnectListeners = Lists.newArrayList();
+    this.clientConfig = RestClientConnectionConfig.builder(this.host, this.port)
+      .userId(this.userId).tenantId(this.tenantId).ssl(this.ssl).build();
+    this.clientManager = new RestClientManager(new Supplier<RestClientConnectionConfig>() {
+      @Override
+      public RestClientConnectionConfig get() {
+        return getClientConfig();
+      }
+    });
   }
 
   public String getVersion() {
@@ -123,10 +133,6 @@ public class CLIConfig {
     return clientManager;
   }
 
-  public void setDefaultConnection() throws IOException {
-    setConnection(host, port, DEFAULT_SSL, userId, tenantId);
-  }
-
   public void setConnection(String host, int port, boolean ssl, String userId, String tenantId) throws IOException {
     this.host = host;
     if (ssl) {
@@ -135,17 +141,18 @@ public class CLIConfig {
       this.port = port;
     }
     this.ssl = ssl;
-    this.uri = URI.create(String.format("%s://%s:%d", ssl ? "https" : "http", host, port));
-    RestClientManager.Builder builder = RestClientManager.builder(host, port);
+    RestClientConnectionConfig.Builder builder = RestClientConnectionConfig.builder(host, port);
     builder.ssl(ssl);
+
     accessToken = getAccessToken(host, port, ssl);
     builder.accessToken(Suppliers.ofInstance(accessToken));
+
     this.userId = userId;
     this.tenantId = tenantId;
     builder.userId(userId);
     builder.tenantId(tenantId);
-    builder.gson(injector.getInstance(Gson.class));
-    this.clientManager = builder.build();
+    this.clientConfig = builder.build();
+
     for (ReconnectListener listener : reconnectListeners) {
       listener.onReconnect();
     }
@@ -189,7 +196,7 @@ public class CLIConfig {
   }
 
   public URI getURI() {
-    return uri;
+    return URI.create(String.format("%s://%s:%d", ssl ? "https" : "http", host, port));
   }
 
   private String loadVersion() {
@@ -206,10 +213,14 @@ public class CLIConfig {
     }
   }
 
+  public RestClientConnectionConfig getClientConfig() {
+    return clientConfig;
+  }
+
   /**
    * Listener to reconnect to a Coopr instance.
    */
   public interface ReconnectListener {
-    void onReconnect() throws IOException;
+    void onReconnect();
   }
 }

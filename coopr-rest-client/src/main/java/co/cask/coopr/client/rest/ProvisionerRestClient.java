@@ -18,6 +18,7 @@ package co.cask.coopr.client.rest;
 
 import co.cask.coopr.client.ProvisionerClient;
 import co.cask.coopr.provisioner.Provisioner;
+import com.google.common.base.Supplier;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -35,11 +36,11 @@ public class ProvisionerRestClient extends RestClient implements ProvisionerClie
   private static final String PROVISIONER_URL_SUFFIX = "provisioners";
   private static final Type PROVISIONERS_LIST_TYPE = new TypeToken<List<Provisioner>>() { }.getType();
 
-  public ProvisionerRestClient(RestClientConnectionConfig config, CloseableHttpClient httpClient) {
+  public ProvisionerRestClient(Supplier<RestClientConnectionConfig> config, CloseableHttpClient httpClient) {
     super(config, httpClient);
   }
 
-  public ProvisionerRestClient(RestClientConnectionConfig config, CloseableHttpClient httpClient, Gson gson) {
+  public ProvisionerRestClient(Supplier<RestClientConnectionConfig> config, CloseableHttpClient httpClient, Gson gson) {
     super(config, httpClient, gson);
   }
 
