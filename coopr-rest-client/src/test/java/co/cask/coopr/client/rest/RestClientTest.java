@@ -25,6 +25,7 @@ import co.cask.coopr.client.rest.handler.PartialTemplateHandler;
 import co.cask.coopr.client.rest.handler.ProviderHandler;
 import co.cask.coopr.client.rest.handler.ProvisionerHandler;
 import co.cask.coopr.client.rest.handler.ServiceHandler;
+import com.google.common.base.Suppliers;
 import org.apache.http.conn.ssl.SSLContexts;
 import co.cask.coopr.client.rest.handler.TenantHandler;
 import org.apache.http.localserver.LocalTestServer;
@@ -100,12 +101,13 @@ public class RestClientTest {
   }
 
   protected ClientManager createClientManager(String userId) {
-    return RestClientManager.builder(testServerHost, testServerPort)
-      .userId(userId)
-      .tenantId(TEST_TENANT_ID)
-      .ssl(sslEnabled)
-      .verifySSLCert(!sslEnabled)
-      .build();
+    return new RestClientManager(Suppliers.ofInstance(
+      RestClientConnectionConfig.builder(testServerHost, testServerPort)
+        .userId(userId)
+        .tenantId(TEST_TENANT_ID)
+        .ssl(sslEnabled)
+        .verifySSLCert(!sslEnabled)
+        .build()));
   }
 
   @After

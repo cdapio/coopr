@@ -48,6 +48,10 @@ public class RestClientConnectionConfig {
     this.accessTokenSupplier = accessTokenSupplier;
   }
 
+  public static Builder builder(String host, int port) {
+    return new Builder(host, port);
+  }
+
   public String getHost() {
     return host;
   }
@@ -85,5 +89,73 @@ public class RestClientConnectionConfig {
 
   public boolean isVerifySSLCert() {
     return verifySSLCert;
+  }
+
+  /**
+   * Class Builder for create RestClientManager instance.
+   */
+  public static class Builder {
+
+    private static final String DEFAULT_VERSION = "v2";
+    private static final boolean DEFAULT_SSL = false;
+    private static final boolean DEFAULT_VERIFY_SSL_CERT = true;
+
+    //mandatory
+    private final int port;
+    private final String host;
+
+    //optional
+    private String apiKey;
+    private boolean ssl = DEFAULT_SSL;
+    private boolean verifySSLCert = DEFAULT_VERIFY_SSL_CERT;
+    private String version = DEFAULT_VERSION;
+    private String userId;
+    private String tenantId;
+    private Supplier<AccessToken> accessTokenSupplier;
+
+    public Builder(String host, int port) {
+      this.host = host;
+      this.port = port;
+    }
+
+    public Builder ssl(boolean ssl) {
+      this.ssl = ssl;
+      return this;
+    }
+
+    public Builder verifySSLCert(boolean verifySSLCert) {
+      this.verifySSLCert = verifySSLCert;
+      return this;
+    }
+
+    public Builder apiKey(String apiKey) {
+      this.apiKey = apiKey;
+      return this;
+    }
+
+    public Builder accessToken(Supplier<AccessToken> accessTokenSupplier) {
+      this.accessTokenSupplier = accessTokenSupplier;
+      return this;
+    }
+
+    public Builder version(String version) {
+      this.version = version;
+      return this;
+    }
+
+    public Builder userId(String userId) {
+      this.userId = userId;
+      return this;
+    }
+
+    public Builder tenantId(String tenantId) {
+      this.tenantId = tenantId;
+      return this;
+    }
+
+    public RestClientConnectionConfig build() {
+      return new RestClientConnectionConfig(host, port, apiKey, ssl, version, userId, tenantId,
+                                            verifySSLCert, accessTokenSupplier);
+    }
   }
 }

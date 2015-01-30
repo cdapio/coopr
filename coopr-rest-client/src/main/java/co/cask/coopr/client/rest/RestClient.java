@@ -21,6 +21,7 @@ import co.cask.coopr.client.rest.exception.UnauthorizedAccessTokenException;
 import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.base.Supplier;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import org.apache.http.Header;
@@ -61,24 +62,21 @@ public class RestClient {
   private static final String COOPR_API_KEY_HEADER_NAME = "Coopr-ApiKey";
   private static final String COOPR_TENANT_ID_HEADER_NAME = "Coopr-TenantID";
   private static final String COOPR_USER_ID_HEADER_NAME = "Coopr-UserID";
-  private static final int NUMBER_OF_AUTH_HEADERS = 4;
 
   private final Gson gson;
-  private final RestClientConnectionConfig config;
-  private final URI baseUrl;
+  private final Supplier<RestClientConnectionConfig> configSupplier;
   private final CloseableHttpClient httpClient;
   private final Set<Header> authHeaders;
 
-  public RestClient(RestClientConnectionConfig config, CloseableHttpClient httpClient) {
+  public RestClient(Supplier<RestClientConnectionConfig> config, CloseableHttpClient httpClient) {
     this(config, httpClient, new Gson());
   }
 
-  public RestClient(RestClientConnectionConfig config, CloseableHttpClient httpClient, Gson gson) {
+  public RestClient(Supplier<RestClientConnectionConfig> configSupplier, CloseableHttpClient httpClient, Gson gson) {
+    RestClientConnectionConfig config = configSupplier.get();
     Preconditions.checkArgument(!Strings.isNullOrEmpty(config.getUserId()), "User ID couldn't be null");
     Preconditions.checkArgument(!Strings.isNullOrEmpty(config.getTenantId()), "Tenant ID couldn't be null");
-    this.config = config;
-    this.baseUrl = URI.create(String.format("%s://%s:%d/%s", config.isSSL() ? HTTPS_PROTOCOL : HTTP_PROTOCOL,
-                                            config.getHost(), config.getPort(), config.getVersion()));
+    this.configSupplier = configSupplier;
     this.httpClient = httpClient;
     this.authHeaders = getAuthHeaders();
     this.gson = gson;
@@ -134,7 +132,7 @@ public class RestClient {
   }
 
   protected <T> List<T> getAll(String urlSuffix, Type type) throws IOException {
-    return getAll(URI.create(String.format("%s/%s", baseUrl, urlSuffix)), type);
+    return getAll(resolveURL(urlSuffix), type);
   }
 
   protected <T> List<T> getAll(URI url, Type type) throws IOException {
@@ -151,7 +149,11 @@ public class RestClient {
   }
 
   protected <V, T> Map<V, Set<T>> getPluginTypeMap(String url, Type type) throws IOException {
-    String fullUrl = String.format("%s%s", getBaseURL(), url);
+    if (!url.startsWith("/")) {
+      url = "/" + url;
+    }
+
+    String fullUrl = String.format("%s/%s%s", getBaseURL(), getConfig().getVersion(), url);
     HttpGet getRequest = new HttpGet(fullUrl);
     CloseableHttpResponse httpResponse = execute(getRequest);
     InputStreamReader reader = null;
@@ -182,7 +184,7 @@ public class RestClient {
   }
 
   protected <T> T getSingle(String urlSuffix, String name, Type type) throws IOException {
-    return getSingle(URI.create(String.format("%s/%s/%s", baseUrl, urlSuffix, name)), type);
+    return getSingle(resolveURL(String.format("%s/%s", urlSuffix, name)), type);
   }
 
   protected <T> T getSingle(URI url, Type type) throws IOException {
@@ -199,7 +201,7 @@ public class RestClient {
   }
 
   protected void delete(String urlSuffix, String name) throws IOException {
-    HttpDelete deleteRequest = new HttpDelete(URI.create(String.format("%s/%s/%s", baseUrl, urlSuffix, name)));
+    HttpDelete deleteRequest = new HttpDelete(resolveURL(String.format("%s/%s", urlSuffix, name)));
     CloseableHttpResponse httpResponse = execute(deleteRequest);
     try {
       RestClient.analyzeResponseCode(httpResponse);
@@ -216,11 +218,17 @@ public class RestClient {
     }
   }
 
-  protected URI buildFullURL(String postfix) {
-    return URI.create(baseUrl + postfix);
+  protected URI resolveURL(String postfix) {
+    RestClientConnectionConfig config = getConfig();
+    if (!postfix.startsWith("/")) {
+      return getBaseURL().resolve("/" + config.getVersion() + "/" + postfix);
+    } else {
+      return getBaseURL().resolve("/" + config.getVersion() + postfix);
+    }
   }
 
   private Set<Header> getAuthHeaders() {
+    RestClientConnectionConfig config = getConfig();
     Set<Header> authHeaders = Sets.newLinkedHashSet();
     authHeaders.add(new BasicHeader(COOPR_USER_ID_HEADER_NAME, config.getUserId()));
     authHeaders.add(new BasicHeader(COOPR_TENANT_ID_HEADER_NAME, config.getTenantId()));
@@ -240,7 +248,9 @@ public class RestClient {
    * @return the base URL of Rest Service API
    */
   public URI getBaseURL() {
-    return baseUrl;
+    RestClientConnectionConfig config = getConfig();
+    return URI.create(String.format("%s://%s:%d", config.isSSL() ? HTTPS_PROTOCOL : HTTP_PROTOCOL,
+                                    config.getHost(), config.getPort()));
   }
 
   /**
@@ -248,5 +258,9 @@ public class RestClient {
    */
   public Gson getGson() {
     return gson;
+  }
+
+  private RestClientConnectionConfig getConfig() {
+    return configSupplier.get();
   }
 }

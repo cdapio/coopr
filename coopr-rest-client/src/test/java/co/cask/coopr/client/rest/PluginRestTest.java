@@ -62,9 +62,9 @@ public class PluginRestTest {
 
     int testServerPort = httpService.getBindAddress().getPort();
     String testServerHost = httpService.getBindAddress().getHostName();
-    clientManager = RestClientManager.builder(testServerHost, testServerPort)
+    clientManager = new RestClientManager(RestClientConnectionConfig.builder(testServerHost, testServerPort)
                     .userId(PluginTestConstants.TEST_USER_ID)
-                    .tenantId(PluginTestConstants.TEST_TENANT_ID).build();
+                    .tenantId(PluginTestConstants.TEST_TENANT_ID).build());
     pluginRestClient = clientManager.getPluginClient();
 
   }

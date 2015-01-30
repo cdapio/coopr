@@ -69,7 +69,7 @@ public class CLIMain {
 
     cliConfig.addReconnectListener(new CLIConfig.ReconnectListener() {
       @Override
-      public void onReconnect() throws IOException {
+      public void onReconnect() {
         cli.setCommands(getCommandSet(cliConfig, injector));
         cli.getReader().setPrompt("coopr (" + cliConfig.getURI() + ")> ");
       }
@@ -106,7 +106,6 @@ public class CLIMain {
     }
 
     CLIConfig config = new CLIConfig(host, port, userId, tenantId);
-    config.setDefaultConnection();
     CLIMain shell = new CLIMain(config);
 
     if (args.length == 0) {
