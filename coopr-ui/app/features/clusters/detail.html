@@ -54,37 +54,50 @@
     </div>
     <div class="col-xs-9">
       <div class="row" ng-show="model.expireTime">
-        <div class="col-xs-9">
+        <div class="col-xs-12">
           <p>
             <span ng-hide="leaseExtendMs">
               {{model.expireTime | date:'short'}}
               <small am-time-ago="model.expireTime"></small>
             </span>
 
-            <span ng-show="leaseExtendMs">
-              <em class="pull-right text-muted">
-                + {{leaseExtendHumanized}}
-              </em>
-              {{leaseExtendDate | date:'short'}}
-              <small am-time-ago="leaseExtendDate"></small>
-            </span>
             &nbsp;
           </p>
-          <p>
-            <input type="range"
-              min="0"
-              step="60000"
-              max="{{leaseMaxMs}}"
-              ng-model="leaseExtendMs" />
-          </p>
-        </div>
-        <div class="col-xs-3">
-          <p ng-show="leaseExtendMs" class="am-fade-and-slide-bottom">
-            <a class="btn btn-primary btn-block" href=""
-                ng-click="doLeaseExtend()">
-              <span class="fa fa-clock-o"></span> extend lease
-            </a>
-          </p>
+          <div class="row" ng-show="leaseMaxMs > 0">
+            <div class="col-xs-3">
+              <div class="input-group">
+                <label for="inputLeaseDays" class="input-group-addon">Days</label>
+                <input id="inputLeaseDays" class="form-control" type="number" 
+                  ng-model="leaseExtension.days"
+                  ng-pattern="/^\d+$/"
+                  min="0"/>
+              </div>
+            </div>
+            <div class="col-xs-3">
+              <div class="input-group">
+                <label for="inputLeaseHours"class="input-group-addon">Hours</label>
+                <input id="inputLeaseHours" class="form-control" type="number" 
+                  ng-model="leaseExtension.hours"
+                  ng-pattern="/^\d+$/"
+                  min="0" max="23"/>
+              </div>
+            </div>
+            <div class="col-xs-3">
+              <div class="input-group">
+                <label for="inputLeaseMinutes" class="input-group-addon">Minutes</label>
+                <input id="inputLeaseMinutes" class="form-control" type="number" 
+                  ng-model="leaseExtension.minutes"
+                  ng-pattern="/^\d+$/"
+                  min="0" max="59"/>
+              </div>
+            </div>
+            <div class="col-xs-3">
+              <a class="btn btn-primary btn-block" href=""
+                  ng-click="doLeaseExtend()">
+                <span class="fa fa-clock-o"></span> extend lease
+              </a>
+            </div>
+          </div>
         </div>
       </div>
       <div ng-hide="model.expireTime">
