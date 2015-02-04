@@ -44,13 +44,13 @@ angular.module(PKG.name+'.services').value('myHelpers', {
     var parsedTime = this.parseMilliseconds(milliseconds);
     var readableString = [];
     if (parsedTime.hasOwnProperty('days')) {
-      readableString.push(parsedTime['days'] + ' days');
+      readableString.push(parsedTime.days + ' days');
     }
     if (parsedTime.hasOwnProperty('hours')) {
-      readableString.push(parsedTime['hours'] + ' hours');
+      readableString.push(parsedTime.hours + ' hours');
     }
     if (parsedTime.hasOwnProperty('minutes')) {
-      readableString.push(parsedTime['minutes'] + ' minutes');
+      readableString.push(parsedTime.minutes + ' minutes');
     }
     return readableString.join(', ');
   }
