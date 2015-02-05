@@ -23,7 +23,7 @@ function ($scope, MYSERVICEPICKER_EVENT, CrudFormBase, $state, $modal, $alert, m
   }
 
 
-  var timeoutPromise;
+  var timeoutPromise, leaseExtensionHumanized;
 
 
   $scope.$on('$destroy', function () {
@@ -78,7 +78,6 @@ function ($scope, MYSERVICEPICKER_EVENT, CrudFormBase, $state, $modal, $alert, m
       maxDate = moment.min(maxDate, moment().add(ld.step, 'ms'));
     }
     $scope.leaseMaxMs = maxDate.valueOf() - Date.now();
-    $scope.leaseMaxHumanized = myHelpers.millisecondsToString($scope.leaseMaxMs);
     $scope.leaseExtendDate = $scope.model.expireTime;
   });
 
@@ -156,9 +155,17 @@ function ($scope, MYSERVICEPICKER_EVENT, CrudFormBase, $state, $modal, $alert, m
   function showLeaseAlert() {
     $alert({
       title: 'Lease extension maxed: ',
-      content: 'maximum lease is ' + $scope.leaseMaxHumanized,
+      content: 'maximum lease is ' + getLeaseExtensionHumanized(),
       type: 'warning'
     });
+  }
+
+  function getLeaseExtensionHumanized() {
+    if (!leaseExtensionHumanized) {
+      var timeObj = myHelpers.parseMilliseconds($scope.leaseMaxMs);
+      leaseExtensionHumanized = myHelpers.timeObjToString(timeObj);
+    }
+    return leaseExtensionHumanized;
   }
 
   function doActionsModal (nodeId) {

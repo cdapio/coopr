@@ -37,20 +37,20 @@ angular.module(PKG.name+'.services').value('myHelpers', {
   },
 
   /**
-   * Get human readable string from milliseconds.
-   * @return {String} readable millisecond display.
+   * Get human readable string from time object.
+   * @param  {Object} timeObj with days, hours and mins as keys.
+   * @return {String} readable time display.
    */
-  millisecondsToString: function (milliseconds) {
-    var parsedTime = this.parseMilliseconds(milliseconds);
+  timeObjToString: function timeObjToString (timeObj) {
     var readableString = [];
-    if (parsedTime.hasOwnProperty('days')) {
-      readableString.push(parsedTime.days + ' days');
+    if (timeObj.days) {
+      readableString.push(timeObj.days + ' days');
     }
-    if (parsedTime.hasOwnProperty('hours')) {
-      readableString.push(parsedTime.hours + ' hours');
+    if (timeObj.hours) {
+      readableString.push(timeObj.hours + ' hours');
     }
-    if (parsedTime.hasOwnProperty('minutes')) {
-      readableString.push(parsedTime.minutes + ' minutes');
+    if (timeObj.minutes) {
+      readableString.push(timeObj.minutes + ' minutes');
     }
     return readableString.join(', ');
   }
