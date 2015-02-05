@@ -55,8 +55,8 @@
     </fileSets>
     <files>
         <file>
-            <source>${project.basedir}/provisioner/master/conf/provisioner-site.xml</source>
-            <outputDirectory>/provisioner/master/conf</outputDirectory>
+            <source>${project.basedir}/provisioner/conf/provisioner-site.xml</source>
+            <outputDirectory>/provisioner/conf</outputDirectory>
         </file>
         <file>
             <source>${project.basedir}/README.md</source>
