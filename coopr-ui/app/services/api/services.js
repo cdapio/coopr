@@ -22,7 +22,7 @@ function ($resource, myApiPrefix) {
         provides: [],
         conflicts: [],
         install: {
-          requires: ['base'],
+          requires: [],
           uses: []
         },
         runtime: {

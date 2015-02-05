@@ -75,44 +75,42 @@ function myServicePickerDirective (MYSERVICEPICKER_EVENT) {
 
       function remapActionables (visible) {
         $scope.actionDropdowns = (visible||[]).reduce(function (out, name) {
-          if(name !== 'base') { // "base" cannot be removed nor managed, so it gets no dropdown
 
-            var dd = [];
+          var dd = [];
 
-            if($scope.clusterId) { // "management mode"
-              dd.push({
-                text: '<span class="fa fa-fw fa-play"></span> Start',
-                click: 'manageService("start", "'+name+'")'
-              });
-              dd.push({
-                text: '<span class="fa fa-fw fa-stop"></span> Stop',
-                click: 'manageService("stop", "'+name+'")'
-              });
-              dd.push({
-                text: '<span class="fa fa-fw fa-undo"></span> Restart',
-                click: 'manageService("restart", "'+name+'")'
-              });
-
-              if($scope.allowRm) {
-                dd.push({ divider: true });
-              }
-            }
+          if($scope.clusterId) { // "management mode"
+            dd.push({
+              text: '<span class="fa fa-fw fa-play"></span> Start',
+              click: 'manageService("start", "'+name+'")'
+            });
+            dd.push({
+              text: '<span class="fa fa-fw fa-stop"></span> Stop',
+              click: 'manageService("stop", "'+name+'")'
+            });
+            dd.push({
+              text: '<span class="fa fa-fw fa-undo"></span> Restart',
+              click: 'manageService("restart", "'+name+'")'
+            });
 
             if($scope.allowRm) {
-              dd.push({
-                text: '<span class="fa fa-fw fa-remove"></span> Remove',
-                click: 'rmService("'+name+'")'
-              });            
+              dd.push({ divider: true });
             }
-
-            /**
-             * As long empty array is a valid object and angular expressions are not able to check for array length,
-             * dropdown control would be displayed.
-             * null would help to serve this expression in thingpicker template: ng-if="actionDropdowns[name]".
-             */
-            out[name] = dd.length ? dd : null;
-
           }
+
+          if($scope.allowRm) {
+            dd.push({
+              text: '<span class="fa fa-fw fa-remove"></span> Remove',
+              click: 'rmService("'+name+'")'
+            });            
+          }
+
+          /**
+           * As long empty array is a valid object and angular expressions are not able to check for array length,
+           * dropdown control would be displayed.
+           * null would help to serve this expression in thingpicker template: ng-if="actionDropdowns[name]".
+           */
+          out[name] = dd.length ? dd : null;
+
           return out;
         }, {});
       }

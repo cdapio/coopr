@@ -18,13 +18,13 @@ function ($resource, myApiPrefix) {
   Template.prototype.initialize = function() {
     angular.extend(this, {
       compatibility: {
-        services: ['base'],
+        services: [],
         imagetypes: [],
         hardwaretypes: []
       },
       defaults: {
         config: {},
-        services: ['base']
+        services: []
       },
       constraints: {
         layout: {
