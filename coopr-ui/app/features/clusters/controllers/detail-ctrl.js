@@ -3,7 +3,7 @@
  */
 
 angular.module(PKG.name+'.feature.clusters').controller('ClusterDetailCtrl',
-function ($scope, MYSERVICEPICKER_EVENT, CrudFormBase, $state, $modal, $alert, myApi, $timeout, moment) {
+function ($scope, MYSERVICEPICKER_EVENT, CrudFormBase, $state, $modal, $alert, myApi, $timeout, moment, myHelpers) {
 
   CrudFormBase.apply($scope);
 
@@ -23,7 +23,7 @@ function ($scope, MYSERVICEPICKER_EVENT, CrudFormBase, $state, $modal, $alert, m
   }
 
 
-  var timeoutPromise;
+  var timeoutPromise, leaseExtensionHumanized;
 
 
   $scope.$on('$destroy', function () {
@@ -78,18 +78,34 @@ function ($scope, MYSERVICEPICKER_EVENT, CrudFormBase, $state, $modal, $alert, m
       maxDate = moment.min(maxDate, moment().add(ld.step, 'ms'));
     }
     $scope.leaseMaxMs = maxDate.valueOf() - Date.now();
+    $scope.leaseExtendDate = $scope.model.expireTime;
   });
 
+  $scope.leaseExtension = myHelpers.parseMilliseconds(0);
+  $scope.leaseExtensionMaxed = false;
+  $scope.$watchCollection('leaseExtension', function (timeObj) {
+    if(timeObj) {
+      var ms = myHelpers.concatMilliseconds(timeObj);
+      if (!$scope.leaseMaxMs || ms <= $scope.leaseMaxMs) {
+        $scope.leaseExtensionMaxed = false;
+        $scope.leaseExtendDate = moment($scope.model.expireTime).add(ms, 'ms').toDate();  
+      } else {
+        $scope.leaseExtensionMaxed = true;
+      }
+    }
+  });
 
-  $scope.leaseExtendMs = 0;
-
-  $scope.$watch('leaseExtendMs', function (ms) {
-    ms = parseInt(ms, 10); // work around input[type=range] ng-model being a string
-    $scope.leaseExtendDate = moment($scope.model.expireTime).add(ms, 'ms').toDate();
-    $scope.leaseExtendHumanized = moment.duration(ms, 'ms').humanize();
+  $scope.$watch('leaseExtensionMaxed', function (isMaxed) {
+    if(isMaxed) {
+      showLeaseAlert();
+    }
   });
 
   $scope.doLeaseExtend = function () {
+    if ($scope.leaseExtensionMaxed) {
+      showLeaseAlert();
+      return;
+    }
     myApi.Cluster.save(
       { id: $scope.model.id },
       { expireTime: $scope.leaseExtendDate.valueOf() },
@@ -99,12 +115,11 @@ function ($scope, MYSERVICEPICKER_EVENT, CrudFormBase, $state, $modal, $alert, m
           content: moment($scope.leaseExtendDate).format('LLL'),
           type: 'success'
         });
-        $scope.leaseExtendMs = 0;
+        $scope.leaseExtension = myHelpers.parseMilliseconds(0);
         update();
       }
     );
   };
-
 
 
   $scope.$on(MYSERVICEPICKER_EVENT.manage, update);
@@ -137,6 +152,21 @@ function ($scope, MYSERVICEPICKER_EVENT, CrudFormBase, $state, $modal, $alert, m
 
   /* ----------------------------------------------------------------------- */
 
+  function showLeaseAlert() {
+    $alert({
+      title: 'Lease extension maxed: ',
+      content: 'maximum lease is ' + getLeaseExtensionHumanized(),
+      type: 'warning'
+    });
+  }
+
+  function getLeaseExtensionHumanized() {
+    if (!leaseExtensionHumanized) {
+      var timeObj = myHelpers.parseMilliseconds($scope.leaseMaxMs);
+      leaseExtensionHumanized = myHelpers.timeObjToString(timeObj);
+    }
+    return leaseExtensionHumanized;
+  }
 
   function doActionsModal (nodeId) {
     $state.go('clusters.detail.node', {nodeId: nodeId});

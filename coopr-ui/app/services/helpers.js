@@ -34,7 +34,28 @@ angular.module(PKG.name+'.services').value('myHelpers', {
       total += timeObj.minutes * 60;
     }
     return total * 1000;
+  },
+
+  /**
+   * Get human readable string from time object.
+   * @param  {Object} timeObj with days, hours and mins as keys.
+   * @return {String} readable time display.
+   */
+  timeObjToString: function timeObjToString (timeObj) {
+    var readableString = [];
+    if (timeObj.days) {
+      readableString.push(timeObj.days + ' days');
+    }
+    if (timeObj.hours) {
+      readableString.push(timeObj.hours + ' hours');
+    }
+    if (timeObj.minutes) {
+      readableString.push(timeObj.minutes + ' minutes');
+    }
+    return readableString.join(', ');
   }
+
+
 
 
 });
