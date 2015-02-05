@@ -316,7 +316,7 @@ wait_for_provisioner () {
 }
 
 provisioner () {
-  if [ "$1" == "start" ]; then
+  if [ "$1" == "start" ] || [ "$1" == "register" ]; then
     echo "Waiting for server to start before running provisioner..."
     wait_for_server
     if [ "${COOPR_USE_DUMMY_PROVISIONER}" == "true" ]; then
