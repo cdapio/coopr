@@ -150,6 +150,7 @@ Unreleased
 - Update coopr-provisioner submodule ( Issues: #897 caskdata/coopr-provisioner#4 caskdata/coopr-provisioner#5 caskdata/coopr-provisioner#6 caskdata/coopr-provisioner#7 caskdata/coopr-provisioner#8 caskdata/coopr-provisioner#9 caskdata/coopr-provisioner#10 caskdata/coopr-provisioner#11 caskdata/coopr-provisioner#12 )
 - Update coopr-templates submodule ( Issues: #900 caskdata/coopr-templates#24 caskdata/coopr-templates#25 )
 - Update coopr-provisioner submodule ( Issues: caskdata/coopr-provisioner#13 caskdata/coopr-provisioner#14 )
+- Update coopr-provisioner submodule ( Issues: caskdata/coopr-provisioner#15 caskdata/coopr-provisioner#16 caskdata/coopr-provisioner#17 caskdata/coopr-provisioner#18 caskdata/coopr-provisioner#19 caskdata/coopr-provisioner#20 )
 
 v0.9.8 (09/26/14)
 -----------------
