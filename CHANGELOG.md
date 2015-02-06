@@ -152,7 +152,6 @@ Unreleased
 - Update coopr-provisioner submodule ( Issues: caskdata/coopr-provisioner#13 caskdata/coopr-provisioner#14 )
 - Update coopr-provisioner submodule ( Issues: caskdata/coopr-provisioner#15 caskdata/coopr-provisioner#16 caskdata/coopr-provisioner#17 caskdata/coopr-provisioner#18 caskdata/coopr-provisioner#19 caskdata/coopr-provisioner#20 )
 
-
 v0.9.8 (09/26/14)
 -----------------
 - AWS provider support ( Issues: #22 #322 )
