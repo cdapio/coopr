@@ -35,7 +35,7 @@
     <dependency>
       <groupId>co.cask.common</groupId>
       <artifactId>common-cli</artifactId>
-      <version>0.1.0</version>
+      <version>0.4.0</version>
     </dependency>
     <dependency>
       <groupId>jline</groupId>
