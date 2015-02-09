@@ -126,6 +126,10 @@ public class TaskQueueService {
     return queueMetricsCache.getUnchecked(tenantId);
   }
 
+  public boolean mayHaveTasks(TakeTaskRequest takeRequest) throws IOException {
+    return taskQueues.size(takeRequest.getTenantId()) > 0;
+  }
+
   /**
    * Returns the next task from task queue that can be handed out for provisioning.
    * When it goes through the task queue, if it gets a task whose job is already marked as FAILED then

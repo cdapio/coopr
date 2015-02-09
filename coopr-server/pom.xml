@@ -39,7 +39,7 @@
         <dependency>
             <groupId>co.cask.http</groupId>
             <artifactId>netty-http</artifactId>
-            <version>0.8.0</version>
+            <version>0.10.0</version>
         </dependency>
 
         <dependency>
@@ -82,6 +82,14 @@
             </exclusion>
           </exclusions>
         </dependency>
+
+      <!--remove-->
+      <dependency>
+        <groupId>mysql</groupId>
+        <artifactId>mysql-connector-java</artifactId>
+        <version>5.1.34</version>
+      </dependency>
+
     </dependencies>
 
 </project>

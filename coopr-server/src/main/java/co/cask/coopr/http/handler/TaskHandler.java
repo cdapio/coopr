@@ -62,8 +62,16 @@ public final class TaskHandler extends AbstractHttpHandler {
   @Path("/take")
   public void handleTakeTask(HttpRequest request, HttpResponder responder) {
     TakeTaskRequest takeRequest = HttpHelper.decodeRequestBody(request, responder, TakeTaskRequest.class, gson);
+    if (takeRequest == null) {
+      return;
+    }
 
     try {
+      if (!taskQueueService.mayHaveTasks(takeRequest)) {
+        responder.sendStatus(HttpResponseStatus.NO_CONTENT);
+        return;
+      }
+
       String taskJson = taskQueueService.takeNextClusterTask(takeRequest);
       if (taskJson == null) {
         responder.sendStatus(HttpResponseStatus.NO_CONTENT);

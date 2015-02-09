@@ -109,8 +109,9 @@ public class ZKInterProcessReentrantLock {
       return false;
     }
     // if we hold a lock, we release it by deleting the node
-    // todo: check that we still hold the lock?
-    Futures.getUnchecked(zkClient.delete(lockNode));
+    if (isOwnerOfLock()) {
+      Futures.getUnchecked(zkClient.delete(lockNode));
+    }
     return true;
   }
 

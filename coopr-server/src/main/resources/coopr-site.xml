@@ -1,0 +1,71 @@
+<configuration>
+  <property>
+    <name>server.zookeeper.quorum</name>
+    <value>zkbench118-1000.dev.continuuity.net:2181,zkbench219-1000.dev.continuuity.net:2181,zkbench320-1000.dev.continuuity.net:2181</value>
+  </property>
+  <property>
+    <name>server.host</name>
+    <value>localhost</value>
+  </property>
+  <property>
+    <name>server.port</name>
+    <value>55054</value>
+  </property>
+  <property>
+    <name>server.jdbc.driver</name>
+    <value>com.mysql.jdbc.Driver</value>
+  </property>
+  <property>
+    <name>server.jdbc.connection.string</name>
+    <value>jdbc:mysql://127.0.0.1:3306/db?useLegacyDatetimeCode=false</value>
+  </property>
+  <property>
+    <name>server.db.user</name>
+    <value>root</value>
+    <description>mysql user</description>
+  </property>
+  <property>
+    <name>server.db.password</name>
+    <value></value>
+    <description>mysql user password</description>
+  </property>
+  <property>
+    <name>server.jdbc.validation.query</name>
+    <value>SELECT 1</value>
+  </property>
+  <property>
+    <name>server.ids.start.num</name>
+    <value>1</value>
+  </property>
+  <property>
+    <name>server.ids.increment.by</name>
+    <value>10</value>
+  </property>
+  <!--
+    <property>
+      <name>server.callback.class</name>
+      <value>co.cask.coopr.callback.mandrill.MandrillCallback</value>
+    </property>
+    <property>
+      <name>server.callback.mandrill.template.success</name>
+      <value>coopr-cloud-success</value>
+    </property>
+    <property>
+      <name>server.callback.mandrill.template.failure</name>
+      <value>coopr-cloud-failure</value>
+    </property>
+    <property>
+      <name>server.callback.mandrill.template.failure.admin</name>
+      <value>coopr-cloud-failure-admin</value>
+    </property>
+    <property>
+      <name>server.callback.mandrill.admin.emails</name>
+      <value>ops@cask.co</value>
+    </property>
+  -->
+  <property>
+    <name>server.plugin.store.localfilestore.data.dir</name>
+    <value>/data/coopr-server/data/plugins/resources</value>
+    <description>base path where plugin resources will be written to</description>
+  </property>
+</configuration>
