@@ -17,6 +17,11 @@
 -->
 <configuration>
 
+  <property>
+    <name>server.zookeeper.quorum</name>
+    <value>zkbench118-1000.dev.continuuity.net:2181,zkbench219-1000.dev.continuuity.net:2181,zkbench320-1000.dev.continuuity.net:2181</value>
+  </property>
+
     <property>
         <name>server.port</name>
         <value>55054</value>
@@ -31,15 +36,20 @@
 
     <property>
         <name>server.jdbc.driver</name>
-        <value>org.apache.derby.jdbc.EmbeddedDriver</value>
+        <value>com.mysql.jdbc.Driver</value>
         <description>specifies db driver to use</description>
     </property>
 
     <property>
         <name>server.db.user</name>
-        <value>coopr</value>
+        <value>root</value>
         <description>database user</description>
     </property>
+
+  <property>
+    <name>server.jdbc.connection.string</name>
+    <value>jdbc:mysql://127.0.0.1:3306/db?useLegacyDatetimeCode=false</value>
+  </property>
 
     <property>
         <name>server.jdbc.max.active.connections</name>
