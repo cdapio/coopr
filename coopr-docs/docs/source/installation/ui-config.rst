@@ -13,17 +13,15 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
-:orphan:
-
 .. index::
-single: UI Configuration
+   single: UI Configuration
 
 ================
 UI Configuration
 ================
 
 Running UI with SSL
-^^^^^^^^^^^^^^^^^^^^^^^
+===================
 
 To enable running UI with SSL, setup these environment variables:
 
