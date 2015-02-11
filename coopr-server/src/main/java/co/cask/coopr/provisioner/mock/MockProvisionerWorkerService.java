@@ -20,6 +20,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.AbstractScheduledService;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.config.SocketConfig;
 import org.apache.http.impl.NoConnectionReuseStrategy;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -80,7 +81,8 @@ public class MockProvisionerWorkerService extends AbstractScheduledService {
       .setMaxConnPerRoute(capacity + 1)
       .setMaxConnTotal(capacity + 1)
       .setConnectionReuseStrategy(NoConnectionReuseStrategy.INSTANCE)
-      .setDefaultSocketConfig(SocketConfig.custom().setSoKeepAlive(false).setSoTimeout(2000).build())
+      .setDefaultSocketConfig(SocketConfig.custom().setSoKeepAlive(false).setSoTimeout(30000).build())
+      .setDefaultRequestConfig(RequestConfig.custom().setConnectTimeout(30000).setSocketTimeout(30000).build())
       .build();
   }
 
