@@ -32,8 +32,8 @@ get requests from the server to add or remove workers for different tenants.
 
 Example
 ^^^^^^^^
-Shown below is an example configuration with settings that you are most likely to change.
-::
+Shown below is an example configuration (``provisioner-site.xml``) with settings that you
+are most likely to change::
 
   <configuration>
     <property>
@@ -42,14 +42,24 @@ Shown below is an example configuration with settings that you are most likely t
       <description>Max number of running workers for this provisioner</description>
     </property>
     <property>
-      <name>provisioner.server.uri</name>
-      <value>http://localhost:55054</value>
-      <description>URI of server to connect to</description>
-    </property>
-    <property>
       <name>provisioner.data.dir</name>
       <value>/var/coopr/data/provisioner/data</value>
       <description>Provisioner storage directory for plugin data resources</description>
+    </property>
+    <property>
+      <name>provisioner.log.level</name>
+      <value>info</value>
+      <description>log level; one of debug, info, warn, error, fatal</description>
+    </property>
+    <property>
+      <name>provisioner.register.ip</name>
+      <value>127.0.0.1</value>
+      <description>Routable IP for the server to call back to this provisioner's API</description>
+    </property>
+    <property>
+      <name>provisioner.server.uri</name>
+      <value>http://localhost:55055</value>
+      <description>URI of server to connect to</description>
     </property>
     <property>
       <name>provisioner.work.dir</name>
@@ -57,6 +67,8 @@ Shown below is an example configuration with settings that you are most likely t
       <description>Provisioner working directory</description>
     </property>
   </configuration>
+  
+**Note:** Changes of the ``provisioner.log.level`` require a restart of the provisioner.
 
 Running Provisioner to use SSL
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -75,9 +87,18 @@ setup these environment variables:
 ====================================     ==========================    =======================================
    Environment variable                     Default Value                     Description
 ====================================     ==========================    =======================================
-TRUST_CERT_PATH                             None                        Trusted certificate file location.
-TRUST_CERT_PASSWORD                         None                        Trusted certificate password.
+TRUST_CERT_PATH                             None                        Trusted certificate file location
+TRUST_CERT_PASSWORD                         None                        Trusted certificate password
 ====================================     ==========================    =======================================
+
+To create an environment with the correct values, one method is to use a shell script
+with the correct values included in it. Create a file (``/etc/profile.d/coopr-provisioner-cert.sh``)
+with appropriate entries (modifying the values to point to the location of your 
+certificate file and password, as required)::
+
+  export TRUST_CERT_PATH=/etc/pki/java/client.cer
+  export TRUST_CERT_PASSWORD=<your-password>
+
 
 Configuration
 ^^^^^^^^^^^^^
@@ -92,16 +113,17 @@ A full list of available configuration settings and their default values are giv
      - Description
    * - provisioner.server.uri
      - http://localhost:55054 
-     - URI of server to connect to.
+     - URI of server to connect to
    * - provisioner.bind.ip
      - 0.0.0.0
-     - Local IP provisioner should listen on.
+     - Local IP provisioner should listen on
    * - provisioner.bind.port
      - 55056
-     - Local Port provisioner should listen on.
+     - Local Port provisioner should listen on
    * - provisioner.register.ip
      - 
-     - Routable IP for the server to call back to this provisioner's API. If left empty, the provisioner will attempt to auto-detect.
+     - Routable IP for the server to call back to this provisioner's API; if left empty,
+       the provisioner will attempt to auto-detect
    * - provisioner.data.dir
      - /var/coopr/data/provisioner/data
      - Provisioner storage directory for plugin data resources
@@ -110,7 +132,7 @@ A full list of available configuration settings and their default values are giv
      - Provisioner working directory
    * - provisioner.capacity
      - 10
-     - Max number of running workers for this provisioner. Assume each worker takes 256mb of memory.
+     - Max number of running workers for this provisioner; assume each worker takes 256mb of memory
    * - provisioner.heartbeat.interval
      - 10
      - Interval in seconds to send heartbeat to server

@@ -20,24 +20,61 @@
 UI Configuration
 ================
 
+SSL Configuration Steps
+=======================
+
+SSL configuration requires these steps:
+
+- Create a SSL certificate and key 
+- Put the certificate and key in position
+- Set the environment variables shown below, to describe the locations
+- Set and export the variables
+- Correctly configure the UI
+
+
 Running UI with SSL
 ===================
 
-To enable running UI with SSL, setup these environment variables:
+To enable running the UI with SSL, set these environment variables:
 
 ====================================     ==========================    =======================================
    Environment variable                     Default Value                     Description
 ====================================     ==========================    =======================================
-COOPR_UI_KEY_FILE                        COOPR_HOME/cert/server.key     Key file location.
-COOPR_UI_CERT_FILE                       COOPR_HOME/cert/server.crt     Certificate password.
+COOPR_UI_KEY_FILE                        COOPR_HOME/cert/server.key    Key file location
+COOPR_UI_CERT_FILE                       COOPR_HOME/cert/server.crt    Certificate file location
+COOPR_UI_SSL_PORT                        8443                          Port the UI listens on for connections  
 ====================================     ==========================    =======================================
 
-To configure UI to support server that uses mutual authentication with SSL, setup these environment variables:
+To configure the UI to support a server that uses mutual authentication with SSL, set these 
+additional environment variables:
 
 ====================================     ==========================    =======================================
    Environment variable                     Default Value                     Description
 ====================================     ==========================    =======================================
-COOPR_UI_TLS_KEY_FILE                       None                        Trusted key file location.
-COOPR_UI_TLS_CRT_FILE                       None                        Trusted certificate file location.
-COOPR_UI_TLS_KEY_PASS                       None                        Trusted certificate password.
+COOPR_UI_TLS_KEY_FILE                       None                        Trusted key file location
+COOPR_UI_TLS_CRT_FILE                       None                        Trusted certificate file location
+COOPR_UI_TLS_KEY_PASS                       None                        Trusted certificate password
 ====================================     ==========================    =======================================
+
+To create an environment with the correct values, one method is to use a shell script
+with the correct values included in it. Create a file (``/etc/profile.d/coopr-ui.sh``)
+with appropriate entries (modifying the values to point to the location of your 
+certificate file and key, as required)::
+
+  export COOPR_UI_KEY_FILE=/etc/pki/tls/private/ui-cert.key
+  export COOPR_UI_CERT_FILE=/etc/pki/tls/certs/ui-cert.crt
+  export COOPR_UI_SSL_PORT=8443
+
+
+Configuring the UI
+==================
+
+To enable the UI listening with SSL on the designated port, add to the ``/etc/default/coopr-ui``::
+
+  COOPR_SSL=true
+
+
+Logging into the UI with SSL Enabled
+====================================
+
+When logging into the UI with SSL enabled, the default port is ``8443``.
