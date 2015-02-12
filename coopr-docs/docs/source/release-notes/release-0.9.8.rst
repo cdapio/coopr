@@ -13,7 +13,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
-.. _overview_release-notes:
+.. _release-notes-0.9.8:
 
 .. index::
    single: Release Notes
@@ -21,7 +21,6 @@
 ===================
 0.9.8 Release Notes
 ===================
-.. _release-notes:
 
 Welcome to the Coopr 0.9.8 release. Release notes with links to issue details can be seen from the github project at https://github.com/caskdata/coopr/releases.
 
