@@ -141,8 +141,6 @@ highlight_language = 'java'
 # html_theme = 'nature'
 html_theme = 'cdap'
 
-# html_style = 'style.css'
-
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
@@ -183,6 +181,11 @@ html_theme_path = ['_themes']
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
 #html_short_title = None
+html_short_title = u"%s Documentation v%s" % (project, version)
+
+# A shorter title for the sidebar section, preceding the words "Table of Contents".
+# html_short_title_toc = u"%s Documentation" % project
+html_short_title_toc = ''
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
@@ -250,6 +253,10 @@ html_show_sphinx = False
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'Cooprdoc'
 
+# This context needs to be created in each child conf.py. At a minimum, it needs to be 
+# html_context = {"html_short_title_toc":html_short_title_toc}
+# This is because it needs to be set as the last item.
+html_context = {"html_short_title_toc":html_short_title_toc}
 
 # -- Options for LaTeX output ---------------------------------------------
 

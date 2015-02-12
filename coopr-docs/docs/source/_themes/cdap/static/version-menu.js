@@ -24,6 +24,8 @@
  *  versionscallback({ "development":[["0.9.9-SNAPSHOT", "0.9.9"],], "current": ["0.9.8", "0.9.8"], "older": [["0.9.7", "0.9.7"],] });
  * 
  * list of development versions; one current version; list of additional versions
+ *
+ * version 0.2
  * 
  */
 
@@ -43,7 +45,7 @@
       document.write('<select id="' + versionID + '" onmousedown="window.currentversion=this.value;" onchange="window.gotoVersion(\'' + versionID + '\')">');
     }
     var ess = "s";
-    if (data.development) {
+    if (data.development && data.development.length > 0) {
       if (data.development.length == 1) {
         ess = "";
       }
@@ -55,11 +57,11 @@
       document.write('</optgroup>');
     }
       document.write('<optgroup label="Current Release">');
-    if (data.current) {
+    if (data.current && data.current.length > 0) {
       writelink(data.current[0], data.current[1]);
       document.write('</optgroup>');
     }
-    if (data.older) {
+    if (data.older && data.older.length > 0) {
       ess = "s";
       if (data.older.length == 1) {
         ess = "";

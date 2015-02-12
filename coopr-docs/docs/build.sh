@@ -260,15 +260,15 @@ function build() {
 }
 
 function build_zip() {
+  echo "Building zip..."
   local target=$1
-  local zip_dir_name=""
   cd $SCRIPT_PATH
   set_project_path
   version
   if [ "x$target" == "x" ]; then
-    zip_dir_name="$PROJECT-docs-$PROJECT_VERSION"
+    ZIP_DIR_NAME="$PROJECT-docs-$PROJECT_VERSION"
   else
-    zip_dir_name="$PROJECT-docs-$PROJECT_VERSION-$1"
+    ZIP_DIR_NAME="$PROJECT-docs-$PROJECT_VERSION-$1"
   fi
   cd $SCRIPT_PATH/$BUILD
   mkdir $PROJECT_VERSION
@@ -276,13 +276,15 @@ function build_zip() {
   # Add a redirect index.html file
   echo "$REDIRECT_EN_HTML" > $PROJECT_VERSION/index.html
   # Zip everything
-  zip -qr $zip_dir_name.zip $PROJECT_VERSION/* --exclude .DS_Store
+  zip -qr $ZIP_DIR_NAME.zip $PROJECT_VERSION/* --exclude .DS_Store
 }
 
 function zip_extras() {
   if [ "x$1" == "x$FALSE" ]; then
+    echo "Not building extras..."
     return
   fi
+  echo "Building extras..."
   # Add JSON file
   cd $SCRIPT_PATH/$SOURCE
   JSON_FILE=`python -c 'import conf; conf.print_json_versions_file();'`
@@ -293,6 +295,7 @@ function zip_extras() {
   rewrite $SOURCE/$HTACCESS $BUILD/$PROJECT_VERSION/.$HTACCESS "<version>" "$PROJECT_VERSION"
   cd $SCRIPT_PATH/$BUILD
   zip -qr $ZIP_DIR_NAME.zip $PROJECT_VERSION/$JSON_FILE $PROJECT_VERSION/.$HTACCESS
+    
 }
 
 function clean() {
