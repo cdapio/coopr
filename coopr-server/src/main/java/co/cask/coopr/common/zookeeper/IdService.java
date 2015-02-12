@@ -29,6 +29,8 @@ import org.apache.twill.zookeeper.ZKClient;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.data.Stat;
 
+import java.util.concurrent.locks.Lock;
+
 /**
  * Uses Zookeeper for creating new unique ids.
  */
@@ -37,7 +39,7 @@ public final class IdService extends AbstractIdleService {
 
   private final long startId;
   private final long incrementBy;
-  private ThreadLocal<ZKInterProcessReentrantLock> idLock;
+  private ThreadLocal<Lock> idLock;
 
   private final ZKClient zkClient;
 
@@ -72,19 +74,19 @@ public final class IdService extends AbstractIdleService {
 
   @Override
   protected void startUp() {
-    this.idLock = new ThreadLocal<ZKInterProcessReentrantLock>() {
+    this.idLock = new ThreadLocal<Lock>() {
       @Override
-      protected ZKInterProcessReentrantLock initialValue() {
+      protected Lock initialValue() {
         return new ZKInterProcessReentrantLock(zkClient, IDS_BASEPATH + "/lock");
       }
     };
-    idLock.get().acquire();
+    idLock.get().lock();
     try {
       for (Type type : Type.values()) {
         initializeCounter(type);
       }
     } finally {
-      idLock.get().release();
+      idLock.get().unlock();
     }
   }
 
@@ -125,14 +127,14 @@ public final class IdService extends AbstractIdleService {
   // This generally should not be a noticeable amount of time compared to the time it takes to perform tasks
   // TODO: try optimistic locking before actual locking to improve performance.
   private long generateId(Type type) {
-    idLock.get().acquire();
+    idLock.get().lock();
     try {
       NodeData nodeData = Futures.getUnchecked(zkClient.getData(type.path));
       long counterVal = Longs.fromByteArray(nodeData.getData());
       Futures.getUnchecked(zkClient.setData(type.path, Longs.toByteArray(counterVal + incrementBy)));
       return counterVal;
     } finally {
-      idLock.get().release();
+      idLock.get().unlock();
     }
   }
 

@@ -28,6 +28,9 @@ import org.apache.zookeeper.data.Stat;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
 
 /**
  * A re-entrant mutual exclusion lock backed up by Zookeeper.
@@ -35,7 +38,7 @@ import java.util.List;
  * Note: this class is not thread-safe. When using within same process every thread should have it's own instance of
  * the lock.
  */
-public class ZKInterProcessReentrantLock {
+public class ZKInterProcessReentrantLock implements Lock {
   private final ZKClient zkClient;
   private final String path;
   private final String lockPath;
@@ -52,7 +55,8 @@ public class ZKInterProcessReentrantLock {
     ZKClientExt.ensureExists(zkClient, path);
   }
 
-  public void acquire() {
+  @Override
+  public void lock() {
     if (isOwnerOfLock()) {
       return;
     }
@@ -104,14 +108,34 @@ public class ZKInterProcessReentrantLock {
     Futures.getUnchecked(future);
   }
 
-  public boolean release() {
+  @Override
+  public void lockInterruptibly() throws InterruptedException {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public boolean tryLock() {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public boolean tryLock(long time, TimeUnit unit) throws InterruptedException {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public void unlock() {
     if (lockNode == null) {
-      return false;
+      return;
     }
     // if we hold a lock, we release it by deleting the node
     // todo: check that we still hold the lock?
     Futures.getUnchecked(zkClient.delete(lockNode));
-    return true;
+  }
+
+  @Override
+  public Condition newCondition() {
+    throw new UnsupportedOperationException();
   }
 
   private boolean isOwnerOfLock() {

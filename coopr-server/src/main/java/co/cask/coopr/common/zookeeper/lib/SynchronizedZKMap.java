@@ -33,6 +33,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
 
 /**
  * Synchronized (across threads and different processes) implementation of {@link java.util.Map} backed
@@ -48,7 +49,7 @@ public class SynchronizedZKMap<T> implements Map<String, T> {
   private final ZKClient zkClient;
   private final Serializer<T> serializer;
 
-  private final ZKInterProcessReentrantLock globalLock;
+  private final Lock globalLock;
   private Map<String, T> currentView;
   private int currentViewVersion;
 
@@ -66,79 +67,79 @@ public class SynchronizedZKMap<T> implements Map<String, T> {
 
   @Override
   public synchronized int size() {
-    globalLock.acquire();
+    globalLock.lock();
     try {
       reloadCacheIfNeeded();
       return currentView.size();
     } finally {
-      globalLock.release();
+      globalLock.unlock();
     }
   }
 
   @Override
   public synchronized boolean isEmpty() {
-    globalLock.acquire();
+    globalLock.lock();
     try {
       reloadCacheIfNeeded();
       return currentView.isEmpty();
     } finally {
-      globalLock.release();
+      globalLock.unlock();
     }
   }
 
   @Override
   public synchronized boolean containsKey(Object key) {
-    globalLock.acquire();
+    globalLock.lock();
     try {
       reloadCacheIfNeeded();
       return currentView.containsKey(key);
     } finally {
-      globalLock.release();
+      globalLock.unlock();
     }
   }
 
   @Override
   public synchronized boolean containsValue(Object value) {
-    globalLock.acquire();
+    globalLock.lock();
     try {
       reloadCacheIfNeeded();
       return currentView.containsValue(value);
     } finally {
-      globalLock.release();
+      globalLock.unlock();
     }
   }
 
   @Override
   public synchronized T get(Object key) {
-    globalLock.acquire();
+    globalLock.lock();
     try {
       reloadCacheIfNeeded();
       return currentView.get(key);
     } finally {
-      globalLock.release();
+      globalLock.unlock();
     }
   }
 
   // note: may not return value and still delete smth from ZK if in-memory view is stale
   public synchronized T put(String key, T value) {
-    globalLock.acquire();
+    globalLock.lock();
     try {
       reloadCacheIfNeeded();
       return putInternal(key, value);
     } finally {
-      globalLock.release();
+      globalLock.unlock();
     }
   }
 
   // note: we may return null even though we removed non-null element if the view in memory is stale. Which is OK
   @Override
   public synchronized T remove(Object key) {
-    globalLock.acquire();
+    globalLock.lock();
     try {
       reloadCacheIfNeeded();
       return removeInternal(key);
     } finally {
-      globalLock.release();
+      globalLock.unlock();
     }
   }
 
@@ -149,45 +150,45 @@ public class SynchronizedZKMap<T> implements Map<String, T> {
   }
 
   public synchronized void clear() {
-    globalLock.acquire();
+    globalLock.lock();
     try {
       reloadCacheIfNeeded();
       clearInternal();
     } finally {
-      globalLock.release();
+      globalLock.unlock();
     }
   }
 
   @Override
   public synchronized Set<String> keySet() {
-    globalLock.acquire();
+    globalLock.lock();
     try {
       reloadCacheIfNeeded();
       return currentView.keySet();
     } finally {
-      globalLock.release();
+      globalLock.unlock();
     }
   }
 
   @Override
   public synchronized Collection<T> values() {
-    globalLock.acquire();
+    globalLock.lock();
     try {
       reloadCacheIfNeeded();
       return currentView.values();
     } finally {
-      globalLock.release();
+      globalLock.unlock();
     }
   }
 
   @Override
   public synchronized Set<Entry<String, T>> entrySet() {
-    globalLock.acquire();
+    globalLock.lock();
     try {
       reloadCacheIfNeeded();
       return currentView.entrySet();
     } finally {
-      globalLock.release();
+      globalLock.unlock();
     }
   }
 

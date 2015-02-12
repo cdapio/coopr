@@ -30,11 +30,11 @@ public class ZKInterProcessReentrantLockTest extends BaseZKTest {
   @Test(timeout = 10000)
   public void testLockIsReentrant() {
     ZKInterProcessReentrantLock lock = new ZKInterProcessReentrantLock(zkClient, "/foo/lock");
-    lock.acquire();
-    lock.acquire();
-    lock.release();
-    lock.acquire();
-    lock.release();
+    lock.lock();
+    lock.lock();
+    lock.unlock();
+    lock.lock();
+    lock.unlock();
   }
 
   @Test(timeout = 10000)
@@ -60,11 +60,11 @@ public class ZKInterProcessReentrantLockTest extends BaseZKTest {
           // perform increments when holding the lock
           for (int j = 0; j < incrementsPerThread; j++) {
             ZKInterProcessReentrantLock lock = new ZKInterProcessReentrantLock(zkClient, lockPath);
-            lock.acquire();
+            lock.lock();
             try {
               counter.setCount(counter.getCount() + 1);
             } finally {
-              lock.release();
+              lock.unlock();
             }
           }
           // hit the latch when you're done

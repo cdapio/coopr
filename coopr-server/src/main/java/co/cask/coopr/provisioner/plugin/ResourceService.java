@@ -19,7 +19,6 @@ import co.cask.coopr.account.Account;
 import co.cask.coopr.common.conf.Configuration;
 import co.cask.coopr.common.utils.ImmutablePair;
 import co.cask.coopr.common.zookeeper.LockService;
-import co.cask.coopr.common.zookeeper.lib.ZKInterProcessReentrantLock;
 import co.cask.coopr.scheduler.task.MissingEntityException;
 import co.cask.coopr.spec.plugin.AutomatorType;
 import co.cask.coopr.spec.plugin.ProviderType;
@@ -46,6 +45,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
 
 /**
  * Service for managing plugin modules.
@@ -89,8 +89,8 @@ public class ResourceService extends AbstractIdleService {
                                                  final ResourceType resourceType,
                                                  final String name,
                                                  final HttpResponder responder) throws IOException {
-    final ZKInterProcessReentrantLock lock = getResourceLock(account, resourceType, name);
-    lock.acquire();
+    final Lock lock = getResourceLock(account, resourceType, name);
+    lock.lock();
     try {
       PluginResourceTypeView view = metaStoreService.getResourceTypeView(account, resourceType);
       // ok to do versioning this way since we have a lock
@@ -147,7 +147,7 @@ public class ResourceService extends AbstractIdleService {
         }
       };
     } finally {
-      lock.release();
+      lock.unlock();
     }
   }
 
@@ -185,8 +185,8 @@ public class ResourceService extends AbstractIdleService {
   private void copySuperadminResource(Account account, ResourceType type, ResourceMeta meta) throws IOException {
     String name = meta.getName();
     int version = meta.getVersion();
-    ZKInterProcessReentrantLock lock = getResourceLock(account, type, name);
-    lock.acquire();
+    Lock lock = getResourceLock(account, type, name);
+    lock.lock();
     InputStream inStream = null;
     OutputStream outStream = null;
     try {
@@ -217,7 +217,7 @@ public class ResourceService extends AbstractIdleService {
           LOG.error("Exception closing input stream while copying superadmin resource.", e);
         }
       }
-      lock.release();
+      lock.unlock();
     }
   }
 
@@ -259,8 +259,8 @@ public class ResourceService extends AbstractIdleService {
     throws MissingEntityException, IOException {
     LOG.debug("staging version {} of resource {} of type {} for account {}.",
               version, name, resourceType, account);
-    ZKInterProcessReentrantLock lock = getResourceLock(account, resourceType, name);
-    lock.acquire();
+    Lock lock = getResourceLock(account, resourceType, name);
+    lock.lock();
     try {
       PluginResourceTypeView view = metaStoreService.getResourceTypeView(account, resourceType);
       if (!view.exists(name, version)) {
@@ -268,7 +268,7 @@ public class ResourceService extends AbstractIdleService {
       }
       view.stage(name, version);
     } finally {
-      lock.release();
+      lock.unlock();
     }
   }
 
@@ -286,8 +286,8 @@ public class ResourceService extends AbstractIdleService {
     throws MissingEntityException, IOException {
     LOG.debug("Recalling version {} of resource {} of type {} for account {}.",
               version, name, resourceType, account);
-    ZKInterProcessReentrantLock lock = getResourceLock(account, resourceType, name);
-    lock.acquire();
+    Lock lock = getResourceLock(account, resourceType, name);
+    lock.lock();
     try {
       PluginResourceTypeView view = metaStoreService.getResourceTypeView(account, resourceType);
       if (!view.exists(name, version)) {
@@ -295,7 +295,7 @@ public class ResourceService extends AbstractIdleService {
       }
       view.recall(name, version);
     } finally {
-      lock.release();
+      lock.unlock();
     }
   }
 
@@ -347,8 +347,8 @@ public class ResourceService extends AbstractIdleService {
   public void delete(Account account, ResourceType resourceType,
                      String name, int version) throws IllegalStateException, IOException {
     LOG.debug("deleting version {} of resource {} of type {} for account {}.", version, name, resourceType, account);
-    ZKInterProcessReentrantLock lock = getResourceLock(account, resourceType, name);
-    lock.acquire();
+    Lock lock = getResourceLock(account, resourceType, name);
+    lock.lock();
     try {
       PluginResourceTypeView view = metaStoreService.getResourceTypeView(account, resourceType);
       ResourceMeta meta = view.get(name, version);
@@ -362,7 +362,7 @@ public class ResourceService extends AbstractIdleService {
       LOG.debug("deleted version {} of resource {} of type {} for account {} from plugin store.",
                 version, name, resourceType, account);
     } finally {
-      lock.release();
+      lock.unlock();
     }
   }
 
@@ -378,8 +378,8 @@ public class ResourceService extends AbstractIdleService {
   public void delete(Account account, ResourceType resourceType,
                      String name) throws IllegalStateException, IOException {
     LOG.debug("deleting all versions of resource {} of type {} for account {}.", name, resourceType, account);
-    ZKInterProcessReentrantLock lock = getResourceLock(account, resourceType, name);
-    lock.acquire();
+    Lock lock = getResourceLock(account, resourceType, name);
+    lock.lock();
     try {
       PluginResourceTypeView view = metaStoreService.getResourceTypeView(account, resourceType);
       Set<ResourceMeta> metas = view.getAll(name);
@@ -395,7 +395,7 @@ public class ResourceService extends AbstractIdleService {
                   meta.getVersion(), name, resourceType, account);
       }
     } finally {
-      lock.release();
+      lock.unlock();
     }
   }
 
@@ -487,7 +487,7 @@ public class ResourceService extends AbstractIdleService {
 
   // locks are namespaced by tenant and resource type and name. for example,
   // /tenant1/automator/chef-solo/cookbooks/reactor
-  private ZKInterProcessReentrantLock getResourceLock(Account account, ResourceType type, String name) {
+  private Lock getResourceLock(Account account, ResourceType type, String name) {
     return lockService.getResourceLock(account.getTenantId(), type.getPluginType().name().toLowerCase(),
                                        type.getPluginName(), type.getTypeName(), name);
   }

@@ -22,7 +22,6 @@ import co.cask.coopr.common.queue.QueueService;
 import co.cask.coopr.common.queue.QueueType;
 import co.cask.coopr.common.zookeeper.IdService;
 import co.cask.coopr.common.zookeeper.LockService;
-import co.cask.coopr.common.zookeeper.lib.ZKInterProcessReentrantLock;
 import co.cask.coopr.http.request.AddServicesRequest;
 import co.cask.coopr.http.request.ClusterConfigureRequest;
 import co.cask.coopr.http.request.ClusterCreateRequest;
@@ -74,6 +73,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
 
 /**
  * Service for performing operations on clusters.
@@ -157,8 +157,8 @@ public class ClusterService {
     QuotaException, MissingEntityException, InvalidClusterException, IllegalAccessException, MissingFieldsException {
     // the create lock is shared across an entire tenant and is needed so that concurrent create requests
     // cannot cause the quota to be exceeded if they both read the old value and both add clusters and nodes
-    ZKInterProcessReentrantLock lock = lockService.getClusterCreateLock(account.getTenantId());
-    lock.acquire();
+    Lock lock = lockService.getClusterCreateLock(account.getTenantId());
+    lock.lock();
     try {
       if (!tenantProvisionerService.satisfiesTenantQuotas(
         account.getTenantId(), 1, clusterCreateRequest.getNumMachines())) {
@@ -183,7 +183,7 @@ public class ClusterService {
       serverStats.getClusterStats().incrementStat(ClusterAction.SOLVE_LAYOUT);
       return cluster.getId();
     } finally {
-      lock.release();
+      lock.unlock();
     }
   }
 
@@ -201,8 +201,8 @@ public class ClusterService {
    */
   public void requestClusterDelete(String clusterId, Account account, ClusterOperationRequest request)
     throws IOException, IllegalAccessException, MissingEntityException, MissingFieldsException {
-    ZKInterProcessReentrantLock lock = lockService.getClusterLock(account.getTenantId(), clusterId);
-    lock.acquire();
+    Lock lock = lockService.getClusterLock(account.getTenantId(), clusterId);
+    lock.lock();
     try {
       Cluster cluster = getCluster(clusterId, account);
       JobId deleteJobId = idService.getNewJobId(clusterId);
@@ -219,7 +219,7 @@ public class ClusterService {
       serverStats.getClusterStats().incrementStat(ClusterAction.CLUSTER_DELETE);
       clusterQueues.add(account.getTenantId(), new Element(clusterId, ClusterAction.CLUSTER_DELETE.name()));
     } finally {
-      lock.release();
+      lock.unlock();
     }
   }
 
@@ -239,8 +239,8 @@ public class ClusterService {
    */
   public void requestClusterReconfigure(String clusterId, Account account, ClusterConfigureRequest request)
     throws IOException, MissingEntityException, IllegalAccessException, MissingFieldsException {
-    ZKInterProcessReentrantLock lock = lockService.getClusterLock(account.getTenantId(), clusterId);
-    lock.acquire();
+    Lock lock = lockService.getClusterLock(account.getTenantId(), clusterId);
+    lock.lock();
     try {
       Cluster cluster = getCluster(clusterId, account);
       if (!Cluster.Status.CONFIGURABLE_STATES.contains(cluster.getStatus())) {
@@ -266,7 +266,7 @@ public class ClusterService {
       serverStats.getClusterStats().incrementStat(action);
       clusterQueues.add(account.getTenantId(), new Element(clusterId, action.name()));
     } finally {
-      lock.release();
+      lock.unlock();
     }
   }
 
@@ -291,8 +291,8 @@ public class ClusterService {
     throws IOException, MissingEntityException, IllegalAccessException, MissingFieldsException {
     Preconditions.checkArgument(ClusterAction.SERVICE_RUNTIME_ACTIONS.contains(action),
                                 action + " is not a service runtime action.");
-    ZKInterProcessReentrantLock lock = lockService.getClusterLock(account.getTenantId(), clusterId);
-    lock.acquire();
+    Lock lock = lockService.getClusterLock(account.getTenantId(), clusterId);
+    lock.lock();
     try {
       Cluster cluster = getCluster(clusterId, account);
       if (service != null && !cluster.getServices().contains(service)) {
@@ -315,7 +315,7 @@ public class ClusterService {
       serverStats.getClusterStats().incrementStat(action);
       clusterQueues.add(account.getTenantId(), new Element(clusterId, action.name()));
     } finally {
-      lock.release();
+      lock.unlock();
     }
   }
 
@@ -345,8 +345,8 @@ public class ClusterService {
       throw new IllegalStateException("Cannot be aborted at this time.");
     }
 
-    ZKInterProcessReentrantLock lock = lockService.getClusterLock(account.getTenantId(), clusterId);
-    lock.acquire();
+    Lock lock = lockService.getClusterLock(account.getTenantId(), clusterId);
+    lock.lock();
     try {
       cluster = view.getCluster(clusterId);
       if (cluster == null) {
@@ -371,7 +371,7 @@ public class ClusterService {
       // Reschedule the job.
       jobQueues.add(account.getTenantId(), new Element(clusterJob.getJobId()));
     } finally {
-      lock.release();
+      lock.unlock();
     }
   }
 
@@ -385,8 +385,8 @@ public class ClusterService {
    */
   public void requestPauseJob(String clusterId, Account account) throws IOException, MissingClusterException {
     LOG.debug("request to pause job for cluster: {}", clusterId);
-    ZKInterProcessReentrantLock lock = lockService.getClusterLock(account.getTenantId(), clusterId);
-    lock.acquire();
+    Lock lock = lockService.getClusterLock(account.getTenantId(), clusterId);
+    lock.lock();
     try {
       Cluster cluster = getCluster(clusterId, account);
       LOG.debug("cluster info: {}", cluster);
@@ -411,7 +411,7 @@ public class ClusterService {
       clusterJob.setStatusMessage("Paused by user.");
       clusterStore.writeClusterJob(clusterJob);
     } finally {
-      lock.release();
+      lock.unlock();
     }
   }
 
@@ -425,8 +425,8 @@ public class ClusterService {
    */
   public void requestResumeJob(String clusterId, Account account) throws IOException, MissingClusterException {
     LOG.debug("request to resume job for cluster: {}", clusterId);
-    ZKInterProcessReentrantLock lock = lockService.getClusterLock(account.getTenantId(), clusterId);
-    lock.acquire();
+    Lock lock = lockService.getClusterLock(account.getTenantId(), clusterId);
+    lock.lock();
     try {
       Cluster cluster = getCluster(clusterId, account);
       LOG.debug("cluster info: {}", cluster);
@@ -452,7 +452,7 @@ public class ClusterService {
       // Reschedule the job.
       jobQueues.add(account.getTenantId(), new Element(clusterJob.getJobId()));
     } finally {
-      lock.release();
+      lock.unlock();
     }
   }
 
@@ -472,8 +472,8 @@ public class ClusterService {
    */
   public void requestAddServices(String clusterId, Account account, AddServicesRequest addRequest)
     throws IOException, MissingEntityException, IllegalAccessException, MissingFieldsException {
-    ZKInterProcessReentrantLock lock = lockService.getClusterLock(account.getTenantId(), clusterId);
-    lock.acquire();
+    Lock lock = lockService.getClusterLock(account.getTenantId(), clusterId);
+    lock.lock();
     try {
       Cluster cluster = getCluster(clusterId, account);
       if (cluster.getStatus() != Cluster.Status.ACTIVE) {
@@ -496,7 +496,7 @@ public class ClusterService {
       SolverRequest solverRequest = new SolverRequest(SolverRequest.Type.ADD_SERVICES, gson.toJson(addRequest));
       solverQueues.add(account.getTenantId(), new Element(clusterId, gson.toJson(solverRequest)));
     } finally {
-      lock.release();
+      lock.unlock();
     }
   }
 
@@ -515,8 +515,8 @@ public class ClusterService {
    */
   public void syncClusterToCurrentTemplate(String clusterId, Account account)
     throws IOException, MissingEntityException, InvalidClusterException, IllegalAccessException {
-    ZKInterProcessReentrantLock lock = lockService.getClusterLock(account.getTenantId(), clusterId);
-    lock.acquire();
+    Lock lock = lockService.getClusterLock(account.getTenantId(), clusterId);
+    lock.lock();
     try {
       Cluster cluster = getCluster(clusterId, account);
       if (cluster.getStatus() != Cluster.Status.ACTIVE) {
@@ -545,7 +545,7 @@ public class ClusterService {
       cluster.setClusterTemplate(currentTemplate);
       view.writeCluster(cluster);
     } finally {
-      lock.release();
+      lock.unlock();
     }
   }
 
@@ -562,8 +562,8 @@ public class ClusterService {
    */
   public void changeExpireTime(String clusterId, Account account, long expireTime) throws IOException,
     IllegalAccessException, MissingClusterException {
-    ZKInterProcessReentrantLock lock = lockService.getClusterLock(account.getTenantId(), clusterId);
-    lock.acquire();
+    Lock lock = lockService.getClusterLock(account.getTenantId(), clusterId);
+    lock.lock();
     try {
       Cluster cluster = getCluster(clusterId, account);
 
@@ -595,7 +595,7 @@ public class ClusterService {
       LOG.debug("Prolonging lease of cluster {} by {} to {}", clusterId, expireTime, cluster.getExpireTime());
       clusterStoreService.getView(account).writeCluster(cluster);
     } finally {
-      lock.release();
+      lock.unlock();
     }
   }
 
