@@ -48,6 +48,13 @@
             <directory>${project.basedir}/server/conf</directory>
             <outputDirectory>/server/conf</outputDirectory>
         </fileSet>
+        <fileSet>
+            <directory>${project.basedir}/../coopr-server/distribution/etc/coopr/conf.dist</directory>
+            <outputDirectory>/server/conf</outputDirectory>
+            <includes>
+                <include>*.example</include>
+            </includes>
+        </fileSet>
       <fileSet>
         <directory>${project.basedir}/../coopr-cli/target/bin</directory>
         <outputDirectory>/cli/bin</outputDirectory>
