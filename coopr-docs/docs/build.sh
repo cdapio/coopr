@@ -97,31 +97,6 @@ ARG_2="$2"
 ARG_3="$3"
 
 
-# function usage_old() {
-#   cd $PROJECT_PATH
-#   PROJECT_PATH=`pwd`
-#   echo "Build script for '$PROJECT_CAPS' docs"
-#   echo "Usage: $SCRIPT < option > [source]"
-#   echo ""
-#   echo "  Options (select one)"
-#   echo "    build         Clean build of javadocs and HTML docs, copy javadocs and PDFs into place, zip results"
-#   echo "    build-github  Clean build and zip for placing on GitHub"
-#   echo "    build-web     Clean build and zip for placing on docs.cask.co webserver"
-#   echo ""
-#   echo "    docs          Clean build of docs"
-#   echo "    javadocs      Clean build of javadocs (api module only) for SDK and website"
-#   echo "    javadocs-full Clean build of javadocs for all modules"
-#   echo "    rest-pdf      Clean build of REST PDF"
-#   echo "    zip           Zips docs into $ZIP"
-#   echo ""
-#   echo "    depends       Build Site listing dependencies"
-#   echo "    sdk           Build SDK"
-#   echo "  with"
-#   echo "    source        Path to $PROJECT source for javadocs, if not $PROJECT_PATH"
-#   echo " "
-#   exit 1
-# }
-
 function set_project_path() {
   if [ "x$ARG_2" == "x" ]; then
     PROJECT_PATH="$SCRIPT_PATH/../../"
@@ -164,28 +139,8 @@ function run_command() {
     test )              test; exit 1;;
     * )                 usage; exit 1;;
   esac
-  
-#   case "$1" in
-#     build )             build; exit 1;;
-#     build-web )         build_web; exit 1;;
-#     build-github )      build_github; exit 1;;
-#     docs )              build_docs; exit 1;;
-#     build-standalone )  build_standalone; exit 1;;
-#     copy-javadocs )     copy_javadocs_sdk; exit 1;;
-#     copy-license-pdfs ) copy_license_pdfs; exit 1;;
-#     javadocs )          build_javadocs_sdk; exit 1;;
-#     javadocs-full )     build_javadocs_full; exit 1;;
-#     depends )           build_dependencies; exit 1;;
-#     rest-pdf )          build_rest_pdf; exit 1;;
-#     sdk )               build_sdk; exit 1;;
-#     version )           print_version; exit 1;;
-#     test )              test; exit 1;;
-#     zip )               make_zip; exit 1;;
-#     * )                 usage; exit 1;;
-#   esac
-
 }
-################################################## new
+
 
 function bell() {
   # Pass a message as $1
@@ -352,113 +307,6 @@ function rewrite() {
     sed -e "s|$sub_string|$new_sub_string|g" $rewrite_source > $rewrite_target
   fi
 }
-
-################################################## current
-
-# function build_docs() {
-#   clean
-#   cd $SCRIPT_PATH
-#   sphinx-build -b html -d build/doctrees source build/html
-# }
-# 
-# function build_docs_google() {
-#   clean
-#   cd $SCRIPT_PATH
-#   sphinx-build -D googleanalytics_id=$1 -D googleanalytics_enabled=1 -b html -d build/doctrees source build/html
-# }
-
-# function build_javadocs_full() {
-#   cd $PROJECT_PATH
-#   mvn clean site -DskipTests
-# }
-# 
-# function build_javadocs_sdk() {
-#   cd $PROJECT_PATH/$API
-#   mvn clean javadoc:javadoc -DskipTests
-# }
-# 
-# function copy_javadocs_sdk() {
-#   cd $BUILD_PATH/$HTML
-#   rm -rf $JAVADOCS
-#   cp -r $SDK_JAVADOCS .
-#   mv -f $APIDOCS $JAVADOCS
-# }
-
-# function copy_license_pdfs() {
-#   cd $BUILD_PATH/$HTML/$LICENSES
-#   cp $SCRIPT_PATH/$LICENSES_PDF/* .
-# }
-
-# function make_zip_html() {
-#   version
-#   ZIP_FILE_NAME="$PROJECT-docs-$PROJECT_VERSION.zip"
-#   cd $SCRIPT_PATH/$BUILD
-#   zip -r $ZIP_FILE_NAME $HTML/*
-# }
-
-# function make_zip() {
-# # This creates a zip that unpacks to the same name
-#   version
-#   if [ "x$1" == "x" ]; then
-#     ZIP_DIR_NAME="$PROJECT-docs-$PROJECT_VERSION"
-#   else
-#     ZIP_DIR_NAME="$PROJECT-docs-$PROJECT_VERSION-$1"
-#   fi
-#   cd $SCRIPT_PATH/$BUILD
-#   mv $HTML $ZIP_DIR_NAME
-#   zip -r $ZIP_DIR_NAME.zip $ZIP_DIR_NAME/*
-# }
-
-
-# function make_zip_localized() {
-# # This creates a named zip that unpacks to the Project Version, localized to english
-#   version
-#   ZIP_DIR_NAME="$PROJECT-docs-$PROJECT_VERSION-$1"
-#   cd $SCRIPT_PATH/$BUILD
-#   mkdir $PROJECT_VERSION
-#   mv $HTML $PROJECT_VERSION/en
-#   zip -r $ZIP_DIR_NAME.zip $PROJECT_VERSION/*
-# }
-
-# function build() {
-#   build_docs
-#   build_javadocs_sdk
-#   copy_javadocs_sdk
-#   copy_license_pdfs
-#   make_zip
-# }
-
-# function build_docs_google() {
-#   clean
-#   cd $SCRIPT_PATH
-#   sphinx-build -D googleanalytics_id=$1 -D googleanalytics_enabled=1 -b html -d build/doctrees source build/html
-# }
-# 
-# function build_web() {
-# # This is used to stage files
-# # desired path is x.x.x-SNAPSHOT/en/*
-#   build_docs_google $GOOGLE_ANALYTICS_WEB
-#   build_javadocs_sdk
-#   copy_javadocs_sdk
-#   make_zip_localized $WEB
-# }
-# 
-# function build_github() {
-#   # GitHub requires a .nojekyll file at the root to allow for Sphinx's directories beginning with underscores
-#   build_docs_google $GOOGLE_ANALYTICS_GITHUB
-#   build_javadocs_sdk
-#   copy_javadocs_sdk
-#   make_zip $GITHUB
-#   ZIP_DIR_NAME="$PROJECT-docs-$PROJECT_VERSION-$GITHUB"
-#   cd $SCRIPT_PATH/$BUILD
-#   touch $ZIP_DIR_NAME/.nojekyll
-#   zip $ZIP_DIR_NAME.zip $ZIP_DIR_NAME/.nojekyll
-# }
-
-# function build_standalone() {
-#   cd $PROJECT_PATH
-#   mvn clean package assembly:single -DskipTests
-# }
 
 function build_sdk() {
   cd $PROJECT_PATH
