@@ -153,6 +153,7 @@ To provide a custom authentication mechanism you may create your own ``Authentic
     }
   }
 
+.. highlight:: console
 
 Testing Security
 ----------------

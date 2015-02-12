@@ -60,6 +60,8 @@ the runtime metadata. We don't recommend running an embedded derby DB in product
 Coopr Server can be configured to connect to standard relational database like MySQL or PostgreSQL
 by simple configurations specified in ``coopr-security.xml``.
 
+.. highlight:: xml
+
 Following are the configuration required for enabling Coopr Server to connect to external relational database::
 
  ...
@@ -133,6 +135,8 @@ There is web service endpoint for retrieving the plan for the cluster being prov
 that are executed on the node. Actions are divided into stages. An action in each stage can be executed in parallel.
 Coopr Server implements a distributed barrier at each stage ensuring that the planned stage actions are all completed
 before proceeding to the next stage. This ensures the actions are executed in the right dependency order.
+
+.. highlight:: console
 
 Following is an example web service call along with the output returned from the Coopr Server provisioning a web server
 on a single node::
@@ -218,3 +222,4 @@ on a single node::
     },
   ]
 
+.. highlight:: java

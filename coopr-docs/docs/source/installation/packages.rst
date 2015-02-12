@@ -18,10 +18,13 @@
 .. index::
    single: Coopr Installation
 
+.. highlight:: console
+
 ==================
 Coopr Installation
 ==================
 
+.. highlight:: console
 
 Overview
 ========
@@ -172,10 +175,9 @@ This will create the file ``/etc/yum.repos.d/cask.repo`` with::
 
 Add the Cask Public GPG Key to your repository::
 
-  sudo rpm --import http://repository.cask.co/centos/6/x86_64/releases/pubkey.gpg
+  $ sudo rpm --import http://repository.cask.co/centos/6/x86_64/releases/pubkey.gpg
 
-Instructions for installing each of the Coopr components are as below:
-::
+Instructions for installing each of the Coopr components are as below::
 
   $ sudo yum install coopr-server
   $ sudo yum install coopr-provisioner
@@ -185,7 +187,7 @@ Debian using APT
 ----------------
 Download the Cask Apt repo definition file::
 
-  sudo curl -o /etc/apt/sources.list.d/cask.list http://repository.cask.co/downloads/ubuntu/precise/amd64/cask.list
+  $ sudo curl -o /etc/apt/sources.list.d/cask.list http://repository.cask.co/downloads/ubuntu/precise/amd64/cask.list
 
 This will create the file ``/etc/apt/sources.list.d/cask.list`` with::
 
@@ -196,8 +198,7 @@ Add the Cask Public GPG Key to your repository::
 
   curl -s http://repository.cask.co/ubuntu/precise/amd64/releases/pubkey.gpg | sudo apt-key add -
 
-Instructions for installing each of the Coopr components are as below:
-::
+Instructions for installing each of the Coopr components are as below::
 
   $ sudo apt-get update
   $ sudo apt-get install coopr-server
@@ -206,8 +207,12 @@ Instructions for installing each of the Coopr components are as below:
 
 Update-Alternatives
 -------------------
-Coopr packages by default use the ``alternatives`` system to initialize a configuration directory which will not be overwritten on subsequent package upgrades.  This directory is ``/etc/coopr/conf.coopr/`` and is pointed to by the symlink ``/etc/coopr/conf/``.  The ``/etc/coopr/conf.dist/`` directory is owned by the Coopr packages and should not be customized.  To doublecheck that ``/etc/coopr/conf.coopr/`` is the active configuration, simply run:
-::
+Coopr packages by default use the ``alternatives`` system to initialize a configuration
+directory which will not be overwritten on subsequent package upgrades.  This directory is
+``/etc/coopr/conf.coopr/`` and is pointed to by the symlink ``/etc/coopr/conf/``.  The
+``/etc/coopr/conf.dist/`` directory is owned by the Coopr packages and should not be
+customized.  To doublecheck that ``/etc/coopr/conf.coopr/`` is the active configuration,
+simply run::
 
   $  update-alternatives --display coopr-conf
 
@@ -222,13 +227,11 @@ Sample MySQL setup
 
 Execute the following command on the Coopr Server machine:
 
-For RHEL/CentOS/Oracle Linux:
-::
+For RHEL/CentOS/Oracle Linux::
 
   $ sudo yum install mysql-connector-java*
 
-For Ubuntu:
-::
+For Ubuntu::
 
   $ sudo apt-get install libmysql-java*
 
@@ -245,9 +248,11 @@ After the install, the MySQL JAR is placed in ``/usr/share/java/``. Copy the ins
 You will need to set up an account and a database in MySQL. An example schema file (for MySQL) for this can be found at
 ``/opt/coopr/server/config/sql``.
 
-If you are setting up a MySQL database from scratch you can run the following on your mysql machine to complete the database setup:
+.. highlight:: console
 
-.. parsed-literal::
+If you are setting up a MySQL database from scratch you can run the following on your
+mysql machine to complete the database setup::
+
   $ mysql -u root -p -e 'create database coopr;'
   $ mysql -u root -p -e 'grant all privileges on coopr.* to "coopr"@"<coopr-server>" identified by "<password>";'
   $ mysql -u coopr -p coopr < /opt/coopr/server/config/sql/create-tables-mysql.sql
@@ -370,8 +375,7 @@ Starting and Stopping Coopr Services
 By default, Coopr's installation RPMs and PKGs do not configure auto start of the services in the ``init.d``. We leave
 that privilege to the administrator. For each Coopr component and its related service (such as the Server, Provisioner, and UI),
 there is a launch script, which you may use to execute a desired operation. For example, to start, stop, or check status
-for a Coopr Provisioner, you can use:
-::
+for a Coopr Provisioner, you can use::
 
   $ sudo /etc/init.d/coopr-server start|stop
   $ sudo /etc/init.d/coopr-provisioner start|stop|status
@@ -383,15 +387,13 @@ Initial Setup
 =============
 The very first time you install Coopr, you will need to perform some data initialization. The first thing you must do is
 register the provisioner plugins, and the plugin resources included with Coopr. If you have not configured the server
-port, it defaults to 55054.
-::
+port, it defaults to 55054::
 
  $ sudo COOPR_SERVER_URI=http://<coopr-server>:<coopr-port> /opt/coopr/provisioner/bin/setup.sh
 
 Coopr provides a set of useful default templates that covers most supported use cases. For new users and administrators of Coopr, we
 recommend installing these defaults as a starting point for template definition. These defaults are required for running
-the example in the :doc:`Quick Start Guide </guide/quickstart/index>`, and are included in the server package. To load these templates, run:
-::
+the example in the :doc:`Quick Start Guide </guide/quickstart/index>`, and are included in the server package. To load these templates, run::
 
  $ sudo COOPR_SERVER_URI=http://<coopr-server>:<coopr-port> /opt/coopr/server/config/defaults/load-defaults.sh
 
@@ -423,11 +425,12 @@ Common Installation Issues
 
 * A common issue is installing Coopr on machines that have Open JDK installed rather than Oracle JDK.
 
-* If you see JDBC exceptions in the Coopr Server log like:
-  ::
+* If you see JDBC exceptions in the Coopr Server log such as::
 
     Caused by: java.lang.AbstractMethodError: com.mysql.jdbc.PreparedStatement.setBlob(ILjava/io/InputStream;)
 
   it means your JDBC connector version is too old.  Upgrade to a newer version to solve the problem.
 
-* If you are running your mysql server on the same machine as the Coopr Server and are seeing connection issues in the Coopr Server logs, you may need to explicitly grant access to "coopr"@"localhost" instead of relying on the wildcard. 
+* If you are running your mysql server on the same machine as the Coopr Server and are
+  seeing connection issues in the Coopr Server logs, you may need to explicitly grant access
+  to ``"coopr"@"localhost"`` instead of relying on the wildcard. 

@@ -30,6 +30,8 @@ your provisioner, assume each worker takes 256mb of memory. CPU usage is negligi
 periodically sends a heartbeat to the server to tell the system it is alive. Live provisioners may
 get requests from the server to add or remove workers for different tenants.
 
+.. highlight:: xml
+
 Example
 ^^^^^^^^
 Shown below is an example configuration (``provisioner-site.xml``) with settings that you
@@ -90,6 +92,8 @@ setup these environment variables:
 TRUST_CERT_PATH                             None                        Trusted certificate file location
 TRUST_CERT_PASSWORD                         None                        Trusted certificate password
 ====================================     ==========================    =======================================
+
+.. highlight:: console
 
 To create an environment with the correct values, one method is to use a shell script
 with the correct values included in it. Create a file (``/etc/profile.d/coopr-provisioner-cert.sh``)

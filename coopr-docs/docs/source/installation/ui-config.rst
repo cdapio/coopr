@@ -56,6 +56,8 @@ COOPR_UI_TLS_CRT_FILE                       None                        Trusted 
 COOPR_UI_TLS_KEY_PASS                       None                        Trusted certificate password
 ====================================     ==========================    =======================================
 
+.. highlight:: console
+
 To create an environment with the correct values, one method is to use a shell script
 with the correct values included in it. Create a file (``/etc/profile.d/coopr-ui.sh``)
 with appropriate entries (modifying the values to point to the location of your 

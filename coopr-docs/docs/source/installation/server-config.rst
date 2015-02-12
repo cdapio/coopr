@@ -24,6 +24,7 @@
 Server Configuration
 ====================
 
+.. highlight:: xml
 
 Configuring the server
 ----------------------
