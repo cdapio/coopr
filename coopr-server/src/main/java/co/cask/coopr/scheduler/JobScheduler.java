@@ -26,7 +26,6 @@ import co.cask.coopr.common.queue.QueueService;
 import co.cask.coopr.common.queue.QueueType;
 import co.cask.coopr.common.queue.TrackingQueue;
 import co.cask.coopr.common.zookeeper.LockService;
-import co.cask.coopr.common.zookeeper.lib.ZKInterProcessReentrantLock;
 import co.cask.coopr.macro.Expander;
 import co.cask.coopr.scheduler.task.ClusterJob;
 import co.cask.coopr.scheduler.task.ClusterTask;
@@ -54,6 +53,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
 
 /**
  * Schedules a cluster job. Polls a queue containing job ids to coordinate. Each time it gets a job id from the queue,
@@ -103,9 +103,9 @@ public class JobScheduler implements Runnable {
 
         LOG.debug("Got job {} to schedule", jobIdStr);
         JobId jobId = JobId.fromString(jobIdStr);
-        ZKInterProcessReentrantLock lock = lockService.getJobLock(queueName, jobId.getClusterId());
+        Lock lock = lockService.getJobLock(queueName, jobId.getClusterId());
+        lock.lock();
         try {
-          lock.acquire();
           ClusterJob job = clusterStore.getClusterJob(jobId);
           Cluster cluster = clusterStore.getCluster(job.getClusterId());
           // this can happen if 2 tasks complete around the same time and the first one places the job in the queue,
@@ -200,7 +200,7 @@ public class JobScheduler implements Runnable {
             taskService.failJob(job);
           }
         } finally {
-          lock.release();
+          lock.unlock();
           jobQueues.recordProgress(consumerId, queueName, element.getId(),
                                   TrackingQueue.ConsumingStatus.FINISHED_SUCCESSFULLY, "");
         }

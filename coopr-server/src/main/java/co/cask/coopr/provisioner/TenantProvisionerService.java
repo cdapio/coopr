@@ -9,7 +9,6 @@ import co.cask.coopr.common.queue.QueueGroup;
 import co.cask.coopr.common.queue.QueueService;
 import co.cask.coopr.common.queue.TrackingQueue;
 import co.cask.coopr.common.zookeeper.LockService;
-import co.cask.coopr.common.zookeeper.lib.ZKInterProcessReentrantLock;
 import co.cask.coopr.provisioner.plugin.ResourceCollection;
 import co.cask.coopr.provisioner.plugin.ResourceService;
 import co.cask.coopr.scheduler.task.MissingEntityException;
@@ -34,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.locks.Lock;
 
 /**
  * Service for managing provisioners.
@@ -42,7 +42,7 @@ public class TenantProvisionerService {
   private static final Logger LOG  = LoggerFactory.getLogger(TenantProvisionerService.class);
   private final ProvisionerStore provisionerStore;
   private final TenantStore tenantStore;
-  private final ZKInterProcessReentrantLock tenantLock;
+  private final Lock tenantLock;
   private final long provisionerTimeoutSecs;
   private final TrackingQueue balanceQueue;
   private final ProvisionerRequestService provisionerRequestService;
@@ -140,7 +140,7 @@ public class TenantProvisionerService {
    */
   public String writeTenantSpecification(TenantSpecification tenantSpecification)
     throws IOException, CapacityException, QuotaException {
-    tenantLock.acquire();
+    tenantLock.lock();
     try {
       Tenant prevTenant = tenantStore.getTenantByName(tenantSpecification.getName());
       String id;
@@ -163,7 +163,7 @@ public class TenantProvisionerService {
       tenantStore.writeTenant(updatedTenant);
       return id;
     } finally {
-      tenantLock.release();
+      tenantLock.unlock();
     }
   }
 
@@ -223,7 +223,7 @@ public class TenantProvisionerService {
    * @throws IOException if there was an exception persisting the deletion
    */
   public void deleteTenantByName(String name) throws IllegalStateException, IOException {
-    tenantLock.acquire();
+    tenantLock.lock();
     try {
       Tenant tenant = tenantStore.getTenantByName(name);
       if (tenant == null) {
@@ -239,7 +239,7 @@ public class TenantProvisionerService {
         queueGroup.removeAll(tenant.getId());
       }
     } finally {
-      tenantLock.release();
+      tenantLock.unlock();
     }
   }
 
@@ -250,7 +250,7 @@ public class TenantProvisionerService {
    * @throws IOException
    */
   public void deleteProvisioner(String provisionerId) throws IOException {
-    tenantLock.acquire();
+    tenantLock.lock();
     try {
       Provisioner provisioner = provisionerStore.getProvisioner(provisionerId);
       if (provisioner == null) {
@@ -259,7 +259,7 @@ public class TenantProvisionerService {
 
       deleteProvisioner(provisioner);
     } finally {
-      tenantLock.release();
+      tenantLock.unlock();
     }
   }
 
@@ -295,7 +295,7 @@ public class TenantProvisionerService {
    * @throws IOException
    */
   public void writeProvisioner(Provisioner provisioner) throws IOException {
-    tenantLock.acquire();
+    tenantLock.lock();
     try {
       provisionerStore.writeProvisioner(provisioner);
       // rebalance tenants every time a provisioner registers itself
@@ -303,7 +303,7 @@ public class TenantProvisionerService {
         balanceQueue.add(new Element(tenant.getId()));
       }
     } finally {
-      tenantLock.release();
+      tenantLock.unlock();
     }
   }
 
@@ -317,7 +317,7 @@ public class TenantProvisionerService {
   public void rebalanceTenantWorkers(String tenantId) throws IOException, CapacityException {
     // lock across all tenants to protect against conflicts in setting worker counts for different tenants across
     // different provisioners
-    tenantLock.acquire();
+    tenantLock.lock();
     try {
       Tenant tenant = tenantStore.getTenantByID(tenantId);
       if (tenant == null) {
@@ -340,7 +340,7 @@ public class TenantProvisionerService {
         addWorkers(tenantId, diff, liveResources);
       }
     } finally {
-      tenantLock.release();
+      tenantLock.unlock();
     }
   }
 
@@ -357,7 +357,7 @@ public class TenantProvisionerService {
     // scenario where the live collection is read for rebalancing, a sync is called, and the sync and rebalance
     // fight over what resource versions should be live on the provisioners, resulting in inconsistent state.
     // Since syncs are uncommon, this should be ok...
-    tenantLock.acquire();
+    tenantLock.lock();
     try {
       ResourceCollection resources = resourceService.getResourcesToSync(account);
 
@@ -374,7 +374,7 @@ public class TenantProvisionerService {
       resourceService.syncResourceMeta(account, resources);
 
     } finally {
-      tenantLock.release();
+      tenantLock.unlock();
     }
   }
 
@@ -397,7 +397,7 @@ public class TenantProvisionerService {
    * @throws IOException
    */
   public void timeoutProvisioners(long timeoutTs) throws IOException {
-    tenantLock.acquire();
+    tenantLock.lock();
     try {
       Set<String> affectedTenants = Sets.newHashSet();
       for (Provisioner provisioner : provisionerStore.getTimedOutProvisioners(timeoutTs)) {
@@ -411,7 +411,7 @@ public class TenantProvisionerService {
         balanceQueue.add(new Element(affectedTenant));
       }
     } finally {
-      tenantLock.release();
+      tenantLock.unlock();
     }
   }
 
