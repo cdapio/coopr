@@ -28,7 +28,7 @@
 
 {%- macro relbar() %}
     <div class="related" role="navigation" aria-label="related navigation">
-      <h3>{{ _('Navigation') }}Test of Template</h3>
+      <h3>{{ _('Navigation') }}</h3>
       <ul>
         {%- for rellink in rellinks %}
         <li class="right" {% if loop.first %}style="margin-right: 10px"{% endif %}>
@@ -36,12 +36,12 @@
              {{ accesskey(rellink[2]) }}>{{ rellink[3] }}</a>
           {%- if not loop.first %}{{ reldelim2 }}{% endif %}</li>
         {%- endfor %}
+        {%- block rootrellink %}
         
         <script type="text/javascript" src="{{ pathto('_static/version-menu.js', 1) }}"></script>
         <script src="{{ theme_versions }}"/></script>
         <script>window.setVersion('{{ release }}');</script>
        
-        {%- block rootrellink %}
         <li><a href="{{ pathto(master_doc) }}">{{ shorttitle|e }}</a>{{ reldelim1 }}</li>
         {%- endblock %}
         {%- for parent in parents %}
