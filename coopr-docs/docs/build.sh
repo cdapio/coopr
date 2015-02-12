@@ -386,12 +386,12 @@ function rewrite() {
 #   cp $SCRIPT_PATH/$LICENSES_PDF/* .
 # }
 
-function make_zip_html() {
-  version
-  ZIP_FILE_NAME="$PROJECT-docs-$PROJECT_VERSION.zip"
-  cd $SCRIPT_PATH/$BUILD
-  zip -r $ZIP_FILE_NAME $HTML/*
-}
+# function make_zip_html() {
+#   version
+#   ZIP_FILE_NAME="$PROJECT-docs-$PROJECT_VERSION.zip"
+#   cd $SCRIPT_PATH/$BUILD
+#   zip -r $ZIP_FILE_NAME $HTML/*
+# }
 
 # function make_zip() {
 # # This creates a zip that unpacks to the same name
@@ -407,15 +407,15 @@ function make_zip_html() {
 # }
 
 
-function make_zip_localized() {
-# This creates a named zip that unpacks to the Project Version, localized to english
-  version
-  ZIP_DIR_NAME="$PROJECT-docs-$PROJECT_VERSION-$1"
-  cd $SCRIPT_PATH/$BUILD
-  mkdir $PROJECT_VERSION
-  mv $HTML $PROJECT_VERSION/en
-  zip -r $ZIP_DIR_NAME.zip $PROJECT_VERSION/*
-}
+# function make_zip_localized() {
+# # This creates a named zip that unpacks to the Project Version, localized to english
+#   version
+#   ZIP_DIR_NAME="$PROJECT-docs-$PROJECT_VERSION-$1"
+#   cd $SCRIPT_PATH/$BUILD
+#   mkdir $PROJECT_VERSION
+#   mv $HTML $PROJECT_VERSION/en
+#   zip -r $ZIP_DIR_NAME.zip $PROJECT_VERSION/*
+# }
 
 # function build() {
 #   build_docs
@@ -425,50 +425,41 @@ function make_zip_localized() {
 #   make_zip
 # }
 
-function build_docs_google() {
-  clean
-  cd $SCRIPT_PATH
-  sphinx-build -D googleanalytics_id=$1 -D googleanalytics_enabled=1 -b html -d build/doctrees source build/html
-}
-
-function build_web() {
-# This is used to stage files
-# desired path is x.x.x-SNAPSHOT/en/*
-  build_docs_google $GOOGLE_ANALYTICS_WEB
-  build_javadocs_sdk
-  copy_javadocs_sdk
-  make_zip_localized $WEB
-}
-
-function build_github() {
-  # GitHub requires a .nojekyll file at the root to allow for Sphinx's directories beginning with underscores
-  build_docs_google $GOOGLE_ANALYTICS_GITHUB
-  build_javadocs_sdk
-  copy_javadocs_sdk
-  make_zip $GITHUB
-  ZIP_DIR_NAME="$PROJECT-docs-$PROJECT_VERSION-$GITHUB"
-  cd $SCRIPT_PATH/$BUILD
-  touch $ZIP_DIR_NAME/.nojekyll
-  zip $ZIP_DIR_NAME.zip $ZIP_DIR_NAME/.nojekyll
-}
-
-# function build_rest_pdf() {
+# function build_docs_google() {
+#   clean
 #   cd $SCRIPT_PATH
-# #   version # version is not needed because the renaming is done by the pom.xml file
-#   rm -rf $SCRIPT_PATH/$BUILD_PDF
-#   mkdir $SCRIPT_PATH/$BUILD_PDF
-#   python $DOCS_PY -g pdf -o $REST_PDF $REST_SOURCE
+#   sphinx-build -D googleanalytics_id=$1 -D googleanalytics_enabled=1 -b html -d build/doctrees source build/html
+# }
+# 
+# function build_web() {
+# # This is used to stage files
+# # desired path is x.x.x-SNAPSHOT/en/*
+#   build_docs_google $GOOGLE_ANALYTICS_WEB
+#   build_javadocs_sdk
+#   copy_javadocs_sdk
+#   make_zip_localized $WEB
+# }
+# 
+# function build_github() {
+#   # GitHub requires a .nojekyll file at the root to allow for Sphinx's directories beginning with underscores
+#   build_docs_google $GOOGLE_ANALYTICS_GITHUB
+#   build_javadocs_sdk
+#   copy_javadocs_sdk
+#   make_zip $GITHUB
+#   ZIP_DIR_NAME="$PROJECT-docs-$PROJECT_VERSION-$GITHUB"
+#   cd $SCRIPT_PATH/$BUILD
+#   touch $ZIP_DIR_NAME/.nojekyll
+#   zip $ZIP_DIR_NAME.zip $ZIP_DIR_NAME/.nojekyll
 # }
 
-function build_standalone() {
-  cd $PROJECT_PATH
-  mvn clean package assembly:single -DskipTests
-#   mvn clean package -DskipTests -P examples && mvn package -pl singlenode -am -DskipTests -P dist,release
-}
+# function build_standalone() {
+#   cd $PROJECT_PATH
+#   mvn clean package assembly:single -DskipTests
+# }
 
 function build_sdk() {
-  build_rest_pdf
-  build_standalone
+  cd $PROJECT_PATH
+  mvn clean package assembly:single -DskipTests
 }
 
 function build_dependencies() {
