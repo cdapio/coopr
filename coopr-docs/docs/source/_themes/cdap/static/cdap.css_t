@@ -207,7 +207,7 @@ a.headerlink:hover {
     color: white;
 }
 
-a.reference.external {
+h2>a.reference.external {
     color: #111;
 }
 
