@@ -53,6 +53,7 @@ import javax.annotation.Nullable;
 public final class ReentrantDistributedLock implements Lock {
 
   private static final Logger LOG = LoggerFactory.getLogger(ReentrantDistributedLock.class);
+  private static final String PREFIX = "lock-";
 
   private final ZKClient zkClient;
   private final String path;
@@ -209,7 +210,7 @@ public final class ReentrantDistributedLock implements Lock {
 
     // Step 1. Create a ephemeral sequential node
     final String guid = UUID.randomUUID().toString();
-    final String lockPath = String.format("%s/%s-", path, guid);
+    final String lockPath = String.format("%s/%s%s-", path, PREFIX, guid);
     OperationFuture<String> future = zkClient.create(lockPath, null, CreateMode.EPHEMERAL_SEQUENTIAL, true);
 
     Futures.addCallback(future, new FutureCallback<String>() {
@@ -369,17 +370,19 @@ public final class ReentrantDistributedLock implements Lock {
    * @return the node found or {@code null} if no such node exist
    */
   private String findNodeToWatch(NodeChildren children, String lockPath, String guid) {
-    // Lock path is "path/guid-id"
+    // Lock path is "path/PREFIX-guid-id"
     int guidLen = guid.length();
-    int id = Integer.parseInt(lockPath.substring(path.length() + guidLen + 2));
+    int id = Integer.parseInt(lockPath.substring(path.length() + 1 + PREFIX.length() + 1 + guidLen + 1));
 
     String nodeToWatch = null;
     int maxOfMins = Integer.MIN_VALUE;
     for (String node : children.getChildren()) {
-      int nodeId = Integer.parseInt(node.substring(guidLen + 1));
-      if (nodeId < id && nodeId > maxOfMins) {
-        maxOfMins = nodeId;
-        nodeToWatch = path + "/" + node;
+      if (node.startsWith(PREFIX)) {
+        int nodeId = Integer.parseInt(node.substring(PREFIX.length() + 1 + guidLen + 1));
+        if (nodeId < id && nodeId > maxOfMins) {
+          maxOfMins = nodeId;
+          nodeToWatch = path + "/" + node;
+        }
       }
     }
     return nodeToWatch;
