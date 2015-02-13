@@ -44,7 +44,7 @@ To enable running the UI with SSL, set these environment variables:
 ``COOPR_UI_CERT_FILE``               ``COOPR_HOME/cert/server.crt`` Certificate file location
 ``COOPR_SSL``                        ``true``                       Use SSL for the UI
 ``COOPR_UI_SSL_PORT``                ``8443``                       Port the UI listens on for connections
-                                                                    (optional)
+                                                                    (**optional**)
 ==================================== ============================== =======================================
 
 
