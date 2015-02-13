@@ -66,7 +66,7 @@ Shown below is an example configuration (``provisioner-site.xml``) with some of 
   
 **Notes:** Changes to the ``provisioner-site.xml`` file require a restart of the provisioner.
 The provisioner will run with no properties set (an empty ``provisioner-site.xml`` file)
-as most properties have defaults set.
+as all properties have defaults set.
 
 
 Running Provisioner to use SSL
