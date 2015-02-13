@@ -42,7 +42,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Implementation of {@link Map} backed by Zookeeper.
- * NOTE: it is not thread-safe and not multi-process safe. Consider using {@link ZKInterProcessReentrantLock}
+ * NOTE: it is not thread-safe and not multi-process safe. Consider using {@link ReentrantDistributedLock}
  * to guard against changes by other processes if needed.
  *
  * @param <T> Type of object to keep in the map values.
