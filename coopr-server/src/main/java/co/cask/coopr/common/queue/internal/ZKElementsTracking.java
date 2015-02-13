@@ -18,9 +18,9 @@ package co.cask.coopr.common.queue.internal;
 import co.cask.coopr.common.queue.Element;
 import co.cask.coopr.common.queue.QueuedElement;
 import co.cask.coopr.common.zookeeper.ZKClientExt;
+import co.cask.coopr.common.zookeeper.lib.ReentrantDistributedLock;
 import co.cask.coopr.common.zookeeper.lib.Serializer;
 import co.cask.coopr.common.zookeeper.lib.SynchronizedZKMap;
-import co.cask.coopr.common.zookeeper.lib.ZKInterProcessReentrantLock;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.Futures;
@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.locks.Lock;
 import javax.annotation.Nullable;
 
 
@@ -51,7 +52,7 @@ public class ZKElementsTracking implements ElementsTracking {
   private static final String NO_CONSUMER_ASSIGNED = "";
   private static final EntrySerializer ENTRY_SERIALIZER = new EntrySerializer();
 
-  private final ThreadLocal<ZKInterProcessReentrantLock> globalLock;
+  private final ThreadLocal<Lock> globalLock;
   private final Map<String, Entry> queueElements;
 
   public ZKElementsTracking(final ZKClient zkClient, final String basePath)  {
@@ -59,10 +60,10 @@ public class ZKElementsTracking implements ElementsTracking {
     Futures.getUnchecked(ZKClientExt.ensureExists(zkClient, queuePath));
     this.queueElements = new SynchronizedZKMap<Entry>(zkClient, queuePath + "/map", ENTRY_SERIALIZER);
 
-    this.globalLock = new ThreadLocal<ZKInterProcessReentrantLock>() {
+    this.globalLock = new ThreadLocal<Lock>() {
       @Override
-      protected ZKInterProcessReentrantLock initialValue() {
-        return new ZKInterProcessReentrantLock(zkClient, basePath);
+      protected Lock initialValue() {
+        return new ReentrantDistributedLock(zkClient, basePath);
       }
     };
   }
@@ -72,13 +73,13 @@ public class ZKElementsTracking implements ElementsTracking {
     try {
       // we actually may need no lock here: we just adding new element (it is assumed that test adds unique
       // elems into queue)
-      globalLock.get().acquire();
+      globalLock.get().lock();
       try {
         Entry entry = new Entry(element, getCurrentHighestPriority());
         queueElements.put(entry.element.getId(), entry);
         return true;
       } finally {
-        globalLock.get().release();
+        globalLock.get().unlock();
       }
     } catch (Exception e) {
       LOG.error("error during adding to queue", e);
@@ -89,7 +90,7 @@ public class ZKElementsTracking implements ElementsTracking {
   @Override
   public Element startConsuming(String consumerId) {
     try {
-      globalLock.get().acquire();
+      globalLock.get().lock();
       try {
         Entry entry = getNotStartedWithHighestPriority();
         if (entry == null) {
@@ -101,7 +102,7 @@ public class ZKElementsTracking implements ElementsTracking {
         queueElements.put(entry.element.getId(), entry);
         return entry.element;
       } finally {
-        globalLock.get().release();
+        globalLock.get().unlock();
       }
     } catch (Exception e) {
       LOG.error("error during start consuming", e);
@@ -127,7 +128,7 @@ public class ZKElementsTracking implements ElementsTracking {
   @Override
   public boolean stopConsumingAndAddBackToQueue(String elementId, String consumerId) {
     try {
-      globalLock.get().acquire();
+      globalLock.get().lock();
       try {
         Entry entry = queueElements.get(elementId);
 
@@ -137,7 +138,7 @@ public class ZKElementsTracking implements ElementsTracking {
         stopAndReschedule(entry);
 
       } finally {
-        globalLock.get().release();
+        globalLock.get().unlock();
       }
     } catch (Exception e) {
       LOG.error("error during stop & reschedule", e);
@@ -156,7 +157,7 @@ public class ZKElementsTracking implements ElementsTracking {
   @Override
   public boolean finishConsuming(String elementId, String consumerId) {
     try {
-      globalLock.get().acquire();
+      globalLock.get().lock();
       try {
         Entry entry = queueElements.get(elementId);
         if (entry == null || !consumerId.equals(entry.consumerId)) {
@@ -165,7 +166,7 @@ public class ZKElementsTracking implements ElementsTracking {
         queueElements.remove(elementId);
 
       } finally {
-        globalLock.get().release();
+        globalLock.get().unlock();
       }
     } catch (Exception e) {
       LOG.error("error during marking finishConsuming", e);
@@ -178,7 +179,7 @@ public class ZKElementsTracking implements ElementsTracking {
   @Override
   public boolean recordProgress(String elementId, String consumerId) {
     try {
-      globalLock.get().acquire();
+      globalLock.get().lock();
       try {
         Entry entry = queueElements.get(elementId);
         if (entry == null || !consumerId.equals(entry.consumerId)) {
@@ -188,7 +189,7 @@ public class ZKElementsTracking implements ElementsTracking {
         queueElements.put(entry.element.getId(), entry);
 
       } finally {
-        globalLock.get().release();
+        globalLock.get().unlock();
       }
     } catch (Exception e) {
       LOG.error("error during checking state", e);
@@ -201,7 +202,7 @@ public class ZKElementsTracking implements ElementsTracking {
   @Override
   public void walkThruElementsBeingConsumed(Walker walker) {
     try {
-      globalLock.get().acquire();
+      globalLock.get().lock();
       try {
         for (Entry entry : queueElements.values()) {
           // we are walking thru *all* element items, hence need to skip those not in progress
@@ -217,7 +218,7 @@ public class ZKElementsTracking implements ElementsTracking {
         }
 
       } finally {
-        globalLock.get().release();
+        globalLock.get().unlock();
       }
     } catch (Exception e) {
       LOG.error("error during walking", e);
@@ -228,11 +229,11 @@ public class ZKElementsTracking implements ElementsTracking {
   @Override
   public boolean remove(String elementId) {
     try {
-      globalLock.get().acquire();
+      globalLock.get().lock();
       try {
         queueElements.remove(elementId);
       } finally {
-        globalLock.get().release();
+        globalLock.get().unlock();
       }
     } catch (Exception e) {
       LOG.error("error during removing element", e);
@@ -244,11 +245,11 @@ public class ZKElementsTracking implements ElementsTracking {
   @Override
   public boolean removeAll() {
     try {
-      globalLock.get().acquire();
+      globalLock.get().lock();
       try {
         queueElements.clear();
       } finally {
-        globalLock.get().release();
+        globalLock.get().unlock();
       }
     } catch (Exception e) {
       LOG.error("error during cleanup of the queue", e);
@@ -261,7 +262,7 @@ public class ZKElementsTracking implements ElementsTracking {
   @Override
   public boolean toHighestPriority(String elementId) {
     try {
-      globalLock.get().acquire();
+      globalLock.get().lock();
       try {
         Entry entry = queueElements.get(elementId);
         if (NO_CONSUMER_ASSIGNED.equals(entry.consumerId)) {
@@ -269,7 +270,7 @@ public class ZKElementsTracking implements ElementsTracking {
           queueElements.put(entry.element.getId(), entry);
         }
       } finally {
-        globalLock.get().release();
+        globalLock.get().unlock();
       }
     } catch (Exception e) {
       LOG.error("error during promoting element to highest priority", e);
@@ -283,7 +284,7 @@ public class ZKElementsTracking implements ElementsTracking {
   public List<QueuedElement> getQueued() {
     List<QueuedElement> list = Lists.newArrayList();
     try {
-      globalLock.get().acquire();
+      globalLock.get().lock();
       try {
         List<Entry> all = Lists.newArrayList(queueElements.values());
         // we want to return the list ordered by priority
@@ -294,7 +295,7 @@ public class ZKElementsTracking implements ElementsTracking {
           }
         }
       } finally {
-        globalLock.get().release();
+        globalLock.get().unlock();
       }
     } catch (Exception e) {
       LOG.error("error during getting queued elements", e);
@@ -307,7 +308,7 @@ public class ZKElementsTracking implements ElementsTracking {
   public List<QueuedElement> getBeingConsumed() {
     ImmutableList.Builder<QueuedElement> listBuilder = new ImmutableList.Builder<QueuedElement>();
     try {
-      globalLock.get().acquire();
+      globalLock.get().lock();
       try {
         for (Entry entry : queueElements.values()) {
           if (!NO_CONSUMER_ASSIGNED.equals(entry.consumerId)) {
@@ -315,7 +316,7 @@ public class ZKElementsTracking implements ElementsTracking {
           }
         }
       } finally {
-        globalLock.get().release();
+        globalLock.get().unlock();
       }
     } catch (Exception e) {
       LOG.error("error during getting queued elements", e);

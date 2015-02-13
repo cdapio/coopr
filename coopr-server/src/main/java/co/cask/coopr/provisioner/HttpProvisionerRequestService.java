@@ -7,6 +7,7 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpPut;
@@ -41,10 +42,13 @@ public class HttpProvisionerRequestService implements ProvisionerRequestService 
     this.maxRetries = conf.getInt(Constants.PROVISIONER_REQUEST_MAX_RETRIES);
     this.msBetweenRetries = conf.getLong(Constants.PROVISIONER_REQUEST_MS_BETWEEN_RETRIES);
     int socketTimeout = conf.getInt(Constants.PROVISIONER_REQUEST_SOCKET_TIMEOUT_MS);
+    int connectTimeout = conf.getInt(Constants.PROVISIONER_REQUEST_CONNECT_TIMEOUT_MS);
 
     this.httpClient = HttpClients.custom()
       .setConnectionReuseStrategy(NoConnectionReuseStrategy.INSTANCE)
       .setDefaultSocketConfig(SocketConfig.custom().setSoTimeout(socketTimeout).build())
+      .setDefaultRequestConfig(
+        RequestConfig.custom().setSocketTimeout(socketTimeout).setConnectTimeout(connectTimeout).build())
       .build();
     this.gson = gson;
   }

@@ -1,10 +1,12 @@
 package co.cask.coopr.common.zookeeper;
 
 import co.cask.coopr.common.conf.Constants;
-import co.cask.coopr.common.zookeeper.lib.ZKInterProcessReentrantLock;
+import co.cask.coopr.common.zookeeper.lib.ReentrantDistributedLock;
 import com.google.common.base.Joiner;
 import com.google.inject.Inject;
 import org.apache.twill.zookeeper.ZKClient;
+
+import java.util.concurrent.locks.Lock;
 
 /**
  * Service for getting locks that makes sure different types of locks have different zookeeper namespaces.
@@ -17,18 +19,18 @@ public class LockService {
     this.zkClient = zkClient;
   }
 
-  public ZKInterProcessReentrantLock getClusterCreateLock(String tenantId) {
+  public Lock getClusterCreateLock(String tenantId) {
     String path = Joiner.on('/').join(Constants.Lock.CLUSTER_NAMESPACE, "create", tenantId);
-    return new ZKInterProcessReentrantLock(zkClient, path);
+    return new ReentrantDistributedLock(zkClient, path);
   }
 
-  public ZKInterProcessReentrantLock getClusterLock(String tenantId, String clusterId) {
+  public Lock getClusterLock(String tenantId, String clusterId) {
     String path = Joiner.on('/').join(Constants.Lock.CLUSTER_NAMESPACE, "clusters", tenantId, clusterId);
-    return new ZKInterProcessReentrantLock(zkClient, path);
+    return new ReentrantDistributedLock(zkClient, path);
   }
 
-  public ZKInterProcessReentrantLock getResourceLock(String tenantId, String pluginType, String pluginName,
-                                                     String typeName, String resourceName) {
+  public Lock getResourceLock(String tenantId, String pluginType, String pluginName,
+                                         String typeName, String resourceName) {
     String path = Joiner.on('/')
       .join(Constants.Lock.PLUGIN_NAMESPACE,
             "resources",
@@ -37,15 +39,15 @@ public class LockService {
             pluginName,
             typeName,
             resourceName);
-    return new ZKInterProcessReentrantLock(zkClient, path);
+    return new ReentrantDistributedLock(zkClient, path);
   }
 
-  public ZKInterProcessReentrantLock getJobLock(String tenantId, String clusterId) {
+  public Lock getJobLock(String tenantId, String clusterId) {
     String path = Joiner.on('/').join(Constants.Lock.TASK_NAMESPACE, "jobs", tenantId, clusterId);
-    return new ZKInterProcessReentrantLock(zkClient, path);
+    return new ReentrantDistributedLock(zkClient, path);
   }
 
-  public ZKInterProcessReentrantLock getTenantProvisionerLock() {
-    return new ZKInterProcessReentrantLock(zkClient, Constants.Lock.TENANT_NAMESPACE);
+  public Lock getTenantProvisionerLock() {
+    return new ReentrantDistributedLock(zkClient, Constants.Lock.TENANT_NAMESPACE);
   }
 }
