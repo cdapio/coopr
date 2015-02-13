@@ -18,9 +18,9 @@ package co.cask.coopr.common.queue.internal;
 import co.cask.coopr.common.queue.Element;
 import co.cask.coopr.common.queue.QueuedElement;
 import co.cask.coopr.common.zookeeper.ZKClientExt;
+import co.cask.coopr.common.zookeeper.lib.ReentrantDistributedLock;
 import co.cask.coopr.common.zookeeper.lib.Serializer;
 import co.cask.coopr.common.zookeeper.lib.SynchronizedZKMap;
-import co.cask.coopr.common.zookeeper.lib.ZKInterProcessReentrantLock;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.Futures;
@@ -63,7 +63,7 @@ public class ZKElementsTracking implements ElementsTracking {
     this.globalLock = new ThreadLocal<Lock>() {
       @Override
       protected Lock initialValue() {
-        return new ZKInterProcessReentrantLock(zkClient, basePath);
+        return new ReentrantDistributedLock(zkClient, basePath);
       }
     };
   }

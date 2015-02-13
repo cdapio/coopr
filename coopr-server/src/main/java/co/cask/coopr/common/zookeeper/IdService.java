@@ -17,7 +17,7 @@ package co.cask.coopr.common.zookeeper;
 
 import co.cask.coopr.common.conf.Configuration;
 import co.cask.coopr.common.conf.Constants;
-import co.cask.coopr.common.zookeeper.lib.ZKInterProcessReentrantLock;
+import co.cask.coopr.common.zookeeper.lib.ReentrantDistributedLock;
 import co.cask.coopr.scheduler.task.JobId;
 import co.cask.coopr.scheduler.task.TaskId;
 import com.google.common.primitives.Longs;
@@ -77,7 +77,7 @@ public final class IdService extends AbstractIdleService {
     this.idLock = new ThreadLocal<Lock>() {
       @Override
       protected Lock initialValue() {
-        return new ZKInterProcessReentrantLock(zkClient, IDS_BASEPATH + "/lock");
+        return new ReentrantDistributedLock(zkClient, IDS_BASEPATH + "/lock");
       }
     };
     idLock.get().lock();

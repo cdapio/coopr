@@ -62,7 +62,7 @@ public class SynchronizedZKMap<T> implements Map<String, T> {
     this.serializer = serializer;
     this.currentView = Maps.newHashMap();
     this.currentViewVersion = -1;
-    this.globalLock = new ZKInterProcessReentrantLock(zkClient, LOCK_PATH);
+    this.globalLock = new ReentrantDistributedLock(zkClient, LOCK_PATH);
   }
 
   @Override
