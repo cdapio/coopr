@@ -1,0 +1,13 @@
+----------------------------------------------------------------
+Tue Feb 10 16:19:08 PST 2015:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.10.1.1 - (1458268): instance a816c00e-014b-7600-f096-0000081668a0 
+on database directory /private/var/coopr/data/db/coopr with class loader sun.misc.Launcher$AppClassLoader@53601a4f 
+Loaded from file:/Users/alvin/.m2/repository/org/apache/derby/derby/10.10.1.1/derby-10.10.1.1.jar
+java.vendor=Oracle Corporation
+java.runtime.version=1.7.0_51-b13
+user.dir=/Users/alvin/dev/caskdata-coopr
+os.name=Mac OS X
+os.arch=x86_64
+os.version=10.9.5
+derby.system.home=null
+Database Class Loader started - derby.database.classpath=''
