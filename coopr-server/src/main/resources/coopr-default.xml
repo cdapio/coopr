@@ -220,6 +220,12 @@
     </property>
 
     <property>
+        <name>server.provisioner.request.connect.timeout.ms</name>
+        <value>10000</value>
+        <description>connect timeout in milliseconds to use when making requests to provisioners</description>
+    </property>
+
+    <property>
         <name>server.metrics.queue.cache.seconds</name>
         <value>10</value>
         <description>Seconds to cache queue metrics in memory before recalculating. Queue metrics require
