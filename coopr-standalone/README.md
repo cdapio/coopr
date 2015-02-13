@@ -18,6 +18,7 @@ sudo gem install sinatra --version 1.4.5
 sudo gem install thin --version 1.6.2
 sudo gem install rest_client --version 1.7.3
 sudo gem install google-api-client --version 0.7.1
+sudo gem install deep_merge --version 1.0.1
 ```
 
 ## Start
