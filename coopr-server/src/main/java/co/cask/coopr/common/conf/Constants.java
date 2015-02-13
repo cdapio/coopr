@@ -80,6 +80,7 @@ public class Constants {
   public static final String PROVISIONER_REQUEST_MAX_RETRIES = "server.provisioner.request.max.retries";
   public static final String PROVISIONER_REQUEST_MS_BETWEEN_RETRIES = "server.provisioner.request.ms.between.retries";
   public static final String PROVISIONER_REQUEST_SOCKET_TIMEOUT_MS = "server.provisioner.request.socket.timeout.ms";
+  public static final String PROVISIONER_REQUEST_CONNECT_TIMEOUT_MS = "server.provisioner.request.connect.timeout.ms";
 
   /**
    * Config settings for the crendential store.
