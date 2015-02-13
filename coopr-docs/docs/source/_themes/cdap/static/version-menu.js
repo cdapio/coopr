@@ -36,12 +36,11 @@
     return versionsURL + dir + '/en/';
   });
   var writelink = (function(dir, label){
-//     document.write('<option value="' + versionsURL + dir + '/en/">Version ' + label + '</option>')
     document.write('<option value="' + buildURL(dir) + '">Version ' + label + '</option>');
   });
   window.versionscallback = (function(data){
     if (data) {
-      document.write('<li style="width: 120px; position: absolute; margin-left: -165px; text-align: right; top: 6px;">');
+      document.write('<li class="versions">');
       document.write('<select id="' + versionID + '" onmousedown="window.currentversion=this.value;" onchange="window.gotoVersion(\'' + versionID + '\')">');
     }
     var ess = "s";

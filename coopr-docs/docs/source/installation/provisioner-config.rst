@@ -65,8 +65,8 @@ Shown below is an example configuration (``provisioner-site.xml``) with some of 
   </configuration>
   
 **Notes:** Changes to the ``provisioner-site.xml`` file require a restart of the provisioner.
-           The provisioner will run with no properties set (empty provisioner-site.xml file),
-             as most properties have defaults set.
+The provisioner will run with no properties set (an empty ``provisioner-site.xml`` file)
+as most properties have defaults set.
 
 
 Running Provisioner to use SSL
@@ -95,44 +95,44 @@ A full list of available configuration settings and their default values are giv
    * - Config setting
      - Default
      - Description
-   * - provisioner.server.uri
-     - http://localhost:55055
+   * - ``provisioner.server.uri``
+     - ``http://localhost:55055``
      - URI of server to connect to
-   * - provisioner.bind.ip
-     - 0.0.0.0
+   * - ``provisioner.bind.ip``
+     - ``0.0.0.0``
      - Local IP provisioner should listen on
-   * - provisioner.bind.port
-     - 55056
+   * - ``provisioner.bind.port``
+     - ``55056``
      - Local Port provisioner should listen on
-   * - provisioner.register.ip
+   * - ``provisioner.register.ip``
      - 
      - Routable IP for the server to call back to this provisioner's API; if left empty,
        the provisioner will attempt to auto-detect
-   * - provisioner.daemonize
-     - false
+   * - ``provisioner.daemonize``
+     - ``false``
      - Run provisioner as a daemon. Ensure you also specify a log directory
-   * - provisioner.data.dir
-     - /var/coopr/data/provisioner/data
+   * - ``provisioner.data.dir``
+     - ``/var/coopr/data/provisioner/data``
      - Provisioner storage directory for plugin data resources
-   * - provisioner.work.dir
-     - /var/coopr/data/provisioner/work
+   * - ``provisioner.work.dir``
+     - ``/var/coopr/data/provisioner/work``
      - Provisioner working directory
-   * - provisioner.capacity
-     - 10
+   * - ``provisioner.capacity``
+     - ``10``
      - Max number of running workers for this provisioner; assume each worker takes 256mb of memory
-   * - provisioner.heartbeat.interval
-     - 10
+   * - ``provisioner.heartbeat.interval``
+     - ``10``
      - Interval in seconds to send heartbeat to server
-   * - provisioner.log.dir
+   * - ``provisioner.log.dir``
      -
      - Provisioner log directory
-   * - provisioner.log.rotation.shift.age
-     - 7
+   * - ``provisioner.log.rotation.shift.age``
+     - ``7``
      - number of old log files to keep, or frequency of rotation (daily, weekly, or monthly)
-   * - provisioner.log.rotation.shift.size
-     - 10485760
+   * - ``provisioner.log.rotation.shift.size``
+     - ``10485760``
      - maximum logfile size. only applies when shift.age is a number
-   * - provisioner.log.level
-     - info
-     - log level, one of debug, info, warn, error, fatal
+   * - ``provisioner.log.level``
+     - ``info``
+     - log level; one of: debug, info, warn, error, fatal
 

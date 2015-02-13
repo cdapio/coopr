@@ -245,6 +245,10 @@ Also, add these properties to ``coopr-security.xml``::
   and *Keystore key password* with the actual file path of the keystore, the keystore
   password and the key password respectively that were used in generating the keystore.
 
+.. role:: raw-html(raw)
+   :format: html
+   
+.. |br-space| replace:: :raw-html:`<br />&nbsp;&nbsp;&nbsp;&nbsp;`
 
 Server Configuration
 ====================
@@ -252,57 +256,69 @@ Server Configuration
 An alphabetical list of the available configuration settings and their default values:
 
 .. list-table::
+   :widths: 30 30 40
    :header-rows: 1
 
    * - Config setting
      - Default
      - Description
 
-   * - ``server.callback.class``
-     - ``co.cask.coopr.scheduler.callback.HttpPostClusterCallback``
+   * - | ``server.callback.class``
+     - | ``co.cask.coopr.``
+       | ``scheduler.callback.``
+       | ``HttpPostClusterCallback``
      - Class to use for executing cluster callbacks
 
-   * - ``server.callback.http.failure.triggers``
+   * - | ``server.callback.``
+       | ``http.failure.triggers``
      - all operations
      - Comma-separated list of cluster operations that should trigger an HTTP POST request
        to be sent after the operation fails
 
-   * - ``server.callback.http.failure.url``
+   * - | ``server.callback.``
+       | ``http.failure.url``
      - 
      - If ``HttpPostClusterCallback`` is in use, URL to send cluster and job information
        to after cluster operations fail; leave unset if no request should be sent
 
-   * - ``server.callback.http.max.connections``
+   * - | ``server.callback.``
+       | ``http.max.connections``
      - ``100``
      - Maximum number of concurrent http connections for callbacks; if the max is reached, the
        next callback to try and send a request blocks until an open connection frees up
 
-   * - ``server.callback.http.socket.timeout``
+   * - | ``server.callback.``
+       | ``http.socket.timeout``
      - ``10000``
      - Socket timeout in milliseconds for HTTP callbacks
 
-   * - ``server.callback.http.start.triggers``
+   * - | ``server.callback.``
+       | ``http.start.triggers``
      - all operations
      - Comma-separated list of cluster operations that should trigger an HTTP POST request
        to be sent before start of the operation
 
-   * - ``server.callback.http.start.url``
+   * - | ``server.callback.``
+       | ``http.start.url``
      - 
      - If ``HttpPostClusterCallback`` is in use, URL to send cluster and job information
        to before cluster operations start; leave unset if no request should be sent
 
-   * - ``server.callback.http.success.triggers``
+   * - | ``server.callback.``
+       | ``http.success.triggers``
      - all operations
      - Comma-separated list of cluster operations that should trigger an HTTP POST request
        to be sent after the operation completes successfully
 
-   * - ``server.callback.http.success.url``
+   * - | ``server.callback.``
+       | ``http.success.url``
      - 
      - If ``HttpPostClusterCallback`` is in use, URL to send cluster and job information
        to after cluster operations complete successfully; leave unset if no request should
        be sent
 
-   * - ``server.cluster.cleanup.seconds``
+   * - | ``server.cluster.``
+       | ``cleanup.seconds``
      - ``180``
      - Interval, in seconds, between server housekeeping runs; housekeeping such as timing
        out tasks and expiring clusters
@@ -319,7 +335,7 @@ An alphabetical list of the available configuration settings and their default v
      - ``localhost``
      - Hostname/IP address for the server to bind to
 
-   * - ``server.ids.increment.by``
+   * - | ``server.ids.increment.by``
      - ``1``
      - Along with ``server.ids.start.num``, this setting is used to partition the ID space
        for :doc:`Multi-Datacenter High Availability </guide/bcp/multi-data-center-bcp>`. The
@@ -327,7 +343,7 @@ An alphabetical list of the available configuration settings and their default v
        same value of ``server.ids.increment.by`` to prevent overlapping of IDs. This number
        has to be large enough to enable future datacenter expansion.
 
-   * - ``server.ids.start.num``
+   * - | ``server.ids.start.num``
      - ``1``
      - Along with ``server.ids.increment.by``, this setting is used to partition the ID
        space for :doc:`Multi-Datacenter High Availability
@@ -336,97 +352,117 @@ An alphabetical list of the available configuration settings and their default v
        the IDs do not overlap. All Coopr Servers in a datacenter should share the same value
        of ``server.ids.start.num``.
 
-   * - ``server.jdbc.connection.string``
-     - ``jdbc:derby:/var/coopr/data/db/coopr;create=true``
+   * - | ``server.jdbc.``
+       | ``connection.string``
+     - | ``jdbc:derby:``
+       | ``/var/coopr/data/db/coopr;``
+       | ``create=true``
      - JDBC connection string to user for database operations
 
-   * - ``server.jdbc.driver``
-     - ``org.apache.derby.jdbc.EmbeddedDriver``
+   * - | ``server.jdbc.driver``
+     - | ``org.apache.derby.``
+       | ``jdbc.EmbeddedDriver``
      - JDBC driver to use for database operations
 
-   * - ``server.jdbc.max.active.connections``
+   * - | ``server.jdbc.``
+       | ``max.active.connections``
      - ``100``
      - Maximum active JDBC connections
 
-   * - ``server.jdbc.validation.query``
-     - ``VALUES 1`` when using default for ``server.jdbc.driver`` (Derby); ``null`` otherwise
+   * - | ``server.jdbc.``
+       | ``validation.query``
+     - ``"VALUES 1"`` when using default for ``server.jdbc.driver`` (Derby); ``"null"`` otherwise
      - Validation query used by JDBC connection pool to validate new DB connections;
        MySQL, PostgreSQL, and Microsoft SQL Server can use ``"select 1"``; Oracle can use
        ``"select 1 from dual"``
 
-   * - ``server.local.data.dir``
+   * - | ``server.local.data.dir``
      - ``/var/coopr/data``
      - Local data directory that default in-memory Zookeeper and embedded Derby will use
 
-   * - ``server.metrics.queue.cache.seconds``
+   * - | ``server.metrics.``
+       | ``queue.cache.seconds``
      - ``10``
      - Seconds to cache queue metrics in memory before recalculating; queue metrics
        require walking through the queue and are therefore expensive to compute
 
-   * - ``server.netty.exec.num.threads``
+   * - | ``server.netty.``
+       | ``exec.num.threads``
      - ``50``
      - Number of execution threads for the server
 
-   * - ``server.netty.worker.num.threads``
+   * - | ``server.netty.``
+       | ``worker.num.threads``
      - ``20``
      - Number of worker threads for the server
 
-   * - ``server.node.max.log.length``
+   * - | ``server.node.max.log.length``
      - ``2048``
      - Maximum log size in bytes for capturing stdout and stderr for actions performed on
        cluster nodes; logs longer than set limit will be trimmed from the head of the file
 
-   * - ``server.node.max.num.actions``
+   * - | ``server.node.max.num.actions``
      - ``200``
      - Maximum number of actions saved for a node; oldest action will be removed when
        actions exceeding this limit are performed on a node
 
-   * - ``server.max.action.retries``
+   * - | ``server.max.action.retries``
      - ``3``
      - Maximum number of times a task gets retried when it fails
 
-   * - ``server.max.cluster.size``
+   * - | ``server.max.cluster.size``
      - ``10000``
      - Maximum number of nodes that a given cluster can be created with
 
-   * - ``server.plugin.store.class``
-     - ``co.cask.coopr.store.provisioner.LocalFilePluginStore``
+   * - | ``server.plugin.store.class``
+     - | ``co.cask.coopr.``
+       | ``store.provisioner.``
+       | ``LocalFilePluginStore``
      - Class to use to store plugin resources
 
-   * - ``server.plugin.store.localfilestore.data.dir``
-     - ``/var/coopr/data/plugins/resources``
+   * - | ``server.plugin.``
+       | ``store.localfilestore.``
+       | ``data.dir``
+     - | ``/var/coopr/data/``
+       | ``plugins/resources``
      - Data directory to store plugin resources when using the local file plugin store
 
    * - ``server.port``
      - ``55054``
      - Port for the server
 
-   * - ``server.provisioner.request.max.retries``
+   * - | ``server.provisioner.``
+       | ``request.max.retries``
      - ``2``
      - Maximum number of times to retry a failed request to a provisioner before reassigning
        its workers and deleting it
 
-   * - ``server.provisioner.request.ms.between.retries``
+   * - | ``server.provisioner.``
+       | ``request.ms.between.retries``
      - ``500``
      - Milliseconds to wait before retrying a failed request to a provisioner
 
-   * - ``server.provisioner.request.socket.timeout.ms``
+   * - | ``server.provisioner.``
+       | ``request.socket.timeout.ms``
      - ``10000``
      - Socket timeout in milliseconds to use when making requests to provisioners
 
-   * - ``server.provisioner.timeout.check.interval.secs``
+   * - | ``server.provisioner.``
+       | ``timeout.check.interval.secs``
      - ``60``
      - Seconds between checks for timed out provisioners
 
-   * - ``server.provisioner.timeout.secs``
+   * - | ``server.provisioner.``
+       | ``timeout.secs``
      - ``120``
      - Seconds to wait for a provisioner heartbeat before moving its workers and deleting it
 
-   * - ``server.scheduler.run.interval.seconds``
+   * - | ``server.scheduler.``
+       | ``run.interval.seconds``
      - ``1``
      - Interval, in seconds, various runs are scheduled on the server
 
-   * - ``server.solver.num.threads``
+   * - | ``server.solver.num.threads``
      - ``20``
      - Number of threads used for solving cluster layout
 
@@ -434,19 +470,20 @@ An alphabetical list of the available configuration settings and their default v
      - ``false``
      - Enable running server with SSL
 
-   * - ``server.task.timeout.seconds``
+   * - | ``server.task.``
+       | ``timeout.seconds``
      - ``1800``
      - Number of seconds the server will wait before timing out a provisioner task and marking it as failed
 
-   * - ``server.zookeeper.namespace``
+   * - | ``server.zookeeper.namespace``
      - ``/coopr``
      - Namespace to use in Zookeeper
 
-   * - ``server.zookeeper.session.timeout.millis``
+   * - | ``server.zookeeper.``
+       | ``session.timeout.millis``
      - ``40000``
      - Zookeeper session timeout value in milliseconds
 
-   * - ``server.zookeeper.quorum``
+   * - | ``server.zookeeper.quorum``
      - A local value determined by an in-memory Zookeeper
      - Zookeeper quorum for the server
-

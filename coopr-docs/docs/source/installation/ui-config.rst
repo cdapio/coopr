@@ -37,22 +37,23 @@ Running UI with SSL
 
 To enable running the UI with SSL, set these environment variables:
 
-====================================     ==========================    =======================================
+==================================== ============================== =======================================
    Environment variable                     Default Value                     Description
-====================================     ==========================    =======================================
-COOPR_UI_KEY_FILE                        COOPR_HOME/cert/server.key    Key file location
-COOPR_UI_CERT_FILE                       COOPR_HOME/cert/server.crt    Certificate file location
-COOPR_SSL                                true                          Use SSL for the UI
-COOPR_UI_SSL_PORT                        8443                          Port the UI listens on for connections  
-====================================     ==========================    =======================================
+==================================== ============================== =======================================
+``COOPR_UI_KEY_FILE``                ``COOPR_HOME/cert/server.key`` Key file location
+``COOPR_UI_CERT_FILE``               ``COOPR_HOME/cert/server.crt`` Certificate file location
+``COOPR_SSL``                        ``true``                       Use SSL for the UI
+``COOPR_UI_SSL_PORT``                ``8443``                       Port the UI listens on for connections
+                                                                    (optional)
+==================================== ============================== =======================================
 
 
 .. highlight:: console
 
 To create an environment with the correct values, one method is to use a shell script
-with the correct values included in it. Create a file (``/etc/profile.d/coopr-ui.sh``)
+with the values included in it. Create a file (``/etc/profile.d/coopr-ui.sh``)
 with appropriate entries (modifying the values to point to the location of your 
-certificate file and key, as required)::
+certificate file and key, desired port—in this case, ``28443``—as required)::
 
   export COOPR_UI_KEY_FILE=/etc/pki/tls/private/ui-cert.key
   export COOPR_UI_CERT_FILE=/etc/pki/tls/certs/ui-cert.crt
@@ -72,4 +73,5 @@ Logging into the UI with SSL Enabled
 ====================================
 
 When logging into the UI with SSL enabled, the default port is ``8443``.
-You only need to set COOPR_UI_SSL_PORT if you wish to use a different port for your UI to listen on when using SSL.
+You only need to set ``COOPR_UI_SSL_PORT`` if you wish to use a different port for your UI
+to listen on when using SSL.
