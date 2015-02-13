@@ -208,34 +208,30 @@ Modify the values shown above to reflect the paths of your relevant keystores.
 
 Also, add these properties to ``coopr-security.xml``::
 
-  <property>
-    <name>server.ssl.keystore.path</name>
-    <value>/path</value>
-    <description>Keystore file location</description>
-  </property>
-  <property>
-    <name>server.ssl.keystore.password</name>
-    <value>Keystore password</value>
-    <description>Keystore password</description>
-  </property>
-  <property>
-    <name>server.ssl.cert.password</name>
-    <value>Keystore key password</value>
-    <description>Keystore key password</description>
-  </property>
+    <!-- keystore info for external API SSL (server.ssl.enabled) -->
+    <property>
+      <name>server.ssl.keystore.password</name>
+      <value>Keystore password</value>
+      <description>Keystore password</description>
+    </property>
+    <property>
+      <name>server.ssl.cert.password</name>
+      <value>Keystore key password</value>
+      <description>Keystore key password</description>
+    </property>
 
-To configure the server to use mutual authentication with SSL, add these properties to ``coopr-security.xml``::
+    <!-- keystore info for internal API SSL (server.tasks.ssl.enabled) -->
+    <property>
+      <name>server.tasks.ssl.keystore.password</name>
+      <value>Keystore password</value>
+      <description>Keystore password</description>
+    </property>
+    <property>
+      <name>server.tasks.ssl.cert.password</name>
+      <value>Keystore key password</value>
+      <description>Keystore key password</description>
+    </property>
 
-  <property>
-    <name>server.ssl.trust.keystore.path</name>
-    <value>/path</value>
-    <description>Truststore file location</description>
-  </property>
-  <property>
-    <name>server.ssl.trust.keystore.password</name>
-    <value>Truststore password</value>
-    <description>Truststore password</description>
-  </property>
 
 .. rubric:: SSL Notes
 
@@ -248,6 +244,7 @@ To configure the server to use mutual authentication with SSL, add these propert
 - For the keystore configuration, update the *Keystore path* and replace *Keystore password*
   and *Keystore key password* with the actual file path of the keystore, the keystore
   password and the key password respectively that were used in generating the keystore.
+
 
 Server Configuration
 ====================

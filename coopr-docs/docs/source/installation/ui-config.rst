@@ -42,19 +42,10 @@ To enable running the UI with SSL, set these environment variables:
 ====================================     ==========================    =======================================
 COOPR_UI_KEY_FILE                        COOPR_HOME/cert/server.key    Key file location
 COOPR_UI_CERT_FILE                       COOPR_HOME/cert/server.crt    Certificate file location
+COOPR_SSL                                true                          Use SSL for the UI
 COOPR_UI_SSL_PORT                        8443                          Port the UI listens on for connections  
 ====================================     ==========================    =======================================
 
-To configure the UI to support a server that uses mutual authentication with SSL, set these 
-additional environment variables:
-
-====================================     ==========================    =======================================
-   Environment variable                     Default Value                     Description
-====================================     ==========================    =======================================
-COOPR_UI_TLS_KEY_FILE                       None                        Trusted key file location
-COOPR_UI_TLS_CRT_FILE                       None                        Trusted certificate file location
-COOPR_UI_TLS_KEY_PASS                       None                        Trusted certificate password
-====================================     ==========================    =======================================
 
 .. highlight:: console
 
@@ -65,7 +56,8 @@ certificate file and key, as required)::
 
   export COOPR_UI_KEY_FILE=/etc/pki/tls/private/ui-cert.key
   export COOPR_UI_CERT_FILE=/etc/pki/tls/certs/ui-cert.crt
-  export COOPR_UI_SSL_PORT=8443
+  export COOPR_UI_SSL=true
+  export COOPR_UI_SSL_PORT=28443
 
 
 Configuring the UI
@@ -80,3 +72,4 @@ Logging into the UI with SSL Enabled
 ====================================
 
 When logging into the UI with SSL enabled, the default port is ``8443``.
+You only need to set COOPR_UI_SSL_PORT if you wish to use a different port for your UI to listen on when using SSL.

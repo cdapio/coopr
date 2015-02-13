@@ -34,8 +34,7 @@ get requests from the server to add or remove workers for different tenants.
 
 Example
 ^^^^^^^^
-Shown below is an example configuration (``provisioner-site.xml``) with settings that you
-are most likely to change::
+Shown below is an example configuration (``provisioner-site.xml``) with some of the optional settings:: 
 
   <configuration>
     <property>
@@ -44,33 +43,31 @@ are most likely to change::
       <description>Max number of running workers for this provisioner</description>
     </property>
     <property>
-      <name>provisioner.data.dir</name>
-      <value>/var/coopr/data/provisioner/data</value>
-      <description>Provisioner storage directory for plugin data resources</description>
-    </property>
-    <property>
-      <name>provisioner.log.level</name>
-      <value>info</value>
-      <description>log level; one of debug, info, warn, error, fatal</description>
-    </property>
-    <property>
-      <name>provisioner.register.ip</name>
-      <value>127.0.0.1</value>
-      <description>Routable IP for the server to call back to this provisioner's API</description>
-    </property>
-    <property>
       <name>provisioner.server.uri</name>
       <value>http://localhost:55055</value>
       <description>URI of server to connect to</description>
+    </property>
+    <property>
+      <name>provisioner.data.dir</name>
+      <value>/var/coopr/data/provisioner/data</value>
+      <description>Provisioner storage directory for plugin data resources</description>
     </property>
     <property>
       <name>provisioner.work.dir</name>
       <value>/var/coopr/data/provisioner/work</value>
       <description>Provisioner working directory</description>
     </property>
+    <property>
+      <name>provisioner.register.ip</name>
+      <value>127.0.0.1</value>
+      <description>Routable IP for the server to call back to this provisioner's API</description>
+    </property>
   </configuration>
   
-**Note:** Changes of the ``provisioner.log.level`` require a restart of the provisioner.
+**Notes:** Changes to the ``provisioner-site.xml`` file require a restart of the provisioner.
+           The provisioner will run with no properties set (empty provisioner-site.xml file),
+             as most properties have defaults set.
+
 
 Running Provisioner to use SSL
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -79,29 +76,12 @@ To configure the provisioner to support server with SSL, add or update this prop
 
     <property>
       <name>provisioner.server.uri</name>
-      <value>https://localhost:55054</value>
+      <value>https://localhost:55055</value>
       <description>URI of server to connect to</description>
     </property>
 
-To configure the provisioner to support server that uses mutual authentication with SSL,
-setup these environment variables:
-
-====================================     ==========================    =======================================
-   Environment variable                     Default Value                     Description
-====================================     ==========================    =======================================
-TRUST_CERT_PATH                             None                        Trusted certificate file location
-TRUST_CERT_PASSWORD                         None                        Trusted certificate password
-====================================     ==========================    =======================================
 
 .. highlight:: console
-
-To create an environment with the correct values, one method is to use a shell script
-with the correct values included in it. Create a file (``/etc/profile.d/coopr-provisioner-cert.sh``)
-with appropriate entries (modifying the values to point to the location of your 
-certificate file and password, as required)::
-
-  export TRUST_CERT_PATH=/etc/pki/java/client.cer
-  export TRUST_CERT_PASSWORD=<your-password>
 
 
 Configuration
@@ -116,7 +96,7 @@ A full list of available configuration settings and their default values are giv
      - Default
      - Description
    * - provisioner.server.uri
-     - http://localhost:55054 
+     - http://localhost:55055
      - URI of server to connect to
    * - provisioner.bind.ip
      - 0.0.0.0
@@ -128,6 +108,9 @@ A full list of available configuration settings and their default values are giv
      - 
      - Routable IP for the server to call back to this provisioner's API; if left empty,
        the provisioner will attempt to auto-detect
+   * - provisioner.daemonize
+     - false
+     - Run provisioner as a daemon. Ensure you also specify a log directory
    * - provisioner.data.dir
      - /var/coopr/data/provisioner/data
      - Provisioner storage directory for plugin data resources
@@ -140,3 +123,16 @@ A full list of available configuration settings and their default values are giv
    * - provisioner.heartbeat.interval
      - 10
      - Interval in seconds to send heartbeat to server
+   * - provisioner.log.dir
+     -
+     - Provisioner log directory
+   * - provisioner.log.rotation.shift.age
+     - 7
+     - number of old log files to keep, or frequency of rotation (daily, weekly, or monthly)
+   * - provisioner.log.rotation.shift.size
+     - 10485760
+     - maximum logfile size. only applies when shift.age is a number
+   * - provisioner.log.level
+     - info
+     - log level, one of debug, info, warn, error, fatal
+
