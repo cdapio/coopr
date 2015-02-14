@@ -190,7 +190,7 @@ SSL Configuration
 
 To enable running a server with SSL, add this property to ``coopr-site.xml`` (while the
 configuration file path is set in ``/etc/alternatives/...``, the default directory is
-``/etc/coopr/conf`` and the configuration files are typically located there).::
+``/etc/coopr/conf`` and the configuration files are typically located there)::
 
   <property>
     <name>server.ssl.enabled</name>
