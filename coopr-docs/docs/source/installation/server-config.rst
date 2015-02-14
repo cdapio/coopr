@@ -180,8 +180,8 @@ Running a Server with SSL
 
 SSL configuration requires these steps: (the first two steps are only necessary once per machine)
 
-- Create a SSL certificate and key
-- Put the certificate and key in position
+- Create a java keystore, keeping track of the keystore password and keystore key password
+- Put the keystore in place (e.g. in /etc/pki/java/serverkeystore.jks as in the example configuration below)
 - Correctly configure the UI (next step)
 
 
@@ -203,14 +203,14 @@ Set the following properties in ``coopr-site.xml`` for the keystore paths::
   <!-- Keystore path for external API SSL (server.ssl.enabled) -->
   <property>
     <name>server.ssl.keystore.path</name>
-    <value>/etc/pki/java/clientkeystore.jks</value>
+    <value>/etc/pki/java/serverkeystore.jks</value>
     <description>Keystore file location</description>
   </property>
 
   <!-- Keystore path for internal API SSL (server.tasks.ssl.enabled) -->
   <property>
     <name>server.tasks.ssl.keystore.path</name>
-    <value>/etc/pki/java/clientkeystore.jks</value>
+    <value>/etc/pki/java/serverkeystore.jks</value>
     <description>Tasks Keystore file location</description>
   </property>
 
