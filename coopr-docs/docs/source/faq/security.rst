@@ -15,7 +15,7 @@
 
 :orphan:
 
-.. _faq_toplevel:
+.. _faq-security:
 
 .. index::
    single: FAQ: Security
@@ -24,11 +24,15 @@
 Security
 ====================================
 
+.. _faq-security-1:
+
 Does Coopr support authentication?
 ----------------------------------------------
 Coopr backend has minimal support for authentication. In the next version, there will
 be integration with Crowd and LDAP servers allowing users to authenticate against the 
 available directories.
+
+.. _faq-security-2:
 
 Are all communications between Coopr Server and Coopr Provisioners secure?
 ------------------------------------------------------------------------------------
@@ -36,10 +40,14 @@ Not right now, but the plan is to move them to communicate on https in future re
 This is not an immediate concern, since there is no user sensitive data passed between 
 them.
 
+.. _faq-security-3:
+
 Can Coopr integrate with any authentication system?
 ---------------------------------------------------------------
 It's designed to integrate with any authentication system. The next release will include support
 for OpenID, LDAP and OAuth, and the later releases will open up integration with different systems.
+
+.. _faq-security-4:
 
 Will Coopr support authorization and granular control in future?
 ---------------------------------------------------------------------------

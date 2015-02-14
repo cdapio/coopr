@@ -1,5 +1,5 @@
 ..
-   Copyright © 2012-2014 Cask Data, Inc.
+   Copyright © 2012-2015 Cask Data, Inc.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -14,7 +14,11 @@
    limitations under the License.
 
 .. index::
-single: Authentication support
+   single: Authentication support
+
+======================
+Authentication Support
+======================
 
 Authentication in COOPR Server is carried out using **Authentication Server** - the authentication server integrates
 with different authentication backends (LDAP, JASPI plugins) using a plugin API. Clients must first authenticate
@@ -22,7 +26,7 @@ with the authentication server through this configured backend. Once authenticat
 representing their identity.
 
 Enabling Security
------------------
+=================
 To enable security in COOPR Server, add these properties to ``coopr-site.xml``:
 
 ==========================================  ==============  ==============
@@ -34,7 +38,7 @@ security.auth.server.bind.port                <port>          55059
 ==========================================  ==============  ==============
 
 Configuring SSL for the Authentication Server
-.............................................
+=============================================
 To configure the granting of ``AccessToken``\s via SSL, add these properties to ``coopr-security.xml``:
 
 =============================================     =====================     =======================================
@@ -50,7 +54,7 @@ security.auth.server.ssl.keystore.type              JKS                       Ke
 
 
 Configuring Authentication Mechanisms
--------------------------------------
+=====================================
 COOPR provides several ways to authenticate a user's identity.
 
 Basic Authentication
@@ -73,7 +77,7 @@ Note that it is not advisable to use this method of authentication. In productio
 other methods described below.
 
 LDAP Authentication
-...................
+-------------------
 You can configure COOPR to authenticate against an LDAP instance by adding these
 properties to ``coopr-site.xml``:
 
@@ -149,6 +153,7 @@ To provide a custom authentication mechanism you may create your own ``Authentic
     }
   }
 
+.. highlight:: console
 
 Testing Security
 ----------------
@@ -177,16 +182,16 @@ security components are working as expected:
 
 - After configuring COOPR as described above, restart COOPR and attempt to use a service::
 
-  curl <base-url>/status
+    curl <base-url>/status
 
 - This should return a 401 Unauthorized response. Submit a username and password to obtain an ``AccessToken``::
 
-  curl -u username:password <base-auth-url>/token
+    curl -u username:password <base-auth-url>/token
 
 - This should return a 200 OK response with the ``AccessToken`` string in the response body.
   Reattempt the first command, but this time include the ``AccessToken`` as a header in the command::
 
-  curl -H "Authorization: Bearer <AccessToken>" <base-url>/status
+    curl -H "Authorization: Bearer <AccessToken>" <base-url>/status
 
 - This should return a 200 OK response.
 
@@ -204,17 +209,17 @@ that has been configured.  For username and password based mechanisms, the ``Aut
 HTTP Responses
 ++++++++++++++
 
-  * ``200 OK`` - Authentication was successful and an access token will be returned
-  * ``401 Unauthorized`` - Authentication failed
+* ``200 OK`` - Authentication was successful and an access token will be returned
+* ``401 Unauthorized`` - Authentication failed
 
 Success Response Fields
 +++++++++++++++++++++++
 
-  * ``access_token`` - The Access Token issued for the client. The serialized token contents are base-64 encoded
+* ``access_token`` - The Access Token issued for the client. The serialized token contents are base-64 encoded
   for safe transport over HTTP.
-  * ``token_type`` - In order to conform with the OAuth 2.0 Bearer Token Usage specification (`RFC 6750`__), this
+* ``token_type`` - In order to conform with the OAuth 2.0 Bearer Token Usage specification (`RFC 6750`_), this
   value must be "Bearer".
-  * ``expires_in`` - Token validity lifetime in seconds.
+* ``expires_in`` - Token validity lifetime in seconds.
 
 Example
 +++++++
@@ -239,4 +244,6 @@ Sample response::
 
 Comments
 --------
-*Only ``Bearer`` tokens (`RFC 6750`__) are currently supported*
+**Note:** Only ``Bearer`` tokens (`RFC 6750`_) are currently supported.
+
+.. _RFC 6750: http://tools.ietf.org/html/rfc6750

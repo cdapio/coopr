@@ -108,7 +108,7 @@ public class ClusterTaskFilter {
   }
 
   /**
-   * Retrieves {@link MetricService.Periodicity} of this filter.
+   * Retrieves {@link co.cask.coopr.metrics.MetricService.Periodicity} of this filter.
    * This field is ignored if its value is {@code null}.
    *
    * @return periodicity

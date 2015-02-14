@@ -100,14 +100,15 @@ ul.search {
 }
 
 ul.search li {
-    padding: 5px 0 5px 20px;
-    background-image: url(file.png);
-    background-repeat: no-repeat;
-    background-position: 0 7px;
+    padding: 5px 0 5px 0px;
 }
 
 ul.search li a {
     font-weight: bold;
+    padding: 5px 2px 5px 20px;
+    background-image: url(file.png);
+    background-repeat: no-repeat;
+    background-position: 0 7px;
 }
 
 ul.search li div.context {
@@ -315,6 +316,7 @@ table.docutils {
     width: 100%;
     margin-left: 0%;
     margin-right: 0%;
+    background-color: white;
 }
 
 table.docutils td, table.docutils th {

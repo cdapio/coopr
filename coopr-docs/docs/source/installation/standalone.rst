@@ -20,6 +20,8 @@
 Coopr Sandboxes
 ==================
 
+.. highlight:: console
+
 For convenience, we have provided several ways to run Coopr on your laptop for experimentation. It is not recommended to run Coopr
 in any of these modes for anything other than experimentation.
 
