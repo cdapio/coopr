@@ -25,8 +25,8 @@ SSL Configuration Steps
 
 SSL configuration requires these steps: (the first two steps are only necessary once per machine)
 
-- Create a SSL certificate and key 
-- Put the certificate and key in position
+- Create PEM encoded SSL certificate and key
+- Put the certificate and key in place (e.g. in /etc/pki/tls/certs/ and /etc/pki/tls/private/, see below)
 - Set the environment variables shown below, to describe the locations
 - Set and export the variables
 - Correctly configure the UI (next step)
