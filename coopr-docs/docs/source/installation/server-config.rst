@@ -179,8 +179,7 @@ Running a Server with SSL
 
 To enable running a server with SSL, add this property to ``coopr-site.xml`` (while the
 configuration file path is set in ``/etc/alternatives/...``, the default directory is
-``/etc/coopr/conf`` and typically the configuration is located at
-``/etc/coopr/conf/coopr-site.xml``)::
+``/etc/coopr/conf`` and the configuration files are typically located there).::
 
   <property>
     <name>server.ssl.enabled</name>
@@ -206,7 +205,8 @@ Set the following properties in ``coopr-site.xml`` for the keystore paths::
 
 Modify the values shown above to reflect the paths of your relevant keystores.
 
-Also, add these properties to ``coopr-security.xml``::
+
+Add these properties to ``coopr-security.xml``::
 
     <!-- keystore info for external API SSL (server.ssl.enabled) -->
     <property>
@@ -235,8 +235,8 @@ Also, add these properties to ``coopr-security.xml``::
 
 .. rubric:: SSL Notes
 
-- The keystore needs to be created before configuring SSL. The keystore's passwords
-  and information should be gathered in preparation for generation.
+- The keystore needs to be created before configuring SSL in Coopr. The keystore's passwords 
+  and information should be gathered accordingly, in preparation for that.
 
 - The keystore path (``server.ssl.keystore.path``) is not a directory, but rather the full
   path of the keystore file itself, such as ``/etc/pki/java/mykeystore``.
