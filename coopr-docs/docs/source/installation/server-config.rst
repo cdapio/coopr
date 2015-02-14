@@ -174,13 +174,16 @@ cluster operations complete successfully. The full list of cluster operations ar
   RESTART_SERVICES
   ADD_SERVICES
 
+
 Running a Server with SSL
 =========================
 
 SSL configuration requires these steps: (the first two steps are only necessary once per machine)
+
 - Create a SSL certificate and key
 - Put the certificate and key in position
 - Correctly configure the UI (next step)
+
 
 SSL Configuration
 ^^^^^^^^^^^^^^^^^
