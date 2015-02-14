@@ -145,10 +145,14 @@ Unreleased
 - CLI - Add version command to CLI COOPR-234 ( Issues: #869 )
 - Provisioner worker - Info log on CREATE, DELETE events for provisioner added COOPR-539 ( Issues: #873 )
 - Standalone - Dockerfile for coopr-standalone ( Issues: #874 )
+- Update coopr-templates submodule
+  - ( Issues: #896 caskdata/coopr-templates#19 caskdata/coopr-templates#20 caskdata/coopr-templates#21 caskdata/coopr-templates#22 )
+  - ( Issues: #900 caskdata/coopr-templates#24 caskdata/coopr-templates#25 )
+  - ( Issues: #    caskdata/coopr-templates#26 caskdata/coopr-templates#27 caskdata/coopr-templates#28 caskdata/coopr-templates#29 )
+  - ( Issues: #    caskdata/coopr-templates#30 caskdata/coopr-templates#31 )
+
 - Update coopr-provisioner submodule ( Issues: #880 #883 caskdata/coopr-provisioner#1 caskdata/coopr-provisioner#2 caskdata/coopr-provisioner#3 )
-- Update coopr-templates submodule ( Issues: #896 caskdata/coopr-templates#19 caskdata/coopr-templates#20 caskdata/coopr-templates#21 caskdata/coopr-templates#22 )
 - Update coopr-provisioner submodule ( Issues: #897 caskdata/coopr-provisioner#4 caskdata/coopr-provisioner#5 caskdata/coopr-provisioner#6 caskdata/coopr-provisioner#7 caskdata/coopr-provisioner#8 caskdata/coopr-provisioner#9 caskdata/coopr-provisioner#10 caskdata/coopr-provisioner#11 caskdata/coopr-provisioner#12 )
-- Update coopr-templates submodule ( Issues: #900 caskdata/coopr-templates#24 caskdata/coopr-templates#25 )
 - Update coopr-provisioner submodule ( Issues: caskdata/coopr-provisioner#13 caskdata/coopr-provisioner#14 )
 - Update coopr-provisioner submodule ( Issues: caskdata/coopr-provisioner#15 caskdata/coopr-provisioner#16 caskdata/coopr-provisioner#17 caskdata/coopr-provisioner#18 caskdata/coopr-provisioner#19 caskdata/coopr-provisioner#20 )
 
