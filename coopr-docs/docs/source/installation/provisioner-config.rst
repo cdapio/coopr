@@ -69,8 +69,18 @@ The provisioner will run with no properties set (an empty ``provisioner-site.xml
 as all properties have defaults set.
 
 
-Running Provisioner to use SSL
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Running Provisioner with SSL
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+SSL configuration requires these steps: (the first two steps are only necessary once per machine)
+
+- Create a SSL certificate and key
+- Put the certificate and key in position
+- Correctly configure the provisioner to support SSL (next step)
+
+
+SSL Configuration
+^^^^^^^^^^^^^^^^^
 
 To configure the provisioner to support server with SSL, add or update this property in ``provisioner-site.xml``::
 

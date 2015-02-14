@@ -21,19 +21,19 @@ UI Configuration
 ================
 
 SSL Configuration Steps
-=======================
+^^^^^^^^^^^^^^^^^^^^^^^
 
-SSL configuration requires these steps:
+SSL configuration requires these steps: (the first two steps are only necessary once per machine)
 
 - Create a SSL certificate and key 
 - Put the certificate and key in position
 - Set the environment variables shown below, to describe the locations
 - Set and export the variables
-- Correctly configure the UI
+- Correctly configure the UI (next step)
 
 
 Running UI with SSL
-===================
+^^^^^^^^^^^^^^^^^^^
 
 To enable running the UI with SSL, set these environment variables:
 
@@ -61,7 +61,7 @@ and, optionally, a different port (``28443`` is used here as an example)::
 
 
 Logging into the UI with SSL Enabled
-====================================
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 When logging into the UI with SSL enabled, the default port is ``8443``.
 You only need to set ``COOPR_UI_SSL_PORT`` if you wish to use a different port for your UI
