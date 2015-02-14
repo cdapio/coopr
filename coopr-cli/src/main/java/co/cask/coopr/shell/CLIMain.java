@@ -20,6 +20,8 @@ import co.cask.common.cli.CLI;
 import co.cask.common.cli.Command;
 import co.cask.common.cli.CommandSet;
 import co.cask.common.cli.command.HelpCommand;
+import co.cask.common.cli.exception.CLIExceptionHandler;
+import co.cask.common.cli.exception.InvalidCommandException;
 import co.cask.coopr.client.AdminClient;
 import co.cask.coopr.client.ClusterClient;
 import co.cask.coopr.client.PluginClient;
@@ -34,6 +36,7 @@ import com.google.inject.Injector;
 import jline.console.completer.Completer;
 
 import java.io.IOException;
+import java.io.PrintStream;
 import java.net.URISyntaxException;
 import java.util.Collections;
 
@@ -65,6 +68,19 @@ public class CLIMain {
     );
 
     cli = new CLI<Command>(getCommandSet(cliConfig, injector), Collections.<String, Completer>emptyMap());
+    cli.setExceptionHandler(new CLIExceptionHandler<Exception>() {
+      @Override
+      public boolean handleException(PrintStream output, Exception exception, int timesRetried) {
+        if (exception instanceof InvalidCommandException) {
+          InvalidCommandException ice = (InvalidCommandException) exception;
+          output.printf("Invalid command: '%s' - Enter 'help' for a list of commands", ice.getInput());
+          output.println();
+        } else {
+          output.println(exception.getMessage());
+        }
+        return false;
+      }
+    });
     cli.getReader().setPrompt("coopr (" + cliConfig.getURI() + ")> ");
 
     cliConfig.addReconnectListener(new CLIConfig.ReconnectListener() {
