@@ -15,7 +15,7 @@
 
 :orphan:
 
-.. _faq_toplevel:
+.. _faq-provisioner:
 
 .. index::
    single: FAQ: Coopr Provisioner
@@ -24,17 +24,21 @@
 Coopr Provisioner
 ============================
 
+.. _faq-provisioner-1:
+
 When something goes wrong, how can I look at the logs?
 ------------------------------------------------------
 
 When a user provisions a cluster, the logs for the nodes that fail are reported at node level, making 
 it easier to investigate the node level errors.
 
+.. _faq-provisioner-2:
+
 How many provisioners should I run?
 -----------------------------------
-A good rule of thumb is:
+A good rule of thumb is::
 
-C * N * n / S 
+  C * N * n / S 
 
 Where:
 
@@ -61,9 +65,13 @@ Memory limits should also be considered when deciding on the number of provision
 requires roughly 200MB of memory, hence, you may want to consider your system specifications
 when allocating the number of provisioners.
 
+.. _faq-provisioner-3:
+
 Can I increase the number of provisioners on the fly?
 -----------------------------------------------------
 No, you can't in this release. We intend to support it in a future release. 
+
+.. _faq-provisioner-4:
 
 How many resources does each provisioner need?
 ----------------------------------------------
@@ -72,24 +80,34 @@ amount of memory. Nor are they CPU bound. For most of the time, they are idle, w
 finish on a remote host. Currently, each Provisioner can handle one task at a time. In future releases, 
 the Provisioner will support performing multiple tasks currently.
 
+.. _faq-provisioner-5:
+
 Is it possible for multiple provisioners to perform operations on the same node at the same time?
 -------------------------------------------------------------------------------------------------
 During normal operations, there is only one Provisioner performing operation on the machine. In case 
 of failure, the previous operation would be timed out, and a new operation would be started.
+
+.. _faq-provisioner-6:
 
 Can I run different types of provisioners at the same time?
 -----------------------------------------------------------
 Currently, the system doesn't support registration of multiple types of provisoners. All Provisioners are currently 
 expected to be of the same type.
 
+.. _faq-provisioner-7:
+
 Can I customize provisioners?
 -----------------------------
 Yes, you can. Please look for more information :doc:`here</guide/superadmin/plugins>`
+
+.. _faq-provisioner-8:
 
 What happens when I stop a provisioner while it is performing a task?
 ---------------------------------------------------------------------
 The provisioner will attempt to finish any task it is performing before stopping.  This means it may take minutes
 before a provisioner shuts itself down after receiving a kill signal.
+
+.. _faq-provisioner-9:
 
 Can the Chef Solo Automator plugin use a Chef server?
 -----------------------------------------------------

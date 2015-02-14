@@ -15,7 +15,7 @@
 
 :orphan:
 
-.. _faq_toplevel:
+.. _faq-oss:
 
 .. index::
    single: FAQ: Licensing and Open Source
@@ -24,9 +24,13 @@
 Licensing and Open Source 
 ============================
 
+.. _faq-oss-1:
+
 What type of license is Coopr open sourced under?
 -------------------------------------------------------------
 Coopr is licensed under an `Apache 2.0 license <http://www.apache.org/licenses/LICENSE-2.0.html>`_.
+
+.. _faq-oss-2:
 
 How can I contribute?
 ---------------------

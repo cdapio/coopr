@@ -30,10 +30,11 @@ your provisioner, assume each worker takes 256mb of memory. CPU usage is negligi
 periodically sends a heartbeat to the server to tell the system it is alive. Live provisioners may
 get requests from the server to add or remove workers for different tenants.
 
+.. highlight:: xml
+
 Example
 ^^^^^^^^
-Shown below is an example configuration with settings that you are most likely to change.
-::
+Shown below is an example configuration (``provisioner-site.xml``) with some of the optional settings:: 
 
   <configuration>
     <property>
@@ -43,7 +44,7 @@ Shown below is an example configuration with settings that you are most likely t
     </property>
     <property>
       <name>provisioner.server.uri</name>
-      <value>http://localhost:55054</value>
+      <value>http://localhost:55055</value>
       <description>URI of server to connect to</description>
     </property>
     <property>
@@ -56,28 +57,32 @@ Shown below is an example configuration with settings that you are most likely t
       <value>/var/coopr/data/provisioner/work</value>
       <description>Provisioner working directory</description>
     </property>
+    <property>
+      <name>provisioner.register.ip</name>
+      <value>127.0.0.1</value>
+      <description>Routable IP for the server to call back to this provisioner's API</description>
+    </property>
   </configuration>
+  
+**Notes:** Changes to the ``provisioner-site.xml`` file require a restart of the provisioner.
+The provisioner will run with no properties set (an empty ``provisioner-site.xml`` file)
+as all properties have defaults set.
 
-Running Provisioner to use SSL
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Running Provisioner with SSL
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 To configure the provisioner to support server with SSL, add or update this property in ``provisioner-site.xml``::
 
     <property>
       <name>provisioner.server.uri</name>
-      <value>https://localhost:55054</value>
+      <value>https://localhost:55055</value>
       <description>URI of server to connect to</description>
     </property>
 
-To configure the provisioner to support server that uses mutual authentication with SSL,
-setup these environment variables:
 
-====================================     ==========================    =======================================
-   Environment variable                     Default Value                     Description
-====================================     ==========================    =======================================
-TRUST_CERT_PATH                             None                        Trusted certificate file location.
-TRUST_CERT_PASSWORD                         None                        Trusted certificate password.
-====================================     ==========================    =======================================
+.. highlight:: console
+
 
 Configuration
 ^^^^^^^^^^^^^
@@ -90,27 +95,44 @@ A full list of available configuration settings and their default values are giv
    * - Config setting
      - Default
      - Description
-   * - provisioner.server.uri
-     - http://localhost:55054 
-     - URI of server to connect to.
-   * - provisioner.bind.ip
-     - 0.0.0.0
-     - Local IP provisioner should listen on.
-   * - provisioner.bind.port
-     - 55056
-     - Local Port provisioner should listen on.
-   * - provisioner.register.ip
+   * - ``provisioner.server.uri``
+     - ``http://localhost:55055``
+     - URI of server to connect to
+   * - ``provisioner.bind.ip``
+     - ``0.0.0.0``
+     - Local IP provisioner should listen on
+   * - ``provisioner.bind.port``
+     - ``55056``
+     - Local Port provisioner should listen on
+   * - ``provisioner.register.ip``
      - 
-     - Routable IP for the server to call back to this provisioner's API. If left empty, the provisioner will attempt to auto-detect.
-   * - provisioner.data.dir
-     - /var/coopr/data/provisioner/data
+     - Routable IP for the server to call back to this provisioner's API; if left empty,
+       the provisioner will attempt to auto-detect
+   * - ``provisioner.daemonize``
+     - ``false``
+     - Run provisioner as a daemon. Ensure you also specify a log directory
+   * - ``provisioner.data.dir``
+     - ``/var/coopr/data/provisioner/data``
      - Provisioner storage directory for plugin data resources
-   * - provisioner.work.dir
-     - /var/coopr/data/provisioner/work
+   * - ``provisioner.work.dir``
+     - ``/var/coopr/data/provisioner/work``
      - Provisioner working directory
-   * - provisioner.capacity
-     - 10
-     - Max number of running workers for this provisioner. Assume each worker takes 256mb of memory.
-   * - provisioner.heartbeat.interval
-     - 10
+   * - ``provisioner.capacity``
+     - ``10``
+     - Max number of running workers for this provisioner; assume each worker takes 256mb of memory
+   * - ``provisioner.heartbeat.interval``
+     - ``10``
      - Interval in seconds to send heartbeat to server
+   * - ``provisioner.log.dir``
+     -
+     - Provisioner log directory
+   * - ``provisioner.log.rotation.shift.age``
+     - ``7``
+     - number of old log files to keep, or frequency of rotation (daily, weekly, or monthly)
+   * - ``provisioner.log.rotation.shift.size``
+     - ``10485760``
+     - maximum logfile size. only applies when shift.age is a number
+   * - ``provisioner.log.level``
+     - ``info``
+     - log level; one of: debug, info, warn, error, fatal
+

@@ -47,10 +47,10 @@ public interface ClusterStore extends ClusterStoreView {
   ClusterTask getClusterTask(TaskId taskId) throws IOException;
 
   /**
-   * Retrieves tasks according to the {@code query} filters.
+   * Retrieves tasks according to the {@code filter} filters.
    *
-   * @param query the object wrapper around filters
-   * @return list of cluster tasks according to the {@code query} filters
+   * @param filter the object wrapper around filters
+   * @return list of cluster tasks according to the {@code filter} filters
    * @throws IOException if there was a problem getting the cluster task.
    */
   List<ClusterTask> getClusterTasks(ClusterTaskFilter filter) throws IOException;

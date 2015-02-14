@@ -4,7 +4,7 @@
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
-
+ 
        http://www.apache.org/licenses/LICENSE-2.0
 
    Unless required by applicable law or agreed to in writing, software
@@ -13,18 +13,26 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
-.. _overview_release-notes:
+.. _release-notes-0.9.9:
 
-=============
-Release Notes
-=============
+.. index::
+   single: Release Notes
 
-Below are release notes for current and previous releases of Coopr. 
-Release notes with links to issue details can be seen from the github project at https://github.com/caskdata/coopr/releases.
+===================
+0.9.9 Release Notes
+===================
 
-.. toctree::
-   :maxdepth: 1
+Welcome to the Coopr 0.9.9 release. Release notes with links to issue details can be seen
+from the github project at https://github.com/caskdata/coopr/releases.
 
-   release-0.9.9
-   release-0.9.8
-   release-0.9.7
+Release Theme: 
+-----------------------------
+
+Release Highlights
+------------------
+  * 1
+  * 2
+
+Change List
+-----------
+  * 1 (Issues: #xx #xx)

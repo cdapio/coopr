@@ -15,7 +15,7 @@
 
 :orphan:
 
-.. _faq_toplevel:
+.. _faq-general:
 
 .. index::
    single: FAQ: General
@@ -23,6 +23,8 @@
 ====================================
 General
 ====================================
+
+.. _faq-general-1:
 
 What are the differences between Coopr and Ambari/Savanna?
 ---------------------------------------------------------------------
@@ -47,7 +49,7 @@ Even though Coopr may seem similar to Apache Ambari and Savanna in some aspects,
 The graph above depicts Coopr's management capabilities on the horizontal scale, and the table below differentiates the high level features absent in Apache Ambari and Savanna:
 
 .. list-table::
-   :widths: 15 10 15 25
+   :widths: 15 10 10 65
    :header-rows: 1
 
    * - Feature
@@ -57,15 +59,15 @@ The graph above depicts Coopr's management capabilities on the horizontal scale,
    * - Multi Cluster support
      - Y
      - N
-     - Ambari/Savanna offers limited support in the backend, and Ambari limits to single cluster in the frontend.
+     - Ambari/Savanna offers limited support in the backend, and Ambari limits to single cluster in the frontend
    * - Private or Public Cloud support
      - Y
      - N
-     - No provisioning capability in Ambari. Savanna supports provisioning, but both are limited only to Hadoop clusters.
+     - No provisioning capability in Ambari; Savanna supports provisioning, but both are limited only to Hadoop clusters
    * - Support for other OS
      - Y 
      - N
-     - Only supports RHEL and SuSE. More information `AMBARI-1241 <https://issues.apache.org/jira/browse/AMBARI-1241>`_ and `AMBARI-660 <https://issues.apache.org/jira/browse/AMBARI-660>`_
+     - Only supports RHEL and SuSE; More information `AMBARI-1241 <https://issues.apache.org/jira/browse/AMBARI-1241>`_ and `AMBARI-660 <https://issues.apache.org/jira/browse/AMBARI-660>`_
    * - Support any distribution of Hadoop 
      - Y
      - N
@@ -73,7 +75,7 @@ The graph above depicts Coopr's management capabilities on the horizontal scale,
    * - Support for any automation system
      - Y
      - N
-     - Ambari only supports Puppet. Coopr can support any automation framework through :doc:`Provisioner Plugins </guide/superadmin/plugins>`
+     - Ambari only supports Puppet; Coopr can support any automation framework through :doc:`Provisioner Plugins </guide/superadmin/plugins>`
    * - Cluster template support 
      - Y
      - Y/N
@@ -83,10 +85,14 @@ The graph above depicts Coopr's management capabilities on the horizontal scale,
      - N
      - Ambari does not guarantee consistency in case of failures during provisioning. In contrast, Coopr layout planner DAG executioner ensures consistency by transacting operations on the cluster.
 
+.. _faq-general-2:
+
 Does Coopr work with Ambari?
 ---------------------------------------
 Currently there is no integration with Ambari. There are plans to add a feature for Coopr to export templates that are compatible with Apache Ambari blueprints. When this compatibility feature is
 completed in Ambari, you may be able to work with these templates. Please refer to `AMBARI-1783 <https://issues.apache.org/jira/browse/AMBARI-1783>`_ for more information.
+
+.. _faq-general-3:
 
 What are the differences between Coopr and Amazon EMR?
 -----------------------------------------------------------------
@@ -95,9 +101,13 @@ jobs and workflows on top of those services. Coopr, on the other hand, is a soft
 creating clusters of any layout and of any type. Being software agnostic and a provisioning tool, Coopr has no direct support
 for managing jobs on clusters, as its focus is on cluster creation and management, not jobs and workflow management.
 
+.. _faq-general-4:
+
 Will Coopr support Docker based clusters?
 ---------------------------------------------------------------------------
 We believe in the potential of `Docker <http://docker.io>`_ based clusters. In the future releases, we plan to support Docker based clusters.
+
+.. _faq-general-5:
 
 Does Coopr support bare metal?
 ------------------------------------------
@@ -106,24 +116,34 @@ pre-existing machines instead of creating them from scratch each time a new node
 introduce the ability to manage bare metal. Enterprise users with existing hardware procurements systems can write a provisioner
 plugin to interface with their existing systems.
 
+.. _faq-general-6:
+
 What providers are supported by Coopr?
 -------------------------------------------------
 Out of the box, Coopr supports Amazon Web Services (EC2), DigitalOcean, Google Compute Engine, Joyent, OpenStack (and compatible), and Rackspace.
 Plugins for HP Cloud, Cloudstack, BlueBox, CloudFoundry, IBM SoftLayer, and Terremark are planned. Contributions here are welcome and encouraged!
+
+.. _faq-general-7:
 
 Does Coopr make it easy for me to migrate from one cloud to another?
 --------------------------------------------------------------------------------
 Absolutely. When we originally built Coopr at Cask Data, the main goal was to make it a seamless process to migrate from
 one cloud to another.
 
+.. _faq-general-8:
+
 Can Coopr work on my laptop?
 ----------------------------------------
 Coopr has been tested on OS X Mavericks and Linux. There are plans to add Windows support in a future release, but until then
 Windows users will have to use the usual workarounds, such as using Cygwin.
 
+.. _faq-general-9:
+
 How long has Coopr been used in a production environment and where is it being used?
 ------------------------------------------------------------------------------------------------
 A previous version of Coopr has been running in production at Cask Data since Feb 2012.
+
+.. _faq-general-10:
 
 Is Coopr designed only for provisioning compute and storage?
 ------------------------------------------------------------------------
@@ -133,25 +153,35 @@ and configuring of other resources. Please refer to the :doc:`Provisioner Plugin
 for more details on how to write plugins for provisioners to support Providers and Automators that can provision and 
 configure different resources.
 
+.. _faq-general-11:
+
 What is the recommended setup for Coopr in terms of hardware and configuration?
 -------------------------------------------------------------------------------------------
 We recommend the following :doc:`deployment configuration </guide/recommended-deployment>` for a production environment that includes
 HA for persistent store, multiple nodes for Zookeeper, and HAProxy for traffic distribution across UIs and servers.
+
+.. _faq-general-12:
 
 Does Coopr support monitoring and alerting of services deployed?
 ---------------------------------------------------------------------------
 Currently, it does not; however, another system within Cask named Mensa (a monitoring and alerting system) is being integrated
 into Coopr to support monitoring and alerting.
 
+.. _faq-general-13:
+
 Does Coopr support metering?
 ---------------------------------------
 For each account, and the templates from which it provisions resources, Coopr internally keeps track of clusters, resources, and services. This information
 will be exposed through the administration interface in the next release.
 
+.. _faq-general-14:
+
 I use Puppet. Will I be able to use Puppet with Coopr?
 ------------------------------------------------------------------
 Yes. Coopr is a smart orchestration layer with open support for integrating any automation framework. You can use your Puppet modules
 to configure clusters. Please refer to the :doc:`Administration Guide </guide/admin/index>` for more details on how to integrate.
+
+.. _faq-general-15:
 
 Can Coopr support approval workflows or the ability to pause provisioning for approval?
 --------------------------------------------------------------------------------------------------

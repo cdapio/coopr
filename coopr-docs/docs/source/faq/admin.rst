@@ -15,7 +15,7 @@
 
 :orphan:
 
-.. _faq_toplevel:
+.. _faq-admin:
 
 .. index::
    single: FAQ: Coopr Administration
@@ -24,12 +24,16 @@
 Coopr Administration
 ============================
 
+.. _faq-admin-1:
+
 What operations are only available to the admin versus other users?
 -------------------------------------------------------------------
 
 Administrators can access all clusters, whereas users can access only
 clusters they own. Only Administrators have super-user operations such as adding, deleting, 
 and editing cluster templates, providers, images, hardware types and services.
+
+.. _faq-admin-2:
 
 What happens to existing clusters when the template used to create them changes?
 --------------------------------------------------------------------------------
@@ -42,11 +46,15 @@ creation.
 Note that clusters created with the original template will always retain their old configurations. 
 Ability to update the clusters with the modified template is not currently supported.
 
+.. _faq-admin-3:
+
 How can I write configuration settings that reference hostnames of other nodes in the cluster?
 ----------------------------------------------------------------------------------------------
 
 Coopr provides a set of macros that allow you to do this.  See :doc:`Macros</guide/admin/macros>` for more information. 
 
+
+.. _faq-admin-4:
 
 Can I configure clusters to delete themselves after some amount of time?
 ------------------------------------------------------------------------
@@ -54,10 +62,14 @@ Can I configure clusters to delete themselves after some amount of time?
 Cluster templates can define a Lease Duration after which the cluster will be automatically deleted,
 see Creating a Template section in :doc:`Administration User Interface </guide/admin/ui>` for more information.
 
+.. _faq-admin-5:
+
 What is the admin password?
 ---------------------------
 
 The default admin password is 'admin'. 
+
+.. _faq-admin-6:
 
 Any user password works. What are the user passwords for?
 ---------------------------------------------------------
