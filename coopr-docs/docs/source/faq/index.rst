@@ -69,7 +69,7 @@ FAQs
 #. :ref:`What happens when I stop a provisioner while it is performing a task? <faq-provisioner-8>`
 #. :ref:`Can the Chef Solo Automator plugin use a chef server ? <faq-provisioner-9>`
 
-`Coopr Administration <administration.html>`__
+`Coopr Administration <admin.html>`__
 ==============================================
 
 #. :ref:`What operations are only available to the admin versus other users? <faq-admin-1>`
