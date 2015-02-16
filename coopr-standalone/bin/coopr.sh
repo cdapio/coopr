@@ -68,7 +68,7 @@ export COOPR_SERVER_HOME=${COOPR_HOME}/server
 export COOPR_SERVER_CONF=${COOPR_HOME}/server/conf
 export COOPR_PROVISIONER_CONF=${COOPR_HOME}/provisioner/conf
 export PROVISIONER_SITE_CONF=${COOPR_PROVISIONER_CONF}/provisioner-site.xml
-export COOPR_PROVISIONER_PLUGIN_DIR=${COOPR_HOME}/provisioner/worker/plugins
+export COOPR_PROVISIONER_PLUGIN_DIR=${COOPR_HOME}/provisioner/lib/provisioner/worker/plugins
 export COOPR_LOG_DIR=${COOPR_HOME}/logs
 export COOPR_DATA_DIR=${COOPR_HOME}/data
 
