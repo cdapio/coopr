@@ -156,9 +156,8 @@ represents failure. A raised exception will also result in failure.
 
 Additionally, your provider plugin will likely need to return information such as a machine's ID, SSH credentials and
 public IP, so that it can be used in subsequent tasks. Special facilities exist for reporting the machine's hostname and
-IP addresses, so that they can be reference by :doc:`macros </guide/admin/macros>`. To report a machine's hostname or
-IP addresses, populate the following fields:
-::
+IP addresses, so that they can be referenced by :doc:`macros </guide/admin/macros>`. To report a machine's hostname or
+IP addresses, populate the following fields::
 
   @result['hostname'] = 'some.provider.generated.hostname'
   @result['ipaddresses'] = {
@@ -169,7 +168,7 @@ IP addresses, populate the following fields:
 where ``access_v4`` is the machine's publicly routable IP address and ``bind_v4`` is the machine's private, internal
 interface. These entries are all optional.
 
-For any other arbitrary data which should be stored for use by subsequent tasks, simply write the results as key-value pairs underneath
+For any other arbitrary data which should be stored for use by subsequent tasks, simply write the results as key-value pairs following 
 the line ``@result['result']['key'] = 'value'``. Subsequent tasks will then contain this information in ``config``, for
 example ``@task['config']['key'] = 'value'``. By convention, most plugins should reuse the following fields:
 ::
@@ -181,10 +180,9 @@ example ``@task['config']['key'] = 'value'``. By convention, most plugins should
 Writing an Automator plugin
 ---------------------------
 
-An automator plugin must extend from the base ``Coopr::Plugin::Automator`` class and implement seven methods: ``bootstrap``, ``install``, ``configure``, ``init``, ``start``, ``stop``, and ``remove``. Each of these methods are called with a hash of key-value pairs. This hash is pre-populated with useful attributes such as ``hostname``, ``ipaddress``, and a hash of ssh credentials. Additionally, the ``fields`` attribute will contain a hash of the custom fields that are defined by each plugin (more on this below). Note that your implementation can also refer to the ``@task`` instance variable, which contains the entire input for this task.
+An automator plugin must extend from the base ``Coopr::Plugin::Automator`` class and implement seven methods: ``bootstrap``, ``install``, ``configure``, ``init``, ``start``, ``stop``, and ``remove``. Each of these methods are called with a hash of key-value pairs. This hash is pre-populated with useful attributes such as ``hostname``, ``ipaddress``, and a hash of SSH credentials. Additionally, the ``fields`` attribute will contain a hash of the custom fields that are defined by each plugin (more on this below). Note that your implementation can also refer to the ``@task`` instance variable, which contains the entire input for this task.
 
-Below is a skeleton for an automator plugin:
-::
+Below is a skeleton for an automator plugin::
 
   #!/usr/bin/env ruby
 
@@ -273,16 +271,14 @@ Note that the bootstrap step is unique in that it is not tied to a service. Sinc
 Logging and Capturing Output
 ----------------------------
 
-During execution, a plugin can write to the provisioner's instance of the Ruby standard logger using the 'log' method:
-::
+During execution, a plugin can write to the provisioner's instance of the Ruby standard logger using the 'log' method::
 
   log.debug "my message"
   log.info "my message"
   log.warn "my warning message"
   log.error "my error message"
 
-Additionally, each task can return strings representing ``stdout`` and ``stderr`` to be displayed on the Coopr UI. Simply return the values:
-::
+Additionally, each task can return strings representing ``stdout`` and ``stderr`` to be displayed on the Coopr UI. Simply return the values::
 
   @result['stdout'] = "my captured stdout message"
   @result['stderr'] = "my captured stderr message"
@@ -302,8 +298,7 @@ Custom fields allow a plugin to announce the fields that it requires. For exampl
 
 Plugin resources specify files or archives that can be used by plugins to perform tasks. For example, the Chef Automator plugin uses cookbooks, data bags, and roles, while the Shell Automator plugin uses scripts and archives. Administrators can then upload and manage resources as needed. For example, an administrator may want to add support for a new service without having to update the plugin. To do so, the administrator can make a cookbook that manages the service, upload it, then sync it so it becomes available for plugins to use. 
 
-For example, consider the JSON definition file for a Rackspace provider plugin:
-::
+For example, consider the JSON definition file for a Rackspace provider plugin::
 
     {
         "name": "rackspace",
@@ -363,9 +358,8 @@ This JSON defines a single plugin which contains a single providertype named "ra
   * ``override``: specifies whether or not a field defined in an admin block can be overridden by the user during cluster creation. default: false
 
 Note that a single plugin may contain multiple providertypes and automatortypes. The top-level ``providertypes`` and ``automatortypes`` arrays 
-should list them all, then each will have a corresponding JSON element where the classname and custom fields are defined. Coopr ships with several 
-provider plugins bundled together into a single ``FogProvider`` plugin. Its definition looks like the following:
-::
+should list them all, with each having a corresponding JSON element where the classname and custom fields are defined. Coopr ships with several 
+provider plugins bundled together into a single ``FogProvider`` plugin. Its definition looks like the following::
 
     {
         "name": "fog",
@@ -396,10 +390,7 @@ provider plugins bundled together into a single ``FogProvider`` plugin. Its defi
 Loading Your Plugin
 -------------------
 
-When the provisioner starts up, it will scan its directories looking for JSON definition files. In order for your plugin to be loaded, it needs to adhere to the following directory structure.
-
-Below is an example directory structure:
-::
+When the provisioner starts up, it will scan its directories looking for JSON definition files. In order for your plugin to be loaded, it needs to adhere to the following directory structure::
 
   $COOPR_HOME/
       provisioner/
@@ -427,8 +418,7 @@ When writing a custom plugin, please consider the following:
 Registering Your Plugin
 -----------------------
 
-The Coopr Server needs to be aware of the installed provisioner plugins and their collective list of providertypes and automatortypes. This can currently be done by starting a provisioner with the ``--register`` argument. For example:
-::
+The Coopr Server needs to be aware of the installed provisioner plugins and their collective list of providertypes and automatortypes. This can currently be done by starting a provisioner with the ``--register`` argument. For example::
 
   $COOPR_HOME/provisioner/bin/provisioner.sh --register
 
