@@ -166,7 +166,7 @@ IP addresses, populate the following fields::
   }
 
 where ``access_v4`` is the machine's publicly routable IP address and ``bind_v4`` is the machine's private, internal
-interface. These entries are all optional.
+interface. Adding these entries is optional.
 
 For any other arbitrary data which should be stored for use by subsequent tasks, simply write the results as key-value pairs following 
 the line ``@result['result']['key'] = 'value'``. Subsequent tasks will then contain this information in ``config``, for
