@@ -32,7 +32,7 @@ releases of Coopr will make it secure and more reliable for provisioning
 clusters. This document describes how we are planning to secure different aspects of
 Coopr.
 
-.. figure:: security-diagram.png
+.. figure:: /_images/security-diagram.png
     :align: right
     :width: 800px
     :alt: Coopr architecture and security

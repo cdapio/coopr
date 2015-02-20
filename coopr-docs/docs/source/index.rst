@@ -70,7 +70,6 @@ Indices and tables
    /guide/admin/admin-links
    /installation/openstack-config
    /guide/recommended-deployment
-   /includes/footer
    /misc/jboss-automator-script
    /overview/design-goals
    /overview/licenses
