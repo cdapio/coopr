@@ -2,7 +2,7 @@
  * myProviderFields
  */
 
-angular.module(PKG.name+'.commons').directive('myProviderFields', 
+angular.module(PKG.name+'.commons').directive('myProviderFields',
 function myProviderFieldsDirective () {
   return {
     restrict: 'E',
@@ -54,6 +54,11 @@ function myProviderFieldsDirective () {
 
         $scope.model = model;
 
+        angular.forEach($scope.provider.provisioner, function (v, k) {
+          if(v!=='') {
+            $scope.model[k] = v;
+          }
+        });
       }
 
 
