@@ -16,6 +16,7 @@
 # to use, run:
 # mysql -u $user -p -h $hostname $dbname < upgrade-tables-pre0.9.9-to-0.9.9.sql
 
+# Resource versioning (COOPR-617)
 ALTER TABLE `providerTypes` ADD version BIGINT NOT NULL DEFAULT 1 AFTER name;
 ALTER TABLE `automatorTypes` ADD version BIGINT NOT NULL DEFAULT 1 AFTER name;
 ALTER TABLE `providers` ADD version BIGINT NOT NULL DEFAULT 1 AFTER name;
@@ -38,3 +39,19 @@ ALTER TABLE `services` DROP PRIMARY KEY;
 ALTER TABLE `services` ADD PRIMARY KEY (name, version, tenant_id);
 ALTER TABLE `clusterTemplates` DROP PRIMARY KEY;
 ALTER TABLE `clusterTemplates` ADD PRIMARY KEY (name, version, tenant_id);
+
+# Node hours API (COOPR-581)
+ALTER TABLE `tasks`
+    ADD type VARCHAR(64) AFTER status,
+    ADD cluster_template_name VARCHAR(255) AFTER type,
+    ADD user_id VARCHAR(255) after cluster_template_name,
+    ADD tenant_id VARCHAR(64) after user_id;
+
+# Partial Templates (COOPR-653)
+CREATE TABLE IF NOT EXISTS partialTemplates (
+    name VARCHAR(255),
+    version BIGINT,
+    tenant_id VARCHAR(64),
+    partialTemplate MEDIUMBLOB,
+    PRIMARY KEY (name, version, tenant_id)
+) ENGINE = InnoDB;
