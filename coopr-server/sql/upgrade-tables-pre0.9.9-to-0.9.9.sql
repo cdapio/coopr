@@ -16,44 +16,25 @@
 # to use, run:
 # mysql -u $user -p -h $hostname $dbname < upgrade-tables-pre0.9.9-to-0.9.9.sql
 
-IF NOT EXISTS(SELECT * FROM sys.columns WHERE Name = N'version' AND OBJECT_ID = OBJECT_ID(N'providerTypes'))
-BEGIN
-  ALTER TABLE providerTypes ADD version BIGINT AFTER name;
-  UPDATE providerTypes SET version = 1;
-END
+ALTER TABLE `providerTypes` ADD version BIGINT NOT NULL DEFAULT 1 AFTER name;
+ALTER TABLE `automatorTypes` ADD version BIGINT NOT NULL DEFAULT 1 AFTER name;
+ALTER TABLE `providers` ADD version BIGINT NOT NULL DEFAULT 1 AFTER name;
+ALTER TABLE `hardwareTypes` ADD version BIGINT NOT NULL DEFAULT 1 AFTER name;
+ALTER TABLE `imageTypes` ADD version BIGINT NOT NULL DEFAULT 1 AFTER name;
+ALTER TABLE `services` ADD version BIGINT NOT NULL DEFAULT 1 AFTER name;
+ALTER TABLE `clusterTemplates` ADD version BIGINT NOT NULL DEFAULT 1 AFTER name;
 
-IF NOT EXISTS(SELECT * FROM sys.columns WHERE Name = N'version' AND OBJECT_ID = OBJECT_ID(N'automatorTypes'))
-BEGIN
-  ALTER TABLE automatorTypes ADD version BIGINT AFTER name;
-  UPDATE automatorTypes SET version = 1;
-END
-
-IF NOT EXISTS(SELECT * FROM sys.columns WHERE Name = N'version' AND OBJECT_ID = OBJECT_ID(N'providers'))
-BEGIN
-  ALTER TABLE providers ADD version BIGINT AFTER name;
-  UPDATE providers SET version = 1;
-END
-
-IF NOT EXISTS(SELECT * FROM sys.columns WHERE Name = N'version' AND OBJECT_ID = OBJECT_ID(N'hardwareTypes'))
-BEGIN
-  ALTER TABLE hardwareTypes ADD version BIGINT AFTER name;
-  UPDATE hardwareTypes SET version = 1;
-END
-
-IF NOT EXISTS(SELECT * FROM sys.columns WHERE Name = N'version' AND OBJECT_ID = OBJECT_ID(N'imageTypes'))
-BEGIN
-  ALTER TABLE imageTypes ADD version BIGINT AFTER name;
-  UPDATE imageTypes SET version = 1;
-END
-
-IF NOT EXISTS(SELECT * FROM sys.columns WHERE Name = N'version' AND OBJECT_ID = OBJECT_ID(N'services'))
-BEGIN
-  ALTER TABLE services ADD version BIGINT AFTER name;
-  UPDATE services SET version = 1;
-END
-
-IF NOT EXISTS(SELECT * FROM sys.columns WHERE Name = N'version' AND OBJECT_ID = OBJECT_ID(N'clusterTemplates'))
-BEGIN
-  ALTER TABLE clusterTemplates ADD version BIGINT AFTER name;
-  UPDATE clusterTemplates SET version = 1;
-END
+ALTER TABLE `providerTypes` DROP PRIMARY KEY;
+ALTER TABLE `providerTypes` ADD PRIMARY KEY (name, version, tenant_id);
+ALTER TABLE `automatorTypes` DROP PRIMARY KEY;
+ALTER TABLE `automatorTypes` ADD PRIMARY KEY (name, version, tenant_id);
+ALTER TABLE `providers` DROP PRIMARY KEY;
+ALTER TABLE `providers` ADD PRIMARY KEY (name, version, tenant_id);
+ALTER TABLE `hardwareTypes` DROP PRIMARY KEY;
+ALTER TABLE `hardwareTypes` ADD PRIMARY KEY (name, version, tenant_id);
+ALTER TABLE `imageTypes` DROP PRIMARY KEY;
+ALTER TABLE `imageTypes` ADD PRIMARY KEY (name, version, tenant_id);
+ALTER TABLE `services` DROP PRIMARY KEY;
+ALTER TABLE `services` ADD PRIMARY KEY (name, version, tenant_id);
+ALTER TABLE `clusterTemplates` DROP PRIMARY KEY;
+ALTER TABLE `clusterTemplates` ADD PRIMARY KEY (name, version, tenant_id);
