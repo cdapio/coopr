@@ -55,3 +55,11 @@ CREATE TABLE IF NOT EXISTS partialTemplates (
     partialTemplate MEDIUMBLOB,
     PRIMARY KEY (name, version, tenant_id)
 ) ENGINE = InnoDB;
+
+# Support sensitive = true for encrypted fields
+CREATE TABLE IF NOT EXISTS sensitiveFields (
+    tenant_id VARCHAR(64),
+    cluster_id VARCHAR(255),
+    fields MEDIUMBLOB,
+    PRIMARY KEY (tenant_id, cluster_id)
+) ENGINE = InnoDB;
