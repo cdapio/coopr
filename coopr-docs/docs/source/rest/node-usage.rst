@@ -87,6 +87,7 @@ of the json results returned when running a general api node usage call 60 secon
 {"start":1424475097,"end":1424486443,"data":[{"time":1424475097,"value":31872}]}
 {"start":1424475097,"end":1424486503,"data":[{"time":1424475097,"value":32112}]}
 
+-----
 
 Time Ranges
 ^^^^^^^^^^^
@@ -98,6 +99,7 @@ Unix time may be checked on most Unix systems by typing date +%s on the command 
 In the general usage example, in the json response to general node hour usage, we see the start and end values
 returned.  If start and end are not specified, 
 
+-----
 
 start time only
 """""""""""""""
@@ -113,6 +115,7 @@ $ curl -H 'Coopr-UserID:admin'
        
 $ {"start":1424393580,"end":1424485774,"data":[{"time":1424393580,"value":29199}]}
        
+-----
  
 end time only
 """""""""""""
@@ -126,6 +129,7 @@ $ curl -H 'Coopr-UserID:admin'
  
 $ {"start":1424475097,"end":1424482780,"data":[{"time":1424475097,"value":17220}]}
         
+-----
 
 time range (start and end time)
 """""""""""""""""""""""""""""""
