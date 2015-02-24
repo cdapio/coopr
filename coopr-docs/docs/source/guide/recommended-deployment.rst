@@ -23,7 +23,7 @@ Deployment
 Logical Deployment
 ===================
 
-.. figure:: logical-deployment.png
+.. figure:: /_images/logical-deployment.png
     :align: center
     :width: 800px
     :alt: Logical Deployment
