@@ -18,8 +18,8 @@
 .. index::
    single: Metrics 
 
-=========
-# Metrics
+==================
+Metrics
 =========
 
 .. include:: /rest/rest-links.rst
@@ -29,7 +29,8 @@ Admins are able to get metrics, such as the number of tasks that are in progress
 .. _metrics-node-usage:
 
 
-## Get Node Usage Metrics
+Get Node Usage Metrics
+=========================
 
 To get node usage metrics, HTTP GET request to URI:
 ::
@@ -40,7 +41,8 @@ Only admins are allowed to get node usage metrics. Tenant admins will see metric
 whereas the superadmin will get metrics for all tenant nodes.
 
 
-## HTTP Responses
+HTTP Responses
+==============
 
 
 The response will be a JSON Object with start and end time as keys, and the node usage metrics as the values.
@@ -60,12 +62,15 @@ based on the selected criteria.
 
 
 
-=======
-
-# API Endpoints and Examples
+--------------
 
 
-## General usage
+API Endpoints and Examples
+==========================
+
+
+General usage
+^^^^^^^^^^^^^
 
 .. code-block:: bash
 
@@ -77,7 +82,6 @@ based on the selected criteria.
  $ {"start":1424475097,"end":1424485733,"data":[{"time":1424475097,"value":29035}]}
 
 The value at the end of the resulting json here, is the number of node seconds for all nodes combined.
-##### Add an explanation of what start and end time are in the result json
 
 As an example, if you have a 3 node cluster and a 1 node cluster (total 4 nodes), every 60 seconds, 
 you will have 240 (4 nodes x 60 seconds) additional node seconds.  The following two lines are examples
@@ -86,8 +90,8 @@ of the json results returned when running a general api node usage call 60 secon
 {"start":1424475097,"end":1424486503,"data":[{"time":1424475097,"value":32112}]}
 
 
-## Time Ranges
-
+Time Ranges
+^^^^^^^^^^^
 
 Start and end values are expressed in Unix time (a.k.a. seconds since epoch, or the beginning of Unix time: 
 00:00:00 Coordinated Universal Time (UTC), Thursday, 1 January 1970).  
@@ -97,7 +101,8 @@ In the general usage example, in the json response to general node hour usage, w
 returned.  If start and end are not specified, 
 
 
-### start time only
+start time only
+"""""""""""""""
 
 To obtain node usage hours since a specific date and time, we would add 'start=x' where x is Unix time.
 
@@ -111,7 +116,8 @@ $ curl -H 'Coopr-UserID:admin'
 $ {"start":1424393580,"end":1424485774,"data":[{"time":1424393580,"value":29199}]}
        
  
-### end time only
+end time only
+"""""""""""""
 
 .. code-block:: bash
 
@@ -123,7 +129,8 @@ $ curl -H 'Coopr-UserID:admin'
 $ {"start":1424475097,"end":1424482780,"data":[{"time":1424475097,"value":17220}]}
         
 
-### time range (start and end time)
+time range (start and end time)
+"""""""""""""""""""""""""""""""
        
 .. code-block:: bash
  
@@ -136,7 +143,8 @@ $ {"start":1424481097,"end":1424486196,"data":[{"time":1424481097,"value":20396}
 
 
 
-## Specify a user
+Specify a user
+^^^^^^^^^^^^^^
 
 .. code-block:: bash
 
@@ -148,7 +156,8 @@ $ curl -H 'Coopr-UserID:admin'
 $ {"start":1424475097,"end":1424486266,"data":[{"time":1424475097,"value":31164}]}
 
 
-## Specify a tenant
+Specify a tenant
+^^^^^^^^^^^^^^^^
 
 .. code-block:: bash
 
