@@ -18,9 +18,9 @@
 .. index::
    single: Metrics 
 
-==================
+=======
 Metrics
-=========
+=======
 
 .. include:: /rest/rest-links.rst
 
@@ -30,7 +30,7 @@ Admins are able to get metrics, such as the number of tasks that are in progress
 
 
 Get Node Usage Metrics
-=========================
+======================
 
 To get node usage metrics, HTTP GET request to URI:
 ::
@@ -165,7 +165,6 @@ $ curl -H 'Coopr-UserID:admin'
        http://<server>:<port>/<version>/metrics/nodes/usage?tenant=superadmin
        
 $ {"start":1424475097,"end":1424486290,"data":[{"time":1424475097,"value":31260}]} 
-
 
 
 
