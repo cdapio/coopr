@@ -18,7 +18,7 @@
 .. index::
    single: Metrics 
 
-=================
+=========
 # Metrics
 =========
 
@@ -36,7 +36,6 @@ To get node usage metrics, HTTP GET request to URI:
 
 /metrics/nodes/usage
 
-######*VERIFY THIS*:
 Only admins are allowed to get node usage metrics. Tenant admins will see metrics for their own nodes,
 whereas the superadmin will get metrics for all tenant nodes.
 
