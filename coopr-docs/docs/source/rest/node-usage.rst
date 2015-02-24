@@ -44,7 +44,6 @@ whereas the superadmin will get metrics for all tenant nodes.
 HTTP Responses
 ==============
 
-
 The response will be a JSON Object with start and end time as keys, and the node usage metrics as the values.
 node usage metrics include the key value pairs entered as parameters, followed by the resulting node hour usage
 based on the selected criteria.
@@ -59,7 +58,6 @@ based on the selected criteria.
      - If update was successful
    * - 403 (FORBIDDEN)
      - If the user is forbidden from getting node usage metrics.
-
 
 
 --------------
