@@ -139,6 +139,9 @@ The value at the end of the resulting json here, is the number of node seconds f
 As an example, if you have a 3 node cluster and a 1 node cluster (total 4 nodes), every 60 seconds,
 you will have 240 (4 nodes x 60 seconds) additional node seconds.  The following two lines are examples
 of the json results returned when running a general api node usage call 60 seconds apart:
+
+.. code-block:: bash
+
 {"start":1424475097,"end":1424486443,"data":[{"time":1424475097,"value":31872}]}
 {"start":1424475097,"end":1424486503,"data":[{"time":1424475097,"value":32112}]}
 
@@ -153,7 +156,8 @@ Start and end values are expressed in Unix time (a.k.a. seconds since epoch, or 
 Unix time may be checked on most Unix systems by typing date +%s on the command line.
 
 In the general usage example, in the json response to general node hour usage, we see the start and end values
-returned.  If start and end are not specified,
+returned. If start and end are not specified, the start time is the exact date and time when the very first 
+task (ever) completes. The end date is the current date and time.
 
 -----
 
