@@ -115,7 +115,6 @@ based on the selected criteria.
      - If the user is forbidden from getting node usage metrics.
 
 
---------------
 
 
 API Endpoints and Examples
@@ -134,6 +133,7 @@ General usage
 
  $ {"start":1424475097,"end":1424485733,"data":[{"time":1424475097,"value":29035}]}
 
+
 The value at the end of the resulting json here, is the number of node seconds for all nodes combined.
 
 As an example, if you have a 3 node cluster and a 1 node cluster (total 4 nodes), every 60 seconds,
@@ -142,10 +142,9 @@ of the json results returned when running a general api node usage call 60 secon
 
 .. code-block:: bash
 
-{"start":1424475097,"end":1424486443,"data":[{"time":1424475097,"value":31872}]}
-{"start":1424475097,"end":1424486503,"data":[{"time":1424475097,"value":32112}]}
+ {"start":1424475097,"end":1424486443,"data":[{"time":1424475097,"value":31872}]}
+ {"start":1424475097,"end":1424486503,"data":[{"time":1424475097,"value":32112}]}
 
------
 
 
 Time Ranges
@@ -159,7 +158,6 @@ In the general usage example, in the json response to general node hour usage, w
 returned. If start and end are not specified, the start time is the exact date and time when the very first 
 task (ever) completes. The end date is the current date and time.
 
------
 
 start time only
 ^^^^^^^^^^^^^^^
@@ -168,40 +166,38 @@ To obtain node usage hours since a specific date and time, we would add 'start=x
 
 .. code-block:: bash
 
-$ curl -H 'Coopr-UserID:admin'
-       -H 'Coopr-ApiKey:<apikey>'
-       -H 'Coopr-TenantID:superadmin'
-       http://<server>:<port>/<version>/metrics/nodes/usage?start=1424393580
+ $ curl -H 'Coopr-UserID:admin'
+        -H 'Coopr-ApiKey:<apikey>'
+        -H 'Coopr-TenantID:superadmin'
+        http://<server>:<port>/<version>/metrics/nodes/usage?start=1424393580
+ 
+ $ {"start":1424393580,"end":1424485774,"data":[{"time":1424393580,"value":29199}]}
 
-$ {"start":1424393580,"end":1424485774,"data":[{"time":1424393580,"value":29199}]}
-
------
 
 end time only
 ^^^^^^^^^^^^^
 
 .. code-block:: bash
 
-$ curl -H 'Coopr-UserID:admin'
-       -H 'Coopr-ApiKey:<apikey>'
-       -H 'Coopr-TenantID:superadmin'
-       http://<server>:<port>/<version>/metrics/nodes/usage?end=1424482780
+ $ curl -H 'Coopr-UserID:admin'
+        -H 'Coopr-ApiKey:<apikey>'
+        -H 'Coopr-TenantID:superadmin'
+        http://<server>:<port>/<version>/metrics/nodes/usage?end=1424482780
+ 
+ $ {"start":1424475097,"end":1424482780,"data":[{"time":1424475097,"value":17220}]}
 
-$ {"start":1424475097,"end":1424482780,"data":[{"time":1424475097,"value":17220}]}
-
------
 
 time range (start and end time)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: bash
 
-$ curl -H 'Coopr-UserID:admin'
-       -H 'Coopr-ApiKey:<apikey>'
-       -H 'Coopr-TenantID:superadmin'
-       http://<server>:<port>/<version>/metrics/nodes/usage?start=1424481097&end=1424482780
-
-$ {"start":1424481097,"end":1424486196,"data":[{"time":1424481097,"value":20396}]}
+ $ curl -H 'Coopr-UserID:admin'
+        -H 'Coopr-ApiKey:<apikey>'
+        -H 'Coopr-TenantID:superadmin'
+        http://<server>:<port>/<version>/metrics/nodes/usage?start=1424481097&end=1424482780
+ 
+ $ {"start":1424481097,"end":1424486196,"data":[{"time":1424481097,"value":20396}]}
 
 
 
@@ -210,12 +206,12 @@ Specify a user
 
 .. code-block:: bash
 
-$ curl -H 'Coopr-UserID:admin'
-       -H 'Coopr-ApiKey:<apikey>'
-       -H 'Coopr-TenantID:superadmin'
-       http://<server>:<port>/<version>/metrics/nodes/usage?user=admin
-
-$ {"start":1424475097,"end":1424486266,"data":[{"time":1424475097,"value":31164}]}
+ $ curl -H 'Coopr-UserID:admin'
+        -H 'Coopr-ApiKey:<apikey>'
+        -H 'Coopr-TenantID:superadmin'
+        http://<server>:<port>/<version>/metrics/nodes/usage?user=admin
+ 
+ $ {"start":1424475097,"end":1424486266,"data":[{"time":1424475097,"value":31164}]}
 
 
 Specify a tenant
@@ -223,13 +219,11 @@ Specify a tenant
 
 .. code-block:: bash
 
-$ curl -H 'Coopr-UserID:admin'
-       -H 'Coopr-ApiKey:<apikey>'
-       -H 'Coopr-TenantID:superadmin'
-       http://<server>:<port>/<version>/metrics/nodes/usage?tenant=superadmin
-
-$ {"start":1424475097,"end":1424486290,"data":[{"time":1424475097,"value":31260}]}
-
-
+ $ curl -H 'Coopr-UserID:admin'
+        -H 'Coopr-ApiKey:<apikey>'
+        -H 'Coopr-TenantID:superadmin'
+        http://<server>:<port>/<version>/metrics/nodes/usage?tenant=superadmin
+ 
+ $ {"start":1424475097,"end":1424486290,"data":[{"time":1424475097,"value":31260}]}
 
 
