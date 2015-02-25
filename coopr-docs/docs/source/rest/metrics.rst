@@ -159,10 +159,10 @@ returned. If start and end are not specified, the start time is the exact date a
 task (ever) completes. The end date is the current date and time.
 
 
-start time only
+Start Time only
 ^^^^^^^^^^^^^^^
 
-To obtain node usage hours since a specific date and time, we would add 'start=x' where x is Unix time.
+To obtain node usage hours since a specific date and time, we would add ``start=x`` where x is Unix time.
 
 .. code-block:: bash
 
@@ -174,7 +174,7 @@ To obtain node usage hours since a specific date and time, we would add 'start=x
  $ {"start":1424393580,"end":1424485774,"data":[{"time":1424393580,"value":29199}]}
 
 
-end time only
+End Time only
 ^^^^^^^^^^^^^
 
 .. code-block:: bash
@@ -187,7 +187,7 @@ end time only
  $ {"start":1424475097,"end":1424482780,"data":[{"time":1424475097,"value":17220}]}
 
 
-time range (start and end time)
+Time Range (Start and End Time)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: bash
