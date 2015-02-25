@@ -138,22 +138,28 @@ Yum
 ---
 To install each of the Coopr components locally from a Yum package:
 
-.. parsed-literal::
+.. role:: gp
+.. |$| replace:: :gp:`$`
+   
+.. container:: highlight
 
-  $ sudo yum localinstall coopr-server-|version|.el6.x86_64.rpm
-  $ sudo yum localinstall coopr-provisioner-|version|.el6.x86_64.rpm
-  $ sudo yum localinstall coopr-ui-|version|.el6.x86_64.rpm
-
+  .. parsed-literal::
+   
+    |$| sudo yum localinstall coopr-server-|version|.el6.x86_64.rpm
+    |$| sudo yum localinstall coopr-provisioner-|version|.el6.x86_64.rpm
+    |$| sudo yum localinstall coopr-ui-|version|.el6.x86_64.rpm
 
 Debian
 ------
 To install each of the Coopr components locally from a Debian package:
 
-.. parsed-literal::
+.. container:: highlight
 
-  $ sudo dpkg -i coopr-server_|version|.ubuntu.12.04_amd64.deb
-  $ sudo dpkg -i coopr-provisioner_|version|.ubuntu.12.04_amd64.deb
-  $ sudo dpkg -i coopr-ui_|version|.ubuntu.12.04_amd64.deb
+  .. parsed-literal::
+
+    |$| sudo dpkg -i coopr-server\_\ |version|.ubuntu.12.04_amd64.deb
+    |$| sudo dpkg -i coopr-provisioner\_\ |version|.ubuntu.12.04_amd64.deb
+    |$| sudo dpkg -i coopr-ui\_\ |version|.ubuntu.12.04_amd64.deb
 
 .. _installation-repository:
 
@@ -164,7 +170,7 @@ RPM using Yum
 -------------
 Download the Cask Yum repo definition file::
 
-  sudo curl -o /etc/yum.repos.d/cask.repo http://repository.cask.co/downloads/centos/6/x86_64/cask.repo
+  $ sudo curl -o /etc/yum.repos.d/cask.repo http://repository.cask.co/downloads/centos/6/x86_64/cask.repo
 
 This will create the file ``/etc/yum.repos.d/cask.repo`` with::
 
@@ -198,7 +204,7 @@ This will create the file ``/etc/apt/sources.list.d/cask.list`` with::
 
 Add the Cask Public GPG Key to your repository::
 
-  curl -s http://repository.cask.co/ubuntu/precise/amd64/releases/pubkey.gpg | sudo apt-key add -
+  $ curl -s http://repository.cask.co/ubuntu/precise/amd64/releases/pubkey.gpg | sudo apt-key add -
 
 Instructions for installing each of the Coopr components are as below::
 
