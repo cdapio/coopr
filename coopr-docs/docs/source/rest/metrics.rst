@@ -30,13 +30,15 @@ Admins are able to get metrics, such as node usage and the number of tasks that 
 
 Get Task Queue Metrics
 ==========================
-To get task queue metrics, HTTP GET request to URI:
+
+To retrieve task queue metrics, issue an HTTP GET request to the URI:
 ::
 
  /metrics/queues
 
-Only admins are allowed to get queue metrics. Tenant admins will see metrics for their own queue,
-whereas the superadmin will get metrics for all tenant queues.
+Only admins are allowed to retrieve node usage metrics. Tenant admins will see metrics for their own nodes,
+while the superadmin tenant will see metrics for all tenant nodes.
+
 
 HTTP Responses
 --------------
@@ -87,10 +89,10 @@ Example
 Get Node Usage Metrics
 ======================
 
-To get node usage metrics, HTTP GET request to URI:
+To retrieve node usage metrics, issue an HTTP GET request to the URI:
 ::
 
-/metrics/nodes/usage
+ /metrics/nodes/usage
 
 Only admins are allowed to get node usage metrics. Tenant admins will see metrics for their own nodes,
 whereas the superadmin will get metrics for all tenant nodes.
@@ -100,7 +102,7 @@ HTTP Responses
 ==============
 
 The response will be a JSON Object with start and end time as keys, and the node usage metrics as the values.
-node usage metrics include the key value pairs entered as parameters, followed by the resulting node hour usage
+node usage metrics include the key-value pairs entered as parameters, followed by the resulting node hour usage
 based on the selected criteria.
 
 .. list-table::
@@ -121,7 +123,7 @@ API Endpoints and Examples
 ==========================
 
 
-General usage
+General Usage
 -------------
 
 .. code-block:: bash
@@ -134,11 +136,11 @@ General usage
  $ {"start":1424475097,"end":1424485733,"data":[{"time":1424475097,"value":29035}]}
 
 
-The value at the end of the resulting json here, is the number of node seconds for all nodes combined.
+The value at the end of the resulting JSON is the number of node seconds for all nodes combined.
 
 As an example, if you have a 3 node cluster and a 1 node cluster (total 4 nodes), every 60 seconds,
 you will have 240 (4 nodes x 60 seconds) additional node seconds.  The following two lines are examples
-of the json results returned when running a general api node usage call 60 seconds apart:
+of the JSON results returned when running a general API node usage call every 60 seconds:
 
 .. code-block:: bash
 
@@ -152,17 +154,17 @@ Time Ranges
 
 Start and end values are expressed in Unix time (a.k.a. seconds since epoch, or the beginning of Unix time:
 00:00:00 Coordinated Universal Time (UTC), Thursday, 1 January 1970).
-Unix time may be checked on most Unix systems by typing date +%s on the command line.
+Unix time may be checked on most Unix systems by typing ``date +%s`` on the command line.
 
-In the general usage example, in the json response to general node hour usage, we see the start and end values
-returned. If start and end are not specified, the start time is the exact date and time when the very first 
-task (ever) completes. The end date is the current date and time.
+With the general usage example, the JSON response to general node hour usage shows the start and end values returned. 
+If the start is not specified, the start time is the exact date and time when the very first 
+task (ever) completes. The end date, if not specified, is the current date and time.
 
 
-Start Time only
+Start Time Only
 ^^^^^^^^^^^^^^^
 
-To obtain node usage hours since a specific date and time, we would add ``start=x`` where x is Unix time.
+To obtain node usage hours since a specific date and time, we would add ``start=x`` where x is a Unix time.
 
 .. code-block:: bash
 
@@ -174,7 +176,7 @@ To obtain node usage hours since a specific date and time, we would add ``start=
  $ {"start":1424393580,"end":1424485774,"data":[{"time":1424393580,"value":29199}]}
 
 
-End Time only
+End Time Only
 ^^^^^^^^^^^^^
 
 .. code-block:: bash
@@ -201,8 +203,8 @@ Time Range (Start and End Time)
 
 
 
-Specify a user
---------------
+Specifying a User
+-----------------
 
 .. code-block:: bash
 
@@ -214,8 +216,8 @@ Specify a user
  $ {"start":1424475097,"end":1424486266,"data":[{"time":1424475097,"value":31164}]}
 
 
-Specify a tenant
-----------------
+Specifying a Tenant
+-------------------
 
 .. code-block:: bash
 
