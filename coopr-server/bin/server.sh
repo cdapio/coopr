@@ -28,6 +28,7 @@ APP_NAME="coopr-server"
 COOPR_SERVER_CONF=${COOPR_SERVER_CONF:-/etc/coopr/conf}
 CLASSPATH="${COOPR_HOME}/server/lib/*:${COOPR_SERVER_CONF}"
 MAIN_CLASS="co.cask.coopr.runtime.ServerMain"
+UPGRADE_CLASS="co.cask.coopr.upgrade.UpgradeTo0_9_9"
 PID_DIR=${PID_DIR:-/var/run/coopr}
 pid="${PID_DIR}/${APP_NAME}.pid"
 
@@ -118,8 +119,18 @@ status() {
 
 restart() { stop; start; }
 
+upgrade() {
+  eval splitJvmOpts ${DEFAULT_JVM_OPTS} ${COOPR_JAVA_OPTS}
+  check_before_start
+
+  echo "Updating Coopr Server ... (this may take a while...)"
+  nice -1 ${JAVACMD} ${JVM_OPTS} -classpath ${CLASSPATH} ${UPGRADE_CLASS} \
+    >> ${COOPR_LOG_DIR}/${APP_NAME}.log 2>&1
+  echo ${!} > ${pid}
+}
+
 case ${1} in
-  start|stop|status|restart) ${1} ;;
+  start|stop|status|restart|upgrade) ${1} ;;
   *) echo "Usage: $0 {start|stop|status|restart}"; exit 1 ;;
 esac
 
