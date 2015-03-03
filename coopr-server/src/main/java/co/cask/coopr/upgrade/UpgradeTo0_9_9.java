@@ -64,7 +64,7 @@ public class UpgradeTo0_9_9 {
   private final DBConnectionPool dbConnectionPool;
   private final ClusterStore clusterStore;
 
-  private long batchSize;
+  private int batchSize;
 
   @Inject
   public UpgradeTo0_9_9(DBConnectionPool dbConnectionPool, SQLClusterStoreService sqlClusterStoreService) {
@@ -72,7 +72,7 @@ public class UpgradeTo0_9_9 {
     this.clusterStore = sqlClusterStoreService.getSystemView();
   }
 
-  public void run(long batchSize) throws IOException, SQLException {
+  public void run(int batchSize) throws IOException, SQLException {
     this.batchSize = batchSize;
     denormalizeTasksTable();
   }
@@ -105,100 +105,80 @@ public class UpgradeTo0_9_9 {
       clustersById.put(Long.parseLong(cluster.getId()), cluster);
     }
 
-    ArrayList<Task> tasks = null;
-    Connection conn = dbConnectionPool.getConnection();
-    try {
-      int approxNumTasks = getTableRowCount(conn, "tasks");
-      tasks = new ArrayList<Task>(approxNumTasks);
+    // grab a batch of tasks, denormalize, and move on to next batch
+    LOG.info("Denormalizing tasks");
+    String rowCondition = "WHERE type IS NULL OR cluster_template_name IS NULL" +
+      " OR user_id IS NULL OR tenant_id IS NULL";
+    ArrayList<Task> tasks = new ArrayList<Task>(batchSize);
 
-      // populate tasks
-      LOG.info("Fetching all tasks");
-      PreparedStatement selectAllTasks = conn.prepareStatement("SELECT * FROM tasks");
+    do {
+      Connection conn = dbConnectionPool.getConnection();
       try {
-        ResultSet rs = selectAllTasks.executeQuery();
-        while (rs.next()) {
-          long taskNum = rs.getLong("task_num");
-          long jobNum = rs.getLong("job_num");
-          long clusterId = rs.getLong("cluster_id");
-          Reader reader = new InputStreamReader(rs.getBlob("task").getBinaryStream(), Charsets.UTF_8);
-          JsonObject blob = GSON.fromJson(reader, JsonObject.class);
-          String taskName = blob.get("taskName").getAsString();
-          tasks.add(new Task(taskNum, jobNum, clusterId, taskName));
-        }
-      } finally {
-        selectAllTasks.close();
-      }
-    } finally {
-      conn.close();
-    }
-
-    conn = dbConnectionPool.getConnection();
-    try {
-      LOG.info("Updating tasks rows");
-      String updateSql = "UPDATE tasks SET" +
-        " type = ?," + // 1: type
-        " cluster_template_name = ?," + // 2: cluster_template_name
-        " user_id = ?," + // 3: user_id
-        " tenant_id = ?" + // 4: tenant_id
-        // 5: task_num, 6: job_num, 7: cluster_id
-        " WHERE task_num = ? AND job_num = ? AND cluster_id = ?";
-      PreparedStatement updateStatement = conn.prepareStatement(updateSql);
-      try {
-        long indexWithinCurrentBatch = 0;
-        long updatesSent = 0;
-        for (Task task : tasks) {
-          long taskNum = task.getTaskNum();
-          long jobNum = task.getJobNum();
-          long clusterId = task.getClusterId();
-          String taskName = task.getTaskName();
-
-          // 1: type
-          ProvisionerAction type = ProvisionerAction.valueOf(taskName.toUpperCase());
-          updateStatement.setString(1, type.name());
-
-          Cluster cluster = clustersById.get(clusterId);
-          if (cluster != null) {
-            updateStatement.setString(2, cluster.getClusterTemplate().getName()); // 2: cluster_template_name
-            updateStatement.setString(3, cluster.getAccount().getUserId()); // 3: user_id
-            updateStatement.setString(4, cluster.getAccount().getTenantId()); // 4: tenant_id
-          } else {
-            LOG.error("Task with id {} referenced a non-existent cluster with id {}", taskNum, clusterId);
-            updateStatement.setString(2, null); // 2: cluster_template_name
-            updateStatement.setString(3, null); // 3: user_id
-            updateStatement.setString(4, null); // 4: tenant_id
+        // populate tasks
+        tasks.clear();
+        PreparedStatement selectTasksBatch = conn.prepareStatement(
+          "SELECT * FROM tasks " + rowCondition + " LIMIT " + batchSize);
+        try {
+          ResultSet rs = selectTasksBatch.executeQuery();
+          while (rs.next()) {
+            long taskNum = rs.getLong("task_num");
+            long jobNum = rs.getLong("job_num");
+            long clusterId = rs.getLong("cluster_id");
+            Reader reader = new InputStreamReader(rs.getBlob("task").getBinaryStream(), Charsets.UTF_8);
+            JsonObject blob = GSON.fromJson(reader, JsonObject.class);
+            String taskName = blob.get("taskName").getAsString();
+            tasks.add(new Task(taskNum, jobNum, clusterId, taskName));
           }
+        } finally {
+          selectTasksBatch.close();
+        }
 
+        String updateSql = "UPDATE tasks SET" +
+          " type = ?," + // 1: type
+          " cluster_template_name = ?," + // 2: cluster_template_name
+          " user_id = ?," + // 3: user_id
+          " tenant_id = ?" + // 4: tenant_id
           // 5: task_num, 6: job_num, 7: cluster_id
-          updateStatement.setLong(5, taskNum);
-          updateStatement.setLong(6, jobNum);
-          updateStatement.setLong(7, clusterId);
+          " WHERE task_num = ? AND job_num = ? AND cluster_id = ?";
+        PreparedStatement updateStatement = conn.prepareStatement(updateSql);
+        try {
+          for (Task task : tasks) {
+            long taskNum = task.getTaskNum();
+            long jobNum = task.getJobNum();
+            long clusterId = task.getClusterId();
+            String taskName = task.getTaskName();
 
-          updateStatement.addBatch();
-          indexWithinCurrentBatch++;
+            // 1: type
+            ProvisionerAction type = ProvisionerAction.valueOf(taskName.toUpperCase());
+            updateStatement.setString(1, type.name());
 
-          if (indexWithinCurrentBatch > batchSize) {
-            updateStatement.executeBatch();
-            updateStatement.close();
-            conn.close();
-            conn = dbConnectionPool.getConnection();
-            updateStatement = conn.prepareStatement(updateSql);
-            updatesSent += (indexWithinCurrentBatch - 1);
-            LOG.info("Successfully sent batch of {} updates", indexWithinCurrentBatch - 1);
-            indexWithinCurrentBatch = 0;
+            Cluster cluster = clustersById.get(clusterId);
+            if (cluster != null) {
+              updateStatement.setString(2, cluster.getClusterTemplate().getName()); // 2: cluster_template_name
+              updateStatement.setString(3, cluster.getAccount().getUserId()); // 3: user_id
+              updateStatement.setString(4, cluster.getAccount().getTenantId()); // 4: tenant_id
+            } else {
+              LOG.error("Task with id {} referenced a non-existent cluster with id {}, " +
+                        "stopping denormalization task", taskNum, clusterId);
+              return;
+            }
+
+            // 5: task_num, 6: job_num, 7: cluster_id
+            updateStatement.setLong(5, taskNum);
+            updateStatement.setLong(6, jobNum);
+            updateStatement.setLong(7, clusterId);
+
+            updateStatement.addBatch();
           }
-        }
-        if (indexWithinCurrentBatch != 0) {
           updateStatement.executeBatch();
-          updatesSent += (indexWithinCurrentBatch - 1);
-          LOG.info("Successfully sent final batch of {} updates, for a total {} updates",
-                   indexWithinCurrentBatch - 1, updatesSent);
+          LOG.info("Successfully sent batch of {} updates", batchSize);
+        } finally {
+          updateStatement.close();
         }
       } finally {
-        updateStatement.close();
+        conn.close();
       }
-    } finally {
-      conn.close();
-    }
+    } while (!tasks.isEmpty());
   }
 
   public static void main(String[] args) throws ClassNotFoundException {
@@ -206,7 +186,7 @@ public class UpgradeTo0_9_9 {
     CommandLineParser parser = new BasicParser();
     try {
       CommandLine command = parser.parse(options, args);
-      long batchSize = Long.parseLong(command.getOptionValue("b", "25000"));
+      int batchSize = Integer.parseInt(command.getOptionValue("b", "25000"));
 
       final Configuration configuration = Configuration.create();
       String jdbcConnectionString = configuration.get(Constants.JDBC_CONNECTION_STRING);
