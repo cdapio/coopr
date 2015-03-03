@@ -24,6 +24,7 @@ import co.cask.coopr.store.cluster.ClusterStore;
 import co.cask.coopr.store.cluster.SQLClusterStoreService;
 import co.cask.coopr.store.guice.StoreModule;
 import com.google.common.base.Charsets;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -31,14 +32,6 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
-import org.apache.commons.cli.BasicParser;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.OptionGroup;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,7 +42,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -64,16 +56,13 @@ public class UpgradeTo0_9_9 {
   private final DBConnectionPool dbConnectionPool;
   private final ClusterStore clusterStore;
 
-  private int batchSize;
-
   @Inject
   public UpgradeTo0_9_9(DBConnectionPool dbConnectionPool, SQLClusterStoreService sqlClusterStoreService) {
     this.dbConnectionPool = dbConnectionPool;
     this.clusterStore = sqlClusterStoreService.getSystemView();
   }
 
-  public void run(int batchSize) throws IOException, SQLException {
-    this.batchSize = batchSize;
+  public void run() throws IOException, SQLException {
     denormalizeTasksTable();
   }
 
@@ -105,132 +94,95 @@ public class UpgradeTo0_9_9 {
       clustersById.put(Long.parseLong(cluster.getId()), cluster);
     }
 
-    // grab a batch of tasks, denormalize, and move on to next batch
-    LOG.info("Denormalizing tasks");
-    String rowCondition = "WHERE type IS NULL OR cluster_template_name IS NULL" +
-      " OR user_id IS NULL OR tenant_id IS NULL";
-    ArrayList<Task> tasks = new ArrayList<Task>(batchSize);
-
-    do {
+    for (Cluster cluster : clusters) {
+      LOG.info("Denormalizing tasks for cluster {}", cluster.getId());
       Connection conn = dbConnectionPool.getConnection();
       try {
-        // populate tasks
-        tasks.clear();
-        PreparedStatement selectTasksBatch = conn.prepareStatement(
-          "SELECT * FROM tasks " + rowCondition + " LIMIT " + batchSize);
-        try {
-          ResultSet rs = selectTasksBatch.executeQuery();
-          while (rs.next()) {
-            long taskNum = rs.getLong("task_num");
-            long jobNum = rs.getLong("job_num");
-            long clusterId = rs.getLong("cluster_id");
-            Reader reader = new InputStreamReader(rs.getBlob("task").getBinaryStream(), Charsets.UTF_8);
-            JsonObject blob = GSON.fromJson(reader, JsonObject.class);
-            String taskName = blob.get("taskName").getAsString();
-            tasks.add(new Task(taskNum, jobNum, clusterId, taskName));
-          }
-        } finally {
-          selectTasksBatch.close();
-        }
-
-        String updateSql = "UPDATE tasks SET" +
-          " type = ?," + // 1: type
-          " cluster_template_name = ?," + // 2: cluster_template_name
-          " user_id = ?," + // 3: user_id
-          " tenant_id = ?" + // 4: tenant_id
-          // 5: task_num, 6: job_num, 7: cluster_id
-          " WHERE task_num = ? AND job_num = ? AND cluster_id = ?";
-        PreparedStatement updateStatement = conn.prepareStatement(updateSql);
-        try {
-          for (Task task : tasks) {
-            long taskNum = task.getTaskNum();
-            long jobNum = task.getJobNum();
-            long clusterId = task.getClusterId();
-            String taskName = task.getTaskName();
-
-            // 1: type
-            ProvisionerAction type = ProvisionerAction.valueOf(taskName.toUpperCase());
-            updateStatement.setString(1, type.name());
-
-            Cluster cluster = clustersById.get(clusterId);
-            if (cluster != null) {
-              updateStatement.setString(2, cluster.getClusterTemplate().getName()); // 2: cluster_template_name
-              updateStatement.setString(3, cluster.getAccount().getUserId()); // 3: user_id
-              updateStatement.setString(4, cluster.getAccount().getTenantId()); // 4: tenant_id
-            } else {
-              LOG.error("Task with id {} referenced a non-existent cluster with id {}, " +
-                        "stopping denormalization task", taskNum, clusterId);
-              return;
-            }
-
-            // 5: task_num, 6: job_num, 7: cluster_id
-            updateStatement.setLong(5, taskNum);
-            updateStatement.setLong(6, jobNum);
-            updateStatement.setLong(7, clusterId);
-
-            updateStatement.addBatch();
-          }
-          updateStatement.executeBatch();
-          LOG.info("Successfully sent batch of {} updates", batchSize);
-        } finally {
-          updateStatement.close();
-        }
+        denormalizeClusterTasks(conn, cluster);
       } finally {
         conn.close();
       }
-    } while (!tasks.isEmpty());
-  }
-
-  public static void main(String[] args) throws ClassNotFoundException {
-    Options options = getOptions();
-    CommandLineParser parser = new BasicParser();
-    try {
-      CommandLine command = parser.parse(options, args);
-      int batchSize = Integer.parseInt(command.getOptionValue("b", "25000"));
-
-      final Configuration configuration = Configuration.create();
-      String jdbcConnectionString = configuration.get(Constants.JDBC_CONNECTION_STRING);
-      if (jdbcConnectionString == null) {
-        LOG.error("Missing property '{}' in coopr-site.xml", Constants.JDBC_CONNECTION_STRING);
-        System.exit(1);
-      }
-
-      Injector injector = Guice.createInjector(
-        new AbstractModule() {
-          @Override
-          protected void configure() {
-            bind(Configuration.class).toInstance(configuration);
-          }
-        },
-        new StoreModule(configuration));
-
-      UpgradeTo0_9_9 upgrade = injector.getInstance(UpgradeTo0_9_9.class);
-      try {
-        upgrade.run(batchSize);
-      } catch (Exception e) {
-        LOG.error("Error running upgrade", e);
-      }
-    } catch (ParseException e) {
-      System.err.println(e.getMessage());
-      usage();
     }
   }
 
-  private static Options getOptions() {
-    Options options = new Options();
+  private void denormalizeClusterTasks(Connection conn, Cluster cluster) throws SQLException {
+    try {
+      long clusterId = Long.parseLong(cluster.getId());
 
-    OptionGroup optionalGroup = new OptionGroup();
-    optionalGroup.setRequired(false);
-    optionalGroup.addOption(new Option("b", "batch-size", true, "Batch size of DB updates. Defaults to 25000."));
-    options.addOptionGroup(optionalGroup);
+      // populate tasks
+      List<Task> tasks = Lists.newArrayList();
+      PreparedStatement selectTasksBatch = conn.prepareStatement(
+        "SELECT * FROM tasks WHERE cluster_id = " + clusterId);
+      try {
+        ResultSet rs = selectTasksBatch.executeQuery();
+        while (rs.next()) {
+          long taskNum = rs.getLong("task_num");
+          long jobNum = rs.getLong("job_num");
+          Reader reader = new InputStreamReader(rs.getBlob("task").getBinaryStream(), Charsets.UTF_8);
+          JsonObject blob = GSON.fromJson(reader, JsonObject.class);
+          String taskName = blob.get("taskName").getAsString();
+          tasks.add(new Task(taskNum, jobNum, taskName));
+        }
+      } finally {
+        selectTasksBatch.close();
+      }
 
-    return options;
+      String updateSql = "UPDATE tasks SET" +
+        " type = ?," + // 1: type
+        " cluster_template_name = ?," + // 2: cluster_template_name
+        " user_id = ?," + // 3: user_id
+        " tenant_id = ?" + // 4: tenant_id
+        // 5: task_num, 6: job_num, 7: cluster_id
+        " WHERE task_num = ? AND job_num = ? AND cluster_id = ?";
+      PreparedStatement updateStatement = conn.prepareStatement(updateSql);
+      try {
+        for (Task task : tasks) {
+          long taskNum = task.getTaskNum();
+          long jobNum = task.getJobNum();
+          String taskName = task.getTaskName();
+
+          ProvisionerAction type = ProvisionerAction.valueOf(taskName.toUpperCase());
+          updateStatement.setString(1, type.name()); // 1: type
+          updateStatement.setString(2, cluster.getClusterTemplate().getName()); // 2: cluster_template_name
+          updateStatement.setString(3, cluster.getAccount().getUserId()); // 3: user_id
+          updateStatement.setString(4, cluster.getAccount().getTenantId()); // 4: tenant_id
+          updateStatement.setLong(5, taskNum); // 5: task_num
+          updateStatement.setLong(6, jobNum); // 6: job_num
+          updateStatement.setLong(7, clusterId); // 7: cluster_id
+          updateStatement.addBatch();
+        }
+        updateStatement.executeBatch();
+      } finally {
+        updateStatement.close();
+      }
+    } finally {
+      conn.close();
+    }
   }
 
-  private static void usage() {
-    HelpFormatter formatter = new HelpFormatter();
-    formatter.printHelp("UpgradeTo0_9_9", getOptions());
-    System.exit(0);
+  public static void main(String[] args) throws ClassNotFoundException {
+    final Configuration configuration = Configuration.create();
+    String jdbcConnectionString = configuration.get(Constants.JDBC_CONNECTION_STRING);
+    if (jdbcConnectionString == null) {
+      LOG.error("Missing property '{}' in coopr-site.xml", Constants.JDBC_CONNECTION_STRING);
+      System.exit(1);
+    }
+
+    Injector injector = Guice.createInjector(
+      new AbstractModule() {
+        @Override
+        protected void configure() {
+          bind(Configuration.class).toInstance(configuration);
+        }
+      },
+      new StoreModule(configuration));
+
+    UpgradeTo0_9_9 upgrade = injector.getInstance(UpgradeTo0_9_9.class);
+    try {
+      upgrade.run();
+    } catch (Exception e) {
+      LOG.error("Error running upgrade", e);
+    }
   }
 
   /**
@@ -240,13 +192,11 @@ public class UpgradeTo0_9_9 {
 
     private final long taskNum;
     private final long jobNum;
-    private final long clusterId;
     private final String taskName;
 
-    private Task(long taskNum, long jobNum, long clusterId, String taskName) {
+    private Task(long taskNum, long jobNum, String taskName) {
       this.taskNum = taskNum;
       this.jobNum = jobNum;
-      this.clusterId = clusterId;
       this.taskName = taskName;
     }
 
@@ -256,10 +206,6 @@ public class UpgradeTo0_9_9 {
 
     public long getJobNum() {
       return jobNum;
-    }
-
-    public long getClusterId() {
-      return clusterId;
     }
 
     public String getTaskName() {
