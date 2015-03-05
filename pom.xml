@@ -24,7 +24,7 @@
     <groupId>co.cask</groupId>
     <artifactId>coopr-parent</artifactId>
     <packaging>pom</packaging>
-    <version>0.9.9-SNAPSHOT</version>
+    <version>0.9.9</version>
     <name>Cask Coopr</name>
 
     <modules>
