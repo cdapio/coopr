@@ -215,9 +215,9 @@ and a non-superadmin tenant named ``mytenant``, the ``mytenant`` admin user will
 own ``george`` user, while the superadmin will retrieve combined total usage for all users named ``george`` 
 (under all tenants, including superadmin). 
 
-The two scenarios in this example are illustrated here, as we show node usage metrics for a user named ``george`` 
-while we authenticate as ``user=admin``, and the ``mytenant`` tenant in the first case, and ``superadmin``
-tenant in the second.  The results in the first case are a subset of those in the second.
+The two scenarios in this example are illustrated here. Node usage metrics for:
+
+1. a user named ``george`` while we authenticate as ``user=admin``, and the ``mytenant`` tenant.
 
 .. code-block:: bash
 
@@ -229,6 +229,9 @@ tenant in the second.  The results in the first case are a subset of those in th
  $ {"start":1424475097,"end":1424486266,"data":[{"time":1424475097,"value":8547}]}
 
 
+
+2. all users named ``george`` while we authenticate as ``user=admin`` and ``superadmin`` tenant.
+
 .. code-block:: bash
 
  $ curl -H 'Coopr-UserID:admin'
@@ -238,13 +241,15 @@ tenant in the second.  The results in the first case are a subset of those in th
  
  $ {"start":1424475097,"end":1424486266,"data":[{"time":1424475097,"value":14164}]}
 
+The results in the first case are a subset of those in the second.
+
 
 Specifying a Tenant
 -------------------
 
-Only superadmin tenant users are allowed to retrieve tenant-level node usage metrics. Any attempt to retrieve
-that type of information will return a 405 error (method not allowed), since this metric is not available for 
-non-superadmin users.
+Only superadmin tenant users are allowed to retrieve tenant-level node usage metrics. Any query by a user
+in a regular tenant to retrieve that type of information will return a 405 error (method not allowed), 
+since this metric is not available for non-superadmin tenant users.
 
 .. code-block:: bash
 
