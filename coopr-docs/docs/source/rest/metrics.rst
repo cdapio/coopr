@@ -113,9 +113,12 @@ based on the selected criteria.
      - Description
    * - 200 (OK)
      - If update was successful
+   * - 401 (UNAUTHORIZED)
+     - If the api call is missing required headers for a metric (status is one of the few that does not require user/tenant headers)
    * - 403 (FORBIDDEN)
      - If the user is forbidden from getting node usage metrics.
-
+   * - 405 (METHOD NOT ALLOWED)
+     - If for example, a non-superadmin tenant user is requesting any tenant metrics, including their own (this metric is only made available for the superadmin tenant)
 
 
 
@@ -206,18 +209,42 @@ Time Range (Start and End Time)
 Specifying a User
 -----------------
 
+Non superadmin tenants can retrieve node usage metrics for their users only. The superadmin tenant retrieves
+node usage metrics for all users. As an example, if there are users named ``george`` under both the superadmin 
+and a non-superadmin tenant named ``mytenant``, the ``mytenant`` admin user will only see node usage for their 
+own ``george`` user, while the superadmin will retrieve combined total usage for all users named ``george`` 
+(under all tenants, including superadmin). 
+
+The two scenarios in this example are illustrated here, as we show node usage metrics for a user named ``george`` 
+while we authenticate as ``user=admin``, and the ``mytenant`` tenant in the first case, and ``superadmin``
+tenant in the second.  The results in the first case are a subset of those in the second.
+
+.. code-block:: bash
+
+ $ curl -H 'Coopr-UserID:admin'
+        -H 'Coopr-ApiKey:<apikey>'
+        -H 'Coopr-TenantID:mytenant'
+        http://<server>:<port>/<version>/metrics/nodes/usage?user=george
+
+ $ {"start":1424475097,"end":1424486266,"data":[{"time":1424475097,"value":8547}]}
+
+
 .. code-block:: bash
 
  $ curl -H 'Coopr-UserID:admin'
         -H 'Coopr-ApiKey:<apikey>'
         -H 'Coopr-TenantID:superadmin'
-        http://<server>:<port>/<version>/metrics/nodes/usage?user=admin
+        http://<server>:<port>/<version>/metrics/nodes/usage?user=george
  
- $ {"start":1424475097,"end":1424486266,"data":[{"time":1424475097,"value":31164}]}
+ $ {"start":1424475097,"end":1424486266,"data":[{"time":1424475097,"value":14164}]}
 
 
 Specifying a Tenant
 -------------------
+
+Only superadmin tenant users are allowed to retrieve tenant-level node usage metrics. Any attempt to retrieve
+that type of information will return a 405 error (method not allowed), since this metric is not available for 
+non-superadmin users.
 
 .. code-block:: bash
 
