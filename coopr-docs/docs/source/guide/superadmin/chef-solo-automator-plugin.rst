@@ -67,14 +67,14 @@ nodes using the "apache2" community cookbook. We define a Coopr service "apache-
                     "type": "chef-solo"
                     "fields": {
                         "json_attributes": "{\"coopr\": { \"node\": { \"services\": { \"apache2\": \"start\" } } } }",
-                        "run_list": "recipe[apache2::default],recipe[coopr_service_runner::default]",
+                        "run_list": "recipe[apache2::default],recipe[coopr_service_manager::default]",
                     }
                 },
                 "stop": {
                     "type": "chef-solo"
                     "fields": {
                         "json_attributes": "{\"coopr\": { \"node\": { \"services\": { \"apache2\": \"stop\" } } } }",
-                        "run_list": "recipe[apache2::default],recipe[coopr_service_runner::default]",
+                        "run_list": "recipe[apache2::default],recipe[coopr_service_manager::default]",
                     }
                 }
             }
@@ -103,7 +103,7 @@ to satisfy dependencies.
 
 The "start" and "stop" tasks introduce a couple of features. They make use of the ``json_attributes`` field to specify custom JSON
 attributes. Note that the format is an escaped JSON string. The ``run_list`` field also contains an additional recipe,
-``coopr_service_runner::default``. More on this later, but essentially this is a helper cookbook that can operate on
+``coopr_service_manager::default``. More on this later, but essentially this is a helper cookbook that can operate on
 any Chef service resource. It looks for any service names listed in node['coopr']['node']['services'], finds the
 corresponding Chef service resource, and invokes the specified action.
 
@@ -227,7 +227,7 @@ The example coopr service definition invoking this cookbook is called "base". It
 action of type "chef-solo" and run_list ``recipe[coopr_base::default]`` (which includes ``recipe[coopr_hosts::default]``).
 Note that the community "hostsfile" cookbook is not needed in the run-list since it is declared in coopr_hosts's metadata.
 
-**coopr_service_runner**
+**coopr_service_manager**
 ------------------------
 
 This cookbook comes in handy as a simple way to isolate the starting and stopping of various services within your
