@@ -219,26 +219,26 @@ The two scenarios in this example are illustrated here. Node usage metrics for:
 
 1. A user named ``george`` while we authenticate as ``user=admin``, and the ``mytenant`` tenant.
 
-.. code-block:: bash
-
-   $ curl -H 'Coopr-UserID:admin'
-          -H 'Coopr-ApiKey:<apikey>'
-          -H 'Coopr-TenantID:mytenant'
-          http://<server>:<port>/<version>/metrics/nodes/usage?user=george
+   .. code-block:: bash
    
-   $ {"start":1424475097,"end":1424486266,"data":[{"time":1424475097,"value":8547}]}
+      $ curl -H 'Coopr-UserID:admin'
+             -H 'Coopr-ApiKey:<apikey>'
+             -H 'Coopr-TenantID:mytenant'
+             http://<server>:<port>/<version>/metrics/nodes/usage?user=george
+      
+      $ {"start":1424475097,"end":1424486266,"data":[{"time":1424475097,"value":8547}]}
 
 
 2. All users named ``george`` while we authenticate as ``user=admin`` and ``superadmin`` tenant.
 
-.. code-block:: bash
-
-   $ curl -H 'Coopr-UserID:admin'
-          -H 'Coopr-ApiKey:<apikey>'
-          -H 'Coopr-TenantID:superadmin'
-          http://<server>:<port>/<version>/metrics/nodes/usage?user=george
+   .. code-block:: bash
    
-   $ {"start":1424475097,"end":1424486266,"data":[{"time":1424475097,"value":14164}]}
+      $ curl -H 'Coopr-UserID:admin'
+             -H 'Coopr-ApiKey:<apikey>'
+             -H 'Coopr-TenantID:superadmin'
+             http://<server>:<port>/<version>/metrics/nodes/usage?user=george
+      
+      $ {"start":1424475097,"end":1424486266,"data":[{"time":1424475097,"value":14164}]}
 
 The results in the first case are a subset of those in the second.
 
