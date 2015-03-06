@@ -241,7 +241,7 @@ specific attributes are added to your Coopr templates::
     node['base']['no_hosts'] = 'true'
     node['base']['no_packages'] = 'true'
 
-**User Management**
+.. rubric:: User Management
 
 The ``coopr_base`` cookbook provides a simple method for user management, utilizing the Chef community `users <https://supermarket.chef.io/cookbooks/users>`_ and
 `sudo <https://supermarket.chef.io/cookbooks/sudo>`_ cookbooks.  To take advantage of this, simply upload a data_bag resource named ``users`` to the Coopr
