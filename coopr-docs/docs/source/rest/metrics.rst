@@ -209,7 +209,7 @@ Time Range (Start and End Time)
 Specifying a User
 -----------------
 
-Non superadmin tenants can retrieve node usage metrics for their users only. The superadmin tenant retrieves
+Non-superadmin tenants can retrieve node usage metrics for their users only. The superadmin tenant retrieves
 node usage metrics for all users. As an example, if there are users named ``george`` under both the superadmin 
 and a non-superadmin tenant named ``mytenant``, the ``mytenant`` admin user will only see node usage for their 
 own ``george`` user, while the superadmin will retrieve combined total usage for all users named ``george`` 
@@ -217,7 +217,7 @@ own ``george`` user, while the superadmin will retrieve combined total usage for
 
 The two scenarios in this example are illustrated here. Node usage metrics for:
 
-1. a user named ``george`` while we authenticate as ``user=admin``, and the ``mytenant`` tenant.
+1. A user named ``george`` while we authenticate as ``user=admin``, and the ``mytenant`` tenant.
 
 .. code-block:: bash
 
@@ -229,8 +229,7 @@ The two scenarios in this example are illustrated here. Node usage metrics for:
  $ {"start":1424475097,"end":1424486266,"data":[{"time":1424475097,"value":8547}]}
 
 
-
-2. all users named ``george`` while we authenticate as ``user=admin`` and ``superadmin`` tenant.
+2. All users named ``george`` while we authenticate as ``user=admin`` and ``superadmin`` tenant.
 
 .. code-block:: bash
 
