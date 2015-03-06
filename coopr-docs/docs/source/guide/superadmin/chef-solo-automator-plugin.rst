@@ -149,13 +149,13 @@ Bootstrap
 Each Coopr Automator plugin is responsible for implementing a bootstrap method in which it performs any actions it needs to be able to carry out further tasks. The Chef Solo Automator plugin performs the following actions for a bootstrap task:
 	1. Bundle its local copy of the cookbooks/roles/data_bags directories into tarballs, ``cookbooks.tar.gz``, ``roles.tar.gz``, ``data_bags.tar.gz``
 		* Unless the tarballs exist already and were created in the last 10 minutes
-	2. Logs into the remote box and installs chef in one of three ways in this order:
+	#. Logs into the remote box and installs chef in one of three ways in this order:
 		a. via ``yum install`` to leverage any internal yum repositories preconfigured on the remote host
 		b. via ``apt-get install`` to leverage any internal apt repositories preconfigured on the remote host
 		c. via the Opscode Omnibus installer (``curl -L https://www.opscode.com/chef/install.sh | bash``). This requires internet access on the remote host
-	3. Creates the remote coopr cache directory ``/var/cache/coopr``
-	4. SCP the local tarballs to the remote Coopr cache directory
-        5. Extracts the tarballs on the remote host to the default chef directory ``/var/chef``
+	#. Creates the remote coopr cache directory ``/var/cache/coopr``
+	#. SCP the local tarballs to the remote Coopr cache directory
+	#. Extracts the tarballs on the remote host to the default chef directory ``/var/chef``
 
 The most important things to note are that:
 	* Upon adding any new cookbooks, roles, or data_bags to the local directories, the tarballs will be regenerated within 10 minutes and used by all running provisioners.
