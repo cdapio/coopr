@@ -34,7 +34,7 @@ Overview
 
 The Docker Automator plugin, like all automator plugins, is responsible for performing the installation and operation
 of services on remote hosts.  The Docker Automator plugin provides a simple way to install Docker images from Docker Hub
-and to manage containers of these images.
+and manage containers of these images.
 
 .. note:: The Docker Automator currently requires that Docker is installed, configured, and running on the target host(s), such as provided by CoreOS.
 
@@ -114,6 +114,4 @@ Bootstrap
 Each Coopr Automator plugin is responsible for implementing a bootstrap method in which it performs any actions it needs 
 to be able to carry out further tasks. The Docker Automator plugin performs the following actions for a bootstrap task:
 
-        1. Verify that the ``docker`` command is installed and in the PATH
-
-
+        Verify that the ``docker`` command is installed and in the PATH
