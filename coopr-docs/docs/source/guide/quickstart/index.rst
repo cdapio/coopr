@@ -76,7 +76,7 @@ to the superadmin.
     :alt: Tenant management screen
     :figclass: align-center
 
-Workers are provided by provisioners. If your system is using all it's workers, additional provisioners must be added to the system
+Workers are provided by provisioners. If your system is using all its workers, additional provisioners must be added to the system
 in order to support additional tenants. With a clean install, only the the superadmin's tenant will exist, and no workers will be 
 assigned to any tenant. In order to create a cluster, we must assign some workers to the superadmin tenant. To do this, we must edit
 the superadmin tenant by clicking on it, which will bring you to the edit tenant screen.
@@ -96,8 +96,8 @@ Configuring a Provider
 
 To start provisioning machines, you must first specify an IaaS provider on which the clusters will be created. Click on the 
 'Providers' tab at the top of the screen. Several defaults are available on this page. There are providers for Amazon, DigitalOcean,
-Google, Joyent, Openstack, and Rackspace. Choose the provider you want to use for this tutorial, then click on it's name to navigate 
-to it's edit screen.
+Google, Joyent, Openstack, and Rackspace. Choose the provider you want to use for this tutorial, then click on its name to navigate 
+to its edit screen.
 
 Each provider type has fields specific to your own provider and account.
 These inputs may include settings such as username and API key, and can be obtained through the provider's own 

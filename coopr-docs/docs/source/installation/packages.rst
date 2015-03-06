@@ -138,9 +138,6 @@ Yum
 ---
 To install each of the Coopr components locally from a Yum package:
 
-.. role:: gp
-.. |$| replace:: :gp:`$`
-   
 .. container:: highlight
 
   .. parsed-literal::
