@@ -434,6 +434,7 @@ Included Plugins
    :maxdepth: 1
 
    chef-solo-automator-plugin
+   docker-automator-plugin
    shell-automator-plugin
 
 Resource types
