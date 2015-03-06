@@ -119,7 +119,7 @@ The Chef Solo Automator plugin automatically merges this data into a single JSON
 the ``--json-attributes argument``. Any custom cookbooks that want to make use of this Coopr data need to be familiar
 with the JSON layout of the Coopr data. In brief, cluster-wide configuration defined in cluster templates and
 service-level action data are deep-merged together, with service-level action data taking precedence. This data is
-preserved at the top-level, and also merged in under ``coopr/*``. For example::
+preserved at the top level, and also merged in under ``coopr/*``. For example::
 
     {
         // cluster config attributes defined in clustertemplates are preserved here at top-level
@@ -140,24 +140,24 @@ preserved at the top-level, and also merged in under ``coopr/*``. For example::
 
 
 Consider the following rules of thumb:
-	* When using community cookbooks, attributes can be specified in Coopr templates exactly as the cookbook expects (at the top-level). If separate services require the same recipe with different attributes, then these attributes can be specified in the service ``json_attributes`` field
+	* When using community cookbooks, attributes can be specified in Coopr templates exactly as the cookbook expects (at the top level). If separate services require the same recipe with different attributes, these attributes can be specified in the service ``json_attributes`` field
 	* When writing cookbooks specifically utilizing Coopr metadata (cluster node data for example), recipes can access the metadata at ``node['coopr']['cluster']...``
 
 Bootstrap
 =========
 
-Each Coopr Automator plugin is responsible for implementing a bootstrap method in which it performs any actions it needs to be able to carry out further tasks. The Chef Solo Automator plugin performs the following actions for a bootstrap task:
-	1. Bundle its local copy of the cookbooks/roles/data_bags directories into tarballs, ``cookbooks.tar.gz``, ``roles.tar.gz``, ``data_bags.tar.gz``
-		* Unless the tarballs exist already and were created in the last 10 minutes
+Each Coopr Automator plugin is responsible for implementing a bootstrap method in which it performs any action it needs to be able to carry out further tasks. The Chef Solo Automator plugin performs the following actions for a bootstrap task:
+	1. Bundle its local copy of the cookbooks/roles/data_bags directories into three tarballs, ``cookbooks.tar.gz``, ``roles.tar.gz``, ``data_bags.tar.gz``
+		* This only happens if prior versions of the tarballs were not created in the past 10 minutes
 	#. Logs into the remote box and installs chef in one of three ways in this order:
 		a. via ``yum install`` to leverage any internal yum repositories preconfigured on the remote host
 		b. via ``apt-get install`` to leverage any internal apt repositories preconfigured on the remote host
 		c. via the Opscode Omnibus installer (``curl -L https://www.opscode.com/chef/install.sh | bash``). This requires internet access on the remote host
 	#. Creates the remote coopr cache directory ``/var/cache/coopr``
-	#. SCP the local tarballs to the remote Coopr cache directory
+	#. SCPs the local tarballs to the remote Coopr cache directory
 	#. Extracts the tarballs on the remote host to the default chef directory ``/var/chef``
 
-The most important things to note are that:
+The most important things to note:
 	* Upon adding any new cookbooks, roles, or data_bags to the local directories, the tarballs will be regenerated within 10 minutes and used by all running provisioners.
 	* Internet access may be needed to install chef unless steps are taken to provide chef in alternate ways.  Most of the bundled community cookbooks require internet access as well.
 
@@ -168,7 +168,7 @@ Coopr and the Chef Solo Automator plugin can still be used in an environment wit
 	1. Chef must be pre-installed on the target hosts' images, or installable via a pre-configured Yum or Apt repository
 	2. The bundled community cookbooks cannot be used.  Note the provided `Helper Cookbooks`_ do not require internet access
 
-Adding your own Cookbooks
+Adding Your Own Cookbooks
 =========================
 **Cookbook requirements**
 
@@ -223,17 +223,17 @@ This is a convenience cookbook which is intended to provide base functionality f
 the ``coopr_base::default`` recipe, which may include additional helper cookbooks. It currently does the following:
 
 	* run ``apt-get update`` (on Ubuntu hosts)
-        * optionally configure the Yum ``epel`` repository (on Rhel hosts)
+	* optionally configure the Yum ``epel`` repository (on Rhel hosts)
 	* optionally include ``coopr_dns::default`` (discussed below)
 	* optionally include ``coopr_firewall::default`` (discussed below)
 	* optionally include ``coopr_hosts::default`` (discussed below)
 	* optionally include ``coopr_packages::default`` (discussed below)
 	* include ``ulimit::default`` to enable user-defined ulimits
-        * optionally runs the ``users`` and ``sudo`` cookbooks to add any users if a ``users`` data_bag resource is present
+	* optionally runs the ``users`` and ``sudo`` cookbooks to add any users if a ``users`` data_bag resource is present
 
-To disable the configuring of the Yum ``epel`` repository on Rhel hosts, set the ``node['base']['use_epel']`` attribute to ``false``
+To disable the configuring of the Yum ``epel`` repository on Rhel hosts, set the ``node['base']['use_epel']`` attribute to ``false``.
 
-To disable the inclusion of the remaining helper cookbooks, set the following attributes. Though note that these cookbooks are designed to not take action unless
+To disable the inclusion of the remaining helper cookbooks, set the following attributes. Note, though, that these cookbooks are designed to not take action unless
 specific attributes are added to your Coopr templates::
 
     node['base']['no_dns'] = 'true'
@@ -251,7 +251,7 @@ Server.  As with cookbooks, you can use the data-uploader utility to do this, fo
 
  /opt/coopr/provisioner/embedded/bin/ruby /opt/coopr/provisioner/bin/data-uploader.rb -u |http:|//localhost:55054 -t superadmin -U admin sync ./my/local/data_bags/users automatortypes/chef-solo/data_bags/users
 
-where ``./my/local/data_bags/users`` is the data_bag to be used by the ``users`` cookbook. It should be a directory containing data_bag_items (json files) of the form::
+where ``./my/local/data_bags/users`` is the data_bag to be used by the ``users`` cookbook. It should be a directory containing data_bag_items (JSON files) of the form::
 
     {
         "id": "bob",
@@ -281,7 +281,7 @@ attributes in the included ``base`` service's ``install`` action JSON attributes
 
 The ``provider`` attribute is simply the name of a recipe that must be implemented.  The ``subdomain_whitelist`` is an optional safety mechanism to only allow
 DNS records to be created for certain domains.  In this example, as part of the ``base`` service the ``coopr_dns::dnsimple`` recipe will be run, which includes
-DNSimple's cookbook and its LWRPs to create A records for each cluster host.
+DNSimple's cookbook and its LWRPs to create "A" records for each cluster host.
 
 **coopr_hosts**
 ---------------
@@ -304,9 +304,9 @@ using the ``node['coopr_hosts']['address_types']`` attribute array. See :doc:`Ma
 This cookbook comes in handy as a simple way to isolate the starting and stopping of various services within your
 cluster. It allows you to simply specify the name of a Chef service resource and an action within a Coopr service
 definition. When run, it will simply lookup the Chef service resource of the given name, regardless of which cookbook
-it is defined in, and run the given action. In the example apache-httpd service definition above, it is simply included
-in the run-list to start or stop the apache2 service defined in the apache2 community cookbook. All that is needed is
-to set the following attribute to "start" or "stop"::
+it is defined in, and run the given action. In the apache-httpd service definition example above, it is simply included
+in the run-list to start or stop the apache2 service defined in the apache2 community cookbook.  Just set the following
+attribute to "start" or "stop"::
 
     node['coopr']['node']['services']['apache2'] = "start"
 
@@ -315,7 +315,7 @@ to set the following attribute to "start" or "stop"::
 ------------------
 
 This cookbook is a simple iptables firewall manager, with the added functionality of automatically whitelisting all
-nodes of a cluster. To use, simply set any of the following attributes::
+nodes in a cluster. To use, simply set any of the following attributes::
 
     node['coopr_firewall']['INPUT_policy']  = (string)
     node['coopr_firewall']['FORWARD_policy'] = (string)
@@ -329,7 +329,7 @@ If this recipe is included in the run-list and no attributes specified, the defa
 **coopr_packages**
 ------------------
 
-This cookbook provides a convient way to install, upgrade, or remove any number of Yum or Apt packages as part of your ``base`` service.  Simply populate
+This cookbook provides a convenient way to install, upgrade, or remove any number of Yum or Apt packages as part of your ``base`` service.  Simply populate
 any of the following (default) attributes::
 
     node['coopr_packages']['debian']['install'] = []
