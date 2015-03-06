@@ -74,7 +74,7 @@ As an example, consider the following Coopr service definition:
 
 This defines a service named "cdap-standalone" which has three defined actions, install, start, and stop.  When each
 action is invoked for this service, the ``type`` field indicates to the provisioner to use the Docker Automator plugin
-to manage the action.  The Docker Automator defines two custom fields: a required ``image_name`` and optional
+to manage the action.  The Docker Automator defines two custom fields: a required ``image_name`` and an optional
 ``publish_ports``.  The ``image_name`` field is the image or repository to pull from Docker Hub.  Note that the image
 must be a public image, hosted on Docker Hub.  The ``publish_ports`` field is optional, and is a comma-separated list
 of exposed container ports to publish on the Docker host.
@@ -94,14 +94,14 @@ invoke the following command on them:
 Note that this example is a real service included with Coopr, which can be used to launch a container with the Cask Data Application
 Platform (CDAP) SDK services running!
 
-How it Works
+How It Works
 ============
 
 A more in-depth look at Docker Automator:
         1. During the "bootstrap" action:
                 a. The plugin verifies that ``docker`` is available on the host(s)
-        2. When a defined docker service action runs (ie, install, start, stop, etc):
-                a. The Docker Automator invokes a common on the remote host which performs one of
+        2. When a defined docker service action runs (install, start, stop):
+                a. The Docker Automator invokes a command on the remote host which performs one of:
                         i. Pulling an image or repository from Docker Hub (install)
                         ii. Running a new container, or starting a stopped container (start)
                         iii. Stopping a container (stop)
