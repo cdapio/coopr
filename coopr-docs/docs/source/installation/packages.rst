@@ -40,7 +40,7 @@ System Requirements
 Hardware Requirements
 ---------------------
 Systems hosting the Coopr components must meet these hardware specifications, in addition to having CPUs
-with a minimum speed of 2 GHz
+with a minimum speed of 2 GHz:
 
 .. list-table::
    :widths: 25 25 50
