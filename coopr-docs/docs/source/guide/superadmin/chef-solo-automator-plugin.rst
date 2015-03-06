@@ -140,33 +140,33 @@ preserved at the top level, and also merged in under ``coopr/*``. For example::
 
 
 Consider the following rules of thumb:
-	* When using community cookbooks, attributes can be specified in Coopr templates exactly as the cookbook expects (at the top level). If separate services require the same recipe with different attributes, these attributes can be specified in the service ``json_attributes`` field
-	* When writing cookbooks specifically utilizing Coopr metadata (cluster node data for example), recipes can access the metadata at ``node['coopr']['cluster']...``
+        * When using community cookbooks, attributes can be specified in Coopr templates exactly as the cookbook expects (at the top level). If separate services require the same recipe with different attributes, these attributes can be specified in the service ``json_attributes`` field
+        * When writing cookbooks specifically utilizing Coopr metadata (cluster node data for example), recipes can access the metadata at ``node['coopr']['cluster']...``
 
 Bootstrap
 =========
 
 Each Coopr Automator plugin is responsible for implementing a bootstrap method in which it performs any action it needs to be able to carry out further tasks. The Chef Solo Automator plugin performs the following actions for a bootstrap task:
-	1. Bundle its local copy of the cookbooks/roles/data_bags directories into three tarballs, ``cookbooks.tar.gz``, ``roles.tar.gz``, ``data_bags.tar.gz``
-		* This only happens if prior versions of the tarballs were not created in the past 10 minutes
-	#. Logs into the remote box and installs chef in one of three ways in this order:
-		a. via ``yum install`` to leverage any internal yum repositories preconfigured on the remote host
-		b. via ``apt-get install`` to leverage any internal apt repositories preconfigured on the remote host
-		c. via the Opscode Omnibus installer (``curl -L https://www.opscode.com/chef/install.sh | bash``). This requires internet access on the remote host
-	#. Creates the remote coopr cache directory ``/var/cache/coopr``
-	#. SCPs the local tarballs to the remote Coopr cache directory
-	#. Extracts the tarballs on the remote host to the default chef directory ``/var/chef``
+        1. Bundle its local copy of the cookbooks/roles/data_bags directories into three tarballs, ``cookbooks.tar.gz``, ``roles.tar.gz``, ``data_bags.tar.gz``
+                * This only happens if prior versions of the tarballs were not created in the past 10 minutes
+        #. Logs into the remote box and installs chef in one of three ways in this order:
+                a. via ``yum install`` to leverage any internal yum repositories preconfigured on the remote host
+                b. via ``apt-get install`` to leverage any internal apt repositories preconfigured on the remote host
+                c. via the Opscode Omnibus installer (``curl -L https://www.opscode.com/chef/install.sh | bash``). This requires internet access on the remote host
+        #. Creates the remote coopr cache directory ``/var/cache/coopr``
+        #. SCPs the local tarballs to the remote Coopr cache directory
+        #. Extracts the tarballs on the remote host to the default chef directory ``/var/chef``
 
 The most important things to note:
-	* Upon adding any new cookbooks, roles, or data_bags to the local directories, the tarballs will be regenerated within 10 minutes and used by all running provisioners.
-	* Internet access may be needed to install chef unless steps are taken to provide chef in alternate ways.  Most of the bundled community cookbooks require internet access as well.
+        * Upon adding any new cookbooks, roles, or data_bags to the local directories, the tarballs will be regenerated within 10 minutes and used by all running provisioners.
+        * Internet access may be needed to install chef unless steps are taken to provide chef in alternate ways.  Most of the bundled community cookbooks require internet access as well.
 
 Internet Access
 ===============
 
 Coopr and the Chef Solo Automator plugin can still be used in an environment without Internet access, with some restrictions:
-	1. Chef must be pre-installed on the target hosts' images, or installable via a pre-configured Yum or Apt repository
-	2. The bundled community cookbooks cannot be used.  Note the provided `Helper Cookbooks`_ do not require internet access
+        1. Chef must be pre-installed on the target hosts' images, or installable via a pre-configured Yum or Apt repository
+        2. The bundled community cookbooks cannot be used.  Note the provided `Helper Cookbooks`_ do not require internet access
 
 Adding Your Own Cookbooks
 =========================
@@ -174,8 +174,8 @@ Adding Your Own Cookbooks
 
 Since the Chef Solo Automator plugin is implemented using chef-solo, the following restrictions apply:
 
-	* No Chef search capability
-	* No persistent attributes
+        * No Chef search capability
+        * No persistent attributes
 
 Cookbooks should be fully attribute-driven. At this time the Chef Solo Automator does not support the chef-solo "environment" primitive. 
 Attributes normally specified in an environment can instead be populated in Coopr primitives such as cluster templates or service action data.
@@ -204,10 +204,10 @@ Examples:
 In order to actually invoke your cookbook or role as part of a cluster provision, you will need to define a Coopr service
 definition with the following parameters:
 
-	* Category: any action (install, configure, start, stop, etc)
-	* Type: chef-solo
-	* run_list: a run-list containing your cookbook's recipe(s) or roles. If your recipe depends on resources defined in other cookbooks which aren't declared dependencies in your cookbook's metadata, make sure to also add them to the run-list.
-	* json_attributes: (optional), any additional custom attributes you want to specify, unique to this action
+        * Category: any action (install, configure, start, stop, etc)
+        * Type: chef-solo
+        * run_list: a run-list containing your cookbook's recipe(s) or roles. If your recipe depends on resources defined in other cookbooks which aren't declared dependencies in your cookbook's metadata, make sure to also add them to the run-list.
+        * json_attributes: (optional), any additional custom attributes you want to specify, unique to this action
 
 Then simply add your service to a cluster template.
 
@@ -222,14 +222,14 @@ Coopr ships with several helper cookbooks. These are provided as convenience and
 This is a convenience cookbook which is intended to provide base functionality for all hosts provisioned by Coopr. The default ``base`` service definition runs
 the ``coopr_base::default`` recipe, which may include additional helper cookbooks. It currently does the following:
 
-	* run ``apt-get update`` (on Ubuntu hosts)
-	* optionally configure the Yum ``epel`` repository (on Rhel hosts)
-	* optionally include ``coopr_dns::default`` (discussed below)
-	* optionally include ``coopr_firewall::default`` (discussed below)
-	* optionally include ``coopr_hosts::default`` (discussed below)
-	* optionally include ``coopr_packages::default`` (discussed below)
-	* include ``ulimit::default`` to enable user-defined ulimits
-	* optionally runs the ``users`` and ``sudo`` cookbooks to add any users if a ``users`` data_bag resource is present
+        * run ``apt-get update`` (on Ubuntu hosts)
+        * optionally configure the Yum ``epel`` repository (on Rhel hosts)
+        * optionally include ``coopr_dns::default`` (discussed below)
+        * optionally include ``coopr_firewall::default`` (discussed below)
+        * optionally include ``coopr_hosts::default`` (discussed below)
+        * optionally include ``coopr_packages::default`` (discussed below)
+        * include ``ulimit::default`` to enable user-defined ulimits
+        * optionally runs the ``users`` and ``sudo`` cookbooks to add any users if a ``users`` data_bag resource is present
 
 To disable the configuring of the Yum ``epel`` repository on Rhel hosts, set the ``node['base']['use_epel']`` attribute to ``false``.
 
