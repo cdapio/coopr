@@ -49,6 +49,8 @@ Change List
 New Features
 ............
 
+.. |JIRA| replace:: https://issues.cask.co/browse/
+
   * |JIRA|COOPR-195 - Entity versioning
   * |JIRA|COOPR-199 - Ability to suspend jobs
   * |JIRA|COOPR-418 - Add more detailed usage statistics
@@ -73,6 +75,8 @@ New Features
 
 Improvements
 ............
+
+.. |JIRA| replace:: https://issues.cask.co/browse/
 
   * |JIRA|COOPR-64 - Confirmations should mention item being acted upon
   * |JIRA|COOPR-300 - Move lease times away from milliseconds
@@ -99,6 +103,9 @@ Improvements
 
 Bugs
 ....
+
+.. |JIRA| replace:: https://issues.cask.co/browse/
+
   * |JIRA|COOPR-487 - Data disk mounting fails on Joyent/CentOS
   * |JIRA|COOPR-488 - standalone script doesn't load defaults if restart is used
   * |JIRA|COOPR-494 - Place safeguards in ClusterCallback
