@@ -44,8 +44,6 @@ Release Highlights
 Change List
 -----------
 
-.. |JIRA| replace:: https://issues.cask.co/browse/
-
 New Features
 ^^^^^^^^^^^^
 
@@ -108,12 +106,12 @@ Bugs
   * `COOPR-511 <https://issues.cask.co/browse/COOPR-511>`_ - Google provisioner plugin disk names
   * `COOPR-519 <https://issues.cask.co/browse/COOPR-519>`_ - cdap singlenode logs fill up the root partition
   * `COOPR-538 <https://issues.cask.co/browse/COOPR-538>`_ - Default sudoers has requiretty on RHEL
-  * `COOPR-544 - ngui <https://issues.cask.co/browse/COOPR-544 - ngui>`_ - Hide theming feature
+  * `COOPR-544 <https://issues.cask.co/browse/COOPR-544>`_ - NGUI: Hide theming feature
   * `COOPR-553 <https://issues.cask.co/browse/COOPR-553>`_ - Cannot run tests
   * `COOPR-554 <https://issues.cask.co/browse/COOPR-554>`_ - Server queues broken in HA mode
   * `COOPR-557 <https://issues.cask.co/browse/COOPR-557>`_ - Flicker on welcome page when clicking on header buttons
   * `COOPR-585 <https://issues.cask.co/browse/COOPR-585>`_ - Using provider hostnames only when not configured
-  * `COOPR-586 - cluster configs overrides service configs <https://issues.cask.co/browse/COOPR-586 - cluster configs overrides service configs>`_ - need to do deep merge
+  * `COOPR-586 <https://issues.cask.co/browse/COOPR-586>`_ - cluster configs overrides service configs, need to do deep merge
   * `COOPR-588 <https://issues.cask.co/browse/COOPR-588>`_ - Standalone coopr.sh SSL code has broken startup
   * `COOPR-599 <https://issues.cask.co/browse/COOPR-599>`_ - coopr-cli doesn't build
   * `COOPR-603 <https://issues.cask.co/browse/COOPR-603>`_ - CLI: rename "sync plugins" to "sync resources"
