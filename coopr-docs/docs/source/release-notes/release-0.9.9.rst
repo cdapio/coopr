@@ -47,9 +47,7 @@ Change List
 .. |JIRA| replace:: https://issues.cask.co/browse/
 
 New Features
-............
-
-.. |JIRA| replace:: https://issues.cask.co/browse/
+^^^^^^^^^^^^
 
   * |JIRA|COOPR-195 - Entity versioning
   * |JIRA|COOPR-199 - Ability to suspend jobs
@@ -74,9 +72,7 @@ New Features
   * |JIRA|COOPR-737 - Promote angular-based UI to default
 
 Improvements
-............
-
-.. |JIRA| replace:: https://issues.cask.co/browse/
+^^^^^^^^^^^^
 
   * |JIRA|COOPR-64 - Confirmations should mention item being acted upon
   * |JIRA|COOPR-300 - Move lease times away from milliseconds
@@ -102,9 +98,7 @@ Improvements
   * |JIRA|COOPR-736 - Update fog to 1.26.0
 
 Bugs
-....
-
-.. |JIRA| replace:: https://issues.cask.co/browse/
+^^^^
 
   * |JIRA|COOPR-487 - Data disk mounting fails on Joyent/CentOS
   * |JIRA|COOPR-488 - standalone script doesn't load defaults if restart is used
