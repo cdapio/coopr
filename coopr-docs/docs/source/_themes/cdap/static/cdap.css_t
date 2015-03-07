@@ -336,3 +336,10 @@ img.bordered-image {
     display: inline-block; 
     margin-top: 20px; 
 }
+
+img.thin-bordered-image, .figure.align-center { 
+    border:1px outset #708091;
+    display: inline-block; 
+    margin-top: 20px; 
+}
+

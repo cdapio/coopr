@@ -29,7 +29,7 @@ admins and users in one tenant cannot access objects from another tenant. The on
 tenant by copying every provider, service, hardware type, image type, cluster template, and plugin resource from the superadmin tenant
 to their own tenant. As a superadmin, you may see an overview of all tenants by clicking on the tenants tab at the top of the screen. 
 
-.. figure:: /_images/superadmin/tenants/overview.png
+.. figure:: /_images/superadmin/tenants/sa_overview.png
     :align: center
     :width: 800px
     :alt: Tenants overview page
@@ -55,7 +55,7 @@ To create a tenant, click on the 'Add tenant' button near the top right of the t
 tenant creation page where you can assign workers to the new tenant and set limits on the number of clusters and nodes allowed
 in the tenant.
 
-.. figure:: /_images/superadmin/tenants/tenant_create.png
+.. figure:: /_images/superadmin/tenants/sa_tenant_create.png
     :align: center
     :width: 800px
     :alt: Tenant creation page
@@ -79,7 +79,7 @@ Edit a Tenant
 
 You can edit a tenant by clicking on the name of the tenant on the overview page. 
 
-.. figure:: /_images/superadmin/tenants/tenant_edit.png
+.. figure:: /_images/superadmin/tenants/sa_tenant_edit.png
     :align: center
     :width: 800px
     :alt: Tenant edit page

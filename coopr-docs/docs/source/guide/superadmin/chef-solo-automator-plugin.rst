@@ -184,8 +184,6 @@ Attributes normally specified in an environment can instead be populated in Coop
 
 The Chef Solo Automator utilizes the :doc:`Plugin Resources </guide/admin/plugin-resources>` capability of Coopr in order to manage cookbooks, data bags, and roles.  Each of these Chef primitives can be uploaded to the Coopr server individually as resources.  Refer to the :doc:`Plugin Resources Guide </guide/admin/plugin-resources>` for more details on plugin resource management.
 
-.. |http:| replace:: http:
-
 Examples:
 
 .. parsed-literal::

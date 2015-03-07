@@ -42,7 +42,7 @@ create and manage tenants. Each tenant has its own admin and a number of users. 
 providers and templates to allow their users to easily create and manage clusters. Data from one tenant is isolated to that
 tenant and is invisible to users in other tenants. The superadmin is also an admin in its own tenant.
 
-.. figure:: /_images/quickstart/login.png
+.. figure:: /_images/quickstart/qs_login.png
     :align: center
     :width: 800px
     :alt: Login as the super admin
@@ -55,7 +55,7 @@ indicates all the nodes ever provisioned. (i.e. it is a historical cumulative nu
 deleted nodes.) This page also shows the 'Catalog', which is a list of 'templates'
 for provisioning clusters. Several default templates are available out of the box.
 
-.. figure:: /_images/quickstart/home_screen2.png
+.. figure:: /_images/quickstart/qs_home_screen.png
     :align: center
     :width: 800px
     :alt: Administrator home screen
@@ -70,7 +70,7 @@ of the system. Near the top of the screen, the total number of workers, the numb
 currently in progress and queued are displayed. These numbers are aggregates across all tenants in the system, and are visible only
 to the superadmin. 
 
-.. figure:: /_images/quickstart/tenants_overview.png
+.. figure:: /_images/quickstart/qs_tenants_overview.png
     :align: center
     :width: 800px
     :alt: Tenant management screen
@@ -81,7 +81,7 @@ in order to support additional tenants. With a clean install, only the the super
 assigned to any tenant. In order to create a cluster, we must assign some workers to the superadmin tenant. To do this, we must edit
 the superadmin tenant by clicking on it, which will bring you to the edit tenant screen.
 
-.. figure:: /_images/quickstart/tenants_edit.png
+.. figure:: /_images/quickstart/qs_tenants_edit.png
     :align: center
     :width: 800px
     :alt: Tenant edit screen
@@ -112,7 +112,7 @@ The Amazon providers require a lot of fields. Of these many fields, ``Secret Acc
 either the ``Security Groups`` field if your account does not use VPC, or the ``Security Groups IDs`` and ``Subnet ID``
 fields if your account uses VPC. The rest of the fields are optional.
 
-.. figure:: /_images/quickstart/providers_aws.png
+.. figure:: /_images/quickstart/qs_providers_aws.png
     :align: center
     :width: 800px
     :alt: Configuring an AWS provider
@@ -160,7 +160,7 @@ Note: ssh key name is the name under which you uploaded your key in the DigitalO
 
 Enter values for all those fields.  If applicable, change the region from the default (currently nyc2).
 
-.. figure:: /_images/quickstart/providers_digitalocean.png
+.. figure:: /_images/quickstart/qs_providers_digitalocean.png
     :align: center
     :width: 800px
     :alt: Configuring a DigitalOcean provider
@@ -189,7 +189,7 @@ The google provider requires a p12 API key, a service account email address, som
 a ssh key to ssh onto nodes, a ssh username for that key, and a zone. Enter the corresponding values in the 
 ``Service account email address``, ``Project ID``, ``SSH Username``, and ``Zone`` field.
 
-.. figure:: /_images/quickstart/providers_google.png
+.. figure:: /_images/quickstart/qs_providers_google.png
     :align: center
     :width: 800px
     :alt: Configuring a Google provider
@@ -241,7 +241,7 @@ Joyent
 Joyent requires a CloudAPI username, region, API version, ssh key, and ssh key name. Enter values for all fields
 except for the ``SSH Key Resource Name``.
 
-.. figure:: /_images/quickstart/providers_joyent.png
+.. figure:: /_images/quickstart/qs_providers_joyent.png
     :align: center
     :width: 800px
     :alt: Configuring a Joyent provider
@@ -288,7 +288,7 @@ The first step is to configure the openstack provider to use your credentials.
 OpenStack requires a password, username, auth url, tenant, ssh key, and ssh key name. Enter the correct value for
 every field, except for the ``SSH Key Resource Name``.
 
-.. figure:: /_images/quickstart/providers_openstack.png
+.. figure:: /_images/quickstart/qs_providers_openstack.png
     :align: center
     :width: 800px
     :alt: Configuring an OpenStack provider
@@ -332,7 +332,7 @@ configured because their flavors are public and unchanging, whereas your OpenSta
 'Add Provider' button, change the provider to openstack, and input your OpenStack's flavor identifier for the corresponding hardware 
 type. You may need to contact your OpenStack administrator to get this information. 
 
-.. figure:: /_images/quickstart/providers_openstack_hardware.png
+.. figure:: /_images/quickstart/qs_providers_openstack_hardware.png
     :align: center
     :width: 800px
     :alt: Configuring an OpenStack hardware type
@@ -343,7 +343,7 @@ Images tab of the left and edit each image type in the list that you wish to use
 change the provider to openstack, and input your OpenStack's image identifier for the corresponding image type. You may need to 
 contact your OpenStack administrator to get this information.
 
-.. figure:: /_images/quickstart/providers_openstack_image.png
+.. figure:: /_images/quickstart/qs_providers_openstack_image.png
     :align: center
     :width: 800px
     :alt: Configuring an OpenStack image type
@@ -355,7 +355,7 @@ Rackspace
 An API key, username, and region are required for using Rackspace (for more information on how to obtain your personalized API key, see
 `this page <http://www.rackspace.com/knowledge_center/article/rackspace-cloud-essentials-1-generating-your-api-key>`_ ).
 
-.. figure:: /_images/quickstart/providers_rackspace.png
+.. figure:: /_images/quickstart/qs_providers_rackspace.png
     :align: center
     :width: 800px
     :alt: Configuring a Rackspace provider
@@ -370,7 +370,7 @@ Provisioning your First Cluster
 Click on the 'Clusters' icon on the right most icon on the top bar. This page lists all the clusters
 that have been provisioned that are accessible to the logged in user.
 
-.. figure:: /_images/quickstart/clusters.png
+.. figure:: /_images/quickstart/qs_clusters.png
     :align: center
     :width: 800px
     :alt: Creating a cluster
@@ -386,7 +386,7 @@ Display the advanced settings menu by clicking on the small triangle next to the
 the default settings for the 'hadoop-distributed' template. If you chose a provider other than the default 
 in the previous section, click on the drop down menu labeled 'Provider' to select the provider you want.
 
-.. figure:: /_images/quickstart/cluster_create_advanced.png
+.. figure:: /_images/quickstart/qs_cluster_create_advanced.png
     :align: center
     :width: 800px
     :alt: Advanced settings
@@ -395,7 +395,7 @@ in the previous section, click on the drop down menu labeled 'Provider' to selec
 To start provisioning, click on 'Create' at the bottom of the page (not shown in the image above). This operation will take you back to the Clusters' home
 screen, where you can monitor the progress and status of your cluster. Creating a cluster may take several minutes.
 
-.. figure:: /_images/quickstart/clusters_list.png
+.. figure:: /_images/quickstart/qs_clusters_list.png
     :align: center
     :width: 800px
     :alt: Creation running
@@ -411,7 +411,7 @@ Clusters' home screen. On this cluster description screen, nodes are grouped tog
 of services that are available on them. To see node details, click on the white triangles next to each
 service set to expand the list. The expanded list shows a list of attributes for each node.
 
-.. figure:: /_images/quickstart/cluster_details.png
+.. figure:: /_images/quickstart/qs_cluster_details.png
     :align: center
     :width: 800px
     :alt: Cluster description and details
