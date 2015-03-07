@@ -1,5 +1,5 @@
 ..
-   Copyright © 2012-2014 Cask Data, Inc.
+   Copyright © 2012-2015 Cask Data, Inc.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -181,17 +181,14 @@ After selecting all the services to add, click on the 'Submit' button.
     :figclass: align-center
 
 
-User Profile
+User Menu
 ============
 
 Users can bring up a user menu by clicking on the button on the very top-right of the screen. This brings up a menu
-for editing their profile, bringing up documentation, contacting support, and logging out. Clicking on the profile 
-button brings you to a page where you can edit your profile. For the time being, this only contains the ability to 
-change the skin of your UI. In the future, skins will be more customizable and additional settings will be available
-to edit. 
+with links to documentation, contacting support, and logging out.
 
 .. figure:: /_images/user/profile.png
     :align: center
     :width: 800px
-    :alt: User Profile
+    :alt: User Menu
     :figclass: align-center
