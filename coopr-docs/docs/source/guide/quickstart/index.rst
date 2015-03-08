@@ -1,5 +1,5 @@
 ..
-   Copyright © 2012-2014 Cask Data, Inc.
+   Copyright © 2012-2015 Cask Data, Inc.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -52,8 +52,9 @@ tenant and is invisible to users in other tenants. The superadmin is also an adm
 Logging in will take you to the administrator home screen. The page, shown below, displays metrics for clusters
 that are currently running within the tenant. Note, the 'All Nodes' count metric
 indicates all the nodes ever provisioned. (i.e. it is a historical cumulative number including the
-deleted nodes.) This page also shows the 'Catalog', which is a list of 'templates'
-for provisioning clusters. Several default templates are available out of the box.
+deleted nodes.) This page also shows, in the icons at the top of the page, a link to the
+'Catalog', which is a list of 'templates' for provisioning clusters. Several default
+templates are available out of the box.
 
 .. figure:: /_images/quickstart/qs_home_screen.png
     :align: center
@@ -64,7 +65,17 @@ for provisioning clusters. Several default templates are available out of the bo
 Adding Workers
 ==============
 
-Before clusters can be created, workers must be assigned to the tenant. To do so, click on the tenants tab at the top of the screen.
+Before clusters can be created, workers must be assigned to the tenant. To do so, click on
+the Admin button in the upper-right of the page to bring down the Admin profile menu. Select
+the 'Tenants' item from the menu:
+
+.. figure:: /_images/quickstart/qs_tenants_menu.png
+    :align: center
+    :width: 800px
+    :alt: Tenant management screen
+    :figclass: align-center
+
+
 This takes you to the tenant management screen, where a superadmin may create, edit, and delete tenants, as well as get an overview
 of the system. Near the top of the screen, the total number of workers, the number of available workers, and the number of tasks 
 currently in progress and queued are displayed. These numbers are aggregates across all tenants in the system, and are visible only
@@ -118,12 +129,12 @@ fields if your account uses VPC. The rest of the fields are optional.
     :alt: Configuring an AWS provider
     :figclass: align-center
 
-Your AWS ssh key is a plugin resource, and must be uploaded to the Coopr server 
+Your AWS SSH key is a plugin resource, and must be uploaded to the Coopr server 
 before it can be used by workers. Coopr will take care of distributing the key to workers that need it. A UI for managing
-resources is coming in the next release. Until then, you must use the REST API directly (see
+resources is coming in a later release. Until then, you must use the REST API directly (see
 :doc:`Plugin Resource API </rest/plugins>`), or use the data upload tool included in the provisioner package.
 
-For example, assume your ssh key is located at '/keys/aws/id_rsa' and you want to upload it as a resource named 'ec2'.
+For example, assume your SSH key is located at '/keys/aws/id_rsa' and you want to upload it as a resource named 'ec2'.
 Enter 'ec2' into the ``SSH Key Resource Name``, then upload the resource.
 If you are using Coopr Standalone, run the following command from the unzipped standalone directory:
 
@@ -155,8 +166,8 @@ Once you are finished, click on 'Submit' to save your changes.
 DigitalOcean
 ^^^^^^^^^^^^
 
-DigitalOcean requires a client ID, API key and ssh key. For the ssh key, you will also need to enter an ssh key name.
-Note: ssh key name is the name under which you uploaded your key in the DigitalOcean portal.
+DigitalOcean requires a client ID, API key and SSH key. For the SSH key, you will also need to enter an SSH key name.
+Note: SSH key name is the name under which you uploaded your key in the DigitalOcean portal.
 
 Enter values for all those fields.  If applicable, change the region from the default (currently nyc2).
 
@@ -166,8 +177,8 @@ Enter values for all those fields.  If applicable, change the region from the de
     :alt: Configuring a DigitalOcean provider
     :figclass: align-center
 
-Your DigitalOcean ssh key is a plugin resource, and must be uploaded to the Coopr server before it can be used by workers. 
-Coopr will take care of distributing the key to workers that need it. A UI for managing resources is coming in the next release. 
+Your DigitalOcean SSH key is a plugin resource, and must be uploaded to the Coopr server before it can be used by workers. 
+Coopr will take care of distributing the key to workers that need it. A UI for managing resources is coming in a later release. 
 Until then, you must use the REST API directly (see :doc:`Plugin Resource API </rest/plugins>`), or use the data upload tool included 
 in the provisioner package.
 
@@ -185,8 +196,8 @@ If you are using Coopr Standalone, run the following command from the unzipped s
 
 Google
 ^^^^^^
-The google provider requires a p12 API key, a service account email address, some default data disk size, a project id,
-a ssh key to ssh onto nodes, a ssh username for that key, and a zone. Enter the corresponding values in the 
+The Google provider requires a p12 API key, a service account email address, some default data disk size, a project id,
+a SSH key to SSH onto nodes, a SSH username for that key, and a zone. Enter the corresponding values in the 
 ``Service account email address``, ``Project ID``, ``SSH Username``, and ``Zone`` field.
 
 .. figure:: /_images/quickstart/qs_providers_google.png
@@ -197,12 +208,12 @@ a ssh key to ssh onto nodes, a ssh username for that key, and a zone. Enter the 
 
 The required ``API Key Resource Name`` and ``SSH Key Resource Name`` fields are plugin resources, and must
 be uploaded to the Coopr server before it can be used by workers. 
-A UI for managing resources is coming in the next release. Until then, you must use the REST API directly (see
+A UI for managing resources is coming in a later release. Until then, you must use the REST API directly (see
 :doc:`Plugin Resource API </rest/plugins>`), or use the data upload tool included in the provisioner package.
 
-For example, assume your google api key is located at '/keys/gce/gce.p12' and your ssh key is located at '/keys/gce/id_rsa'.
+For example, assume your Google API key is located at '/keys/gce/gce.p12' and your SSH key is located at '/keys/gce/id_rsa'.
 Enter 'gce' in the ``API Key Resource Name`` field and 'coopr' in the ``SSH Key Resource Name`` field.
-We must then upload your api key and name it 'gce', and upload your ssh key and name it 'coopr'.
+We must then upload your API key and name it 'gce', and upload your SSH key and name it 'coopr'.
 If you are using Coopr Standalone, run the following commands from the unzipped standalone directory:
 
 .. code-block:: bash
@@ -230,15 +241,15 @@ If you have installed Coopr from packages or are running it using the VM image:
  sync successful
 
 The port to use is the server port, which defaults to 55054 if you have not set it in your server configuration.
-This will upload your api and ssh keys to the server, then sync them to make them available to use. After this you may 
-use these keys in any other google provider you manage. Similarly, you may upload other keys you may want to use.
+This will upload your API and SSH keys to the server, then sync them to make them available to use. After this you may 
+use these keys in any other Google provider you manage. Similarly, you may upload other keys you may want to use.
 
 Once you are finished, click 'Submit' to save your changes.
 
 
 Joyent
 ^^^^^^
-Joyent requires a CloudAPI username, region, API version, ssh key, and ssh key name. Enter values for all fields
+Joyent requires a CloudAPI password, username, region, API version, SSH key, and SSH key name. Enter values for all fields
 except for the ``SSH Key Resource Name``.
 
 .. figure:: /_images/quickstart/qs_providers_joyent.png
@@ -247,9 +258,9 @@ except for the ``SSH Key Resource Name``.
     :alt: Configuring a Joyent provider
     :figclass: align-center
 
-Your Joyent ssh key is a plugin resource, and must be uploaded to the Coopr server 
+Your Joyent SSH key is a plugin resource, and must be uploaded to the Coopr server 
 before it can be used by workers. Coopr will take care of distributing the key to workers that need it. A UI for managing
-resources is coming in the next release. Until then, you must use the REST API directly (see
+resources is coming in a later release. Until then, you must use the REST API directly (see
 :doc:`Plugin Resource API </rest/plugins>`), or use the data upload tool included in the provisioner package.
 
 For example, assume your key is located at '/keys/joyent/id_rsa' and you want to add it as a resource named 'coopr'.
@@ -285,7 +296,7 @@ The OpenStack provider has been tested on Havana, but also supports Grizzly out 
 some limitations that are described :doc:`here </installation/openstack-config>`.
 Several of these limitations will be eliminated in future releases of Coopr.
 The first step is to configure the openstack provider to use your credentials. 
-OpenStack requires a password, username, auth url, tenant, ssh key, and ssh key name. Enter the correct value for
+OpenStack requires a password, username, auth url, tenant, SSH key, and SSH key name. Enter the correct value for
 every field, except for the ``SSH Key Resource Name``.
 
 .. figure:: /_images/quickstart/qs_providers_openstack.png
@@ -296,10 +307,10 @@ every field, except for the ``SSH Key Resource Name``.
 
 The ``SSH Key Resource Name`` is a plugin resource, and must be uploaded to the Coopr server 
 before it can be used by workers. Coopr will take care of distributing the key to workers that need it. A UI for managing
-resources is coming in the next release. Until then, you must use the REST API directly (see
+resources is coming in a later release. Until then, you must use the REST API directly (see
 :doc:`Plugin Resource API </rest/plugins>`), or use the data upload tool included in the provisioner package.
 
-For example, assume your key is located at '/keys/openstack/id_rsa' and you want to upload it as a resource named 'coopr'.
+For example, assume your key is located at ``/keys/openstack/id_rsa`` and you want to upload it as a resource named 'coopr'.
 Enter 'coopr' into the ``SSH Key Resource Name``, then upload the resource.
 If you are using Coopr Standalone, run the following command from the unzipped standalone directory:
 
@@ -368,19 +379,28 @@ Provisioning your First Cluster
 ===============================
 
 Click on the 'Clusters' icon on the right most icon on the top bar. This page lists all the clusters
-that have been provisioned that are accessible to the logged in user.
+that have been provisioned that are accessible to the logged-in user.
 
 .. figure:: /_images/quickstart/qs_clusters.png
+    :align: center
+    :width: 800px
+    :alt: Clusters list
+    :figclass: align-center
+
+Click on the 'Create' buttom at the top right (or, as you have no clusters currently, the
+'Create a cluster' button in the middle of the list) to enter the cluster creation page:
+
+.. figure:: /_images/quickstart/qs_cluster_create.png
     :align: center
     :width: 800px
     :alt: Creating a cluster
     :figclass: align-center
 
-Click on the 'Create' buttom at the top right to enter the cluster creation page. In the 'Name' field,
-enter a name (for example, 'hadoop-quickstart') as the name of the cluster to create. The 'Template' field
-specifies which template in the catalog to use for this cluster. For this tutorial, let's
-create a distributed Hadoop cluster.  Select 'hadoop-distributed' from the 'Template' drop down box. 
-Enter the number of nodes you want your cluster to have (for example, 5) in the field labeled 'Number of machines'.
+In the 'Name' field, enter a name (for example, 'hadoop-quickstart') as the name of the
+cluster to create. The 'Template' field specifies which template in the catalog to use for
+this cluster. For this tutorial, let's create a distributed Hadoop cluster.  Select
+'hadoop-distributed' from the 'Template' drop down box. Enter the number of nodes you want
+your cluster to have (for example, 5) in the field labeled '# of nodes'.
 
 Display the advanced settings menu by clicking on the small triangle next to the label 'Advanced'. This lists
 the default settings for the 'hadoop-distributed' template. If you chose a provider other than the default 
@@ -389,7 +409,7 @@ in the previous section, click on the drop down menu labeled 'Provider' to selec
 .. figure:: /_images/quickstart/qs_cluster_create_advanced.png
     :align: center
     :width: 800px
-    :alt: Advanced settings
+    :alt: Advanced cluster settings
     :figclass: align-center
 
 To start provisioning, click on 'Create' at the bottom of the page (not shown in the image above). This operation will take you back to the Clusters' home
@@ -408,8 +428,9 @@ Once creation is complete, the cluster is ready for use.
 
 For more information on your cluster, click on the name 'hadoop-quickstart' on the
 Clusters' home screen. On this cluster description screen, nodes are grouped together by the set
-of services that are available on them. To see node details, click on the white triangles next to each
-service set to expand the list. The expanded list shows a list of attributes for each node.
+of services that are available on them. To see node details, click on the descriptions
+next to the number of nodes ('2 noes with 5 services each') to expand the list. The
+expanded list shows a list of attributes for each node.
 
 .. figure:: /_images/quickstart/qs_cluster_details.png
     :align: center
@@ -417,6 +438,8 @@ service set to expand the list. The expanded list shows a list of attributes for
     :alt: Cluster description and details
     :figclass: align-center
 
-In this example, there is 1 master node that contains the 'hbase-master', 'hadoop-hdfs-namenode', 'zookeeper-server', and
-'hadoop-yarn-resourcemenager' services. There are also 4 slave nodes that contain the 'hbase-regionserver', 'hadoop-yarn-nodemanager',
-and 'hadoop-hdfs-datanode' services.
+In this example, there is 1 master node that contains the 'base',
+'continuuity-sensu-monitoring', 'hadoop-hdfs-namenode', 'hadoop-yarn-resourcemanager',
+'hbase-master', and 'zookeeper-server' services. There are also 2 slave nodes that contain
+the 'base', 'continuuity-sensu-monitoring', 'hadoop-hdfs-datanode',
+'hadoop-yarn-nodemanager', and 'hbase-regionserver' services.

@@ -1,5 +1,5 @@
 ..
-   Copyright © 2012-2014 Cask Data, Inc.
+   Copyright © 2012-2015 Cask Data, Inc.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -22,12 +22,23 @@
 Tenant Management
 =================
 
-The superadmin can create, edit, and delete tenants. The superadmin is also an admin of his own superadmin tenant, meaning the 
+The superadmin can create, edit, and delete tenants. The superadmin is also an admin of its own superadmin tenant, meaning the 
 superadmin can create, edit, and delete providers, services, hardware types, image types, cluster templates, and plugin resources
-for his own tenant. This also means the superadmin can create clusters. Tenants are completely isolated from other tenants, meaning
+for its own tenant. This also means the superadmin can create clusters. Tenants are completely isolated from other tenants, meaning
 admins and users in one tenant cannot access objects from another tenant. The one exception is that tenant admins can bootstrap their
 tenant by copying every provider, service, hardware type, image type, cluster template, and plugin resource from the superadmin tenant
-to their own tenant. As a superadmin, you may see an overview of all tenants by clicking on the tenants tab at the top of the screen. 
+to their own tenant. As a superadmin, you may see an overview of all tenants by clicking on
+the Admin button in the upper-right of the page to bring down the Admin profile menu. Select
+the 'Tenants' item from the menu:
+
+.. figure:: /_images/superadmin/tenants/sa_profile.png
+    :align: center
+    :width: 800px
+    :alt: Profile menu
+    :figclass: align-center
+
+This takes you to the 'Tenant List' Overview page:
+
 
 .. figure:: /_images/superadmin/tenants/sa_overview.png
     :align: center
@@ -43,15 +54,15 @@ If your system does not have enough workers to meet your needs, you will need to
 to a tenant is exactly equal to the number of tasks that can be executed in parallel for the tenant. Tenants with a lot of activity
 will require more workers. 
 
-The number of in progress tasks is the number of tasks that are currently being executed by a worker in some tenant. The number of
+The number of in-progress tasks is the number of tasks that are currently being executed by a worker in some tenant. The number of
 queue tasks are tasks that are queued, but are not currently being executed. If your queued tasks are consistently high, it is a 
-sign that there is at least one tenant that does not have enough workers. These numbers can be broken down per tenant by using the
+sign that there is at least one tenant that does not have enough workers. These numbers can be broken down for each tenant by using the
 :doc:`Tenant APIs </rest/tenants>` and :doc:`Provisioner APIs </rest/provisioners>`. 
 
 Creating a Tenant
 =================
 
-To create a tenant, click on the 'Add tenant' button near the top right of the tenants overview screen. This takes you to the
+To create a tenant, click on the 'Create' button near the top right of the tenants overview screen. This takes you to the
 tenant creation page where you can assign workers to the new tenant and set limits on the number of clusters and nodes allowed
 in the tenant.
 
@@ -71,7 +82,7 @@ will be copied to the new tenant.
 If a user in the tenant tries to create a cluster that would cause the max clusters or  
 max nodes limit to be violated, that create request will fail.
 
-Once you are done, hit the 'Submit' button to create the tenant. This will take you back to the overview page, where you should
+Once you are done, hit the 'Create' button to create the tenant. This will take you back to the overview page, where you should
 notice that the number of available workers has decreased in response to assigning workers to the new tenant.
 
 Edit a Tenant
