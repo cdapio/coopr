@@ -31,7 +31,7 @@ Release Highlights
   * Provider plugin for Digital Ocean added
   * New UI, rewritten to be more modular and extensible
   * CLI tool, allows interaction via simple commands
-  * Split Server APIs into internal and external, served on different ports
+  * Splits the Server APIs into internal and external APIs, served on different ports
   * Node usage metrics, provides detailed metrics by tenant, user, or template
   * Significant bug and stability fixes to provisioner and server
   * Initial support for versioned templates
@@ -57,7 +57,7 @@ New Features
   * `COOPR-531 <https://issues.cask.co/browse/COOPR-531>`_ - Command Line Shell for Coopr similar to CDAP CLI
   * `COOPR-542 <https://issues.cask.co/browse/COOPR-542>`_ - Add ability to configure UI to use TLS
   * `COOPR-563 <https://issues.cask.co/browse/COOPR-563>`_ - Support for DigitalOcean provider
-  * `COOPR-567 <https://issues.cask.co/browse/COOPR-567>`_ - Split server APIs to separate ports.
+  * `COOPR-567 <https://issues.cask.co/browse/COOPR-567>`_ - Split server APIs to separate ports
   * `COOPR-594 <https://issues.cask.co/browse/COOPR-594>`_ - SSH Host-key validation
   * `COOPR-609 <https://issues.cask.co/browse/COOPR-609>`_ - TLS configuration for Coopr components
   * `COOPR-611 <https://issues.cask.co/browse/COOPR-611>`_ - Secure communications with SSL
