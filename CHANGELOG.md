@@ -188,6 +188,7 @@ v0.9.9 (Unreleased)
   - ( Issues: #929 caskdata/coopr-provisioner#35 caskdata/coopr-provisioner#36 caskdata/coopr-provisioner#37 caskdata/coopr-provisioner#38 caskdata/coopr-provisioner#39 caskdata/coopr-provisioner#40 caskdata/coopr-provisioner#41 caskdata/coopr-provisioner#42 caskdata/coopr-provisioner#43 caskdata/coopr-provisioner#44 caskdata/coopr-provisioner#45 caskdata/coopr-provisioner#46 caskdata/coopr-provisioner#47 caskdata/coopr-provisioner#48 caskdata/coopr-provisioner#49 )
   - ( Issues: #935 caskdata/coopr-provisioner#50 caskdata/coopr-provisioner#51 caskdata/coopr-provisioner#52 caskdata/coopr-provisioner#53 caskdata/coopr-provisioner#55 caskdata/coopr-provisioner#56 )
   - ( Issues: #940 caskdata/coopr-provisioner#57 caskdata/coopr-provisioner#58 caskdata/coopr-provisioner#59 caskdata/coopr-provisioner#60 caskdata/coopr-provisioner#61 caskdata/coopr-provisioner#62 )
+  - ( Issues: #948 caskdata/coopr-provisioner#63 )
 
 v0.9.8 (09/26/14)
 -----------------
