@@ -157,3 +157,14 @@ Bugs
   * `COOPR-730 <https://issues.cask.co/browse/COOPR-730>`_ - joyent plugin provider fails on CentOS: confirm stage fails to unmount disk
   * `COOPR-731 <https://issues.cask.co/browse/COOPR-731>`_ - Standalone startup script broken
 
+Known Issues
+^^^^^^^^^^^^
+
+  * Provisioner: during chef-solo, between bootstrap and coopr hosts running, non-fatal sudo error
+  * UI: If base is removed from selected roles/services to install, it still gets installed
+  * UI: Unable to edit provider
+  * Node usage API: Coopr Node Usage Hours 'now-Nx' does not work               `COOPR-714 <https://issues.cask.co/browse/COOPR-714>`_
+  * Node usage API: API allows arbitrary, random parameters to be used as keys  `COOPR-716 <https://issues.cask.co/browse/COOPR-716>`_
+  * CDH install fails when distribution_version >= 5.3 specified                `COOPR-740 <https://issues.cask.co/browse/COOPR-740>`_
+  * Template Creation. Service Constraints min/max boxes are uneditable         `COOPR-739 <https://issues.cask.co/browse/COOPR-739>`_
+  * Node deletion issue (Joyent) 
