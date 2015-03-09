@@ -157,8 +157,9 @@ Bugs
   * `COOPR-730 <https://issues.cask.co/browse/COOPR-730>`_ - joyent plugin provider fails on CentOS: confirm stage fails to unmount disk
   * `COOPR-731 <https://issues.cask.co/browse/COOPR-731>`_ - Standalone startup script broken
 
+
 Known Issues
-^^^^^^^^^^^^
+------------
 
   * Provisioner: during chef-solo, between bootstrap and coopr hosts running, non-fatal sudo error
   * UI: If base is removed from selected roles/services to install, it still gets installed
