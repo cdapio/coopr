@@ -22,14 +22,14 @@
 Tenant Management
 =================
 
-The superadmin can create, edit, and delete tenants. The superadmin is also an admin of its own superadmin tenant, meaning the 
-superadmin can create, edit, and delete providers, services, hardware types, image types, cluster templates, and plugin resources
-for its own tenant. This also means the superadmin can create clusters. Tenants are completely isolated from other tenants, meaning
-admins and users in one tenant cannot access objects from another tenant. The one exception is that tenant admins can bootstrap their
-tenant by copying every provider, service, hardware type, image type, cluster template, and plugin resource from the superadmin tenant
-to their own tenant. As a superadmin, you may see an overview of all tenants by clicking on
-the Admin button in the upper-right of the page to bring down the Admin profile menu. Select
-the 'Tenants' item from the menu:
+The superadmin can create, edit, and delete tenants. The superadmin is also an admin of
+its own superadmin tenant, meaning the superadmin can create, edit, and delete providers,
+services, hardware types, image types, cluster templates, and plugin resources for its own
+tenant. This also means the superadmin can create clusters. Tenants are completely
+isolated from other tenants, meaning admins and users in one tenant cannot access objects
+from another tenant. As a superadmin, you may see an overview of all tenants by clicking
+on the Admin button in the upper-right of the page to bring down the Admin profile menu.
+Select the 'Tenants' item from the menu:
 
 .. figure:: /_images/superadmin/tenants/sa_profile.png
     :align: center
@@ -72,12 +72,8 @@ in the tenant.
     :alt: Tenant creation page
     :figclass: align-center
 
-You cannot assign more workers to the tenant than the number of available workers. When creating a tenant, you may optionally
-bootstrap the tenant. Bootstrapping a tenant copies all providers, hardware types, image types, services, cluster templates,
-and plugin resources from the superadmin tenant to the newly created tenant. If you do not bootstrap the tenant, it will be
+You cannot assign more workers to the tenant than the number of available workers. When creating a tenant, it will be
 completely empty, and the tenant admin will need to populate all entities before it can be used to create any clusters.
-Be aware that bootstrapping copies all plugin resources, meaning any provider keys that have been uploaded to the superadmin tenant
-will be copied to the new tenant.
 
 If a user in the tenant tries to create a cluster that would cause the max clusters or  
 max nodes limit to be violated, that create request will fail.
