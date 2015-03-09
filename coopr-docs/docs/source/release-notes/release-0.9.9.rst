@@ -161,7 +161,8 @@ Bugs
 Known Issues
 ------------
 
-  * Provisioner: during chef-solo, between bootstrap and coopr hosts running, non-fatal sudo error
+  * Provisioner: plugins must now extend from Coopr::Plugin::Automator or Coopr::Plugin::Provider.  Existing custom plugins need to be updated accordingly for 0.9.9
+  * Provisioner: non-fatal sudo errors may be seen prior to coopr_hosts (part of base service) being run
   * UI: If base is removed from selected roles/services to install, it still gets installed
   * UI: Unable to edit provider
   * Node usage API: Coopr Node Usage Hours 'now-Nx' does not work               `COOPR-714 <https://issues.cask.co/browse/COOPR-714>`_
