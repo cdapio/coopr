@@ -16,6 +16,8 @@
 .. index::
    single: Coopr Upgrade
 
+.. _upgrade-to-0.9.9:
+
 ==================
 Coopr Upgrade
 ==================
@@ -60,7 +62,7 @@ On the Coopr servers:
 3. Upgrade Database Schema (if using an external database)
 
   * You have to update the schema for any external database. However, we only provide example SQL files for MySQL.
-      The changes need to be made to any external database. To update MySQL:
+    The changes need to be made to any external database. To update MySQL:
 
   .. code-block:: bash
 
@@ -69,6 +71,7 @@ On the Coopr servers:
 4. Change the provisioner.server.uri port
 
   * Edit the ``provisioner.server.uri`` property in ``/etc/coopr/conf/provisioner-site.xml`` and change the port from 55054 to 55055 unless you have changed the port with server.tasks.uri, in which case you should match the port below to that one. Here is an example (changing your server to the correct host/FQDN):
+
   .. code-block:: bash
 
    <property>

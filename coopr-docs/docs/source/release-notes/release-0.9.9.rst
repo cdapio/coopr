@@ -40,6 +40,7 @@ Release Highlights
   * New Services: Impala, Node.js modules, PHP modules, Docker, Nginx 
   * New Cluster Templates: Docker, MEAN, MongoDB
   * Coopr cookbook updates (coopr_*)
+  * :ref:`Upgrade Guide <upgrade-to-0.9.9>` for upgrading Coopr from 0.9.8 to 0.9.9
 
 Change List
 -----------

@@ -37,3 +37,5 @@ to experiment with, you can choose to use Coopr Standalone, or Coopr in a VM.
   openstack-config
   ui-config
   authentication
+  upgrade
+  

@@ -184,10 +184,10 @@ html_theme_options = {
   "versions":"http://docs.cask.co/%s/json-versions.js" % project.lower(),
   "versions_data":
     { "development": 
-        [ ["0.9.9-SNAPSHOT", "0.9.9"], ], 
-      "current": ["0.9.8", "0.9.8"], 
+        [ ["0.9.10-SNAPSHOT", "0.9.10"], ], 
+      "current": ["0.9.9", "0.9.9"], 
       "older": 
-        [ ], 
+        ["0.9.8", "0.9.8"], 
     },
 }
 
