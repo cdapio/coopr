@@ -1,0 +1,359 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-55081520-3']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+    <title>0.9.9 Release Notes &mdash; Coopr 0.9.9 Documentation</title>
+    
+    <link rel="stylesheet" href="../_static/cdap.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+
+
+
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.9.9',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    <link rel="top" title="Coopr 0.9.9 Documentation" href="../index.html" />
+    <link rel="up" title="Release Notes" href="index.html" />
+    <link rel="next" title="0.9.8 Release Notes" href="release-0.9.8.html" />
+    <link rel="prev" title="Release Notes" href="index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">Index</a></li>
+        <li class="right" >
+          <a href="release-0.9.8.html" title="0.9.8 Release Notes"
+             accesskey="N">Next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Release Notes"
+             accesskey="P">Previous</a> |</li>
+        
+        <script type="text/javascript" src="../_static/version-menu.js"></script>
+        <script src="http://docs.cask.co/coopr/json-versions.js"/></script>
+        <script>window.setVersion('0.9.9');</script>
+       
+        <li><a href="../index.html">Coopr Documentation v0.9.9</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Release Notes</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <span class="target" id="release-notes-0-9-9"></span><div class="section" id="release-notes">
+<span id="index-0"></span><h1>0.9.9 Release Notes<a class="headerlink" href="#release-notes" title="Permalink to this headline">¶</a></h1>
+<p>Welcome to the Coopr 0.9.9 release. Release notes with links to issue details can be seen
+from the github project at <a class="reference external" href="https://github.com/caskdata/coopr/releases">https://github.com/caskdata/coopr/releases</a>.</p>
+<div class="section" id="release-highlights">
+<h2>Release Highlights<a class="headerlink" href="#release-highlights" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li>Docker support, ability to deploy Docker services and manage Docker containers</li>
+<li>Provider plugin for Digital Ocean added</li>
+<li>New UI, rewritten to be more modular and extensible</li>
+<li>CLI tool, allows interaction via simple commands</li>
+<li>Splits the Server APIs into internal and external APIs, served on different ports</li>
+<li>Node usage metrics, provides detailed metrics by tenant, user, or template</li>
+<li>Significant bug and stability fixes to provisioner and server</li>
+<li>Initial support for versioned templates</li>
+<li>Initial SSL support for UI and server</li>
+<li>New Services: Impala, Node.js modules, PHP modules, Docker, Nginx</li>
+<li>New Cluster Templates: Docker, MEAN, MongoDB</li>
+<li>Coopr cookbook updates (coopr_*)</li>
+<li><a class="reference internal" href="../installation/upgrade.html#upgrade-to-0-9-9"><em>Upgrade Guide</em></a> for upgrading Coopr from 0.9.8 to 0.9.9</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="change-list">
+<h2>Change List<a class="headerlink" href="#change-list" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="new-features">
+<h3>New Features<a class="headerlink" href="#new-features" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><ul class="simple">
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-195">COOPR-195</a> - Entity versioning</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-199">COOPR-199</a> - Ability to suspend jobs</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-418">COOPR-418</a> - Add more detailed usage statistics</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-493">COOPR-493</a> - Add a command line interface</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-496">COOPR-496</a> - Add some way to expose links for a cluster</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-497">COOPR-497</a> - Split out sensitive config setting into a separate config file</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-513">COOPR-513</a> - Add labels to admin entities</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-531">COOPR-531</a> - Command Line Shell for Coopr similar to CDAP CLI</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-542">COOPR-542</a> - Add ability to configure UI to use TLS</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-563">COOPR-563</a> - Support for DigitalOcean provider</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-567">COOPR-567</a> - Split server APIs to separate ports</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-594">COOPR-594</a> - SSH Host-key validation</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-609">COOPR-609</a> - TLS configuration for Coopr components</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-611">COOPR-611</a> - Secure communications with SSL</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-615">COOPR-615</a> - Secure communications with ZooKeeper using SASL</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-621">COOPR-621</a> - Do not require Internet access for chef-solo automator</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-672">COOPR-672</a> - Attribute-driven ability to install/upgrade/remove packages</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-674">COOPR-674</a> - Support for installing Impala on clusters when CDH is installed.</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-678">COOPR-678</a> - Docker Automator</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-718">COOPR-718</a> - Attribute-driven coopr_hosts /etc/hosts ordering</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-737">COOPR-737</a> - Promote angular-based UI to default</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="improvements">
+<h3>Improvements<a class="headerlink" href="#improvements" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><ul class="simple">
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-64">COOPR-64</a> - Confirmations should mention item being acted upon</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-300">COOPR-300</a> - Move lease times away from milliseconds</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-338">COOPR-338</a> - Improve disk handling for AWS</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-367">COOPR-367</a> - Standalone should copy loom-site.xml.example into server/conf</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-500">COOPR-500</a> - Include organization in pom</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-537">COOPR-537</a> - Add documentation to Cluster Pause feature</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-545">COOPR-545</a> - Better handling of memory settings for Coopr Server</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-556">COOPR-556</a> - remove CORS</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-600">COOPR-600</a> - CLI: doesn&#8217;t show current user or tenant</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-601">COOPR-601</a> - CLI: alias ? to TAB</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-604">COOPR-604</a> - CLI: help command output should be more readable</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-605">COOPR-605</a> - CLI: help should be context-aware</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-624">COOPR-624</a> - CLI: output is always in DEBUG</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-639">COOPR-639</a> - coopr-cli jar is too large (63M)</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-641">COOPR-641</a> - Update netty-http</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-647">COOPR-647</a> - Template dropdown should use label or name instead of description</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-665">COOPR-665</a> - API endpoints should only return a single version</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-670">COOPR-670</a> - Provisioner info log on create should show image name, not value</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-675">COOPR-675</a> - refactor provisioner worker</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-681">COOPR-681</a> - Command Line Interface should provide usage when given invalid command</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-722">COOPR-722</a> - GCE handle quota exceed error</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-736">COOPR-736</a> - Update fog to 1.26.0</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="bugs">
+<h3>Bugs<a class="headerlink" href="#bugs" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><ul class="simple">
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-487">COOPR-487</a> - Data disk mounting fails on Joyent/CentOS</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-488">COOPR-488</a> - standalone script doesn&#8217;t load defaults if restart is used</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-494">COOPR-494</a> - Place safeguards in ClusterCallback</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-507">COOPR-507</a> - Updated Coopr Docker images instructions</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-508">COOPR-508</a> - Enhance Joyent delete to not fail on missing servers</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-511">COOPR-511</a> - Google provisioner plugin disk names</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-519">COOPR-519</a> - cdap singlenode logs fill up the root partition</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-538">COOPR-538</a> - Default sudoers has requiretty on RHEL</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-544">COOPR-544</a> - NGUI: Hide theming feature</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-553">COOPR-553</a> - Cannot run tests</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-554">COOPR-554</a> - Server queues broken in HA mode</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-557">COOPR-557</a> - Flicker on welcome page when clicking on header buttons</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-585">COOPR-585</a> - Using provider hostnames only when not configured</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-586">COOPR-586</a> - cluster configs overrides service configs, need to do deep merge</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-588">COOPR-588</a> - Standalone coopr.sh SSL code has broken startup</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-599">COOPR-599</a> - coopr-cli doesn&#8217;t build</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-603">COOPR-603</a> - CLI: rename &#8220;sync plugins&#8221; to &#8220;sync resources&#8221;</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-608">COOPR-608</a> - Can&#8217;t run coopr-cli.jar</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-612">COOPR-612</a> - maven-shade-plugin corrupt coopr-cli jar</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-613">COOPR-613</a> - UI does not show log messages for failed actions</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-614">COOPR-614</a> - CDAP singlenode template fails to start on AWS</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-619">COOPR-619</a> - COOPR ngui shows cluster created message before creating clusters</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-620">COOPR-620</a> - Auth server doesn&#8217;t start with jdk 1.7 on secure hadoop/secure cdap cluster</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-622">COOPR-622</a> - server /status endpoint not closing connection</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-623">COOPR-623</a> - CLI: quit doesn&#8217;t quit</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-625">COOPR-625</a> - CLI: commands do not function when given on command line</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-626">COOPR-626</a> - Server seems susceptible to hangs/failures when run in an HA setup</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-642">COOPR-642</a> - CLI coopr-cli JAR is huge</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-644">COOPR-644</a> - CLI move tests under coopr-cli directory</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-645">COOPR-645</a> - Remove old UI integration tests</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-651">COOPR-651</a> - Update netty-http to 0.8.0</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-652">COOPR-652</a> - Calls to /status should set &#8220;Connection: close&#8221; header</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-660">COOPR-660</a> - Coopr Server does not accept JSON input</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-661">COOPR-661</a> - Coopr Server builds failing</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-666">COOPR-666</a> - UI should not force base service on clusters</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-682">COOPR-682</a> - Unused setting kafka.broker.quorum is added to cdap-site.xml</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-685">COOPR-685</a> - server leaking zookeeper watches</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-686">COOPR-686</a> - Coopr UI lease expiration slider broken/dangerous</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-689">COOPR-689</a> - Dummy provisioner load-mock.sh uses wrong API port</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-691">COOPR-691</a> - Can&#8217;t start CLI if Coopr isn&#8217;t running locally</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-692">COOPR-692</a> - deleting of GCE hosts without a provider id dangerous</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-696">COOPR-696</a> - google disk delete issues</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-700">COOPR-700</a> - standalone data directory should be moved</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-702">COOPR-702</a> - coopr_base::default fails for vanilla standalone due to users databag</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-703">COOPR-703</a> - MySQL upgrade SQL script doesn&#8217;t work</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-704">COOPR-704</a> - ec2 key fields not populated with provider defaults</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-705">COOPR-705</a> - coopr-base can interfere with sudo access in vanilla standalone</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-706">COOPR-706</a> - Scheduling jobs fails after upgrade</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-709">COOPR-709</a> - Registering provisioner capabilities causes an error</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-711">COOPR-711</a> - After 0.9.8-&gt;0.9.9 upgrade, templates cannot be uploaded</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-713">COOPR-713</a> - cdap-distributed template failing on hive-metastore db permissions</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-721">COOPR-721</a> - Provider-specified hostnames cause issues with YARN/Hive</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-723">COOPR-723</a> - coopr install fails for docker-base template with centos images (yum-epel not found)</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-724">COOPR-724</a> - coopr install fails for docker-base template with ubuntu 12 images (cannot find apt)</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-728">COOPR-728</a> - Upstream cacerts.pem dropped some certs</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-729">COOPR-729</a> - joyent plugin provider fails on Ubuntu for cdap-dist: Failure formatting disk error</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-730">COOPR-730</a> - joyent plugin provider fails on CentOS: confirm stage fails to unmount disk</li>
+<li><a class="reference external" href="https://issues.cask.co/browse/COOPR-731">COOPR-731</a> - Standalone startup script broken</li>
+</ul>
+</div></blockquote>
+</div>
+</div>
+<div class="section" id="known-issues">
+<h2>Known Issues<a class="headerlink" href="#known-issues" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li>Provisioner: non-fatal sudo errors may be seen prior to coopr_hosts (part of base service) being run</li>
+<li>Node usage API: Coopr Node Usage Hours &#8216;now-Nx&#8217; does not work                                         <a class="reference external" href="https://issues.cask.co/browse/COOPR-714">COOPR-714</a></li>
+<li>Node usage API: API allows arbitrary, random parameters to be used as keys                            <a class="reference external" href="https://issues.cask.co/browse/COOPR-716">COOPR-716</a></li>
+<li>UI: If base is removed from selected roles/services prior to install, it still gets installed         <a class="reference external" href="https://issues.cask.co/browse/COOPR-666">COOPR-666</a></li>
+<li>UI: Unable to edit providers with multiple required field sets                                        <a class="reference external" href="https://issues.cask.co/browse/COOPR-714">COOPR-712</a></li>
+<li>UI: Service Constraints fields do not display entered value during Template creation                  <a class="reference external" href="https://issues.cask.co/browse/COOPR-739">COOPR-739</a></li>
+</ul>
+</div></blockquote>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><!--
+  Copyright © 2014-2015 Cask Data, Inc.
+
+  Licensed under the Apache License, Version 2.0 (the "License"); you may not
+  use this file except in compliance with the License. You may obtain a copy of
+  the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+  License for the specific language governing permissions and limitations under
+  the License.
+-->
+
+
+    
+<div aria-label="globaltoc links">
+<h3 class="pagenavtitle"><a href="../index.html"> Table&nbsp;of&nbsp;Contents</a></h3>
+<nav class="pagenav">
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../overview/index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/quickstart/index.html">Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation/index.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/superadmin/index.html">Super Admin Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/admin/index.html">Administration Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/user/index.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rest/index.html">Web Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/security.html">Security</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../implementation.html">Under the Hood</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq/index.html">FAQs</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Release Notes</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="">0.9.9 Release Notes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#release-highlights">Release Highlights</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#change-list">Change List</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#new-features">New Features</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#improvements">Improvements</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#bugs">Bugs</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#known-issues">Known Issues</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="release-0.9.8.html">0.9.8 Release Notes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release-0.9.7.html">0.9.7 Release Notes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../javadocs/index.html">Javadocs</a></li>
+</ul>
+
+</nav>
+</div>
+  <h4>Previous Topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="Previous Chapter">Release Notes</a></p>
+  <h4>Next Topic</h4>
+  <p class="topless"><a href="release-0.9.8.html"
+                        title="Next Chapter">0.9.8 Release Notes</a></p>
+  <div role="note" aria-label="downloads links">
+    <h3>Downloads</h3>
+    <ul class="this-page-menu">
+      <li><a href="http://docs.cask.co/coopr/0.9.9/coopr-docs-0.9.9-web.zip"
+            rel="nofollow">Zip Archive of Coopr Documentation</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick Search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer" role="contentinfo">
+
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;margin:0px auto;}
+.tg td{padding:0px 20px 0px 20px;border-width:0px;overflow:hidden;word-break:normal;font-weight:normal;}
+.tg th{padding:0px 20px 0px 20px;border-width:0px;overflow:hidden;word-break:normal;font-weight:normal;}
+.tg .tg-s6z2{text-align:center;}
+.tg .tg-0ord{text-align:right;}
+.tg a{font-weight:bold;}
+</style>
+<table class="tg" width= 100%>
+  <tr>
+    <th class="tg-031e">Previous Topic: 
+    <a title="Release Notes" href="index.html" />Release Notes</a>&nbsp;&nbsp;
+    
+    </th>
+    <th class="tg-s6z2">
+        Copyright &copy; 2014-2015 Cask Data, Inc.
+    
+    </th>
+    <th class="tg-0ord">&nbsp;&nbsp;Next Topic:
+    <a title="0.9.8 Release Notes" href="release-0.9.8.html" />0.9.8 Release Notes</a>
+    
+    </th>
+  </tr>
+</table>
+
+    </div>
+  </body>
+</html>

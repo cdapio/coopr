@@ -1,0 +1,554 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-55081520-3']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+    <title>Authentication Support &mdash; Coopr 0.9.9 Documentation</title>
+    
+    <link rel="stylesheet" href="../_static/cdap.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+
+
+
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.9.9',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    <link rel="top" title="Coopr 0.9.9 Documentation" href="../index.html" />
+    <link rel="up" title="Installation Guide" href="index.html" />
+    <link rel="next" title="Coopr Upgrade" href="upgrade.html" />
+    <link rel="prev" title="UI Configuration" href="ui-config.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">Index</a></li>
+        <li class="right" >
+          <a href="upgrade.html" title="Coopr Upgrade"
+             accesskey="N">Next</a> |</li>
+        <li class="right" >
+          <a href="ui-config.html" title="UI Configuration"
+             accesskey="P">Previous</a> |</li>
+        
+        <script type="text/javascript" src="../_static/version-menu.js"></script>
+        <script src="http://docs.cask.co/coopr/json-versions.js"/></script>
+        <script>window.setVersion('0.9.9');</script>
+       
+        <li><a href="../index.html">Coopr Documentation v0.9.9</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Installation Guide</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="authentication-support">
+<span id="index-0"></span><h1>Authentication Support<a class="headerlink" href="#authentication-support" title="Permalink to this headline">¶</a></h1>
+<p>Authentication in COOPR Server is carried out using <strong>Authentication Server</strong> - the authentication server integrates
+with different authentication backends (LDAP, JASPI plugins) using a plugin API. Clients must first authenticate
+with the authentication server through this configured backend. Once authenticated, clients are issued an access token
+representing their identity.</p>
+<div class="section" id="enabling-security">
+<h2>Enabling Security<a class="headerlink" href="#enabling-security" title="Permalink to this headline">¶</a></h2>
+<p>To enable security in COOPR Server, add these properties to <tt class="docutils literal"><span class="pre">coopr-site.xml</span></tt>:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="60%" />
+<col width="20%" />
+<col width="20%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Property</th>
+<th class="head">Value</th>
+<th class="head">Default</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>security.enabled</td>
+<td>true</td>
+<td>false</td>
+</tr>
+<tr class="row-odd"><td>security.auth.server.address</td>
+<td>&lt;hostname&gt;</td>
+<td>localhost</td>
+</tr>
+<tr class="row-even"><td>security.auth.server.bind.port</td>
+<td>&lt;port&gt;</td>
+<td>55059</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="configuring-ssl-for-the-authentication-server">
+<h2>Configuring SSL for the Authentication Server<a class="headerlink" href="#configuring-ssl-for-the-authentication-server" title="Permalink to this headline">¶</a></h2>
+<p>To configure the granting of <tt class="docutils literal"><span class="pre">AccessToken</span></tt>s via SSL, add these properties to <tt class="docutils literal"><span class="pre">coopr-security.xml</span></tt>:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="42%" />
+<col width="20%" />
+<col width="38%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Property</th>
+<th class="head">Default Value</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>security.auth.server.ssl.keystore.path</td>
+<td>None</td>
+<td>Keystore file location. The file should
+be owned and readable only by the
+COOPR user</td>
+</tr>
+<tr class="row-odd"><td>security.auth.server.ssl.keystore.password</td>
+<td>None</td>
+<td>Keystore password</td>
+</tr>
+<tr class="row-even"><td>security.auth.server.ssl.keystore.keypassword</td>
+<td>None</td>
+<td>Keystore key password</td>
+</tr>
+<tr class="row-odd"><td>security.auth.server.ssl.keystore.type</td>
+<td>JKS</td>
+<td>Keystore file type</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="configuring-authentication-mechanisms">
+<h2>Configuring Authentication Mechanisms<a class="headerlink" href="#configuring-authentication-mechanisms" title="Permalink to this headline">¶</a></h2>
+<p>COOPR provides several ways to authenticate a user&#8217;s identity.</p>
+<div class="section" id="basic-authentication">
+<h3>Basic Authentication<a class="headerlink" href="#basic-authentication" title="Permalink to this headline">¶</a></h3>
+<p>The simplest way to identity a user is to authenticate against a realm file.
+To configure basic authentication add the following properties to <tt class="docutils literal"><span class="pre">coopr-site.xml</span></tt>:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="43%" />
+<col width="57%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Property</th>
+<th class="head">Value</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>security.authentication.handlerClassName</td>
+<td>co.cask.cdap.security.server.BasicAuthenticationHandler</td>
+</tr>
+<tr class="row-odd"><td>security.authentication.basic.realmfile</td>
+<td>&lt;path&gt;</td>
+</tr>
+</tbody>
+</table>
+<p>The realm file is of the following format:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="nl">username:</span> <span class="n">password</span><span class="o">[,</span><span class="n">rolename</span> <span class="o">...]</span>
+</pre></div>
+</div>
+<p>Note that it is not advisable to use this method of authentication. In production, we recommend using any of the
+other methods described below.</p>
+</div>
+<div class="section" id="ldap-authentication">
+<h3>LDAP Authentication<a class="headerlink" href="#ldap-authentication" title="Permalink to this headline">¶</a></h3>
+<p>You can configure COOPR to authenticate against an LDAP instance by adding these
+properties to <tt class="docutils literal"><span class="pre">coopr-site.xml</span></tt>:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="46%" />
+<col width="54%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Property</th>
+<th class="head">Value</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>security.authentication.handlerClassName</td>
+<td>co.cask.cdap.security.server.LDAPAuthenticationHandler</td>
+</tr>
+<tr class="row-odd"><td>security.authentication.loginmodule.className</td>
+<td>org.eclipse.jetty.plus.jaas.spi.LdapLoginModule</td>
+</tr>
+<tr class="row-even"><td>security.authentication.handler.debug</td>
+<td>true/false</td>
+</tr>
+<tr class="row-odd"><td>security.authentication.handler.hostname</td>
+<td>&lt;hostname&gt;</td>
+</tr>
+<tr class="row-even"><td>security.authentication.handler.port</td>
+<td>&lt;port&gt;</td>
+</tr>
+<tr class="row-odd"><td>security.authentication.handler.userBaseDn</td>
+<td>&lt;userBaseDn&gt;</td>
+</tr>
+<tr class="row-even"><td>security.authentication.handler.userRdnAttribute</td>
+<td>&lt;userRdnAttribute&gt;</td>
+</tr>
+<tr class="row-odd"><td>security.authentication.handler.userObjectClass</td>
+<td>&lt;userObjectClass&gt;</td>
+</tr>
+</tbody>
+</table>
+<p>In addition, you may also configure these optional properties:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="69%" />
+<col width="31%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Property</th>
+<th class="head">Value</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>security.authentication.handler.bindDn</td>
+<td>&lt;bindDn&gt;</td>
+</tr>
+<tr class="row-odd"><td>security.authentication.handler.bindPassword</td>
+<td>&lt;bindPassword&gt;</td>
+</tr>
+<tr class="row-even"><td>security.authentication.handler.userIdAttribute</td>
+<td>&lt;userIdAttribute&gt;</td>
+</tr>
+<tr class="row-odd"><td>security.authentication.handler.userPasswordAttribute</td>
+<td>&lt;userPasswordAttribute&gt;</td>
+</tr>
+<tr class="row-even"><td>security.authentication.handler.roleBaseDn</td>
+<td>&lt;roleBaseDn&gt;</td>
+</tr>
+<tr class="row-odd"><td>security.authentication.handler.roleNameAttribute</td>
+<td>&lt;roleNameAttribute&gt;</td>
+</tr>
+<tr class="row-even"><td>security.authentication.handler.roleMemberAttribute</td>
+<td>&lt;roleMemberAttribute&gt;</td>
+</tr>
+<tr class="row-odd"><td>security.authentication.handler.roleObjectClass</td>
+<td>&lt;roleObjectClass&gt;</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="java-authentication-service-provider-interface-jaspi-authentication">
+<h3>Java Authentication Service Provider Interface (JASPI) Authentication<a class="headerlink" href="#java-authentication-service-provider-interface-jaspi-authentication" title="Permalink to this headline">¶</a></h3>
+<p>To authenticate a user using JASPI add the following properties to <tt class="docutils literal"><span class="pre">coopr-site.xml</span></tt>:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="46%" />
+<col width="54%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Property</th>
+<th class="head">Value</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>security.authentication.handlerClassName</td>
+<td>co.cask.cdap.security.server.JASPIAuthenticationHandler</td>
+</tr>
+<tr class="row-odd"><td>security.authentication.loginmodule.className</td>
+<td>&lt;custom-login-module&gt;</td>
+</tr>
+</tbody>
+</table>
+<p>In addition, any properties with the prefix <tt class="docutils literal"><span class="pre">security.authentication.handler.</span></tt>,
+such as <tt class="docutils literal"><span class="pre">security.authentication.handler.hostname</span></tt>, will also be used by the handler.
+These properties, without the prefix, will be used to instantiate the <tt class="docutils literal"><span class="pre">javax.security.auth.login.Configuration</span></tt> used
+by the <tt class="docutils literal"><span class="pre">LoginModule</span></tt>.</p>
+</div>
+<div class="section" id="custom-authentication">
+<h3>Custom Authentication<a class="headerlink" href="#custom-authentication" title="Permalink to this headline">¶</a></h3>
+<p>To provide a custom authentication mechanism you may create your own <tt class="docutils literal"><span class="pre">AuthenticationHandler</span></tt> by overriding
+<tt class="docutils literal"><span class="pre">AbstractAuthenticationHandler</span></tt> and implementing the abstract methods</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="kd">public</span> <span class="kd">class</span> <span class="nc">CustomAuthenticationHandler</span> <span class="kd">extends</span> <span class="n">AbstractAuthenticationHandler</span> <span class="o">{</span>
+
+  <span class="nd">@Inject</span>
+  <span class="kd">public</span> <span class="nf">CustomAuthenticationHandler</span><span class="o">(</span><span class="n">CConfiguration</span> <span class="n">configuration</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kd">super</span><span class="o">(</span><span class="n">configuration</span><span class="o">);</span>
+  <span class="o">}</span>
+
+  <span class="nd">@Override</span>
+  <span class="kd">protected</span> <span class="n">LoginService</span> <span class="nf">getHandlerLoginService</span><span class="o">()</span> <span class="o">{</span>
+    <span class="c1">// ...</span>
+  <span class="o">}</span>
+
+  <span class="nd">@Override</span>
+  <span class="kd">protected</span> <span class="n">IdentityService</span> <span class="nf">getHandlerIdentityService</span><span class="o">()</span> <span class="o">{</span>
+    <span class="c1">// ...</span>
+  <span class="o">}</span>
+
+  <span class="nd">@Override</span>
+  <span class="kd">protected</span> <span class="n">Configuration</span> <span class="nf">getLoginModuleConfiguration</span><span class="o">()</span> <span class="o">{</span>
+    <span class="c1">// ...</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="testing-security">
+<h3>Testing Security<a class="headerlink" href="#testing-security" title="Permalink to this headline">¶</a></h3>
+<p>From here on out we will use:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="go">&lt;base-url&gt;</span>
+</pre></div>
+</div>
+<p>to represent the base URL that clients can use for the HTTP REST API:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="go">http://&lt;host&gt;:&lt;port&gt;</span>
+</pre></div>
+</div>
+<p>and:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="go">&lt;base-auth-url&gt;</span>
+</pre></div>
+</div>
+<p>to represent the base URL that clients can use for obtaining access tokens:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="go">http://&lt;host&gt;:&lt;auth-port&gt;</span>
+</pre></div>
+</div>
+<p>where <tt class="docutils literal"><span class="pre">&lt;host&gt;</span></tt> is the host name of the COOPR server, <tt class="docutils literal"><span class="pre">&lt;port&gt;</span></tt> is the port that is set as the <tt class="docutils literal"><span class="pre">server.port</span></tt>
+in <tt class="docutils literal"><span class="pre">coopr-site.xml</span></tt> (default: <tt class="docutils literal"><span class="pre">55054</span></tt>), and <tt class="docutils literal"><span class="pre">&lt;auth-port&gt;</span></tt> is the port that is set as the
+<tt class="docutils literal"><span class="pre">security.auth.server.bind.port</span></tt> (default: <tt class="docutils literal"><span class="pre">55059</span></tt>).</p>
+<p>To ensure that you&#8217;ve configured security correctly, run these simple tests to verify that the
+security components are working as expected:</p>
+<ul>
+<li><p class="first">After configuring COOPR as described above, restart COOPR and attempt to use a service:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="go">curl &lt;base-url&gt;/status</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">This should return a 401 Unauthorized response. Submit a username and password to obtain an <tt class="docutils literal"><span class="pre">AccessToken</span></tt>:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="go">curl -u username:password &lt;base-auth-url&gt;/token</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">This should return a 200 OK response with the <tt class="docutils literal"><span class="pre">AccessToken</span></tt> string in the response body.
+Reattempt the first command, but this time include the <tt class="docutils literal"><span class="pre">AccessToken</span></tt> as a header in the command:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="go">curl -H &quot;Authorization: Bearer &lt;AccessToken&gt;&quot; &lt;base-url&gt;/status</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">This should return a 200 OK response.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="obtaining-an-access-token">
+<h3>Obtaining an Access Token<a class="headerlink" href="#obtaining-an-access-token" title="Permalink to this headline">¶</a></h3>
+<p>Obtain a new access token by calling:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="go">GET &lt;base-auth-url&gt;/token</span>
+</pre></div>
+</div>
+<p>The required header and request parameters may vary according to the external authentication mechanism
+that has been configured.  For username and password based mechanisms, the <tt class="docutils literal"><span class="pre">Authorization</span></tt> header may be used:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="go">Authorization: Basic czZCaGRSa3F0MzpnWDFmQmF0M2JW</span>
+</pre></div>
+</div>
+<div class="section" id="http-responses">
+<h4>HTTP Responses<a class="headerlink" href="#http-responses" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">200</span> <span class="pre">OK</span></tt> - Authentication was successful and an access token will be returned</li>
+<li><tt class="docutils literal"><span class="pre">401</span> <span class="pre">Unauthorized</span></tt> - Authentication failed</li>
+</ul>
+</div>
+<div class="section" id="success-response-fields">
+<h4>Success Response Fields<a class="headerlink" href="#success-response-fields" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">access_token</span></tt> - The Access Token issued for the client. The serialized token contents are base-64 encoded
+for safe transport over HTTP.</li>
+<li><tt class="docutils literal"><span class="pre">token_type</span></tt> - In order to conform with the OAuth 2.0 Bearer Token Usage specification (<a class="reference external" href="http://tools.ietf.org/html/rfc6750">RFC 6750</a>), this
+value must be &#8220;Bearer&#8221;.</li>
+<li><tt class="docutils literal"><span class="pre">expires_in</span></tt> - Token validity lifetime in seconds.</li>
+</ul>
+</div>
+<div class="section" id="example">
+<h4>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h4>
+<p>Sample request:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="go">GET &lt;base-auth-url&gt;/token HTTP/1.1</span>
+<span class="go">Host: server.example.com</span>
+<span class="go">Authorization: Basic czZCaGRSa3F0MzpnWDFmQmF0M2JW</span>
+</pre></div>
+</div>
+<p>Sample response:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="go">HTTP/1.1 200 OK</span>
+<span class="go">Content-Type: application/json;charset=UTF-8</span>
+<span class="go">Cache-Control: no-store</span>
+<span class="go">Pragma: no-cache</span>
+
+<span class="go">{</span>
+<span class="go">  &quot;access_token&quot;:&quot;2YotnFZFEjr1zCsicMWpAA&quot;,</span>
+<span class="go">  &quot;token_type&quot;:&quot;Bearer&quot;,</span>
+<span class="go">  &quot;expires_in&quot;:3600,</span>
+<span class="go">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="comments">
+<h3>Comments<a class="headerlink" href="#comments" title="Permalink to this headline">¶</a></h3>
+<p><strong>Note:</strong> Only <tt class="docutils literal"><span class="pre">Bearer</span></tt> tokens (<a class="reference external" href="http://tools.ietf.org/html/rfc6750">RFC 6750</a>) are currently supported.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><!--
+  Copyright © 2014-2015 Cask Data, Inc.
+
+  Licensed under the Apache License, Version 2.0 (the "License"); you may not
+  use this file except in compliance with the License. You may obtain a copy of
+  the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+  License for the specific language governing permissions and limitations under
+  the License.
+-->
+
+
+    
+<div aria-label="globaltoc links">
+<h3 class="pagenavtitle"><a href="../index.html"> Table&nbsp;of&nbsp;Contents</a></h3>
+<nav class="pagenav">
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../overview/index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/quickstart/index.html">Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/architecture.html">Architecture</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Installation Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="packages.html">Coopr Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server-config.html">Server Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provisioner-config.html">Provisioner Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="standalone.html">Coopr Sandboxes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="openstack-config.html">Openstack Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ui-config.html">UI Configuration</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="">Authentication Support</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#enabling-security">Enabling Security</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#configuring-ssl-for-the-authentication-server">Configuring SSL for the Authentication Server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#configuring-authentication-mechanisms">Configuring Authentication Mechanisms</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#basic-authentication">Basic Authentication</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ldap-authentication">LDAP Authentication</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#java-authentication-service-provider-interface-jaspi-authentication">Java Authentication Service Provider Interface (JASPI) Authentication</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#custom-authentication">Custom Authentication</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#testing-security">Testing Security</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#obtaining-an-access-token">Obtaining an Access Token</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#http-responses">HTTP Responses</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#success-response-fields">Success Response Fields</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#example">Example</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#comments">Comments</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="upgrade.html">Coopr Upgrade</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/superadmin/index.html">Super Admin Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/admin/index.html">Administration Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/user/index.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rest/index.html">Web Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/security.html">Security</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../implementation.html">Under the Hood</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq/index.html">FAQs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../release-notes/index.html">Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../javadocs/index.html">Javadocs</a></li>
+</ul>
+
+</nav>
+</div>
+  <h4>Previous Topic</h4>
+  <p class="topless"><a href="ui-config.html"
+                        title="Previous Chapter">UI Configuration</a></p>
+  <h4>Next Topic</h4>
+  <p class="topless"><a href="upgrade.html"
+                        title="Next Chapter">Coopr Upgrade</a></p>
+  <div role="note" aria-label="downloads links">
+    <h3>Downloads</h3>
+    <ul class="this-page-menu">
+      <li><a href="http://docs.cask.co/coopr/0.9.9/coopr-docs-0.9.9-web.zip"
+            rel="nofollow">Zip Archive of Coopr Documentation</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick Search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer" role="contentinfo">
+
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;margin:0px auto;}
+.tg td{padding:0px 20px 0px 20px;border-width:0px;overflow:hidden;word-break:normal;font-weight:normal;}
+.tg th{padding:0px 20px 0px 20px;border-width:0px;overflow:hidden;word-break:normal;font-weight:normal;}
+.tg .tg-s6z2{text-align:center;}
+.tg .tg-0ord{text-align:right;}
+.tg a{font-weight:bold;}
+</style>
+<table class="tg" width= 100%>
+  <tr>
+    <th class="tg-031e">Previous Topic: 
+    <a title="UI Configuration" href="ui-config.html" />UI Configuration</a>&nbsp;&nbsp;
+    
+    </th>
+    <th class="tg-s6z2">
+        Copyright &copy; 2014-2015 Cask Data, Inc.
+    
+    </th>
+    <th class="tg-0ord">&nbsp;&nbsp;Next Topic:
+    <a title="Coopr Upgrade" href="upgrade.html" />Coopr Upgrade</a>
+    
+    </th>
+  </tr>
+</table>
+
+    </div>
+  </body>
+</html>

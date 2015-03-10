@@ -1,0 +1,859 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-55081520-3']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+    <title>REST API: Cluster Templates &mdash; Coopr 0.9.8 Beta Documentation</title>
+    
+    <link rel="stylesheet" href="../_static/cdap.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.9.8 Beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    <link rel="top" title="Coopr 0.9.8 Beta Documentation" href="../index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">Index</a></li>
+        <li><a href="../index.html">Coopr 0.9.8 Beta Documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="rest-api-cluster-templates">
+<span id="index-0"></span><h1>REST API: Cluster Templates<a class="headerlink" href="#rest-api-cluster-templates" title="Permalink to this headline">¶</a></h1>
+<p><a class="reference internal" href="index.html"><em>REST Overview</em></a> |
+<a class="reference internal" href="tenants.html"><em>Tenants</em></a> |
+<a class="reference internal" href="provisioners.html"><em>Provisioners</em></a> |
+<a class="reference internal" href="provider.html"><em>Providers</em></a> |
+<a class="reference internal" href="hardware.html"><em>Hardware Types</em></a> |
+<a class="reference internal" href="image.html"><em>Image Types</em></a> |
+<a class="reference internal" href="services.html"><em>Services</em></a> |
+<a class="reference internal" href=""><em>Cluster Template</em></a> |
+<a class="reference internal" href="entities.html"><em>Importing &amp; Exporting</em></a> |
+<a class="reference internal" href="clusters.html"><em>Clusters</em></a> |
+<a class="reference internal" href="plugins.html"><em>Plugins</em></a> |
+<a class="reference internal" href="metrics.html"><em>Metrics</em></a></p>
+<p>The REST APIs allow you to create templates describing different types of clusters.  For example, there may be a template for Hadoop clusters,
+a template for LAMP clusters, a template for Solr clusters, etc. Templates contain enough information that a user only needs to specify a template
+and a number of machines to create a cluster. This is done by first describing the set of services, hardware types,
+and image types that a cluster is compatible with. Next, default values for provider, services, and configuration are given, with optional defaults for
+cluster-wide hardware and image type. Finally, a set of constraints are defined that describe how services, hardware, and images should be placed on a cluster.</p>
+<div class="section" id="cluster-template-details">
+<h2>Cluster Template Details<a class="headerlink" href="#cluster-template-details" title="Permalink to this headline">¶</a></h2>
+<p>Each cluster template configured in the system has a unique name, a short description, and a section devoted to compatibilities, defaults, and constraints.</p>
+<div class="section" id="compatibility">
+<h3>Compatibility<a class="headerlink" href="#compatibility" title="Permalink to this headline">¶</a></h3>
+<p>A cluster template defines 3 things in its compatibility section. The first is a set of services that are compatible with the template. This means that when a user goes to create a cluster
+with this template, the user is allowed to specify any service from this set as services to place on the cluster. The system will not automatically pull in service dependencies, so the full set
+of compatible services must be defined.</p>
+<p>Next, a set of compatible hardware types is defined.  This means only hardware types in the compatible set can be used to create a cluster. Similarly, the compatible image types are defined,
+where only image types in the compatible set can be used to create a cluster.</p>
+</div>
+<div class="section" id="example-compatibility-section">
+<h3>Example Compatibility Section<a class="headerlink" href="#example-compatibility-section" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-bash"><div class="highlight"><pre><span class="s2">&quot;compatibility&quot;</span>: <span class="o">{</span>
+    <span class="s2">&quot;hardwaretypes&quot;</span>: <span class="o">[</span>
+        <span class="s2">&quot;small&quot;</span>,
+        <span class="s2">&quot;medium&quot;</span>,
+        <span class="s2">&quot;large&quot;</span>
+    <span class="o">]</span>,
+    <span class="s2">&quot;imagetypes&quot;</span>: <span class="o">[</span>
+        <span class="s2">&quot;centos6&quot;</span>,
+        <span class="s2">&quot;ubuntu12&quot;</span>
+    <span class="o">]</span>,
+    <span class="s2">&quot;services&quot;</span>: <span class="o">[</span>
+        <span class="s2">&quot;hadoop-hdfs-namenode&quot;</span>,
+        <span class="s2">&quot;hadoop-hdfs-datanode&quot;</span>,
+        <span class="s2">&quot;hadoop-yarn-resourcemanager&quot;</span>,
+        <span class="s2">&quot;hadoop-yarn-nodemanager&quot;</span>,
+        <span class="s2">&quot;zookeeper-server&quot;</span>,
+        <span class="s2">&quot;hbase-master&quot;</span>,
+        <span class="s2">&quot;hbase-regionserver&quot;</span>,
+        <span class="s2">&quot;reactor&quot;</span>
+    <span class="o">]</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="defaults">
+<h3>Defaults<a class="headerlink" href="#defaults" title="Permalink to this headline">¶</a></h3>
+<p>The defaults section describes what will be used to create a cluster if the user does not specifically specify anything beyond the number of machines to use in a cluster.  Everything in
+this section can be overwritten by the user, though it is likely only advanced users will want to do so.  Templates must contain a set of default services, a default provider, and a
+default config.  Optionally, a hardware type to use across the entire cluster, and an image type to use across the entire cluster, may be specified.  The default services must be a subset
+of the services defined in the compatibility section.  Similarly, if a hardwaretype or imagetype is specified, it must be one of the types given in the compatibility section.
+A default DNS suffix can also be provided for suggested hostnames. If none is specified, the Server will use &#8220;local&#8221; as the DNS suffix.
+Lastly, the config is a JSON Object that gets passed straight through to provisioners, usually describing different configuration settings for the services that will be placed on the cluster.</p>
+</div>
+<div class="section" id="example-default-section">
+<h3>Example Default Section<a class="headerlink" href="#example-default-section" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-bash"><div class="highlight"><pre><span class="s2">&quot;defaults&quot;</span>: <span class="o">{</span>
+    <span class="s2">&quot;services&quot;</span>: <span class="o">[</span>
+        <span class="s2">&quot;hadoop-hdfs-namenode&quot;</span>,
+        <span class="s2">&quot;hadoop-hdfs-datanode&quot;</span>,
+        <span class="s2">&quot;hadoop-yarn-resourcemanager&quot;</span>,
+        <span class="s2">&quot;hadoop-yarn-nodemanager&quot;</span>
+    <span class="o">]</span>,
+    <span class="s2">&quot;provider&quot;</span>: <span class="s2">&quot;rackspace&quot;</span>,
+    <span class="s2">&quot;hardwaretype&quot;</span>: <span class="s2">&quot;medium&quot;</span>,
+    <span class="s2">&quot;imagetype&quot;</span>: <span class="s2">&quot;ubuntu12&quot;</span>,
+    <span class="s2">&quot;dnsSuffix&quot;</span>: <span class="s2">&quot;dev.company.com&quot;</span>,
+    <span class="s2">&quot;config&quot;</span>: <span class="o">{</span>
+        <span class="s2">&quot;hadoop&quot;</span>: <span class="o">{</span>
+            <span class="s2">&quot;core_site&quot;</span>: <span class="o">{</span>
+                <span class="s2">&quot;fs.defaultFS&quot;</span>: <span class="s2">&quot;hdfs://%host.service.hadoop-hdfs-namenode%&quot;</span>
+            <span class="o">}</span>,
+            <span class="s2">&quot;hdfs_site&quot;</span>: <span class="o">{</span>
+                <span class="s2">&quot;dfs.datanode.max.xcievers&quot;</span>: <span class="s2">&quot;4096&quot;</span>
+            <span class="o">}</span>,
+            <span class="s2">&quot;mapred_site&quot;</span>: <span class="o">{</span>
+                <span class="s2">&quot;mapreduce.framework.name&quot;</span>: <span class="s2">&quot;yarn&quot;</span>
+            <span class="o">}</span>,
+            <span class="s2">&quot;yarn_site&quot;</span>: <span class="o">{</span>
+                <span class="s2">&quot;yarn.resourcemanager.hostname&quot;</span>: <span class="s2">&quot;%host.service.hadoop-yarn-resourcemanager%&quot;</span>
+            <span class="o">}</span>
+        <span class="o">}</span>,
+        <span class="s2">&quot;hbase&quot;</span>: <span class="o">{</span>
+            <span class="s2">&quot;hbase_site&quot;</span>: <span class="o">{</span>
+                <span class="s2">&quot;hbase.rootdir&quot;</span>: <span class="s2">&quot;hdfs://%host.service.hadoop-hdfs-namenode%/hbase&quot;</span>,
+                <span class="s2">&quot;hbase.cluster.distributed&quot;</span>: <span class="s2">&quot;true&quot;</span>,
+                <span class="s2">&quot;hbase.zookeeper.quorum&quot;</span>: <span class="s2">&quot;%join(map(host.service.zookeeper-server,&#39;$:2181&#39;),&#39;,&#39;)%&quot;</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="constraints">
+<h3>Constraints<a class="headerlink" href="#constraints" title="Permalink to this headline">¶</a></h3>
+<p>Templates can define 3 types of constraints &#8211; size, layout, and service.</p>
+<p>Size constraints determine how many nodes a cluster can have. Currently, a minimum and maximum can be defined. If no minimum is defined, a minimum of 1 node will be used.
+If no maximum is defined, there is no maximum. The maximum must be greater than or equal to the minimum.</p>
+<p>Layout constraints define which services must and can&#8217;t coexist on the same node.  Must coexist constraints are given as an array of arrays.
+Each inner array is a set of services that must all coexist together on the same node.  For example, in a hadoop cluster, you generally want datanodes, regionservers,
+and nodemanagers to all be placed together. To achieve this cloistered coexistancy, you would put all 3 services in the same &#8220;must coexist&#8221; constraint.  Must coexist constraints
+are not transitive. If there is one constraint saying serviceA must coexist with serviceB, and another constraint saying serviceB must coexist with serviceC, this does NOT mean
+that serviceA must coexist with serviceC. It was designed this way to prevent unintended links between services, especially as the number of must coexist constraints increase.
+If a must coexist rule contains a service that is not on the cluster, it is shrunk to ignore the service that is not on the cluster. For example, your template may be compatible with
+datanodes, nodemanagers, and regionservers. However, by default, you only put datanodes and nodemanagers on the cluster. A constraint stating that datanodes, nodemanagers, and
+regionservers must coexist on the same node will get transformed into a constraint that just says datanodes and nodemanagers must coexist on the same node.</p>
+<p>The other type of layout constraint are can&#8217;t coexist constraints, which are also given as an array of arrays. Each inner array is a set of services that cannot all
+coexist together on the same node.  For example, in a hadoop cluster, you generally do not want your namenode to be on the same node as a datanode.  Specifying more
+than 2 services in a can&#8217;t coexist rule means the entire set cannot exist on the same node. For example, if there is a constraint that serviceA, serviceB, and serviceC can&#8217;t
+coexist, serviceA and serviceB can still coexist on the same node.  Though supported, this can be confusing, so the best practice is to keep the can&#8217;t coexist constraints binary.
+Anything not mentioned in the must or can&#8217;t coexist constraints are allowed.</p>
+<p>Service constraints are defined as a JSON Object containing optional hardware types, image types, and quantities for a service that can be placed on the cluster.  Keys in the JSON Object
+are service names, and values are JSON Objects representing the service constraint.  A service constraint can contain a key named hardwaretypes, with a corresponding JSON array of
+hardware types that the service can be placed on.  Any node with that service must use one of the hardware types in the array.  If nothing is given, the service can go on a node with any
+type of hardware.  Similarly, a service constraint can contain a key named imagetypes, with a corresponding JSON array of image types that the service can be placed on.  Any node with
+that service must use one of the image types in the array.  If nothing is given, the service can go on a node with any type of image.  A service constraint can also limit the quantities
+of that service across the entire cluster.  These are specified with a quantities key, whose corresponding value is a JSON Object.  The JSON Object can optionally contain a key for min
+and an integer for the minimum number of nodes that must contain the service across the entire cluster.  Similarly, a max can be given to limit the maximum number of nodes with the service
+on the cluster.</p>
+</div>
+<div class="section" id="example-constraints-section">
+<h3>Example Constraints Section<a class="headerlink" href="#example-constraints-section" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-bash"><div class="highlight"><pre><span class="s2">&quot;constraints&quot;</span>: <span class="o">{</span>
+    <span class="s2">&quot;size&quot;</span>: <span class="o">{</span>
+        <span class="s2">&quot;min&quot;</span>: 3,
+        <span class="s2">&quot;max&quot;</span>: 50
+    <span class="o">}</span>,
+    <span class="s2">&quot;layout&quot;</span>: <span class="o">{</span>
+        <span class="s2">&quot;mustcoexist&quot;</span>: <span class="o">[</span>
+            <span class="o">[</span> <span class="s2">&quot;hadoop-hdfs-datanode&quot;</span>, <span class="s2">&quot;hadoop-yarn-nodemanager&quot;</span>, <span class="s2">&quot;hbase-regionserver&quot;</span> <span class="o">]</span>,
+            <span class="o">[</span> <span class="s2">&quot;hadoop-hdfs-namenode&quot;</span>, <span class="s2">&quot;hadoop-yarn-resourcemanager&quot;</span>, <span class="s2">&quot;hbase-master&quot;</span> <span class="o">]</span>
+        <span class="o">]</span>,
+        <span class="s2">&quot;cantcoexist&quot;</span>: <span class="o">[</span>
+            <span class="o">[</span> <span class="s2">&quot;hadoop-hdfs-namenode&quot;</span>, <span class="s2">&quot;hadoop-hdfs-datanode&quot;</span> <span class="o">]</span>,
+            <span class="o">[</span> <span class="s2">&quot;hadoop-hdfs-namenode&quot;</span>, <span class="s2">&quot;zookeeper-server&quot;</span> <span class="o">]</span>,
+            <span class="o">[</span> <span class="s2">&quot;hadoop-hdfs-datanode&quot;</span>, <span class="s2">&quot;zookeeper-server&quot;</span> <span class="o">]</span>
+        <span class="o">]</span>
+    <span class="o">}</span>,
+    <span class="s2">&quot;services&quot;</span>: <span class="o">{</span>
+        <span class="s2">&quot;hadoop-hdfs-namenode&quot;</span>: <span class="o">{</span>
+            <span class="s2">&quot;hardwaretypes&quot;</span>: <span class="o">[</span> <span class="s2">&quot;large&quot;</span> <span class="o">]</span>,
+            <span class="s2">&quot;quantities&quot;</span>: <span class="o">{</span>
+                <span class="s2">&quot;min&quot;</span>: <span class="s2">&quot;1&quot;</span>,
+                <span class="s2">&quot;max&quot;</span>: <span class="s2">&quot;1&quot;</span>
+            <span class="o">}</span>
+        <span class="o">}</span>,
+        <span class="s2">&quot;hadoop-hdfs-datanode&quot;</span>: <span class="o">{</span>
+            <span class="s2">&quot;hardwaretypes&quot;</span>: <span class="o">[</span> <span class="s2">&quot;medium&quot;</span> <span class="o">]</span>,
+            <span class="s2">&quot;quantities&quot;</span>: <span class="o">{</span>
+                <span class="s2">&quot;min&quot;</span>: <span class="s2">&quot;3&quot;</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="administration">
+<h3>Administration<a class="headerlink" href="#administration" title="Permalink to this headline">¶</a></h3>
+<p>The administration section describes elements for managing clusters. The lease duration of clusters is defined in this
+section. Lease duration is composed of three components: the initial lease duration, the maximum lease duration, and the
+step size of incrementing the lease duration. For each of these variables, zero values denote special cases. For
+initial lease duration, a zero value specifies that clusters created will have an unlimited lease duration. A zero max
+represents that the lease duration a cluster can be extended to any amount of time. A zero step size signifies that
+increments of lease duration can be of any value.</p>
+</div>
+<div class="section" id="example-administration-section">
+<h3>Example Administration Section<a class="headerlink" href="#example-administration-section" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-bash"><div class="highlight"><pre><span class="s2">&quot;administration&quot;</span>: <span class="o">{</span>
+    <span class="s2">&quot;leaseduration&quot;</span>: <span class="o">{</span>
+        <span class="s2">&quot;initial&quot;</span>:172800000,
+        <span class="s2">&quot;max&quot;</span>:864000000,
+        <span class="s2">&quot;step&quot;</span>:86400000
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="add-a-cluster-template">
+<span id="template-create"></span><h2>Add a Cluster Template<a class="headerlink" href="#add-a-cluster-template" title="Permalink to this headline">¶</a></h2>
+<p>To create a new cluster template, make a HTTP POST request to URI:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="o">/</span><span class="n">clustertemplates</span>
+</pre></div>
+</div>
+<div class="section" id="post-parameters">
+<h3>POST Parameters<a class="headerlink" href="#post-parameters" title="Permalink to this headline">¶</a></h3>
+<p>Required Parameters</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="60%" />
+<col width="40%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Parameter</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>name</td>
+<td>Specifies the name for the cluster template. The assigned name must have only
+alphanumeric, dash(-), dot(.), and underscore(_) characters.</td>
+</tr>
+<tr class="row-odd"><td>description</td>
+<td>Provides a description for the cluster template.</td>
+</tr>
+<tr class="row-even"><td>defaults</td>
+<td>JSON Object describing default service set, provider, config, and an optional imagetype and hardwaretype.</td>
+</tr>
+<tr class="row-odd"><td>compatibility</td>
+<td>JSON Object describing services, hardware types, and imagetypes that are compatible with the cluster.</td>
+</tr>
+<tr class="row-even"><td>constraints</td>
+<td>JSON Object describing layout and service constraints.</td>
+</tr>
+<tr class="row-odd"><td>administration</td>
+<td>JSON Object describing administration properties, such as the lease duration of clusters.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="http-responses">
+<h3>HTTP Responses<a class="headerlink" href="#http-responses" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="60%" />
+<col width="40%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Status Code</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>200 (OK)</td>
+<td>Successfully created</td>
+</tr>
+<tr class="row-odd"><td>400 (BAD_REQUEST)</td>
+<td>Bad request, server is unable to process the request, or a cluster template with the name already exists
+in the system.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="example">
+<h3>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>curl -X POST
+       -H <span class="s1">&#39;Coopr-UserID:admin&#39;</span>
+       -H <span class="s1">&#39;Coopr-TenantID:&lt;tenantid&gt;&#39;</span>
+       -H <span class="s1">&#39;Coopr-ApiKey:&lt;apikey&gt;&#39;</span>
+       -d <span class="s1">&#39;{</span>
+<span class="s1">               &quot;name&quot;: &quot;hadoop.example&quot;,</span>
+<span class="s1">               &quot;description&quot;: &quot;Hadoop cluster with hdfs and YARN&quot;,</span>
+<span class="s1">               &quot;compatibility&quot;: {</span>
+<span class="s1">                   &quot;hardwaretypes&quot;: [ &quot;small&quot;, &quot;medium&quot;, &quot;large&quot; ],</span>
+<span class="s1">                   &quot;imagetypes&quot;: [ &quot;centos6&quot;, &quot;ubuntu12&quot; ],</span>
+<span class="s1">                   &quot;services&quot;: [</span>
+<span class="s1">                       &quot;hadoop-hdfs-namenode&quot;,</span>
+<span class="s1">                       &quot;hadoop-hdfs-datanode&quot;,</span>
+<span class="s1">                       &quot;hadoop-yarn-resourcemanager&quot;,</span>
+<span class="s1">                       &quot;hadoop-yarn-nodemanager&quot;,</span>
+<span class="s1">                       &quot;zookeeper-server&quot;,</span>
+<span class="s1">                       &quot;hbase-master&quot;,</span>
+<span class="s1">                       &quot;hbase-regionserver&quot;,</span>
+<span class="s1">                       &quot;reactor&quot;</span>
+<span class="s1">                   ]</span>
+<span class="s1">               },</span>
+<span class="s1">               &quot;defaults&quot;: {</span>
+<span class="s1">                   &quot;services&quot;: [</span>
+<span class="s1">                       &quot;hadoop-hdfs-namenode&quot;,</span>
+<span class="s1">                       &quot;hadoop-hdfs-datanode&quot;,</span>
+<span class="s1">                       &quot;hadoop-yarn-resourcemanager&quot;,</span>
+<span class="s1">                       &quot;hadoop-yarn-nodemanager&quot;</span>
+<span class="s1">                   ],</span>
+<span class="s1">                   &quot;provider&quot;: &quot;rackspace&quot;,</span>
+<span class="s1">                   &quot;imagetype&quot;: &quot;ubuntu12&quot;,</span>
+<span class="s1">                   &quot;config&quot;: {</span>
+<span class="s1">                       &quot;hadoop&quot;: {</span>
+<span class="s1">                           &quot;core_site&quot;: {</span>
+<span class="s1">                               &quot;fs.defaultFS&quot;: &quot;hdfs://%host.service.hadoop-hdfs-namenode%&quot;</span>
+<span class="s1">                           },</span>
+<span class="s1">                           &quot;hdfs_site&quot;: {</span>
+<span class="s1">                               &quot;dfs.datanode.max.xcievers&quot;: &quot;4096&quot;</span>
+<span class="s1">                           },</span>
+<span class="s1">                           &quot;mapred_site&quot;: {</span>
+<span class="s1">                               &quot;mapreduce.framework.name&quot;: &quot;yarn&quot;</span>
+<span class="s1">                           },</span>
+<span class="s1">                           &quot;yarn_site&quot;: {</span>
+<span class="s1">                               &quot;yarn.resourcemanager.hostname&quot;: &quot;%host.service.hadoop-yarn-resourcemanager%&quot;</span>
+<span class="s1">                           }</span>
+<span class="s1">                      },</span>
+<span class="s1">                      &quot;hbase&quot;: {</span>
+<span class="s1">                          &quot;hbase_site&quot;: {</span>
+<span class="s1">                              &quot;hbase.rootdir&quot;: &quot;hdfs://%host.service.hadoop-hdfs-namenode%/hbase&quot;,</span>
+<span class="s1">                              &quot;hbase.cluster.distributed&quot;: &quot;true&quot;,</span>
+<span class="s1">                              &quot;hbase.zookeeper.quorum&quot;: &quot;%join(map(host.service.zookeeper-server,&#39;</span><span class="nv">$:</span>2181<span class="s1">&#39;),&#39;</span>,<span class="s1">&#39;)%&quot;</span>
+<span class="s1">                          }</span>
+<span class="s1">                      }</span>
+<span class="s1">                  }</span>
+<span class="s1">               },</span>
+<span class="s1">               &quot;constraints&quot;: {</span>
+<span class="s1">                   &quot;size&quot;: {</span>
+<span class="s1">                       &quot;min&quot;: 3,</span>
+<span class="s1">                       &quot;max&quot;: 50</span>
+<span class="s1">                   },</span>
+<span class="s1">                   &quot;layout&quot;: {</span>
+<span class="s1">                       &quot;mustcoexist&quot;: [</span>
+<span class="s1">                           [ &quot;hadoop-hdfs-datanode&quot;, &quot;hadoop-yarn-nodemanager&quot;, &quot;hbase-regionserver&quot; ],</span>
+<span class="s1">                           [ &quot;hadoop-hdfs-namenode&quot;, &quot;hadoop-yarn-resourcemanager&quot;, &quot;hbase-master&quot; ]</span>
+<span class="s1">                       ],</span>
+<span class="s1">                       &quot;cantcoexist&quot;: [</span>
+<span class="s1">                           [ &quot;hadoop-hdfs-namenode&quot;, &quot;hadoop-hdfs-datanode&quot; ],</span>
+<span class="s1">                           [ &quot;hadoop-hdfs-namenode&quot;, &quot;zookeeper-server&quot; ],</span>
+<span class="s1">                           [ &quot;hadoop-hdfs-datanode&quot;, &quot;zookeeper-server&quot; ]</span>
+<span class="s1">                       ]</span>
+<span class="s1">                   },</span>
+<span class="s1">                   &quot;services&quot;: {</span>
+<span class="s1">                       &quot;hadoop-hdfs-namenode&quot;: {</span>
+<span class="s1">                           &quot;hardwaretypes&quot;: [ &quot;large&quot; ],</span>
+<span class="s1">                           &quot;quantities&quot;: {</span>
+<span class="s1">                               &quot;min&quot;: &quot;1&quot;,</span>
+<span class="s1">                               &quot;max&quot;: &quot;1&quot;</span>
+<span class="s1">                           }</span>
+<span class="s1">                       },</span>
+<span class="s1">                       &quot;hadoop-hdfs-datanode&quot;: {</span>
+<span class="s1">                           &quot;hardwaretypes&quot;: [ &quot;medium&quot; ],</span>
+<span class="s1">                           &quot;quantities&quot;: {</span>
+<span class="s1">                               &quot;min&quot;: &quot;3&quot;</span>
+<span class="s1">                           }</span>
+<span class="s1">                       }</span>
+<span class="s1">                   }</span>
+<span class="s1">               },</span>
+<span class="s1">               &quot;administration&quot;: {</span>
+<span class="s1">                   &quot;leaseduration&quot;: {</span>
+<span class="s1">                       &quot;initial&quot;:172800000,</span>
+<span class="s1">                       &quot;max&quot;:864000000,</span>
+<span class="s1">                       &quot;step&quot;:86400000</span>
+<span class="s1">                   }</span>
+<span class="s1">               }</span>
+<span class="s1">           }&#39;</span>
+       http://&lt;server&gt;:&lt;port&gt;/&lt;version&gt;/clustertemplates
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="retrieve-a-cluster-template">
+<span id="template-retrieve"></span><h2>Retrieve a Cluster Template<a class="headerlink" href="#retrieve-a-cluster-template" title="Permalink to this headline">¶</a></h2>
+<p>To retrieve details about a cluster template, make a GET HTTP request to URI:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="o">/</span><span class="n">clustertemplates</span><span class="o">/{</span><span class="n">name</span><span class="o">}</span>
+</pre></div>
+</div>
+<p>This resource request represents an individual cluster template for viewing.</p>
+<div class="section" id="id1">
+<h3>HTTP Responses<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="60%" />
+<col width="40%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Status Code</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>200 (OK)</td>
+<td>Successful</td>
+</tr>
+<tr class="row-odd"><td>404 (NOT FOUND)</td>
+<td>If the resource requested is not configured and available in system.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="id2">
+<h3>Example<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>curl -H <span class="s1">&#39;Coopr-UserID:admin&#39;</span>
+       -H <span class="s1">&#39;Coopr-TenantID:&lt;tenantid&gt;&#39;</span>
+       -H <span class="s1">&#39;Coopr-ApiKey:&lt;apikey&gt;&#39;</span>
+       http://&lt;server&gt;:&lt;port&gt;/&lt;version&gt;/clustertemplates/hadoop.example
+<span class="nv">$ </span><span class="o">{</span>
+      <span class="s2">&quot;name&quot;</span>: <span class="s2">&quot;hadoop.example&quot;</span>,
+      <span class="s2">&quot;description&quot;</span>: <span class="s2">&quot;Hadoop cluster with hdfs and YARN&quot;</span>,
+      <span class="s2">&quot;compatibility&quot;</span>: <span class="o">{</span>
+          <span class="s2">&quot;hardwaretypes&quot;</span>: <span class="o">[</span> <span class="s2">&quot;small&quot;</span>, <span class="s2">&quot;medium&quot;</span>, <span class="s2">&quot;large&quot;</span> <span class="o">]</span>,
+          <span class="s2">&quot;imagetypes&quot;</span>: <span class="o">[</span> <span class="s2">&quot;centos6&quot;</span>, <span class="s2">&quot;ubuntu12&quot;</span> <span class="o">]</span>,
+          <span class="s2">&quot;services&quot;</span>: <span class="o">[</span>
+              <span class="s2">&quot;hadoop-hdfs-namenode&quot;</span>,
+              <span class="s2">&quot;hadoop-hdfs-datanode&quot;</span>,
+              <span class="s2">&quot;hadoop-yarn-resourcemanager&quot;</span>,
+              <span class="s2">&quot;hadoop-yarn-nodemanager&quot;</span>,
+              <span class="s2">&quot;zookeeper-server&quot;</span>,
+              <span class="s2">&quot;hbase-master&quot;</span>,
+              <span class="s2">&quot;hbase-regionserver&quot;</span>,
+              <span class="s2">&quot;reactor&quot;</span>
+          <span class="o">]</span>
+      <span class="o">}</span>,
+      <span class="s2">&quot;defaults&quot;</span>: <span class="o">{</span>
+          <span class="s2">&quot;services&quot;</span>: <span class="o">[</span>
+              <span class="s2">&quot;hadoop-hdfs-namenode&quot;</span>,
+              <span class="s2">&quot;hadoop-hdfs-datanode&quot;</span>,
+              <span class="s2">&quot;hadoop-yarn-resourcemanager&quot;</span>,
+              <span class="s2">&quot;hadoop-yarn-nodemanager&quot;</span>
+          <span class="o">]</span>,
+          <span class="s2">&quot;provider&quot;</span>: <span class="s2">&quot;rackspace&quot;</span>,
+          <span class="s2">&quot;imagetype&quot;</span>: <span class="s2">&quot;ubuntu12&quot;</span>,
+          <span class="s2">&quot;config&quot;</span>: <span class="o">{</span>
+              <span class="s2">&quot;hadoop&quot;</span>: <span class="o">{</span>
+                  <span class="s2">&quot;core_site&quot;</span>: <span class="o">{</span>
+                      <span class="s2">&quot;fs.defaultFS&quot;</span>: <span class="s2">&quot;hdfs://%host.service.hadoop-hdfs-namenode%&quot;</span>
+                  <span class="o">}</span>,
+                  <span class="s2">&quot;hdfs_site&quot;</span>: <span class="o">{</span>
+                      <span class="s2">&quot;dfs.datanode.max.xcievers&quot;</span>: <span class="s2">&quot;4096&quot;</span>
+                  <span class="o">}</span>,
+                  <span class="s2">&quot;mapred_site&quot;</span>: <span class="o">{</span>
+                      <span class="s2">&quot;mapreduce.framework.name&quot;</span>: <span class="s2">&quot;yarn&quot;</span>
+                  <span class="o">}</span>,
+                  <span class="s2">&quot;yarn_site&quot;</span>: <span class="o">{</span>
+                      <span class="s2">&quot;yarn.resourcemanager.hostname&quot;</span>: <span class="s2">&quot;%host.service.hadoop-yarn-resourcemanager%&quot;</span>
+                  <span class="o">}</span>
+              <span class="o">}</span>,
+              <span class="s2">&quot;hbase&quot;</span>: <span class="o">{</span>
+                  <span class="s2">&quot;hbase_site&quot;</span>: <span class="o">{</span>
+                      <span class="s2">&quot;hbase.rootdir&quot;</span>: <span class="s2">&quot;hdfs://%host.service.hadoop-hdfs-namenode%/hbase&quot;</span>,
+                      <span class="s2">&quot;hbase.cluster.distributed&quot;</span>: <span class="s2">&quot;true&quot;</span>,
+                      <span class="s2">&quot;hbase.zookeeper.quorum&quot;</span>: <span class="s2">&quot;%join(map(host.service.zookeeper-server,&#39;$:2181&#39;),&#39;,&#39;)%&quot;</span>
+                  <span class="o">}</span>
+              <span class="o">}</span>
+         <span class="o">}</span>
+     <span class="o">}</span>,
+     <span class="s2">&quot;constraints&quot;</span>: <span class="o">{</span>
+         <span class="s2">&quot;size&quot;</span>: <span class="o">{</span>
+             <span class="s2">&quot;min&quot;</span>: 3,
+             <span class="s2">&quot;max&quot;</span>: 50
+         <span class="o">}</span>,
+         <span class="s2">&quot;layout&quot;</span>: <span class="o">{</span>
+              <span class="s2">&quot;mustcoexist&quot;</span>: <span class="o">[</span>
+                  <span class="o">[</span> <span class="s2">&quot;hadoop-hdfs-datanode&quot;</span>, <span class="s2">&quot;hadoop-yarn-nodemanager&quot;</span>, <span class="s2">&quot;hbase-regionserver&quot;</span> <span class="o">]</span>,
+                  <span class="o">[</span> <span class="s2">&quot;hadoop-hdfs-namenode&quot;</span>, <span class="s2">&quot;hadoop-yarn-resourcemanager&quot;</span>, <span class="s2">&quot;hbase-master&quot;</span> <span class="o">]</span>
+              <span class="o">]</span>,
+              <span class="s2">&quot;cantcoexist&quot;</span>: <span class="o">[</span>
+                  <span class="o">[</span> <span class="s2">&quot;hadoop-hdfs-namenode&quot;</span>, <span class="s2">&quot;hadoop-hdfs-datanode&quot;</span> <span class="o">]</span>,
+                  <span class="o">[</span> <span class="s2">&quot;hadoop-hdfs-namenode&quot;</span>, <span class="s2">&quot;zookeeper-server&quot;</span> <span class="o">]</span>,
+                  <span class="o">[</span> <span class="s2">&quot;hadoop-hdfs-datanode&quot;</span>, <span class="s2">&quot;zookeeper-server&quot;</span> <span class="o">]</span>
+              <span class="o">]</span>
+         <span class="o">}</span>,
+         <span class="s2">&quot;services&quot;</span>: <span class="o">{</span>
+              <span class="s2">&quot;hadoop-hdfs-namenode&quot;</span>: <span class="o">{</span>
+                  <span class="s2">&quot;hardwaretypes&quot;</span>: <span class="o">[</span> <span class="s2">&quot;large&quot;</span> <span class="o">]</span>,
+                  <span class="s2">&quot;quantities&quot;</span>: <span class="o">{</span>
+                      <span class="s2">&quot;min&quot;</span>: <span class="s2">&quot;1&quot;</span>,
+                      <span class="s2">&quot;max&quot;</span>: <span class="s2">&quot;1&quot;</span>
+                  <span class="o">}</span>
+              <span class="o">}</span>,
+              <span class="s2">&quot;hadoop-hdfs-datanode&quot;</span>: <span class="o">{</span>
+                  <span class="s2">&quot;hardwaretypes&quot;</span>: <span class="o">[</span> <span class="s2">&quot;medium&quot;</span> <span class="o">]</span>,
+                  <span class="s2">&quot;quantities&quot;</span>: <span class="o">{</span>
+                      <span class="s2">&quot;min&quot;</span>: <span class="s2">&quot;3&quot;</span>
+                  <span class="o">}</span>
+              <span class="o">}</span>
+         <span class="o">}</span>
+     <span class="o">}</span>,
+     <span class="s2">&quot;administration&quot;</span>: <span class="o">{</span>
+         <span class="s2">&quot;leaseduration&quot;</span>: <span class="o">{</span>
+             <span class="s2">&quot;initial&quot;</span>:172800000,
+             <span class="s2">&quot;max&quot;</span>:864000000,
+             <span class="s2">&quot;step&quot;</span>:86400000
+        <span class="o">}</span>
+     <span class="o">}</span>
+ <span class="o">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="delete-a-cluster-template">
+<span id="template-delete"></span><h2>Delete a Cluster Template<a class="headerlink" href="#delete-a-cluster-template" title="Permalink to this headline">¶</a></h2>
+<p>To delete a cluster template, make a DELETE HTTP request to URI:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="o">/</span><span class="n">clustertemplates</span><span class="o">/{</span><span class="n">name</span><span class="o">}</span>
+</pre></div>
+</div>
+<p>This resource requests represents an individual cluster template for deletion.</p>
+<div class="section" id="id3">
+<h3>HTTP Responses<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="60%" />
+<col width="40%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Status Code</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>200 (OK)</td>
+<td>If delete was successful</td>
+</tr>
+<tr class="row-odd"><td>404 (NOT FOUND)</td>
+<td>If the resource requested is not found.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="id4">
+<h3>Example<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>curl -X DELETE
+       -H <span class="s1">&#39;Coopr-UserID:admin&#39;</span>
+       -H <span class="s1">&#39;Coopr-TenantID:&lt;tenantid&gt;&#39;</span>
+       -H <span class="s1">&#39;Coopr-ApiKey:&lt;apikey&gt;&#39;</span>
+       http://&lt;server&gt;:&lt;port&gt;/&lt;version&gt;/clustertemplates/hadoop.example
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="update-a-cluster-template">
+<span id="template-modify"></span><h2>Update a Cluster Template<a class="headerlink" href="#update-a-cluster-template" title="Permalink to this headline">¶</a></h2>
+<p>To update a service, make a PUT HTTP request to URI:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="o">/</span><span class="n">clustertemplates</span><span class="o">/{</span><span class="n">name</span><span class="o">}</span>
+</pre></div>
+</div>
+<p>Resource specified above respresents an individual services request for an update operation.
+Currently, the update of services resource requires complete services object to be
+in the request body.</p>
+<div class="section" id="put-parameters">
+<h3>PUT Parameters<a class="headerlink" href="#put-parameters" title="Permalink to this headline">¶</a></h3>
+<p>Required Parameters</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="60%" />
+<col width="40%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Parameter</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>name</td>
+<td>Specifies the name of the cluster template to be updated.</td>
+</tr>
+<tr class="row-odd"><td>description</td>
+<td>New description or old one for the cluster template.</td>
+</tr>
+<tr class="row-even"><td>defaults</td>
+<td>JSON Object describing default service set, provider, config, and optional imagetype and hardwaretype.</td>
+</tr>
+<tr class="row-odd"><td>compatibility</td>
+<td>JSON Object describing services, hardware types, and imagetypes that are compatible with the cluster.</td>
+</tr>
+<tr class="row-even"><td>constraints</td>
+<td>JSON Object describing layout and service constraints.</td>
+</tr>
+<tr class="row-odd"><td>administration</td>
+<td>JSON Object describing administration properties, such as the lease duration of clusters.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="id5">
+<h3>HTTP Responses<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="60%" />
+<col width="40%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Status Code</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>200 (OK)</td>
+<td>If update was successful</td>
+</tr>
+<tr class="row-odd"><td>400 (BAD REQUEST)</td>
+<td>If the resource requested is not found or the fields of the PUT body doesn&#8217;t specify all the required fields.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="id6">
+<h3>Example<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-bash"><div class="highlight"><pre>$ curl -X PUT
+       -H &#39;Coopr-UserID:admin&#39;
+       -H &#39;Coopr-TenantID:&lt;tenantid&gt;&#39;
+       -H &#39;Coopr-ApiKey:&lt;apikey&gt;&#39;
+       -d
+ &#39;{
+      &quot;name&quot;: &quot;hadoop.example&quot;,
+      &quot;description&quot;: &quot;Reduced Hadoop cluster&quot;,
+      &quot;compatibility&quot;: {
+          &quot;hardwaretypes&quot;: [ &quot;small&quot; ],
+          &quot;imagetypes&quot;: [
+              &quot;centos6&quot;,
+              &quot;ubuntu12&quot;
+          ],
+          &quot;services&quot;: [
+              &quot;hadoop-hdfs-namenode&quot;,
+              &quot;hadoop-hdfs-datanode&quot;,
+              &quot;hadoop-yarn-resourcemanager&quot;,
+              &quot;hadoop-yarn-nodemanager&quot;
+          ]
+      },
+      &quot;defaults&quot;: {
+          &quot;services&quot;: [
+              &quot;hadoop-hdfs-namenode&quot;,
+              &quot;hadoop-hdfs-datanode&quot;,
+              &quot;hadoop-yarn-resourcemanager&quot;,
+              &quot;hadoop-yarn-nodemanager&quot;
+          ],
+          &quot;provider&quot;: &quot;rackspace&quot;,
+          &quot;imagetype&quot;: &quot;ubuntu12&quot;,
+          &quot;config&quot;: {
+              &quot;hadoop&quot;: {
+                  &quot;core_site&quot;: {
+                      &quot;fs.defaultFS&quot;: &quot;hdfs://%host.service.hadoop-hdfs-namenode%&quot;
+                  },
+                  &quot;hdfs_site&quot;: {
+                      &quot;dfs.datanode.max.xcievers&quot;: &quot;4096&quot;
+                  },
+                  &quot;mapred_site&quot;: {
+                      &quot;mapreduce.framework.name&quot;: &quot;yarn&quot;
+                  },
+                  &quot;yarn_site&quot;: {
+                      &quot;yarn.resourcemanager.hostname&quot;: &quot;%host.service.hadoop-yarn-resourcemanager%&quot;
+                  }
+              }
+          }
+      },
+      &quot;constraints&quot;: {
+          &quot;size&quot;: {
+              &quot;min&quot;: 3,
+              &quot;max&quot;: 50
+          },
+          &quot;layout&quot;: {
+              &quot;mustcoexist&quot;: [
+                  [
+                      &quot;hadoop-hdfs-datanode&quot;,
+                      &quot;hadoop-yarn-nodemanager&quot;
+                  ],
+                  [
+                      &quot;hadoop-hdfs-namenode&quot;,
+                      &quot;hadoop-yarn-resourcemanager&quot;
+                  ]
+              ],
+              &quot;cantcoexist&quot;: [
+                  [
+                      &quot;hadoop-hdfs-namenode&quot;,
+                      &quot;hadoop-hdfs-datanode&quot;
+                  ]
+              ]
+          },
+          &quot;services&quot;: {
+              &quot;hadoop-hdfs-namenode&quot;: {
+                  &quot;quantities&quot;: {
+                      &quot;min&quot;: &quot;1&quot;,
+                      &quot;max&quot;: &quot;1&quot;
+                  }
+              },
+              &quot;hadoop-hdfs-datanode&quot;: {
+                  &quot;quantities&quot;: {
+                      &quot;min&quot;: &quot;3&quot;
+                  }
+              }
+          }
+      },
+      &quot;administration&quot;: {
+          &quot;leaseduration&quot;: {
+              &quot;initial&quot;:172800000,
+              &quot;max&quot;:864000000,
+              &quot;step&quot;:86400000
+         }
+      }
+  }
+     http://&lt;server&gt;:&lt;port&gt;/&lt;version&gt;/clustertemplates/hadoop.example
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="list-all-cluster-templates">
+<span id="template-all-list"></span><h2>List all Cluster Templates<a class="headerlink" href="#list-all-cluster-templates" title="Permalink to this headline">¶</a></h2>
+<p>To list all the cluster templates, make a GET HTTP request to URI:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="o">/</span><span class="n">clustertemplates</span>
+</pre></div>
+</div>
+<div class="section" id="id7">
+<h3>HTTP Responses<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="60%" />
+<col width="40%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Status Code</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>200 (OK)</td>
+<td>Successful</td>
+</tr>
+<tr class="row-odd"><td>400 (BAD REQUEST)</td>
+<td>If the resource uri is specified incorrectly.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="id8">
+<h3>Example<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>curl -H <span class="s1">&#39;Coopr-UserID:admin&#39;</span>
+       -H <span class="s1">&#39;Coopr-TenantID:&lt;tenantid&gt;&#39;</span>
+       -H <span class="s1">&#39;Coopr-ApiKey:&lt;apikey&gt;&#39;</span>
+       http://&lt;server&gt;:&lt;port&gt;/&lt;version&gt;/clustertemplates
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><!--
+  ~ Copyright 2014 Cask Data, Inc.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License"); you may not
+  ~ use this file except in compliance with the License. You may obtain a copy of
+  ~ the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+  ~ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+  ~ License for the specific language governing permissions and limitations under
+  ~ the License.
+  -->
+
+<h3><a href="../index.html">Table of Contents</a></h3>
+<nav>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../overview/index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/quickstart/index.html">Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation/index.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/superadmin/index.html">Super Admin Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/admin/index.html">Administration Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/user/index.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html">Web Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/security.html">Security</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../implementation.html">Under the Hood</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq/index.html">FAQs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../release-notes/index.html">Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../javadocs/index.html">Javadocs</a></li>
+</ul>
+
+</nav>
+<div id="searchbox" style="display: none">
+  <h3>Quick Search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >Index</a></li>
+        <li><a href="../index.html">Coopr 0.9.8 Beta Documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        Copyright &copy; 2014 Cask Data, Inc.
+    </div>
+  </body>
+</html>

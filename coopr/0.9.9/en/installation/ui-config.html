@@ -1,0 +1,261 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-55081520-3']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+    <title>UI Configuration &mdash; Coopr 0.9.9 Documentation</title>
+    
+    <link rel="stylesheet" href="../_static/cdap.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+
+
+
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.9.9',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    <link rel="top" title="Coopr 0.9.9 Documentation" href="../index.html" />
+    <link rel="up" title="Installation Guide" href="index.html" />
+    <link rel="next" title="Authentication Support" href="authentication.html" />
+    <link rel="prev" title="Openstack Configuration" href="openstack-config.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">Index</a></li>
+        <li class="right" >
+          <a href="authentication.html" title="Authentication Support"
+             accesskey="N">Next</a> |</li>
+        <li class="right" >
+          <a href="openstack-config.html" title="Openstack Configuration"
+             accesskey="P">Previous</a> |</li>
+        
+        <script type="text/javascript" src="../_static/version-menu.js"></script>
+        <script src="http://docs.cask.co/coopr/json-versions.js"/></script>
+        <script>window.setVersion('0.9.9');</script>
+       
+        <li><a href="../index.html">Coopr Documentation v0.9.9</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Installation Guide</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="ui-configuration">
+<span id="index-0"></span><h1>UI Configuration<a class="headerlink" href="#ui-configuration" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="ssl-configuration-steps">
+<h2>SSL Configuration Steps<a class="headerlink" href="#ssl-configuration-steps" title="Permalink to this headline">¶</a></h2>
+<p>SSL configuration requires these steps: (the first two steps are only necessary once per machine)</p>
+<ul class="simple">
+<li>Create PEM encoded SSL certificate and key</li>
+<li>Put the certificate and key in place (e.g. in /etc/pki/tls/certs/ and /etc/pki/tls/private/, see below)</li>
+<li>Set the environment variables shown below, to describe the locations</li>
+<li>Set and export the variables</li>
+<li>Correctly configure the UI (next step)</li>
+</ul>
+</div>
+<div class="section" id="running-ui-with-ssl">
+<h2>Running UI with SSL<a class="headerlink" href="#running-ui-with-ssl" title="Permalink to this headline">¶</a></h2>
+<p>To enable running the UI with SSL, set these environment variables:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="34%" />
+<col width="29%" />
+<col width="37%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Environment variable</th>
+<th class="head">Default Value</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">COOPR_UI_KEY_FILE</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">COOPR_HOME/cert/server.key</span></tt></td>
+<td>Key file location</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">COOPR_UI_CERT_FILE</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">COOPR_HOME/cert/server.crt</span></tt></td>
+<td>Certificate file location</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">COOPR_SSL</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">true</span></tt></td>
+<td>Use SSL for the UI</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">COOPR_UI_SSL_PORT</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">8443</span></tt></td>
+<td>Port the UI listens on for connections
+(<strong>optional</strong>)</td>
+</tr>
+</tbody>
+</table>
+<p>Create a file (example, <tt class="docutils literal"><span class="pre">/etc/profile.d/coopr-ui.sh</span></tt>) with appropriate entries,
+modifying the values as needed to point to the location of your certificate file and key,
+and, optionally, a different port (<tt class="docutils literal"><span class="pre">28443</span></tt> is used here as an example):</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="go">export COOPR_UI_KEY_FILE=/etc/pki/tls/private/ui-cert.key</span>
+<span class="go">export COOPR_UI_CERT_FILE=/etc/pki/tls/certs/ui-cert.crt</span>
+<span class="go">export COOPR_UI_SSL=true</span>
+<span class="go">export COOPR_UI_SSL_PORT=28443</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="logging-into-the-ui-with-ssl-enabled">
+<h2>Logging into the UI with SSL Enabled<a class="headerlink" href="#logging-into-the-ui-with-ssl-enabled" title="Permalink to this headline">¶</a></h2>
+<p>When logging into the UI with SSL enabled, the default port is <tt class="docutils literal"><span class="pre">8443</span></tt>.
+You only need to set <tt class="docutils literal"><span class="pre">COOPR_UI_SSL_PORT</span></tt> if you wish to use a different port for your UI
+to listen on when using SSL.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><!--
+  Copyright © 2014-2015 Cask Data, Inc.
+
+  Licensed under the Apache License, Version 2.0 (the "License"); you may not
+  use this file except in compliance with the License. You may obtain a copy of
+  the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+  License for the specific language governing permissions and limitations under
+  the License.
+-->
+
+
+    
+<div aria-label="globaltoc links">
+<h3 class="pagenavtitle"><a href="../index.html"> Table&nbsp;of&nbsp;Contents</a></h3>
+<nav class="pagenav">
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../overview/index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/quickstart/index.html">Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/architecture.html">Architecture</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Installation Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="packages.html">Coopr Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server-config.html">Server Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provisioner-config.html">Provisioner Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="standalone.html">Coopr Sandboxes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="openstack-config.html">Openstack Configuration</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="">UI Configuration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#ssl-configuration-steps">SSL Configuration Steps</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#running-ui-with-ssl">Running UI with SSL</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#logging-into-the-ui-with-ssl-enabled">Logging into the UI with SSL Enabled</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="authentication.html">Authentication Support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="upgrade.html">Coopr Upgrade</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/superadmin/index.html">Super Admin Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/admin/index.html">Administration Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/user/index.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rest/index.html">Web Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/security.html">Security</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../implementation.html">Under the Hood</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq/index.html">FAQs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../release-notes/index.html">Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../javadocs/index.html">Javadocs</a></li>
+</ul>
+
+</nav>
+</div>
+  <h4>Previous Topic</h4>
+  <p class="topless"><a href="openstack-config.html"
+                        title="Previous Chapter">Openstack Configuration</a></p>
+  <h4>Next Topic</h4>
+  <p class="topless"><a href="authentication.html"
+                        title="Next Chapter">Authentication Support</a></p>
+  <div role="note" aria-label="downloads links">
+    <h3>Downloads</h3>
+    <ul class="this-page-menu">
+      <li><a href="http://docs.cask.co/coopr/0.9.9/coopr-docs-0.9.9-web.zip"
+            rel="nofollow">Zip Archive of Coopr Documentation</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick Search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer" role="contentinfo">
+
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;margin:0px auto;}
+.tg td{padding:0px 20px 0px 20px;border-width:0px;overflow:hidden;word-break:normal;font-weight:normal;}
+.tg th{padding:0px 20px 0px 20px;border-width:0px;overflow:hidden;word-break:normal;font-weight:normal;}
+.tg .tg-s6z2{text-align:center;}
+.tg .tg-0ord{text-align:right;}
+.tg a{font-weight:bold;}
+</style>
+<table class="tg" width= 100%>
+  <tr>
+    <th class="tg-031e">Previous Topic: 
+    <a title="Openstack Configuration" href="openstack-config.html" />Openstack Configuration</a>&nbsp;&nbsp;
+    
+    </th>
+    <th class="tg-s6z2">
+        Copyright &copy; 2014-2015 Cask Data, Inc.
+    
+    </th>
+    <th class="tg-0ord">&nbsp;&nbsp;Next Topic:
+    <a title="Authentication Support" href="authentication.html" />Authentication Support</a>
+    
+    </th>
+  </tr>
+</table>
+
+    </div>
+  </body>
+</html>

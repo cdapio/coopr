@@ -1,0 +1,313 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-55081520-3']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+    <title>Docker Automator Plugin &mdash; Coopr 0.9.9 Documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/cdap.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+
+
+
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.9.9',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+    <link rel="top" title="Coopr 0.9.9 Documentation" href="../../index.html" />
+    <link rel="up" title="Provisioner Plugins" href="plugins.html" />
+    <link rel="next" title="Shell Automator Plugin" href="shell-automator-plugin.html" />
+    <link rel="prev" title="Chef Solo Automator Plugin" href="chef-solo-automator-plugin.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">Index</a></li>
+        <li class="right" >
+          <a href="shell-automator-plugin.html" title="Shell Automator Plugin"
+             accesskey="N">Next</a> |</li>
+        <li class="right" >
+          <a href="chef-solo-automator-plugin.html" title="Chef Solo Automator Plugin"
+             accesskey="P">Previous</a> |</li>
+        
+        <script type="text/javascript" src="../../_static/version-menu.js"></script>
+        <script src="http://docs.cask.co/coopr/json-versions.js"/></script>
+        <script>window.setVersion('0.9.9');</script>
+       
+        <li><a href="../../index.html">Coopr Documentation v0.9.9</a> &raquo;</li>
+          <li><a href="index.html" >Super Admin Guide</a> &raquo;</li>
+          <li><a href="plugins.html" accesskey="U">Provisioner Plugins</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <span class="target" id="plugin-reference"></span><div class="section" id="docker-automator-plugin">
+<span id="index-0"></span><h1>Docker Automator Plugin<a class="headerlink" href="#docker-automator-plugin" title="Permalink to this headline">¶</a></h1>
+<p>This section describes an automator that uses docker commands via Secure Shell (SSH).</p>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>The Docker Automator plugin, like all automator plugins, is responsible for performing the installation and operation
+of services on remote hosts.  The Docker Automator plugin provides a simple way to install Docker images from Docker Hub
+and manage containers of these images.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The Docker Automator currently requires that Docker is installed, configured, and running on the target host(s), such as provided by CoreOS.</p>
+</div>
+<p>As an example, consider the following Coopr service definition:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="o">{</span>
+    <span class="s">&quot;name&quot;</span><span class="o">:</span> <span class="s">&quot;cdap-standalone&quot;</span><span class="o">,</span>
+    <span class="s">&quot;description&quot;</span><span class="o">:</span> <span class="s">&quot;CDAP SDK (Standalone) running in a Docker container (caskdata/cdap-standalone)&quot;</span><span class="o">,</span>
+    <span class="s">&quot;provisioner&quot;</span><span class="o">:</span> <span class="o">{</span>
+        <span class="s">&quot;actions&quot;</span><span class="o">:</span> <span class="o">{</span>
+            <span class="s">&quot;install&quot;</span><span class="o">:</span> <span class="o">{</span>
+                <span class="s">&quot;type&quot;</span><span class="o">:</span> <span class="s">&quot;docker&quot;</span><span class="o">,</span>
+                <span class="s">&quot;fields&quot;</span><span class="o">:</span> <span class="o">{</span>
+                    <span class="s">&quot;image_name&quot;</span><span class="o">:</span> <span class="s">&quot;caskdata/cdap-standalone&quot;</span><span class="o">,</span>
+                    <span class="s">&quot;publish_ports&quot;</span><span class="o">:</span> <span class="s">&quot;9999,10000&quot;</span>
+                <span class="o">}</span>
+            <span class="o">},</span>
+            <span class="s">&quot;start&quot;</span><span class="o">:</span> <span class="o">{</span>
+                <span class="s">&quot;type&quot;</span><span class="o">:</span> <span class="s">&quot;docker&quot;</span><span class="o">,</span>
+                <span class="s">&quot;fields&quot;</span><span class="o">:</span> <span class="o">{</span>
+                    <span class="s">&quot;image_name&quot;</span><span class="o">:</span> <span class="s">&quot;caskdata/cdap-standalone&quot;</span><span class="o">,</span>
+                    <span class="s">&quot;publish_ports&quot;</span><span class="o">:</span> <span class="s">&quot;9999,10000&quot;</span>
+                <span class="o">}</span>
+            <span class="o">},</span>
+            <span class="s">&quot;stop&quot;</span><span class="o">:</span> <span class="o">{</span>
+                <span class="s">&quot;type&quot;</span><span class="o">:</span> <span class="s">&quot;docker&quot;</span><span class="o">,</span>
+                <span class="s">&quot;fields&quot;</span><span class="o">:</span> <span class="o">{</span>
+                    <span class="s">&quot;image_name&quot;</span><span class="o">:</span> <span class="s">&quot;caskdata/cdap-standalone&quot;</span><span class="o">,</span>
+                    <span class="s">&quot;publish_ports&quot;</span><span class="o">:</span> <span class="s">&quot;9999,10000&quot;</span>
+                <span class="o">}</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<p>This defines a service named &#8220;cdap-standalone&#8221; which has three defined actions, install, start, and stop.  When each
+action is invoked for this service, the <tt class="docutils literal"><span class="pre">type</span></tt> field indicates to the provisioner to use the Docker Automator plugin
+to manage the action.  The Docker Automator defines two custom fields: a required <tt class="docutils literal"><span class="pre">image_name</span></tt> and an optional
+<tt class="docutils literal"><span class="pre">publish_ports</span></tt>.  The <tt class="docutils literal"><span class="pre">image_name</span></tt> field is the image or repository to pull from Docker Hub.  Note that the image
+must be a public image, hosted on Docker Hub.  The <tt class="docutils literal"><span class="pre">publish_ports</span></tt> field is optional, and is a comma-separated list
+of exposed container ports to publish on the Docker host.</p>
+<p>In this example, when the install action is invoked for this service, the Docker Automator will connect to the remote
+host(s), then effectively invoke the following command on them:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="n">docker</span> <span class="n">pull</span> <span class="n">caskdata</span><span class="o">/</span><span class="n">cdap</span><span class="o">-</span><span class="n">standalone</span>
+</pre></div>
+</div>
+<p>When the start action is invoked for this service, the Docker Automator will connect to the remote host(s), then effectively
+invoke the following command on them:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="n">docker</span> <span class="n">run</span> <span class="o">-</span><span class="n">d</span> <span class="o">-</span><span class="nl">p9999:</span><span class="mi">9999</span> <span class="o">-</span><span class="nl">p10000:</span><span class="mi">10000</span> <span class="n">caskdata</span><span class="o">/</span><span class="n">cdap</span><span class="o">-</span><span class="n">standalone</span>
+</pre></div>
+</div>
+<p>Note that this example is a real service included with Coopr, which can be used to launch a container with the Cask Data Application
+Platform (CDAP) SDK services running!</p>
+</div>
+<div class="section" id="how-it-works">
+<h2>How It Works<a class="headerlink" href="#how-it-works" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>A more in-depth look at Docker Automator:</dt>
+<dd><ol class="first last arabic">
+<li><dl class="first docutils">
+<dt>During the &#8220;bootstrap&#8221; action:</dt>
+<dd><ol class="first last loweralpha simple">
+<li>The plugin verifies that <tt class="docutils literal"><span class="pre">docker</span></tt> is available on the host(s)</li>
+</ol>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>When a defined docker service action runs (install, start, stop):</dt>
+<dd><ol class="first last loweralpha">
+<li><dl class="first docutils">
+<dt>The Docker Automator invokes a command on the remote host which performs one of:</dt>
+<dd><ol class="first last lowerroman simple">
+<li>Pulling an image or repository from Docker Hub (install)</li>
+<li>Running a new container, or starting a stopped container (start)</li>
+<li>Stopping a container (stop)</li>
+<li>Removing an image from the host(s) (remove)</li>
+</ol>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+</div>
+<div class="section" id="bootstrap">
+<h2>Bootstrap<a class="headerlink" href="#bootstrap" title="Permalink to this headline">¶</a></h2>
+<p>Each Coopr Automator plugin is responsible for implementing a bootstrap method in which it performs any actions it needs
+to be able to carry out further tasks. The Docker Automator plugin performs the following actions for a bootstrap task:</p>
+<blockquote>
+<div>Verify that the <tt class="docutils literal"><span class="pre">docker</span></tt> command is installed and in the PATH</div></blockquote>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><!--
+  Copyright © 2014-2015 Cask Data, Inc.
+
+  Licensed under the Apache License, Version 2.0 (the "License"); you may not
+  use this file except in compliance with the License. You may obtain a copy of
+  the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+  License for the specific language governing permissions and limitations under
+  the License.
+-->
+
+
+    
+<div aria-label="globaltoc links">
+<h3 class="pagenavtitle"><a href="../../index.html"> Table&nbsp;of&nbsp;Contents</a></h3>
+<nav class="pagenav">
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../overview/index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart/index.html">Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview/features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview/architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation/index.html">Installation Guide</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Super Admin Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tenants.html">Tenant Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="callbacks.html">Cluster Callbacks</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="plugins.html">Provisioner Plugins</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="plugins.html#types-of-plugins">Types of Plugins</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plugins.html#task-types">Task Types</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plugins.html#writing-a-plugin">Writing a Plugin</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="plugins.html#included-plugins">Included Plugins</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="chef-solo-automator-plugin.html">Chef Solo Automator Plugin</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="">Docker Automator Plugin</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#how-it-works">How It Works</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#bootstrap">Bootstrap</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="shell-automator-plugin.html">Shell Automator Plugin</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="plugins.html#resource-types">Resource types</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="monitoring.html">Monitoring and Metrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bcp/index.html">Business Continuity Plan (BCP)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../admin/index.html">Administration Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rest/index.html">Web Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview/security.html">Security</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../implementation.html">Under the Hood</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../faq/index.html">FAQs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release-notes/index.html">Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview/glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../javadocs/index.html">Javadocs</a></li>
+</ul>
+
+</nav>
+</div>
+  <h4>Previous Topic</h4>
+  <p class="topless"><a href="chef-solo-automator-plugin.html"
+                        title="Previous Chapter">Chef Solo Automator Plugin</a></p>
+  <h4>Next Topic</h4>
+  <p class="topless"><a href="shell-automator-plugin.html"
+                        title="Next Chapter">Shell Automator Plugin</a></p>
+  <div role="note" aria-label="downloads links">
+    <h3>Downloads</h3>
+    <ul class="this-page-menu">
+      <li><a href="http://docs.cask.co/coopr/0.9.9/coopr-docs-0.9.9-web.zip"
+            rel="nofollow">Zip Archive of Coopr Documentation</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick Search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer" role="contentinfo">
+
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;margin:0px auto;}
+.tg td{padding:0px 20px 0px 20px;border-width:0px;overflow:hidden;word-break:normal;font-weight:normal;}
+.tg th{padding:0px 20px 0px 20px;border-width:0px;overflow:hidden;word-break:normal;font-weight:normal;}
+.tg .tg-s6z2{text-align:center;}
+.tg .tg-0ord{text-align:right;}
+.tg a{font-weight:bold;}
+</style>
+<table class="tg" width= 100%>
+  <tr>
+    <th class="tg-031e">Previous Topic: 
+    <a title="Chef Solo Automator Plugin" href="chef-solo-automator-plugin.html" />Chef Solo Automator Plugin</a>&nbsp;&nbsp;
+    
+    </th>
+    <th class="tg-s6z2">
+        Copyright &copy; 2014-2015 Cask Data, Inc.
+    
+    </th>
+    <th class="tg-0ord">&nbsp;&nbsp;Next Topic:
+    <a title="Shell Automator Plugin" href="shell-automator-plugin.html" />Shell Automator Plugin</a>
+    
+    </th>
+  </tr>
+</table>
+
+    </div>
+  </body>
+</html>

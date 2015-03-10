@@ -1,0 +1,436 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-55081520-3']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+    <title>Quick Start Guide &mdash; Coopr 0.9.8 Beta Documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/cdap.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.9.8 Beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+    <link rel="top" title="Coopr 0.9.8 Beta Documentation" href="../../index.html" />
+    <link rel="next" title="Features" href="../../overview/features.html" />
+    <link rel="prev" title="Overview" href="../../overview/index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">Index</a></li>
+        <li class="right" >
+          <a href="../../overview/features.html" title="Features"
+             accesskey="N">Next</a> |</li>
+        <li class="right" >
+          <a href="../../overview/index.html" title="Overview"
+             accesskey="P">Previous</a> |</li>
+        <li><a href="../../index.html">Coopr 0.9.8 Beta Documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <span class="target" id="guide-installation-toplevel"></span><div class="section" id="quick-start-guide">
+<span id="index-0"></span><h1>Quick Start Guide<a class="headerlink" href="#quick-start-guide" title="Permalink to this headline">¶</a></h1>
+<p>This guide will help you get started with Coopr. In this section, you will learn to provision a cluster
+using one of the preset templates.</p>
+<div class="section" id="installing-coopr">
+<h2>Installing Coopr<a class="headerlink" href="#installing-coopr" title="Permalink to this headline">¶</a></h2>
+<p>Please follow the steps found in the <a class="reference internal" href="../../installation/index.html"><em>Installation Guide</em></a>. Once successfully installed,
+start all the relevant Coopr components: the server, provisioners, and UI.</p>
+</div>
+<div class="section" id="getting-started">
+<span id="quickstart-getting-started"></span><h2>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h2>
+<p>Open the Coopr UI using a browser at <tt class="docutils literal"><span class="pre">http://&lt;coopr-host&gt;:&lt;coopr-ui-port&gt;/</span></tt> and login as a superadmin by entering
+&#8216;superadmin&#8217; in the tenant field, &#8216;admin&#8217; in the username field, and &#8216;admin&#8217; in the password field. A superadmin can
+create and manage tenants. Each tenant has its own admin and a number of users. Tenant admins are responsible for configuring
+providers and templates to allow their users to easily create and manage clusters. Data from one tenant is isolated to that
+tenant and is invisible to users in other tenants. The superadmin is also an admin in its own tenant.</p>
+<div class="align-center figure">
+<a class="reference internal image-reference" href="../../_images/login1.png"><img alt="Login as the super admin" src="../../_images/login1.png" style="width: 800px;" /></a>
+</div>
+<p>Logging in will take you to the administrator home screen. The page, shown below, displays metrics for clusters
+that are currently running within the tenant. Note, the &#8216;All Nodes&#8217; count metric
+indicates all the nodes ever provisioned. (i.e. it is a historical cumulative number including the
+deleted nodes.) This page also shows the &#8216;Catalog&#8217;, which is a list of &#8216;templates&#8217;
+for provisioning clusters. Several default templates are available out of the box.</p>
+<div class="align-center figure">
+<a class="reference internal image-reference" href="../../_images/home_screen2.png"><img alt="Administrator home screen" src="../../_images/home_screen2.png" style="width: 800px;" /></a>
+</div>
+</div>
+<div class="section" id="adding-workers">
+<h2>Adding Workers<a class="headerlink" href="#adding-workers" title="Permalink to this headline">¶</a></h2>
+<p>Before clusters can be created, workers must be assigned to the tenant. To do so, click on the tenants tab at the top of the screen.
+This takes you to the tenant management screen, where a superadmin may create, edit, and delete tenants, as well as get an overview
+of the system. Near the top of the screen, the total number of workers, the number of available workers, and the number of tasks
+currently in progress and queued are displayed. These numbers are aggregates across all tenants in the system, and are visible only
+to the superadmin.</p>
+<div class="align-center figure">
+<a class="reference internal image-reference" href="../../_images/tenants_overview.png"><img alt="Tenant management screen" src="../../_images/tenants_overview.png" style="width: 800px;" /></a>
+</div>
+<p>Workers are provided by provisioners. If your system is using all it&#8217;s workers, additional provisioners must be added to the system
+in order to support additional tenants. With a clean install, only the the superadmin&#8217;s tenant will exist, and no workers will be
+assigned to any tenant. In order to create a cluster, we must assign some workers to the superadmin tenant. To do this, we must edit
+the superadmin tenant by clicking on it, which will bring you to the edit tenant screen.</p>
+<div class="align-center figure">
+<a class="reference internal image-reference" href="../../_images/tenants_edit.png"><img alt="Tenant edit screen" src="../../_images/tenants_edit.png" style="width: 800px;" /></a>
+</div>
+<p>On this screen, assign 10 workers (all available workers) to the tenant and enter some reasonable maximums for the number of clusters
+and nodes that can be live at any given time within the tenant. Once you are done, click submit.</p>
+</div>
+<div class="section" id="configuring-a-provider">
+<h2>Configuring a Provider<a class="headerlink" href="#configuring-a-provider" title="Permalink to this headline">¶</a></h2>
+<p>To start provisioning machines, you must first specify an IaaS provider on which the clusters will be created. Click on the
+&#8216;Providers&#8217; tab at the top of the screen. Several defaults are available on this page. There are providers for Amazon, Google,
+Joyent, Openstack, and Rackspace. Choose the provider you want to use for this tutorial, then click on it&#8217;s name to navigate to
+it&#8217;s edit screen.</p>
+<p>Each provider type has fields specific to your own provider and account.
+These inputs may include settings such as username and API key, and can be obtained through the provider&#8217;s own
+system. If you do not already have an account with the provider, you may register or obtain one on a provider&#8217;s
+website. Next, we go through how to set up each of the default providers. You will only need to set up the
+provider(s) you are using.</p>
+<div class="section" id="amazon-web-services-aws">
+<h3>Amazon Web Services (AWS)<a class="headerlink" href="#amazon-web-services-aws" title="Permalink to this headline">¶</a></h3>
+<p>The Amazon providers require a lot of fields. Of these many fields, <tt class="docutils literal"><span class="pre">Secret</span> <span class="pre">Access</span> <span class="pre">Key</span></tt>, <tt class="docutils literal"><span class="pre">Access</span> <span class="pre">Key</span> <span class="pre">ID</span></tt>,
+<tt class="docutils literal"><span class="pre">AWS</span> <span class="pre">Region</span></tt>, <tt class="docutils literal"><span class="pre">Key</span> <span class="pre">Pair</span> <span class="pre">Name</span></tt>, and <tt class="docutils literal"><span class="pre">SSH</span> <span class="pre">Key</span> <span class="pre">Resource</span> <span class="pre">Name</span></tt> must be set. Once those are set, you must provide
+either the <tt class="docutils literal"><span class="pre">Security</span> <span class="pre">Groups</span></tt> field if your account does not use VPC, or the <tt class="docutils literal"><span class="pre">Security</span> <span class="pre">Groups</span> <span class="pre">IDs</span></tt> and <tt class="docutils literal"><span class="pre">Subnet</span> <span class="pre">ID</span></tt>
+fields if your account uses VPC. The rest of the fields are optional.</p>
+<div class="align-center figure">
+<a class="reference internal image-reference" href="../../_images/providers_aws.png"><img alt="Configuring an AWS provider" src="../../_images/providers_aws.png" style="width: 800px;" /></a>
+</div>
+<p>Your AWS ssh key is a plugin resource, and must be uploaded to the Coopr server
+before it can be used by workers. Coopr will take care of distributing the key to workers that need it. A UI for managing
+resources is coming in the next release. Until then, you must use the REST API directly (see
+<a class="reference internal" href="../../rest/plugins.html"><em>Plugin Resource API</em></a>), or use the data upload tool included in the provisioner package.</p>
+<p>For example, assume your ssh key is located at &#8216;/keys/aws/id_rsa&#8217; and you want to upload it as a resource named &#8216;ec2&#8217;.
+Enter &#8216;ec2&#8217; into the <tt class="docutils literal"><span class="pre">SSH</span> <span class="pre">Key</span> <span class="pre">Resource</span> <span class="pre">Name</span></tt>, then upload the resource.
+If you are using Coopr Standalone, run the following command from the unzipped standalone directory:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>ruby provisioner/bin/data-uploader.rb sync /keys/aws/id_rsa providertypes/aws/ssh_keys/ec2 -u http://&lt;server&gt;:&lt;port&gt;
+upload successful <span class="k">for </span>http://&lt;server&gt;:&lt;port&gt;/v2/plugins/providertypes/aws/ssh_keys/ec2, version: 1
+stage successful <span class="k">for </span>http://&lt;server&gt;:&lt;port&gt;/v2/plugins/providertypes/aws/ssh_keys/ec2/versions/1/stage
+sync successful
+</pre></div>
+</div>
+<p>If you have installed Coopr from packages or are running it using the VM image:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>/opt/coopr/provisioner/embedded/bin/ruby /opt/coopr/provisioner/bin/data-uploader.rb sync /keys/aws/id_rsa providertypes/aws/ssh_keys/ec2 -u http://&lt;server&gt;:&lt;port&gt;
+upload successful <span class="k">for </span>http://&lt;server&gt;:&lt;port&gt;/v2/plugins/providertypes/aws/ssh_keys/ec2, version: 1
+stage successful <span class="k">for </span>http://&lt;server&gt;:&lt;port&gt;/v2/plugins/providertypes/aws/ssh_keys/ec2/versions/1/stage
+sync successful
+</pre></div>
+</div>
+<p>The port to use is the server port, which defaults to 55054 if you have not set it in your server configuration.
+This will upload your key to the server, then sync it to make it available for use. After this you may
+use this key in any aws provider by referring to it as &#8216;ec2&#8217;. Similarly, you may upload other keys you may want to use.
+For example, you could upload the another key and name it &#8216;ec2-east-1&#8217;. Then in the <tt class="docutils literal"><span class="pre">SSH</span> <span class="pre">Key</span> <span class="pre">Resource</span> <span class="pre">Name</span></tt> field,
+you would enter &#8216;ec2-east-1&#8217;.</p>
+<p>Once you are finished, click on &#8216;Submit&#8217; to save your changes.</p>
+</div>
+<div class="section" id="google">
+<h3>Google<a class="headerlink" href="#google" title="Permalink to this headline">¶</a></h3>
+<p>The google provider requires a p12 API key, a service account email address, some default data disk size, a project id,
+a ssh key to ssh onto nodes, a ssh username for that key, and a zone. Enter the corresponding values in the
+<tt class="docutils literal"><span class="pre">Service</span> <span class="pre">account</span> <span class="pre">email</span> <span class="pre">address</span></tt>, <tt class="docutils literal"><span class="pre">Project</span> <span class="pre">ID</span></tt>, <tt class="docutils literal"><span class="pre">SSH</span> <span class="pre">Username</span></tt>, and <tt class="docutils literal"><span class="pre">Zone</span></tt> field.</p>
+<div class="align-center figure">
+<a class="reference internal image-reference" href="../../_images/providers_google.png"><img alt="Configuring a Google provider" src="../../_images/providers_google.png" style="width: 800px;" /></a>
+</div>
+<p>The required <tt class="docutils literal"><span class="pre">API</span> <span class="pre">Key</span> <span class="pre">Resource</span> <span class="pre">Name</span></tt> and <tt class="docutils literal"><span class="pre">SSH</span> <span class="pre">Key</span> <span class="pre">Resource</span> <span class="pre">Name</span></tt> fields are plugin resources, and must
+be uploaded to the Coopr server before it can be used by workers.
+A UI for managing resources is coming in the next release. Until then, you must use the REST API directly (see
+<a class="reference internal" href="../../rest/plugins.html"><em>Plugin Resource API</em></a>), or use the data upload tool included in the provisioner package.</p>
+<p>For example, assume your google api key is located at &#8216;/keys/gce/gce.p12&#8217; and your ssh key is located at &#8216;/keys/gce/id_rsa&#8217;.
+Enter &#8216;gce&#8217; in the <tt class="docutils literal"><span class="pre">API</span> <span class="pre">Key</span> <span class="pre">Resource</span> <span class="pre">Name</span></tt> field and &#8216;coopr&#8217; in the <tt class="docutils literal"><span class="pre">SSH</span> <span class="pre">Key</span> <span class="pre">Resource</span> <span class="pre">Name</span></tt> field.
+We must then upload your api key and name it &#8216;gce&#8217;, and upload your ssh key and name it &#8216;coopr&#8217;.
+If you are using Coopr Standalone, run the following commands from the unzipped standalone directory:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>ruby provisioner/bin/data-uploader.rb sync /keys/gce/gce.p12 providertypes/google/api_keys/gce -u http://&lt;server&gt;:&lt;port&gt;
+upload successful <span class="k">for </span>http://&lt;server&gt;:&lt;port&gt;/v2/plugins/providertypes/google/api_keys/gce, version: 1
+stage successful <span class="k">for </span>http://&lt;server&gt;:&lt;port&gt;/v2/plugins/providertypes/google/api_keys/gce/versions/1/stage
+sync successful
+<span class="nv">$ </span>ruby provisioner/bin/data-uploader.rb sync /keys/gce/id_rsa providertypes/google/ssh_keys/coopr -u http://&lt;server&gt;:&lt;port&gt;
+upload successful <span class="k">for </span>http://&lt;server&gt;:&lt;port&gt;/v2/plugins/providertypes/google/ssh_keys/coopr, version: 1
+stage successful <span class="k">for </span>http://&lt;server&gt;:&lt;port&gt;/v2/plugins/providertypes/google/ssh_keys/coopr/versions/1/stage
+sync successful
+</pre></div>
+</div>
+<p>If you have installed Coopr from packages or are running it using the VM image:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>/opt/coopr/provisioner/embedded/bin/ruby /opt/coopr/provisioner/bin/data-uploader.rb sync /keys/gce/gce.p12 providertypes/google/api_keys/gce -u http://&lt;server&gt;:&lt;port&gt;
+upload successful <span class="k">for </span>http://&lt;server&gt;:&lt;port&gt;/v2/plugins/providertypes/google/api_keys/gce, version: 1
+stage successful <span class="k">for </span>http://&lt;server&gt;:&lt;port&gt;/v2/plugins/providertypes/google/api_keys/gce/versions/1/stage
+sync successful
+<span class="nv">$ </span>/opt/coopr/provisioner/embedded/bin/ruby /opt/coopr/provisioner/bin/data-uploader.rb sync /keys/gce/id_rsa providertypes/google/ssh_keys/coopr -u http://&lt;server&gt;:&lt;port&gt;
+upload successful <span class="k">for </span>http://&lt;server&gt;:&lt;port&gt;/v2/plugins/providertypes/google/ssh_keys/coopr, version: 1
+stage successful <span class="k">for </span>http://&lt;server&gt;:&lt;port&gt;/v2/plugins/providertypes/google/ssh_keys/coopr/versions/1/stage
+sync successful
+</pre></div>
+</div>
+<p>The port to use is the server port, which defaults to 55054 if you have not set it in your server configuration.
+This will upload your api and ssh keys to the server, then sync them to make them available to use. After this you may
+use these keys in any other google provider you manage. Similarly, you may upload other keys you may want to use.</p>
+<p>Once you are finished, click &#8216;Submit&#8217; to save your changes.</p>
+</div>
+<div class="section" id="rackspace">
+<h3>Rackspace<a class="headerlink" href="#rackspace" title="Permalink to this headline">¶</a></h3>
+<p>An API key, username, and region are required for using Rackspace (for more information on how to obtain your personalized API key, see
+<a class="reference external" href="http://www.rackspace.com/knowledge_center/article/rackspace-cloud-essentials-1-generating-your-api-key">this page</a> ).</p>
+<div class="align-center figure">
+<a class="reference internal image-reference" href="../../_images/providers_rackspace.png"><img alt="Configuring a Rackspace provider" src="../../_images/providers_rackspace.png" style="width: 800px;" /></a>
+</div>
+<p>Enter the necessary fields and click on &#8216;Submit&#8217; to save your changes.</p>
+</div>
+<div class="section" id="joyent">
+<h3>Joyent<a class="headerlink" href="#joyent" title="Permalink to this headline">¶</a></h3>
+<p>Joyent requires a CloudAPI username, region, API version, ssh key, and ssh key name. Enter values for all fields
+except for the <tt class="docutils literal"><span class="pre">SSH</span> <span class="pre">Key</span> <span class="pre">Resource</span> <span class="pre">Name</span></tt>.</p>
+<div class="align-center figure">
+<a class="reference internal image-reference" href="../../_images/providers_joyent.png"><img alt="Configuring a Joyent provider" src="../../_images/providers_joyent.png" style="width: 800px;" /></a>
+</div>
+<p>Your Joyent ssh key is a plugin resource, and must be uploaded to the Coopr server
+before it can be used by workers. Coopr will take care of distributing the key to workers that need it. A UI for managing
+resources is coming in the next release. Until then, you must use the REST API directly (see
+<a class="reference internal" href="../../rest/plugins.html"><em>Plugin Resource API</em></a>), or use the data upload tool included in the provisioner package.</p>
+<p>For example, assume your key is located at &#8216;/keys/joyent/id_rsa&#8217; and you want to add it as a resource named &#8216;coopr&#8217;.
+Enter &#8216;coopr&#8217; into the <tt class="docutils literal"><span class="pre">SSH</span> <span class="pre">Key</span> <span class="pre">Resource</span> <span class="pre">Name</span></tt>, then upload the resource.
+If you are using Coopr Standalone, run the following command from the unzipped standalone directory:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>ruby provisioner/bin/data-uploader.rb sync /keys/joyent/id_rsa providertypes/joyent/ssh_keys/coopr -u http://&lt;server&gt;:&lt;port&gt;
+upload successful <span class="k">for </span>http://&lt;server&gt;:&lt;port&gt;/v2/plugins/providertypes/joyent/ssh_keys/coopr, version: 1
+stage successful <span class="k">for </span>http://&lt;server&gt;:&lt;port&gt;/v2/plugins/providertypes/joyent/ssh_keys/coopr/versions/1/stage
+sync successful
+</pre></div>
+</div>
+<p>If you have installed Coopr from packages or are running it using the VM image:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>/opt/coopr/provisioner/embedded/bin/ruby /opt/coopr/provisioner/bin/data-uploader.rb sync /keys/joyent/id_rsa providertypes/joyent/ssh_keys/coopr -u http://&lt;server&gt;:&lt;port&gt;
+upload successful <span class="k">for </span>http://&lt;server&gt;:&lt;port&gt;/v2/plugins/providertypes/joyent/ssh_keys/coopr, version: 1
+stage successful <span class="k">for </span>http://&lt;server&gt;:&lt;port&gt;/v2/plugins/providertypes/joyent/ssh_keys/coopr/versions/1/stage
+sync successful
+</pre></div>
+</div>
+<p>The port to use is the server port, which defaults to 55054 if you have not set it in your server configuration.
+This will upload your key to the server, then sync it to make it available for use. After this you may
+use this key in any joyent provider by referring to it as &#8216;coopr&#8217;. Similarly, you may upload other keys you may want to use.
+For example, you could upload the another key and name it &#8216;joyentuser&#8217;. Then in the <tt class="docutils literal"><span class="pre">SSH</span> <span class="pre">Key</span> <span class="pre">Resource</span> <span class="pre">Name</span></tt> field,
+you would enter &#8216;joyentuser&#8217;.</p>
+</div>
+<div class="section" id="openstack">
+<h3>OpenStack<a class="headerlink" href="#openstack" title="Permalink to this headline">¶</a></h3>
+<p>The OpenStack provider has been tested on Havana, but also supports Grizzly out of the box. OpenStack support has
+some limitations that are described <a class="reference internal" href="../../installation/openstack-config.html"><em>here</em></a>.
+Several of these limitations will be eliminated in future releases of Coopr.
+The first step is to configure the openstack provider to use your credentials.
+OpenStack requires a password, username, auth url, tenant, ssh key, and ssh key name. Enter the correct value for
+every field, except for the <tt class="docutils literal"><span class="pre">SSH</span> <span class="pre">Key</span> <span class="pre">Resource</span> <span class="pre">Name</span></tt>.</p>
+<div class="align-center figure">
+<a class="reference internal image-reference" href="../../_images/providers_openstack.png"><img alt="Configuring an OpenStack provider" src="../../_images/providers_openstack.png" style="width: 800px;" /></a>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">SSH</span> <span class="pre">Key</span> <span class="pre">Resource</span> <span class="pre">Name</span></tt> is a plugin resource, and must be uploaded to the Coopr server
+before it can be used by workers. Coopr will take care of distributing the key to workers that need it. A UI for managing
+resources is coming in the next release. Until then, you must use the REST API directly (see
+<a class="reference internal" href="../../rest/plugins.html"><em>Plugin Resource API</em></a>), or use the data upload tool included in the provisioner package.</p>
+<p>For example, assume your key is located at &#8216;/keys/openstack/id_rsa&#8217; and you want to upload it as a resource named &#8216;coopr&#8217;.
+Enter &#8216;coopr&#8217; into the <tt class="docutils literal"><span class="pre">SSH</span> <span class="pre">Key</span> <span class="pre">Resource</span> <span class="pre">Name</span></tt>, then upload the resource.
+If you are using Coopr Standalone, run the following command from the unzipped standalone directory:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>ruby provisioner/bin/data-uploader.rb sync /keys/openstack/id_rsa providertypes/openstack/ssh_keys/coopr -u http://&lt;server&gt;:&lt;port&gt;
+upload successful <span class="k">for </span>http://&lt;server&gt;:&lt;port&gt;/v2/plugins/providertypes/openstack/ssh_keys/coopr, version: 1
+stage successful <span class="k">for </span>http://&lt;server&gt;:&lt;port&gt;/v2/plugins/providertypes/openstack/ssh_keys/coopr/versions/1/stage
+sync successful
+</pre></div>
+</div>
+<p>If you have installed Coopr from packages or are running it using the VM image:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>/opt/coopr/provisioner/embedded/bin/ruby /opt/coopr/provisioner/bin/data-uploader.rb sync /keys/openstack/id_rsa providertypes/openstack/ssh_keys/coopr -u http://&lt;server&gt;:&lt;port&gt;
+upload successful <span class="k">for </span>http://&lt;server&gt;:&lt;port&gt;/v2/plugins/providertypes/openstack/ssh_keys/coopr, version: 1
+stage successful <span class="k">for </span>http://&lt;server&gt;:&lt;port&gt;/v2/plugins/providertypes/openstack/ssh_keys/coopr/versions/1/stage
+sync successful
+</pre></div>
+</div>
+<p>The port to use is the server port, which defaults to 55054 if you have not set it in your server configuration.
+This will upload your key to the server, then sync it to make it available for use. After this you may
+use this key in any openstack provider by referring to it as &#8216;coopr&#8217;. Similarly, you may upload other keys you may want to use.
+For example, you could upload another key and name it &#8216;havana&#8217;. Then in the <tt class="docutils literal"><span class="pre">SSH</span> <span class="pre">Key</span> <span class="pre">Resource</span> <span class="pre">Name</span></tt> field,
+you would enter &#8216;havana&#8217;. Once you are finished, click &#8216;Submit&#8217; to save your changes.</p>
+<p>Next, we need to configure the default hardware types and image types to be able to use your instance of OpenStack. Navigate
+to the Hardware tab on the top of the screen and edit each hardware type in the list that you wish to use. You will notice that
+other providers like google and aws are already configured for each hardware type with their corresponding flavor. They are already
+configured because their flavors are public and unchanging, whereas your OpenStack instance may use its own flavors. Click on the
+&#8216;Add Provider&#8217; button, change the provider to openstack, and input your OpenStack&#8217;s flavor identifier for the corresponding hardware
+type. You may need to contact your OpenStack administrator to get this information.</p>
+<div class="align-center figure">
+<a class="reference internal image-reference" href="../../_images/providers_openstack_hardware.png"><img alt="Configuring an OpenStack hardware type" src="../../_images/providers_openstack_hardware.png" style="width: 800px;" /></a>
+</div>
+<p>Next, we need to configure the default image types. Navigate to the
+Images tab of the left and edit each image type in the list that you wish to use. Click on the &#8216;Add Provider&#8217; button,
+change the provider to openstack, and input your OpenStack&#8217;s image identifier for the corresponding image type. You may need to
+contact your OpenStack administrator to get this information.</p>
+<div class="align-center figure">
+<a class="reference internal image-reference" href="../../_images/providers_openstack_image.png"><img alt="Configuring an OpenStack image type" src="../../_images/providers_openstack_image.png" style="width: 800px;" /></a>
+</div>
+</div>
+</div>
+<div class="section" id="provisioning-your-first-cluster">
+<h2>Provisioning your First Cluster<a class="headerlink" href="#provisioning-your-first-cluster" title="Permalink to this headline">¶</a></h2>
+<p>Click on the &#8216;Clusters&#8217; icon on the right most icon on the top bar. This page lists all the clusters
+that have been provisioned that are accessible to the logged in user.</p>
+<div class="align-center figure">
+<a class="reference internal image-reference" href="../../_images/clusters1.png"><img alt="Creating a cluster" src="../../_images/clusters1.png" style="width: 800px;" /></a>
+</div>
+<p>Click on the &#8216;Create&#8217; buttom at the top right to enter the cluster creation page. In the &#8216;Name&#8217; field,
+enter a name (for example, &#8216;hadoop-quickstart&#8217;) as the name of the cluster to create. The &#8216;Template&#8217; field
+specifies which template in the catalog to use for this cluster. For this tutorial, let&#8217;s
+create a distributed Hadoop cluster.  Select &#8216;hadoop-distributed&#8217; from the &#8216;Template&#8217; drop down box.
+Enter the number of nodes you want your cluster to have (for example, 5) in the field labeled &#8216;Number of machines&#8217;.</p>
+<p>Display the advanced settings menu by clicking on the small triangle next to the label &#8216;Advanced&#8217;. This lists
+the default settings for the &#8216;hadoop-distributed&#8217; template. If you chose a provider other than the default
+in the previous section, click on the drop down menu labeled &#8216;Provider&#8217; to select the provider you want.</p>
+<div class="align-center figure">
+<a class="reference internal image-reference" href="../../_images/cluster_create_advanced.png"><img alt="Advanced settings" src="../../_images/cluster_create_advanced.png" style="width: 800px;" /></a>
+</div>
+<p>To start provisioning, click on &#8216;Create&#8217; at the bottom of the page (not shown in the image above). This operation will take you back to the Clusters&#8217; home
+screen, where you can monitor the progress and status of your cluster. Creating a cluster may take several minutes.</p>
+<div class="align-center figure">
+<a class="reference internal image-reference" href="../../_images/clusters_list.png"><img alt="Creation running" src="../../_images/clusters_list.png" style="width: 800px;" /></a>
+</div>
+</div>
+<div class="section" id="accessing-the-cluster">
+<h2>Accessing the Cluster<a class="headerlink" href="#accessing-the-cluster" title="Permalink to this headline">¶</a></h2>
+<p>Once creation is complete, the cluster is ready for use.</p>
+<p>For more information on your cluster, click on the name &#8216;hadoop-quickstart&#8217; on the
+Clusters&#8217; home screen. On this cluster description screen, nodes are grouped together by the set
+of services that are available on them. To see node details, click on the white triangles next to each
+service set to expand the list. The expanded list shows a list of attributes for each node.</p>
+<div class="align-center figure">
+<a class="reference internal image-reference" href="../../_images/cluster_details.png"><img alt="Cluster description and details" src="../../_images/cluster_details.png" style="width: 800px;" /></a>
+</div>
+<p>In this example, there is 1 master node that contains the &#8216;hbase-master&#8217;, &#8216;hadoop-hdfs-namenode&#8217;, &#8216;zookeeper-server&#8217;, and
+&#8216;hadoop-yarn-resourcemenager&#8217; services. There are also 4 slave nodes that contain the &#8216;hbase-regionserver&#8217;, &#8216;hadoop-yarn-nodemanager&#8217;,
+and &#8216;hadoop-hdfs-datanode&#8217; services.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><!--
+  ~ Copyright 2014 Cask Data, Inc.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License"); you may not
+  ~ use this file except in compliance with the License. You may obtain a copy of
+  ~ the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+  ~ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+  ~ License for the specific language governing permissions and limitations under
+  ~ the License.
+  -->
+
+<h3><a href="../../index.html">Table of Contents</a></h3>
+<nav>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../overview/index.html">Overview</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">Quick Start Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#installing-coopr">Installing Coopr</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#getting-started">Getting Started</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#adding-workers">Adding Workers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#configuring-a-provider">Configuring a Provider</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#amazon-web-services-aws">Amazon Web Services (AWS)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#google">Google</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rackspace">Rackspace</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#joyent">Joyent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openstack">OpenStack</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#provisioning-your-first-cluster">Provisioning your First Cluster</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#accessing-the-cluster">Accessing the Cluster</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview/features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview/architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation/index.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../superadmin/index.html">Super Admin Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../admin/index.html">Administration Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rest/index.html">Web Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview/security.html">Security</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../implementation.html">Under the Hood</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../faq/index.html">FAQs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release-notes/index.html">Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview/glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../javadocs/index.html">Javadocs</a></li>
+</ul>
+
+</nav>
+  <h4>Previous Topic</h4>
+  <p class="topless"><a href="../../overview/index.html"
+                        title="Previous Chapter">Overview</a></p>
+  <h4>Next Topic</h4>
+  <p class="topless"><a href="../../overview/features.html"
+                        title="Next Chapter">Features</a></p>
+<div id="searchbox" style="display: none">
+  <h3>Quick Search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >Index</a></li>
+        <li class="right" >
+          <a href="../../overview/features.html" title="Features"
+             >Next</a> |</li>
+        <li class="right" >
+          <a href="../../overview/index.html" title="Overview"
+             >Previous</a> |</li>
+        <li><a href="../../index.html">Coopr 0.9.8 Beta Documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        Copyright &copy; 2014 Cask Data, Inc.
+    </div>
+  </body>
+</html>

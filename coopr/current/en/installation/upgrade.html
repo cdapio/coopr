@@ -1,0 +1,286 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-55081520-3']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+    <title>Coopr Upgrade &mdash; Coopr 0.9.9 Documentation</title>
+    
+    <link rel="stylesheet" href="../_static/cdap.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+
+
+
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.9.9',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    <link rel="top" title="Coopr 0.9.9 Documentation" href="../index.html" />
+    <link rel="up" title="Installation Guide" href="index.html" />
+    <link rel="next" title="Super Admin Guide" href="../guide/superadmin/index.html" />
+    <link rel="prev" title="Authentication Support" href="authentication.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">Index</a></li>
+        <li class="right" >
+          <a href="../guide/superadmin/index.html" title="Super Admin Guide"
+             accesskey="N">Next</a> |</li>
+        <li class="right" >
+          <a href="authentication.html" title="Authentication Support"
+             accesskey="P">Previous</a> |</li>
+        
+        <script type="text/javascript" src="../_static/version-menu.js"></script>
+        <script src="http://docs.cask.co/coopr/json-versions.js"/></script>
+        <script>window.setVersion('0.9.9');</script>
+       
+        <li><a href="../index.html">Coopr Documentation v0.9.9</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Installation Guide</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="coopr-upgrade">
+<span id="upgrade-to-0-9-9"></span><span id="index-0"></span><h1>Coopr Upgrade<a class="headerlink" href="#coopr-upgrade" title="Permalink to this headline">¶</a></h1>
+<p>This guide describes how to upgrade Cask Coopr from 0.9.8 to the 0.9.9 Release.</p>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>This upgrade involves three key steps:</dt>
+<dd><ul class="first last simple">
+<li>A database upgrade</li>
+<li>Changing the provisioner server URI port</li>
+<li>Running the upgrade script</li>
+</ul>
+</dd>
+</dl>
+<div class="section" id="compatibility-notes">
+<h3>Compatibility Notes<a class="headerlink" href="#compatibility-notes" title="Permalink to this headline">¶</a></h3>
+<p>Provisioner plugins must now extend from Coopr::Plugin::Automator or Coopr::Plugin::Provider.
+Any existing custom plugins need to be updated accordingly.</p>
+</div>
+</div>
+<div class="section" id="upgrade-steps">
+<h2>Upgrade Steps<a class="headerlink" href="#upgrade-steps" title="Permalink to this headline">¶</a></h2>
+<p>On the Coopr servers:</p>
+<ol class="arabic simple">
+<li>Stop all processes</li>
+</ol>
+<blockquote>
+<div><div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>sudo /etc/init.d/coopr-provisioner stop
+<span class="nv">$ </span>sudo /etc/init.d/coopr-ui stop
+<span class="nv">$ </span>sudo /etc/init.d/coopr-server stop
+</pre></div>
+</div>
+</div></blockquote>
+<ol class="arabic simple" start="2">
+<li>Back up your database</li>
+</ol>
+<blockquote>
+<div><ul class="simple">
+<li>It is recommended to backup your database. Consult your database vendor&#8217;s documentation for instructions.</li>
+</ul>
+</div></blockquote>
+<ol class="arabic simple" start="3">
+<li>Upgrade Database Schema (if using an external database)</li>
+</ol>
+<blockquote>
+<div><ul class="simple">
+<li>You have to update the schema for any external database. However, we only provide example SQL files for MySQL.
+The changes need to be made to any external database. To update MySQL:</li>
+</ul>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>mysql -p coopr &lt; /opt/coopr/server/sql/upgrade-tables-pre0.9.9-to-0.9.9.sql
+</pre></div>
+</div>
+</div></blockquote>
+<ol class="arabic simple" start="4">
+<li>Change the provisioner.server.uri port</li>
+</ol>
+<blockquote>
+<div><ul class="simple">
+<li>Edit the <tt class="docutils literal"><span class="pre">provisioner.server.uri</span></tt> property in <tt class="docutils literal"><span class="pre">/etc/coopr/conf/provisioner-site.xml</span></tt> and change the port from 55054 to 55055 unless you have changed the port with server.tasks.uri, in which case you should match the port below to that one. Here is an example (changing your server to the correct host/FQDN):</li>
+</ul>
+<div class="highlight-bash"><div class="highlight"><pre>&lt;property&gt;
+  &lt;name&gt;provisioner.server.uri&lt;/name&gt;
+  &lt;value&gt;http://myserver.mydomain.com:55055&lt;/value&gt;
+  &lt;description&gt;URI of server to connect to&lt;/description&gt;
+&lt;/property&gt;
+</pre></div>
+</div>
+</div></blockquote>
+<ol class="arabic simple" start="5">
+<li>Run the upgrade script</li>
+</ol>
+<blockquote>
+<div><div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>sudo /etc/init.d/coopr-server upgrade
+</pre></div>
+</div>
+</div></blockquote>
+<ol class="arabic simple" start="6">
+<li>Start Coopr Server, UI and Provisioner services</li>
+</ol>
+<blockquote>
+<div><div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>sudo /etc/init.d/coopr-server start
+<span class="nv">$ </span>sudo /etc/init.d/coopr-ui start
+<span class="nv">$ </span>sudo /etc/init.d/coopr-provisioner start
+</pre></div>
+</div>
+</div></blockquote>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><!--
+  Copyright © 2014-2015 Cask Data, Inc.
+
+  Licensed under the Apache License, Version 2.0 (the "License"); you may not
+  use this file except in compliance with the License. You may obtain a copy of
+  the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+  License for the specific language governing permissions and limitations under
+  the License.
+-->
+
+
+    
+<div aria-label="globaltoc links">
+<h3 class="pagenavtitle"><a href="../index.html"> Table&nbsp;of&nbsp;Contents</a></h3>
+<nav class="pagenav">
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../overview/index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/quickstart/index.html">Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/architecture.html">Architecture</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Installation Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="packages.html">Coopr Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server-config.html">Server Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provisioner-config.html">Provisioner Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="standalone.html">Coopr Sandboxes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="openstack-config.html">Openstack Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ui-config.html">UI Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="authentication.html">Authentication Support</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="">Coopr Upgrade</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#overview">Overview</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#compatibility-notes">Compatibility Notes</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#upgrade-steps">Upgrade Steps</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/superadmin/index.html">Super Admin Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/admin/index.html">Administration Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/user/index.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rest/index.html">Web Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/security.html">Security</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../implementation.html">Under the Hood</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq/index.html">FAQs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../release-notes/index.html">Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../javadocs/index.html">Javadocs</a></li>
+</ul>
+
+</nav>
+</div>
+  <h4>Previous Topic</h4>
+  <p class="topless"><a href="authentication.html"
+                        title="Previous Chapter">Authentication Support</a></p>
+  <h4>Next Topic</h4>
+  <p class="topless"><a href="../guide/superadmin/index.html"
+                        title="Next Chapter">Super Admin Guide</a></p>
+  <div role="note" aria-label="downloads links">
+    <h3>Downloads</h3>
+    <ul class="this-page-menu">
+      <li><a href="http://docs.cask.co/coopr/0.9.9/coopr-docs-0.9.9-web.zip"
+            rel="nofollow">Zip Archive of Coopr Documentation</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick Search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer" role="contentinfo">
+
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;margin:0px auto;}
+.tg td{padding:0px 20px 0px 20px;border-width:0px;overflow:hidden;word-break:normal;font-weight:normal;}
+.tg th{padding:0px 20px 0px 20px;border-width:0px;overflow:hidden;word-break:normal;font-weight:normal;}
+.tg .tg-s6z2{text-align:center;}
+.tg .tg-0ord{text-align:right;}
+.tg a{font-weight:bold;}
+</style>
+<table class="tg" width= 100%>
+  <tr>
+    <th class="tg-031e">Previous Topic: 
+    <a title="Authentication Support" href="authentication.html" />Authentication Support</a>&nbsp;&nbsp;
+    
+    </th>
+    <th class="tg-s6z2">
+        Copyright &copy; 2014-2015 Cask Data, Inc.
+    
+    </th>
+    <th class="tg-0ord">&nbsp;&nbsp;Next Topic:
+    <a title="Super Admin Guide" href="../guide/superadmin/index.html" />Super Admin Guide</a>
+    
+    </th>
+  </tr>
+</table>
+
+    </div>
+  </body>
+</html>
