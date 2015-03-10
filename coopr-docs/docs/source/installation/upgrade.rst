@@ -59,7 +59,7 @@ We are assuming you have access to all (current 0.9.8) Coopr servers and are log
 5. Run the upgrade script
 
   .. parsed-literal::
-   $ /etc/init.d/coopr-server upgrade
+   $ sudo /etc/init.d/coopr-server upgrade
 
 6. Start Coopr Server, UI and Provisioner services
 
@@ -68,3 +68,9 @@ We are assuming you have access to all (current 0.9.8) Coopr servers and are log
    $ sudo /etc/init.d/coopr-ui start
    $ sudo /etc/init.d/coopr-provisioner start
 
+
+Compatibility Notes
+-------------------
+
+Provisioner plugins must now extend from Coopr::Plugin::Automator or Coopr::Plugin::Provider. 
+Any existing custom plugins need to be updated accordingly.
