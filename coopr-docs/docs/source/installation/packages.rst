@@ -162,20 +162,20 @@ RPM using Yum
 -------------
 Download the Cask Yum repo definition file::
 
-  sudo curl -o /etc/yum.repos.d/cask.repo http://repository.cask.co/downloads/centos/6/x86_64/cask.repo
+  sudo curl -o /etc/yum.repos.d/coopr.repo http://repository.cask.co/centos/6/x86_64/coopr/0.9/coopr.repo
 
-This will create the file ``/etc/yum.repos.d/cask.repo`` with::
+This will create the file ``/etc/yum.repos.d/coopr.repo`` with::
 
-  [cask]
-  name=Cask Packages
-  baseurl=http://repository.cask.co/centos/6/x86_64/releases
+  [coopr]
+  name=Coopr Packages
+  baseurl=http://repository.cask.co/centos/6/x86_64/coopr/0.9
   enabled=1
   gpgcheck=1
 
 
 Add the Cask Public GPG Key to your repository::
 
-  $ sudo rpm --import http://repository.cask.co/centos/6/x86_64/releases/pubkey.gpg
+  $ sudo rpm --import http://repository.cask.co/centos/6/x86_64/coopr/0.9/pubkey.gpg
 
 Instructions for installing each of the Coopr components are as below::
 
@@ -187,16 +187,16 @@ Debian using APT
 ----------------
 Download the Cask Apt repo definition file::
 
-  $ sudo curl -o /etc/apt/sources.list.d/cask.list http://repository.cask.co/downloads/ubuntu/precise/amd64/cask.list
+  $ sudo curl -o /etc/apt/sources.list.d/coopr.list http://repository.cask.co/downloads/ubuntu/precise/amd64/coopr/0.9/coopr.list
 
-This will create the file ``/etc/apt/sources.list.d/cask.list`` with::
+This will create the file ``/etc/apt/sources.list.d/coopr.list`` with::
 
-  deb [ arch=amd64 ] http://repository.cask.co/ubuntu/precise/amd64/releases precise releases
+  deb [ arch=amd64 ] http://repository.cask.co/ubuntu/precise/amd64/coopr/0.9 precise coopr
 
 
 Add the Cask Public GPG Key to your repository::
 
-  curl -s http://repository.cask.co/ubuntu/precise/amd64/releases/pubkey.gpg | sudo apt-key add -
+  curl -s http://repository.cask.co/ubuntu/precise/amd64/coopr/0.9/pubkey.gpg | sudo apt-key add -
 
 Instructions for installing each of the Coopr components are as below::
 
