@@ -423,6 +423,13 @@ Coopr depends on the external Linux utility logrotate to rotate its logs. Coopr
 packages contain logrotate configurations in ``/etc/logrotate.d`` but it does not perform the rotations itself.
 Please ensure logrotate is enabled on your Coopr hosts.
 
+
+Upgrading Coopr
+===============
+
+To upgrade Coopr from 0.9.8 to 0.9.9, please refer to the :ref:`Upgrade Guide <upgrade-to-0.9.9>`.
+
+
 .. _common-issues:
 
 Common Installation Issues
