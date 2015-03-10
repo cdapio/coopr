@@ -12,10 +12,10 @@ while utilizing common SCM tools (Chef and scripts).
 
 ## Releases
 
-   Current:
+### Current:
    * [Codename: Ursa Major, 0.9.9](http://docs.cask.co/coopr/0.9.9/en/release-notes/index.html)
 
-   Older:
+### Older:
    * [Codename: Centaurus, Theme: multi-tenancy, 0.9.8](http://docs.cask.co/coopr/0.9.8/en/release-notes/index.html)
 
 ## Getting Started
