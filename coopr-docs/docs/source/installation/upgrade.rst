@@ -38,7 +38,7 @@ We are assuming you have access to all (current 0.9.8) Coopr servers and are log
 
 2. Back up your database
 
-  * It is always recommended to back up databases. For MySQL, you can use mysqldump to do that.
+  * It is recommended to backup your database. Consult your database vendor's documentation for instructions.
 
 3. Upgrade MySQL database schema (if you are using MySQL as a database)
 
