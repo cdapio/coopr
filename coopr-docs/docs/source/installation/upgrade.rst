@@ -47,7 +47,8 @@ On the Coopr servers:
 
 1. Stop all processes
 
-  .. parsed-literal::
+  .. code-block:: bash
+
    $ sudo /etc/init.d/coopr-provisioner stop
    $ sudo /etc/init.d/coopr-ui stop
    $ sudo /etc/init.d/coopr-server stop
@@ -61,29 +62,31 @@ On the Coopr servers:
   * You have to update the schema for any external database. However, we only provide example SQL files for MySQL.
       The changes need to be made to any external database. To update MySQL:
 
-  .. parsed-literal::
+  .. code-block:: bash
+
    $ mysql -p coopr < /opt/coopr/server/sql/upgrade-tables-pre0.9.9-to-0.9.9.sql
 
 4. Change the provisioner.server.uri port
 
   * Edit the ``provisioner.server.uri`` property in ``/etc/coopr/conf/provisioner-site.xml`` and change the port from 55054 to 55055 unless you have changed the port with server.tasks.uri, in which case you should match the port below to that one. Here is an example (changing your server to the correct host/FQDN):
-  .. parsed-literal::
+  .. code-block:: bash
+
    <property>
      <name>provisioner.server.uri</name>
      <value>http://myserver.mydomain.com:55055</value>
      <description>URI of server to connect to</description>
    </property> 
 
-
-
 5. Run the upgrade script
 
-  .. parsed-literal::
+  .. code-block:: bash
+
    $ sudo /etc/init.d/coopr-server upgrade
 
 6. Start Coopr Server, UI and Provisioner services
 
-  .. parsed-literal::
+  .. code-block:: bash
+
    $ sudo /etc/init.d/coopr-server start
    $ sudo /etc/init.d/coopr-ui start
    $ sudo /etc/init.d/coopr-provisioner start
