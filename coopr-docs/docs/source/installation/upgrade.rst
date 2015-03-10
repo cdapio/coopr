@@ -26,8 +26,7 @@ This is an overview of the upgrade path from Coopr 0.9.8 to Coopr 0.9.9.
 
 Upgrade Steps
 -------------
-As with any system upgrades, please back up all critical data, prior to running any of the steps below.
-We are assuming you have access to all (current 0.9.8) Coopr servers and are logged in as root on those.
+We are assuming you have access to all (current 0.9.8) Coopr servers and are logged in to those.
 
 1. Stop all processes
 
@@ -40,14 +39,14 @@ We are assuming you have access to all (current 0.9.8) Coopr servers and are log
 
   * It is recommended to backup your database. Consult your database vendor's documentation for instructions.
 
-3. Upgrade MySQL database schema (if you are using MySQL as a database)
+3. Upgrade Database Schema (if using an external database)
 
-  * If you are using MySQL, update the schema:
+  * You have to update the schema for any external database. However, we only provide example SQL files for MySQL. The changes need to be made to any external database. Here is how you would do with MySQL:
 
   .. parsed-literal::
    $ mysql -p coopr < /opt/coopr/server/sql/upgrade-tables-pre0.9.9-to-0.9.9.sql
 
-4. Change provisioner.server.uri port to 55055
+4. Change provisioner.server.uri port
 
   * Edit the ``provisioner.server.uri`` property in ``/etc/coopr/conf/provisioner-site.xml`` and change the port from 55054 to 55055. Here is an example (changing your server to the correct host/FQDN):
   .. parsed-literal::
