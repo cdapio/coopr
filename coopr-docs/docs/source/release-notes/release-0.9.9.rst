@@ -168,4 +168,3 @@ Known Issues
   * Node usage API: Coopr Node Usage Hours 'now-Nx' does not work                     `COOPR-714 <https://issues.cask.co/browse/COOPR-714>`_
   * Node usage API: API allows arbitrary, random parameters to be used as keys        `COOPR-716 <https://issues.cask.co/browse/COOPR-716>`_
   * Service Constraints fields do not display entered value during Template creation  `COOPR-739 <https://issues.cask.co/browse/COOPR-739>`_
-  * Node deletion issue (Joyent) 
