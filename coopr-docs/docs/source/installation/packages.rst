@@ -192,7 +192,7 @@ Debian using APT
 ----------------
 Download the Cask Apt repo definition file::
 
-  $ sudo curl -o /etc/apt/sources.list.d/coopr.list http://repository.cask.co/downloads/ubuntu/precise/amd64/coopr/0.9/coopr.list
+  $ sudo curl -o /etc/apt/sources.list.d/coopr.list http://repository.cask.co/ubuntu/precise/amd64/coopr/0.9/coopr.list
 
 This will create the file ``/etc/apt/sources.list.d/coopr.list`` with::
 
