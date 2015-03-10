@@ -65,13 +65,15 @@ On the Coopr servers:
 
 4. Change provisioner.server.uri port
 
-  * Edit the ``provisioner.server.uri`` property in ``/etc/coopr/conf/provisioner-site.xml`` and change the port from 55054 to 55055. Here is an example (changing your server to the correct host/FQDN):
+  * Edit the ``provisioner.server.uri`` property in ``/etc/coopr/conf/provisioner-site.xml`` and change the port from 55054 to 55055 unless you have changed the port with server.tasks.uri, in which case you should match the port below to that one. Here is an example (changing your server to the correct host/FQDN):
   .. parsed-literal::
    <property>
      <name>provisioner.server.uri</name>
      <value>http://myserver.mydomain.com:55055</value>
      <description>URI of server to connect to</description>
    </property> 
+
+
 
 5. Run the upgrade script
 
