@@ -32,7 +32,7 @@ for the UI, and Ruby 1.9.0p0 or higher for the provisioner. The server runs an e
 removing the need to setup a database or zookeeper instance. It is not recommended to run Coopr in this mode for anything other
 than experimentation.
 
-`Download <http://repository.cask.co/downloads/co/cask/coopr/coopr-standalone/0.9.8/coopr-standalone-0.9.8.zip>`_ the standalone zip.
+`Download <http://repository.cask.co/downloads/co/cask/coopr/coopr-standalone/0.9.9/coopr-standalone-0.9.9.zip>`_ the standalone zip.
 After downloading it, unzip it and follow the instructions in the README.md file to install the required ruby gems for the provisioner.
 After that, you can start and initialize Coopr standalone by running::
 
@@ -43,7 +43,7 @@ follow the instructions in the :ref:`Quickstart Guide <quickstart-getting-starte
 
 Virtual Machine
 ---------------
-You can also run Coopr in a virtual machine that you can `download here <http://repository.cask.co/downloads/co/cask/coopr/coopr-standalone-vm/0.9.8/coopr-standalone-vm-0.9.8.ova>`_. You will need virtualization software like Oracle VirtualBox or
+You can also run Coopr in a virtual machine that you can `download here <http://repository.cask.co/downloads/co/cask/coopr/coopr-vm/0.9.9/coopr-vm-0.9.9.ova>`_. You will need virtualization software like Oracle VirtualBox or
 VMWare player in order to run the VM. Once you have downloaded the image, import it using VirtualBox or VMWare Player. 
 The VM has been set up with 4GB RAM and 10GB disk. No password is required to enter the machine. However, should you need to perform an administrative
 operation, the coopr admin password is coopr.
