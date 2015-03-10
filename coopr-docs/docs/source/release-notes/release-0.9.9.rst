@@ -157,3 +157,13 @@ Bugs
   * `COOPR-730 <https://issues.cask.co/browse/COOPR-730>`_ - joyent plugin provider fails on CentOS: confirm stage fails to unmount disk
   * `COOPR-731 <https://issues.cask.co/browse/COOPR-731>`_ - Standalone startup script broken
 
+
+Known Issues
+------------
+
+  * Provisioner: non-fatal sudo errors may be seen prior to coopr_hosts (part of base service) being run
+  * Node usage API: Coopr Node Usage Hours 'now-Nx' does not work                                         `COOPR-714 <https://issues.cask.co/browse/COOPR-714>`_
+  * Node usage API: API allows arbitrary, random parameters to be used as keys                            `COOPR-716 <https://issues.cask.co/browse/COOPR-716>`_
+  * UI: If base is removed from selected roles/services prior to install, it still gets installed         `COOPR-666 <https://issues.cask.co/browse/COOPR-666>`_
+  * UI: Unable to edit providers with multiple required field sets                                        `COOPR-712 <https://issues.cask.co/browse/COOPR-714>`_
+  * UI: Service Constraints fields do not display entered value during Template creation                  `COOPR-739 <https://issues.cask.co/browse/COOPR-739>`_
