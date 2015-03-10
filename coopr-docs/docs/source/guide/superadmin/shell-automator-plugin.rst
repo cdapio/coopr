@@ -1,5 +1,5 @@
 ..
-   Copyright © 2012-2014 Cask Data, Inc.
+   Copyright © 2012-2015 Cask Data, Inc.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -74,11 +74,10 @@ How it Works
 ============
 
 A more in-depth look at Shell Automator:
-	1. The source of truth for any custom scripts is the local plugin directory on the provisioner host.  For example using the default packages: ``/opt/coopr/provisioner/daemon/plugins/automators/shell_automator/scripts``.
-	2. During the "bootstrap" action:
+	1. During the "bootstrap" action:
 		a. These scripts are bundled and scp'd to the remote host
 		b. The scripts are extracted on the remote host, by default to ``/var/cache/coopr/scripts``
-	3. When a defined shell service action runs (ie, install, configure, start, etc):
+	2. When a defined shell service action runs (ie, install, configure, start, etc):
 		a. The Shell Automator first generates a copy of the current task's JSON data
 		b. This task json data is scp'd to the remote host, where it can be referenced by the executed script
 		c. The Shell Automator invokes a command on the remote host which
@@ -98,7 +97,7 @@ to be able to carry out further tasks. The Shell Automator plugin performs the f
 	3. SCP the local tarball to the remote Coopr cache directory.
 	4. Extracts the tarball on the remote host in the coopr cache directory, creating ``/var/cache/coopr/scripts``.
 
-The most important thing to note is that upon adding any new script to the local directory, the tarball will be 
+The most important thing to note is that upon adding any new script to the resources collection, the tarball will be
 regenerated within 10 minutes and used by all running provisioners.
 
 

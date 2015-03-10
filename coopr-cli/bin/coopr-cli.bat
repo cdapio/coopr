@@ -22,7 +22,7 @@ SET COOPR_HOME=%~dp0
 SET COOPR_HOME=%COOPR_HOME:~0,-5%
 SET JAVACMD=%JAVA_HOME%\bin\java.exe
 
-SET CLASSPATH=%COOPR_HOME%\lib\coopr-cli-0.9.9-SNAPSHOT.jar
+SET CLASSPATH=%COOPR_HOME%\lib\coopr-cli-0.9.9.jar
 
 REM Check for 64-bit version of OS. Currently not supporting 32-bit Windows
 IF NOT EXIST "%PROGRAMFILES(X86)%" (
