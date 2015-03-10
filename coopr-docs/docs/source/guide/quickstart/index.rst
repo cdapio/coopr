@@ -429,7 +429,7 @@ Once creation is complete, the cluster is ready for use.
 For more information on your cluster, click on the name 'hadoop-quickstart' on the
 Clusters' home screen. On this cluster description screen, nodes are grouped together by the set
 of services that are available on them. To see node details, click on the descriptions
-next to the number of nodes ('2 noes with 5 services each') to expand the list. The
+next to the number of nodes ('2 nodes with 5 services each') to expand the list. The
 expanded list shows a list of attributes for each node.
 
 .. figure:: /_images/quickstart/qs_cluster_details.png
@@ -438,8 +438,7 @@ expanded list shows a list of attributes for each node.
     :alt: Cluster description and details
     :figclass: align-center
 
-In this example, there is 1 master node that contains the 'base',
-'continuuity-sensu-monitoring', 'hadoop-hdfs-namenode', 'hadoop-yarn-resourcemanager',
-'hbase-master', and 'zookeeper-server' services. There are also 2 slave nodes that contain
-the 'base', 'continuuity-sensu-monitoring', 'hadoop-hdfs-datanode',
+In this example, there is 1 master node that contains the 'base', 'hadoop-hdfs-namenode',
+'hadoop-yarn-resourcemanager', 'hbase-master', and 'zookeeper-server' services. There are
+also 2 slave nodes that contain the 'base', 'hadoop-hdfs-datanode',
 'hadoop-yarn-nodemanager', and 'hbase-regionserver' services.

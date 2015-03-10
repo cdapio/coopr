@@ -75,6 +75,13 @@ in the tenant.
 You cannot assign more workers to the tenant than the number of available workers. When creating a tenant, it will be
 completely empty, and the tenant admin will need to populate all entities before it can be used to create any clusters.
 
+**Note:** If you :ref:`create a tenant using the REST API <tenants-create>`, you can
+optionally 'bootstrap' the tenant. Bootstrapping a tenant copies all providers, hardware
+types, image types, services, cluster templates, and plugin resources from the superadmin
+tenant to the newly created tenant. Be aware that bootstrapping copies all plugin
+resources, meaning any provider keys that have been uploaded to the superadmin tenant will
+be copied to the new tenant.
+
 If a user in the tenant tries to create a cluster that would cause the max clusters or  
 max nodes limit to be violated, that create request will fail.
 

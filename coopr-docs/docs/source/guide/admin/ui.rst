@@ -188,7 +188,7 @@ service.
     :figclass: align-center
 
 Additionally, administrators can limit the number of instances of each service. An example of this is to limit the
-number of instances of HDFS name node and Yarn resource manager to one in a Hadoop cluster. To do so, click '+ Add
+number of instances of HDFS NameNode and YARN ResourceManager to one in a Hadoop cluster. To do so, click '+ Add
 service constraint', choose the item you want to limit from the drop-down list, and set the minimum and maximum
 number of instances permitted. The constraint itself or the number of instances can be changed from the list of
 service constraints. 
@@ -464,7 +464,7 @@ types of dependencies by going through example. In this example we have a servic
 
 Provides
 --------
-The ``Provides`` field define an extra level of indirection when specifying dependencies.
+The ``Provides`` field defines an extra level of indirection when specifying dependencies.
 In this example, the "myapp-2.0" service provides the "myapp" service. This means that
 other services can put "myapp" in their runtime or install dependencies, and "myapp-2.0"
 will satisfy that dependency. 
