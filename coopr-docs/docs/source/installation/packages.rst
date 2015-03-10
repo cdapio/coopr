@@ -40,7 +40,7 @@ System Requirements
 Hardware Requirements
 ---------------------
 Systems hosting the Coopr components must meet these hardware specifications, in addition to having CPUs
-with a minimum speed of 2 GHz
+with a minimum speed of 2 GHz:
 
 .. list-table::
    :widths: 25 25 50
@@ -138,20 +138,25 @@ Yum
 ---
 To install each of the Coopr components locally from a Yum package:
 
-.. parsed-literal::
-  $ sudo yum localinstall coopr-server-\ |version|\ .el6.x86_64.rpm
-  $ sudo yum localinstall coopr-provisioner-\ |version|\ .el6.x86_64.rpm
-  $ sudo yum localinstall coopr-ui-\ |version|\ .el6.x86_64.rpm
+.. container:: highlight
 
+  .. parsed-literal::
+   
+    |$| sudo yum localinstall coopr-server-|version|.el6.x86_64.rpm
+    |$| sudo yum localinstall coopr-provisioner-|version|.el6.x86_64.rpm
+    |$| sudo yum localinstall coopr-ui-|version|.el6.x86_64.rpm
 
 Debian
 ------
 To install each of the Coopr components locally from a Debian package:
 
-.. parsed-literal::
-  $ sudo dpkg -i coopr-server\_\ |version|\ .ubuntu.12.04_amd64.deb
-  $ sudo dpkg -i coopr-provisioner\_\ |version|\ .ubuntu.12.04_amd64.deb
-  $ sudo dpkg -i coopr-ui\_\ |version|\ .ubuntu.12.04_amd64.deb
+.. container:: highlight
+
+  .. parsed-literal::
+
+    |$| sudo dpkg -i coopr-server\_\ |version|.ubuntu.12.04_amd64.deb
+    |$| sudo dpkg -i coopr-provisioner\_\ |version|.ubuntu.12.04_amd64.deb
+    |$| sudo dpkg -i coopr-ui\_\ |version|.ubuntu.12.04_amd64.deb
 
 .. _installation-repository:
 
@@ -162,7 +167,7 @@ RPM using Yum
 -------------
 Download the Cask Yum repo definition file::
 
-  sudo curl -o /etc/yum.repos.d/coopr.repo http://repository.cask.co/centos/6/x86_64/coopr/0.9/coopr.repo
+  $ sudo curl -o /etc/yum.repos.d/coopr.repo http://repository.cask.co/centos/6/x86_64/coopr/0.9/coopr.repo
 
 This will create the file ``/etc/yum.repos.d/coopr.repo`` with::
 
@@ -196,7 +201,7 @@ This will create the file ``/etc/apt/sources.list.d/coopr.list`` with::
 
 Add the Cask Public GPG Key to your repository::
 
-  curl -s http://repository.cask.co/ubuntu/precise/amd64/coopr/0.9/pubkey.gpg | sudo apt-key add -
+  $ curl -s http://repository.cask.co/ubuntu/precise/amd64/coopr/0.9/pubkey.gpg | sudo apt-key add -
 
 Instructions for installing each of the Coopr components are as below::
 

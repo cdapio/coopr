@@ -96,6 +96,36 @@ version, release = get_sdk_version()
 language = 'en_CDAP'
 locale_dirs = ['_locale/']
 
+# A string of reStructuredText that will be included at the end of every source file that
+# is read. This is the right place to add substitutions that should be available in every
+# file. 
+rst_epilog = """
+.. |bold-version| replace:: **%(version)s**
+
+.. |italic-version| replace:: *%(version)s*
+
+.. |literal-version| replace:: ``%(version)s``
+
+.. |literal-release| replace:: ``%(release)s``
+
+.. role:: gp
+.. |$| replace:: :gp:`$`
+
+.. |http:| replace:: http:
+
+.. |(TM)| unicode:: U+2122 .. trademark sign
+   :ltrim:
+
+.. |(R)| unicode:: U+00AE .. registered trademark sign
+   :ltrim:
+
+.. |copyright| replace:: %(copyright)s
+
+""" % {'version': version, 
+       'release': release,
+       'copyright': copyright,
+       }
+
 # There are two options for replacing |today|: either, you set today to some
 # non-false value, then it is used:
 #today = ''
