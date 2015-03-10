@@ -10,7 +10,7 @@
   </property>
   <property>
     <name>provisioner.data.dir</name>
-    <value>COOPR_DATA_DIR</value>
+    <value>COOPR_DATA_DIR/provisioner/data</value>
     <description>Provisioner storage directory for plugin data resources</description>
   </property>
   <property>

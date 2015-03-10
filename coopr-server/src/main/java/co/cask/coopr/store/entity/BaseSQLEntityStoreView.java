@@ -181,6 +181,7 @@ public abstract class BaseSQLEntityStoreView extends BaseEntityStoreView {
     queryBuilder.append(" INNER JOIN(");
     queryBuilder.append("   SELECT name, MAX(version) version");
     queryBuilder.append("   FROM ").append(entityType.getTableName());
+    queryBuilder.append("   WHERE tenant_id=?");
     queryBuilder.append("   GROUP BY name");
     queryBuilder.append(" ) ss on t.name = ss.name AND t.version = ss.version");
     queryBuilder.append(" WHERE t.tenant_id=?");
@@ -193,6 +194,7 @@ public abstract class BaseSQLEntityStoreView extends BaseEntityStoreView {
 
     PreparedStatement statement = conn.prepareStatement(queryString);
     statement.setString(1, tenantId);
+    statement.setString(2, tenantId);
     return statement;
   }
 }

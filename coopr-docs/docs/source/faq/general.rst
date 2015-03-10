@@ -39,7 +39,7 @@ From the `Savanna <https://savanna.readthedocs.org/en/latest/>`_ site:
 
 Even though Coopr may seem similar to Apache Ambari and Savanna in some aspects, it is vastly different in terms of functionality and system capabilities.
 
-.. figure:: coopr-ambari-comparision.png
+.. figure:: /_images/coopr-ambari-comparision.png
     :align: center
     :width: 800px
     :alt: Coopr Ambari Comparision

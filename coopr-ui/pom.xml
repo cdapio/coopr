@@ -23,7 +23,7 @@
     <parent>
         <artifactId>coopr-parent</artifactId>
         <groupId>co.cask</groupId>
-        <version>0.9.9-SNAPSHOT</version>
+        <version>0.9.9</version>
     </parent>
 
     <build>

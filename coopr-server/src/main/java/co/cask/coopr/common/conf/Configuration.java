@@ -81,10 +81,9 @@ import javax.xml.transform.stream.StreamResult;
  *
  * <p>Unless explicitly turned off, Hadoop by default specifies two
  * resources, loaded in-order from the classpath: <ol>
- * <li><tt><a href="{@docRoot}/../core-default.html">core-default.xml</a>
- * </tt>: Read-only defaults for hadoop.</li>
- * <li><tt>core-site.xml</tt>: Site-specific configuration for a given hadoop
- * installation.</li>
+ * <li><tt>core-default.xml</tt>: Read-only defaults for Hadoop</li>
+ * <li><tt>core-site.xml</tt>: Site-specific configuration for a given Hadoop
+ * installation</li>
  * </ol>
  * Applications may add additional resources, which are loaded
  * subsequent to these resources in the order they are added.

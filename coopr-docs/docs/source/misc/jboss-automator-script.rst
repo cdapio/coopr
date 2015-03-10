@@ -101,5 +101,5 @@ Provision an instance of 'jboss-application-cluster' with Coopr
 Once the cluster template has been created, you are now ready to create a cluster. Please
 follow the cluster creation procedure from the main Coopr documentation. You can either choose
 a singlenode or multi-node JBoss AS cluster. Once the cluster has been successfully provisioned
-you can verify the installations by visiting http://<host-id>:8080 or can also check the default
-helloworld application by visiting http://<host-id>:8080/helloworld/hi.jsp.
+you can verify the installations by visiting ``http://<host-id>:8080`` or can also check the default
+*helloworld* application by visiting ``http://<host-id>:8080/helloworld/hi.jsp``.
