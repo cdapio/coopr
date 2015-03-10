@@ -22,11 +22,28 @@ Coopr Upgrade
 
 .. highlight:: console
 
-This is an overview of the upgrade path from Coopr 0.9.8 to Coopr 0.9.9.
+This guide describes how to upgrade Cask Coopr from 0.9.8 to the |release| Release.
+
+Overview
+========
+
+This upgrade involves three key steps:
+ * A database upgrade
+ * Changing the provisioner server URI port
+ * Running the upgrade script
+
+
+Compatibility Notes
+-------------------
+
+Provisioner plugins must now extend from Coopr::Plugin::Automator or Coopr::Plugin::Provider. 
+Any existing custom plugins need to be updated accordingly.
+
 
 Upgrade Steps
--------------
-We are assuming you have access to all (current 0.9.8) Coopr servers and are logged in to those.
+=============
+
+On the Coopr servers:
 
 1. Stop all processes
 
@@ -68,9 +85,3 @@ We are assuming you have access to all (current 0.9.8) Coopr servers and are log
    $ sudo /etc/init.d/coopr-ui start
    $ sudo /etc/init.d/coopr-provisioner start
 
-
-Compatibility Notes
--------------------
-
-Provisioner plugins must now extend from Coopr::Plugin::Automator or Coopr::Plugin::Provider. 
-Any existing custom plugins need to be updated accordingly.
