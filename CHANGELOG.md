@@ -1,8 +1,15 @@
 Coopr CHANGELOG
 ===============
 
-v0.9.9 (Unreleased)
------------
+Beginning with version 0.9.10, changes are tracked using JIRA: https://issues.cask.co/browse/COOPR
+
+v0.9.10 (Unreleased)
+--------------------
+
+https://issues.cask.co/issues/?filter=11001
+
+v0.9.9 (03/09/2015)
+-------------------
 - Provisioner - Shell automation - correct exception class name ( Issues: #531 )
 - Providers - fog plugins and update, mock-provisioner, field types, full path resources COOPR-516, COOPR-538 ( Issues: #532, #530, #591, #592, #651, #689 )
 - OpenStack provider support ( Issues: #535 #614 #686 #694 #700 #733 )
