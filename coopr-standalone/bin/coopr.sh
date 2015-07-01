@@ -90,7 +90,7 @@ sed -i.old "s/COOPR_DATA_DIR/${SED_COOPR_DATA_DIR}/g" ${COOPR_PROVISIONER_CONF}/
 if test -e /proc/1/cgroup && grep docker /proc/1/cgroup 2>&1 >/dev/null; then
   SED_COOPR_HOST=`hostname -i`
 else
-  SED_COOPR_HOST='localhost'
+  SED_COOPR_HOST='127.0.0.1'
 fi
 sed -i.old "s/COOPR_HOST/${SED_COOPR_HOST}/g" ${COOPR_SERVER_CONF}/coopr-site.xml
 sed -i.old "s/COOPR_HOST/${SED_COOPR_HOST}/g" ${COOPR_PROVISIONER_CONF}/provisioner-site.xml
@@ -320,7 +320,7 @@ provisioner () {
     echo "Waiting for server to start before running provisioner..."
     wait_for_server
     if [ "${COOPR_USE_DUMMY_PROVISIONER}" == "true" ]; then
-      COOPR_SERVER_URI=http://localhost:55055 ${COOPR_HOME}/server/templates/mock/load-mock.sh
+      COOPR_SERVER_URI=http://127.0.0.1:55055 ${COOPR_HOME}/server/templates/mock/load-mock.sh
     fi
   fi
   if [ "${COOPR_USE_DUMMY_PROVISIONER}" == "true" ]; then
