@@ -251,7 +251,7 @@ After the install, the MySQL JAR is placed in ``/usr/share/java/``. Copy the ins
 **Setup database**
 
 You will need to set up an account and a database in MySQL. An example schema file (for MySQL) for this can be found at
-``/opt/coopr/server/config/sql``.
+``/opt/coopr/server/sql``.
 
 .. highlight:: console
 
@@ -260,7 +260,7 @@ mysql machine to complete the database setup::
 
   $ mysql -u root -p -e 'create database coopr;'
   $ mysql -u root -p -e 'grant all privileges on coopr.* to "coopr"@"<coopr-server>" identified by "<password>";'
-  $ mysql -u coopr -p coopr < /opt/coopr/server/config/sql/create-tables-mysql.sql
+  $ mysql -u coopr -p coopr < /opt/coopr/server/sql/create-tables-mysql.sql
   $ mysql -u coopr -p coopr -e 'show tables;'
  +--------------------+
  | Tables_in_coopr    |
