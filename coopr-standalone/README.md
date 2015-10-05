@@ -13,6 +13,7 @@ mvn clean package assembly:single -DskipTests
 
 ## Install
 ```
+sudo gem install net-ssh --version 2.6.6
 sudo gem install fog --version 1.26.0
 sudo gem install sinatra --version 1.4.5
 sudo gem install thin --version 1.6.2
@@ -38,7 +39,3 @@ Once Cask Coopr is running, follow the instructions in the quickstart guide at
 http://docs.cask.co/coopr/current/en/guide/quickstart/index.html#getting-started.
 
 It contains step by step instructions for creating a Hadoop cluster with different providers.
-
-## Known Issues
-GCE does not offer an ubuntu image, so the Google provider included here has no corresponding
-ubuntu image type. If you require one, you will have to add your own.
