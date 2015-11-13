@@ -32,6 +32,8 @@ env:
     - secure: "XRVVni+G1G2bvSjd65dAJzDCccF/FyfeD8DrkIo9TU0at6eas+wj/BIxlGlE6haMAomRwku8zkCIDawDHiGyNUBxQfM5I+9bhodM7RqIc0zUXFFtsD0uEhdq+XA7JuzRou5bvZoI2ZnKovLER3QIyNpkjmWJcZ1F7kafjm67aBo="
     - secure: "U4DMqL41wYrH63a7Vwst421tTs/P9GeNwtHmkSM0u4ZbEzKcjLuHbqbd4e6rKKIUqaAE282H4qYk3ESQY8wWJ9xPwVFw2jfJPrTeeed6DjT45bpHlUMUDvw4RrG5YqXwYaiw1wD97XMUC1I4YWSdhdlIU1ucn/PRR3mdO30ocZw="
     - secure: "PWXYU5rIBx7C0vqTlBTx0COujfEiGufD2yjMtKAlug1xSw7+DRbXyyA7SllYj/9y8lor6xSs2TBzDkJsYuFiRtHOkzwAmbEs0YOZ7ZwwiSKyhHISxopKtOYgf0ifX7lHefd/+wyWmwZprZD7DQKKcgDecHxKHcP03LedJ4hfu/U="
+    - CHROME_BIN="chromium-browser"
+    - DISPLAY=":99.0"
 
 branches:
   only:
@@ -39,6 +41,9 @@ branches:
     - /^feature\/.*$/
     - /^hotfix\/.*$/
     - /^release\/.*$/
+
+before_install:
+  - 'sh -e /etc/init.d/xvfb start'
 
 script:
   - 'mvn test'
