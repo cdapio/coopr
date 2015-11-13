@@ -23,13 +23,6 @@ env:
   global:
     - secure: "XRVVni+G1G2bvSjd65dAJzDCccF/FyfeD8DrkIo9TU0at6eas+wj/BIxlGlE6haMAomRwku8zkCIDawDHiGyNUBxQfM5I+9bhodM7RqIc0zUXFFtsD0uEhdq+XA7JuzRou5bvZoI2ZnKovLER3QIyNpkjmWJcZ1F7kafjm67aBo="
     - secure: "U4DMqL41wYrH63a7Vwst421tTs/P9GeNwtHmkSM0u4ZbEzKcjLuHbqbd4e6rKKIUqaAE282H4qYk3ESQY8wWJ9xPwVFw2jfJPrTeeed6DjT45bpHlUMUDvw4RrG5YqXwYaiw1wD97XMUC1I4YWSdhdlIU1ucn/PRR3mdO30ocZw="
-    - COOPR_SERVER_HOME=`pwd`/coopr-server
-    - COOPR_SERVER_URI=http://127.0.0.1:55054
-    - COOPR_USE_DUMMY_PROVISIONER=true
-    - SELENIUM_HOST=hub.browserstack.com
-    - SELENIUM_PORT=80
-    - BS_AUTOMATE_PROJECT="$TRAVIS_REPO_SLUG"
-    - BS_AUTOMATE_BUILD="Travis build No. $TRAVIS_BUILD_NUMBER for $TRAVIS_REPO_SLUG"
 
 branches:
   only:
@@ -38,35 +31,8 @@ branches:
     - /^hotfix\/.*$/
     - /^release\/.*$/
 
-before_install:
-  - 'export CHROME_BIN=chromium-browser'
-  - 'export DISPLAY=:99.0'
-  - 'sh -e /etc/init.d/xvfb start'
-
-before_script:
-  - 'cd coopr-ui && npm run build'
-  - 'npm start > /dev/null &'
-  - 'cd ..'
-  - 'if [ -n "$BROWSER_STACK_ACCESS_KEY" ]; then cd coopr-server; fi'
-  - 'if [ -n "$BROWSER_STACK_ACCESS_KEY" ]; then mvn package assembly:single -DskipTests; fi'
-  - 'if [ -n "$BROWSER_STACK_ACCESS_KEY" ]; then cd ..; fi'
-  - 'if [ -n "$BROWSER_STACK_ACCESS_KEY" ]; then java -cp coopr-server/target/*:coopr-e2e/config co.cask.coopr.runtime.ServerMain; fi >/dev/null 2>&1 &'
-  - 'if [ -n "$BROWSER_STACK_ACCESS_KEY" ]; then java -cp coopr-server/target/*:coopr-e2e/config co.cask.coopr.runtime.MockProvisionerMain -p 55054; fi >/dev/null 2>&1 &'
-  - 'sleep 10' # give servers generous time to start
-  - 'if [ -n "$BROWSER_STACK_ACCESS_KEY" ]; then cd coopr-e2e; fi'
-  - 'if [ -n "$BROWSER_STACK_ACCESS_KEY" ]; then npm run build; fi'
-  - 'if [ -n "$BROWSER_STACK_ACCESS_KEY" ]; then cd ..; fi'
-  - 'if [ -n "$BROWSER_STACK_ACCESS_KEY" ]; then bash coopr-server/templates/mock/load-mock.sh; fi'
-  - 'if [ -n "$BROWSER_STACK_ACCESS_KEY" ]; then curl https://www.browserstack.com/browserstack-local/BrowserStackLocal-linux-x64.zip > BrowserStackLocal-linux-x64.zip; fi'
-  - 'if [ -n "$BROWSER_STACK_ACCESS_KEY" ]; then unzip BrowserStackLocal-linux-x64.zip; fi'
-  - 'if [ -n "$BROWSER_STACK_ACCESS_KEY" ]; then ./BrowserStackLocal $BROWSER_STACK_ACCESS_KEY localhost,8080,0; fi >/dev/null 2>&1 &'
-  - 'sleep 10'
-
 script:
+  - 'mvn test'
   - 'cd coopr-ui'
   - 'node ./node_modules/gulp/bin/gulp.js jshint'
   - 'npm run test-single-run'
-  - 'if [ -n "$BROWSER_STACK_ACCESS_KEY" ]; then cd ../coopr-e2e; fi'
-  - 'if [ -n "$BROWSER_STACK_ACCESS_KEY" ]; then npm run protractor; fi'
-  - 'cd ..'
-  - 'mvn test'
