@@ -13,11 +13,12 @@ mvn clean package assembly:single -DskipTests
 
 ## Install
 
-This will install the appropriate Ruby Gems on the system.
+Unpack Coopr Standalone ZIP onto your system and enter it's directory.
+
+Next, install the appropriate Ruby Gems on the system.
 ```
 sudo gem install bundler
-cd coopr-provisioner
-bundle install
+bundle install --gemfile provisioner/Gemfile
 ```
 
 ## Start
