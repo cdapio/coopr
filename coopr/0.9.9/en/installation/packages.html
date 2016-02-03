@@ -184,11 +184,11 @@ with a minimum speed of 2 GHz:</p>
 <p>Coopr requires Java™. JDK or JRE version 6 or 7 must be installed in your environment. Coopr is certified with Oracle JDK 6.0_31, Oracle JDK 7.0_51 and OpenJDK 6b27-1.12.6.</p>
 <div class="section" id="linux">
 <h3>Linux<a class="headerlink" href="#linux" title="Permalink to this headline">¶</a></h3>
-<p><a class="reference external" href="http://www.java.com/en/download/manual.jsp">Click here</a> to download the Java Runtime for Linux and Solaris. Following installation, please set the <tt class="docutils literal"><span class="pre">JAVA_HOME</span></tt> environment variable.</p>
+<p><a class="reference external" href="http://www.java.com/en/download/manual.jsp">Click here</a> to download the Java Runtime for Linux and Solaris. Following installation, please set the <code class="docutils literal"><span class="pre">JAVA_HOME</span></code> environment variable.</p>
 </div>
 <div class="section" id="mac-os">
 <h3>Mac OS<a class="headerlink" href="#mac-os" title="Permalink to this headline">¶</a></h3>
-<p>On Mac OS X, the JVM is bundled with the operating system. Following installation, please set the <tt class="docutils literal"><span class="pre">JAVA_HOME</span></tt> environment variable.</p>
+<p>On Mac OS X, the JVM is bundled with the operating system. Following installation, please set the <code class="docutils literal"><span class="pre">JAVA_HOME</span></code> environment variable.</p>
 </div>
 </div>
 <div class="section" id="installing-from-file">
@@ -228,7 +228,7 @@ with a minimum speed of 2 GHz:</p>
 <div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> sudo curl -o /etc/yum.repos.d/coopr.repo http://repository.cask.co/centos/6/x86_64/coopr/0.9/coopr.repo
 </pre></div>
 </div>
-<p>This will create the file <tt class="docutils literal"><span class="pre">/etc/yum.repos.d/coopr.repo</span></tt> with:</p>
+<p>This will create the file <code class="docutils literal"><span class="pre">/etc/yum.repos.d/coopr.repo</span></code> with:</p>
 <div class="highlight-console"><div class="highlight"><pre><span class="go">[coopr]</span>
 <span class="go">name=Coopr Packages</span>
 <span class="go">baseurl=http://repository.cask.co/centos/6/x86_64/coopr/0.9</span>
@@ -253,12 +253,12 @@ with a minimum speed of 2 GHz:</p>
 <div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> sudo curl -o /etc/apt/sources.list.d/coopr.list http://repository.cask.co/ubuntu/precise/amd64/coopr/0.9/coopr.list
 </pre></div>
 </div>
-<p>This will create the file <tt class="docutils literal"><span class="pre">/etc/apt/sources.list.d/coopr.list</span></tt> with:</p>
+<p>This will create the file <code class="docutils literal"><span class="pre">/etc/apt/sources.list.d/coopr.list</span></code> with:</p>
 <div class="highlight-console"><div class="highlight"><pre><span class="go">deb [ arch=amd64 ] http://repository.cask.co/ubuntu/precise/amd64/coopr/0.9 precise coopr</span>
 </pre></div>
 </div>
 <p>Add the Cask Public GPG Key to your repository:</p>
-<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> curl -s http://repository.cask.co/ubuntu/precise/amd64/coopr/0.9/pubkey.gpg | sudo apt-key add -
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> curl -s http://repository.cask.co/ubuntu/precise/amd64/coopr/0.9/pubkey.gpg <span class="p">|</span> sudo apt-key add -
 </pre></div>
 </div>
 <p>Instructions for installing each of the Coopr components are as below:</p>
@@ -271,11 +271,11 @@ with a minimum speed of 2 GHz:</p>
 </div>
 <div class="section" id="update-alternatives">
 <h3>Update-Alternatives<a class="headerlink" href="#update-alternatives" title="Permalink to this headline">¶</a></h3>
-<p>Coopr packages by default use the <tt class="docutils literal"><span class="pre">alternatives</span></tt> system to initialize a configuration
+<p>Coopr packages by default use the <code class="docutils literal"><span class="pre">alternatives</span></code> system to initialize a configuration
 directory which will not be overwritten on subsequent package upgrades.  This directory is
-<tt class="docutils literal"><span class="pre">/etc/coopr/conf.coopr/</span></tt> and is pointed to by the symlink <tt class="docutils literal"><span class="pre">/etc/coopr/conf/</span></tt>.  The
-<tt class="docutils literal"><span class="pre">/etc/coopr/conf.dist/</span></tt> directory is owned by the Coopr packages and should not be
-customized.  To doublecheck that <tt class="docutils literal"><span class="pre">/etc/coopr/conf.coopr/</span></tt> is the active configuration,
+<code class="docutils literal"><span class="pre">/etc/coopr/conf.coopr/</span></code> and is pointed to by the symlink <code class="docutils literal"><span class="pre">/etc/coopr/conf/</span></code>.  The
+<code class="docutils literal"><span class="pre">/etc/coopr/conf.dist/</span></code> directory is owned by the Coopr packages and should not be
+customized.  To doublecheck that <code class="docutils literal"><span class="pre">/etc/coopr/conf.coopr/</span></code> is the active configuration,
 simply run:</p>
 <div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span>  update-alternatives --display coopr-conf
 </pre></div>
@@ -297,24 +297,24 @@ Additional steps are required to configure this setting.</p>
 <div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> sudo apt-get install libmysql-java*
 </pre></div>
 </div>
-<p>After the install, the MySQL JAR is placed in <tt class="docutils literal"><span class="pre">/usr/share/java/</span></tt>. Copy the installed JAR files to the
-<tt class="docutils literal"><span class="pre">/opt/coopr/server/lib/</span></tt> directory on your Coopr Server machine. Verify that the JAR file has appropriate permissions.</p>
+<p>After the install, the MySQL JAR is placed in <code class="docutils literal"><span class="pre">/usr/share/java/</span></code>. Copy the installed JAR files to the
+<code class="docutils literal"><span class="pre">/opt/coopr/server/lib/</span></code> directory on your Coopr Server machine. Verify that the JAR file has appropriate permissions.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <ul class="last simple">
-<li>After installing the MySQL connector, the Java version may change.  Make sure you are using Java 1.6 or 1.7 from Oracle.  You may need to run <tt class="docutils literal"><span class="pre">update-alternatives</span> <span class="pre">--config</span> <span class="pre">java</span></tt> to do this.</li>
+<li>After installing the MySQL connector, the Java version may change.  Make sure you are using Java 1.6 or 1.7 from Oracle.  You may need to run <code class="docutils literal"><span class="pre">update-alternatives</span> <span class="pre">--config</span> <span class="pre">java</span></code> to do this.</li>
 <li>The minimum required version of MySQL connector is 5.1.6.</li>
 <li>You can also download MySQL JDBC driver JAR (mysql-connector-java) from <a class="reference external" href="http://dev.mysql.com/downloads/connector/j">MySQL website</a>.</li>
 </ul>
 </div>
 <p><strong>Setup database</strong></p>
 <p>You will need to set up an account and a database in MySQL. An example schema file (for MySQL) for this can be found at
-<tt class="docutils literal"><span class="pre">/opt/coopr/server/config/sql</span></tt>.</p>
+<code class="docutils literal"><span class="pre">/opt/coopr/server/sql</span></code>.</p>
 <p>If you are setting up a MySQL database from scratch you can run the following on your
 mysql machine to complete the database setup:</p>
 <div class="highlight-console"><div class="highlight"><pre><span class="go"> $ mysql -u root -p -e &#39;create database coopr;&#39;</span>
 <span class="go"> $ mysql -u root -p -e &#39;grant all privileges on coopr.* to &quot;coopr&quot;@&quot;&lt;coopr-server&gt;&quot; identified by &quot;&lt;password&gt;&quot;;&#39;</span>
-<span class="go"> $ mysql -u coopr -p coopr &lt; /opt/coopr/server/config/sql/create-tables-mysql.sql</span>
+<span class="go"> $ mysql -u coopr -p coopr &lt; /opt/coopr/server/sql/create-tables-mysql.sql</span>
 <span class="go"> $ mysql -u coopr -p coopr -e &#39;show tables;&#39;</span>
 <span class="go">+--------------------+</span>
 <span class="go">| Tables_in_coopr    |</span>
@@ -348,14 +348,14 @@ mysql machine to complete the database setup:</p>
 <h3>Server<a class="headerlink" href="#server" title="Permalink to this headline">¶</a></h3>
 <div class="section" id="site-config">
 <h4>Site Config<a class="headerlink" href="#site-config" title="Permalink to this headline">¶</a></h4>
-<p>Coopr Server settings can be changed under the <tt class="docutils literal"><span class="pre">/etc/coopr/conf/coopr-site.xml</span></tt> configuration file.
+<p>Coopr Server settings can be changed under the <code class="docutils literal"><span class="pre">/etc/coopr/conf/coopr-site.xml</span></code> configuration file.
 You will likely want to add configuration settings for zookeeper, your database, and server host. There is also
-an example configuration file you can examine at <tt class="docutils literal"><span class="pre">/etc/coopr/conf/coopr-site.xml.example</span></tt>.
+an example configuration file you can examine at <code class="docutils literal"><span class="pre">/etc/coopr/conf/coopr-site.xml.example</span></code>.
 For a list of available configurations, see the <a class="reference internal" href="server-config.html"><em>Server Configuration</em></a> page.</p>
 </div>
 <div class="section" id="environment">
 <h4>Environment<a class="headerlink" href="#environment" title="Permalink to this headline">¶</a></h4>
-<p>The Server environmental variables can be set at <tt class="docutils literal"><span class="pre">/etc/default/coopr-server</span></tt>. The configurable variables are as below:</p>
+<p>The Server environmental variables can be set at <code class="docutils literal"><span class="pre">/etc/default/coopr-server</span></code>. The configurable variables are as below:</p>
 <table border="1" class="docutils">
 <colgroup>
 <col width="33%" />
@@ -369,19 +369,19 @@ For a list of available configurations, see the <a class="reference internal" hr
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">COOPR_LOG_DIR</span></tt></td>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">COOPR_LOG_DIR</span></code></td>
 <td>/var/log/coopr</td>
 <td>Path for the log directory</td>
 </tr>
-<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">COOPR_JMX_OPTS</span></tt></td>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">COOPR_JMX_OPTS</span></code></td>
 <td>&nbsp;</td>
 <td>JMX options for monitoring the Coopr Server</td>
 </tr>
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">COOPR_GC_OPTS</span></tt></td>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">COOPR_GC_OPTS</span></code></td>
 <td>&nbsp;</td>
 <td>java garbage collection options to use when running the Coopr Server</td>
 </tr>
-<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">COOPR_JAVA_OPTS</span></tt></td>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">COOPR_JAVA_OPTS</span></code></td>
 <td>-XX:+UseConcMarkSweepGC -XX:+UseParNewGC</td>
 <td>java options to use when running the Coopr Server</td>
 </tr>
@@ -393,13 +393,13 @@ For a list of available configurations, see the <a class="reference internal" hr
 <h3>Provisioner<a class="headerlink" href="#provisioner" title="Permalink to this headline">¶</a></h3>
 <div class="section" id="id2">
 <h4>Site Config<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h4>
-<p>Coopr Provisioner settings can be changed under the <tt class="docutils literal"><span class="pre">/etc/coopr/conf/provisioner-site.xml</span></tt> configuration file.
+<p>Coopr Provisioner settings can be changed under the <code class="docutils literal"><span class="pre">/etc/coopr/conf/provisioner-site.xml</span></code> configuration file.
 You will likely want to add configuration settings for the server uri the provisioner should connect to.
 For a list of available configurations, see the <a class="reference internal" href="provisioner-config.html"><em>Provisioner Configuration</em></a> page.</p>
 </div>
 <div class="section" id="id3">
 <h4>Environment<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h4>
-<p>The Provisioner environmental variables can be set at <tt class="docutils literal"><span class="pre">/etc/default/coopr-provisioner</span></tt>. The configurable variables are as below:</p>
+<p>The Provisioner environmental variables can be set at <code class="docutils literal"><span class="pre">/etc/default/coopr-provisioner</span></code>. The configurable variables are as below:</p>
 <table border="1" class="docutils">
 <colgroup>
 <col width="33%" />
@@ -413,15 +413,15 @@ For a list of available configurations, see the <a class="reference internal" hr
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">COOPR_LOG_DIR</span></tt></td>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">COOPR_LOG_DIR</span></code></td>
 <td>/var/log/coopr</td>
 <td>Path for the log directory</td>
 </tr>
-<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">COOPR_LOG_LEVEL</span></tt></td>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">COOPR_LOG_LEVEL</span></code></td>
 <td>info</td>
 <td>Logging level</td>
 </tr>
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">PROVISIONER_SITE_CONF</span></tt></td>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">PROVISIONER_SITE_CONF</span></code></td>
 <td>/etc/coopr/conf/provisioner-site.xml</td>
 <td>Location of site config</td>
 </tr>
@@ -433,7 +433,7 @@ For a list of available configurations, see the <a class="reference internal" hr
 <h3>UI<a class="headerlink" href="#ui" title="Permalink to this headline">¶</a></h3>
 <div class="section" id="id4">
 <h4>Environment<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h4>
-<p>The UI environment variables can be set at <tt class="docutils literal"><span class="pre">/etc/default/coopr-ui</span></tt>. The configurable variables are as below:</p>
+<p>The UI environment variables can be set at <code class="docutils literal"><span class="pre">/etc/default/coopr-ui</span></code>. The configurable variables are as below:</p>
 <table border="1" class="docutils">
 <colgroup>
 <col width="33%" />
@@ -447,15 +447,15 @@ For a list of available configurations, see the <a class="reference internal" hr
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">COOPR_LOG_DIR</span></tt></td>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">COOPR_LOG_DIR</span></code></td>
 <td>/var/log/coopr</td>
 <td>Path for the log directory</td>
 </tr>
-<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">COOPR_SERVER_URI</span></tt></td>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">COOPR_SERVER_URI</span></code></td>
 <td><a class="reference external" href="http://localhost:55054">http://localhost:55054</a></td>
 <td>The URI for Coopr Server</td>
 </tr>
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">COOPR_UI_PORT</span></tt></td>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">COOPR_UI_PORT</span></code></td>
 <td>8100</td>
 <td>The port number that hosts the UI</td>
 </tr>
@@ -466,13 +466,13 @@ For a list of available configurations, see the <a class="reference internal" hr
 </div>
 <div class="section" id="starting-and-stopping-coopr-services">
 <span id="starting-stopping"></span><h2>Starting and Stopping Coopr Services<a class="headerlink" href="#starting-and-stopping-coopr-services" title="Permalink to this headline">¶</a></h2>
-<p>By default, Coopr&#8217;s installation RPMs and PKGs do not configure auto start of the services in the <tt class="docutils literal"><span class="pre">init.d</span></tt>. We leave
+<p>By default, Coopr&#8217;s installation RPMs and PKGs do not configure auto start of the services in the <code class="docutils literal"><span class="pre">init.d</span></code>. We leave
 that privilege to the administrator. For each Coopr component and its related service (such as the Server, Provisioner, and UI),
 there is a launch script, which you may use to execute a desired operation. For example, to start, stop, or check status
 for a Coopr Provisioner, you can use:</p>
-<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> sudo /etc/init.d/coopr-server start|stop
-<span class="gp">$</span> sudo /etc/init.d/coopr-provisioner start|stop|status
-<span class="gp">$</span> sudo /etc/init.d/coopr-ui start|stop
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> sudo /etc/init.d/coopr-server start<span class="p">|</span>stop
+<span class="gp">$</span> sudo /etc/init.d/coopr-provisioner start<span class="p">|</span>stop<span class="p">|</span>status
+<span class="gp">$</span> sudo /etc/init.d/coopr-ui start<span class="p">|</span>stop
 </pre></div>
 </div>
 </div>
@@ -495,24 +495,24 @@ the example in the <a class="reference internal" href="../guide/quickstart/index
 <span id="logs"></span><h2>Log Management<a class="headerlink" href="#log-management" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="location">
 <h3>Location<a class="headerlink" href="#location" title="Permalink to this headline">¶</a></h3>
-<p>By default, Coopr logs are located at <tt class="docutils literal"><span class="pre">/var/log/coopr</span></tt>.  This can be changed by editing the corresponding <tt class="docutils literal"><span class="pre">/etc/default/coopr-server</span></tt>,
-<tt class="docutils literal"><span class="pre">/etc/default/coopr-ui</span></tt>, or <tt class="docutils literal"><span class="pre">/etc/default/coopr-provisioner</span></tt> file.</p>
+<p>By default, Coopr logs are located at <code class="docutils literal"><span class="pre">/var/log/coopr</span></code>.  This can be changed by editing the corresponding <code class="docutils literal"><span class="pre">/etc/default/coopr-server</span></code>,
+<code class="docutils literal"><span class="pre">/etc/default/coopr-ui</span></code>, or <code class="docutils literal"><span class="pre">/etc/default/coopr-provisioner</span></code> file.</p>
 </div>
 <div class="section" id="options">
 <h3>Options<a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h3>
-<p>Log options for the server, such as log level, can be changed by editing the <tt class="docutils literal"><span class="pre">/etc/coopr/conf/logback.xml</span></tt> file.  Log level for
-the provisioner can be changed by editing the <tt class="docutils literal"><span class="pre">/etc/default/coopr-provisioner</span></tt> file.</p>
+<p>Log options for the server, such as log level, can be changed by editing the <code class="docutils literal"><span class="pre">/etc/coopr/conf/logback.xml</span></code> file.  Log level for
+the provisioner can be changed by editing the <code class="docutils literal"><span class="pre">/etc/default/coopr-provisioner</span></code> file.</p>
 </div>
 <div class="section" id="rotation">
 <h3>Rotation<a class="headerlink" href="#rotation" title="Permalink to this headline">¶</a></h3>
 <p>Coopr depends on the external Linux utility logrotate to rotate its logs. Coopr
-packages contain logrotate configurations in <tt class="docutils literal"><span class="pre">/etc/logrotate.d</span></tt> but it does not perform the rotations itself.
+packages contain logrotate configurations in <code class="docutils literal"><span class="pre">/etc/logrotate.d</span></code> but it does not perform the rotations itself.
 Please ensure logrotate is enabled on your Coopr hosts.</p>
 </div>
 </div>
 <div class="section" id="upgrading-coopr">
 <h2>Upgrading Coopr<a class="headerlink" href="#upgrading-coopr" title="Permalink to this headline">¶</a></h2>
-<p>To upgrade Coopr from 0.9.8 to 0.9.9, please refer to the <a class="reference internal" href="upgrade.html#upgrade-to-0-9-9"><em>Upgrade Guide</em></a>.</p>
+<p>To upgrade Coopr from 0.9.8 to 0.9.9, please refer to the <a class="reference internal" href="upgrade.html#upgrade-to-0-9-9"><span>Upgrade Guide</span></a>.</p>
 </div>
 <div class="section" id="common-installation-issues">
 <span id="common-issues"></span><h2>Common Installation Issues<a class="headerlink" href="#common-installation-issues" title="Permalink to this headline">¶</a></h2>
@@ -527,7 +527,7 @@ Please ensure logrotate is enabled on your Coopr hosts.</p>
 </li>
 <li><p class="first">If you are running your mysql server on the same machine as the Coopr Server and are
 seeing connection issues in the Coopr Server logs, you may need to explicitly grant access
-to <tt class="docutils literal"><span class="pre">&quot;coopr&quot;&#64;&quot;localhost&quot;</span></tt> instead of relying on the wildcard.</p>
+to <code class="docutils literal"><span class="pre">&quot;coopr&quot;&#64;&quot;localhost&quot;</span></code> instead of relying on the wildcard.</p>
 </li>
 </ul>
 </div>
@@ -697,7 +697,7 @@ to <tt class="docutils literal"><span class="pre">&quot;coopr&quot;&#64;&quot;lo
     
     </th>
     <th class="tg-s6z2">
-        Copyright &copy; 2014-2015 Cask Data, Inc.
+        Copyright &copy; 2014-2016 Cask Data, Inc.
     
     </th>
     <th class="tg-0ord">&nbsp;&nbsp;Next Topic:

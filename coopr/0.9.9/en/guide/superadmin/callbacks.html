@@ -80,9 +80,9 @@ created and page your operations team if a cluster create operation failed. Or y
 hook up created clusters to your existing monitoring system once they are created, and remove them from your
 monitoring system after they are deleted.</p>
 <p>The Server can perform custom callbacks before the start of any cluster operation, after an operation has successfully
-completed, and after an operation has failed. To activate callbacks, you must set the <tt class="docutils literal"><span class="pre">server.callback.class</span></tt> setting
+completed, and after an operation has failed. To activate callbacks, you must set the <code class="docutils literal"><span class="pre">server.callback.class</span></code> setting
 in the server config to the fully qualified name of the class you want to use. The class must implement the
-<tt class="docutils literal"><span class="pre">ClusterCallback</span></tt> interface, and the jar containing the class must be included in the lib directory for the Server.
+<code class="docutils literal"><span class="pre">ClusterCallback</span></code> interface, and the jar containing the class must be included in the lib directory for the Server.
 The Server comes with a HttpPostRequestCallback class that can send a HTTP POST request containing the cluster, nodes,
 and job to a configurable URL at start, success, and failure of different types of cluster operations.</p>
 <p>You can view the <a class="reference internal" href="../../javadocs/index.html"><em>javadocs</em></a> for more information about the interface and example callback class.</p>
@@ -189,7 +189,7 @@ and job to a configurable URL at start, success, and failure of different types 
     
     </th>
     <th class="tg-s6z2">
-        Copyright &copy; 2014-2015 Cask Data, Inc.
+        Copyright &copy; 2014-2016 Cask Data, Inc.
     
     </th>
     <th class="tg-0ord">&nbsp;&nbsp;Next Topic:

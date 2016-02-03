@@ -80,7 +80,7 @@ hostnames or IP addresses of other nodes within a cluster. For this reason, Coop
 to programmatically set these values ahead of time as place holders, which later can be substituted with actual values.</p>
 <div class="section" id="basic-macros">
 <h2>Basic Macros<a class="headerlink" href="#basic-macros" title="Permalink to this headline">¶</a></h2>
-<p>Macros are supported in the config section of a template and are denoted by surrounding <tt class="docutils literal"><span class="pre">%</span></tt>
+<p>Macros are supported in the config section of a template and are denoted by surrounding <code class="docutils literal"><span class="pre">%</span></code>
 symbols or strings. Basic macros allow you to specify a comma delimited list of hostnames or IP addresses of nodes that provide a
 specific service. The basic macros available are:</p>
 <div class="highlight-java"><div class="highlight"><pre><span class="o">%</span><span class="n">host</span><span class="o">.</span><span class="na">service</span><span class="o">.&lt;</span><span class="n">service</span> <span class="n">name</span><span class="o">&gt;%</span>
@@ -139,19 +139,19 @@ replaced by whatever value the entity resolves to.</p>
 <p>Macros are best described with examples, and they are very common during installation, automation and configuration tasks.</p>
 <p>Suppose you are configuring a HDFS + HBase cluster that uses three Zookeeper
 nodes. A user creates a cluster from this template, and Coopr decides to place the namenode and
-hbase-master services on a node with hostname <tt class="docutils literal"><span class="pre">hadoop-dev-1001.local</span></tt> and IP address <tt class="docutils literal"><span class="pre">123.456.0.1</span></tt>. It then decides to place
-the three Zookeeper services on their own nodes with hostnames <tt class="docutils literal"><span class="pre">hadoop-dev-[1002-1004].local</span></tt> with IP addresses <tt class="docutils literal"><span class="pre">123.456.0.[2-4]</span></tt>.
-One configuration setting each datanode needs is called <tt class="docutils literal"><span class="pre">fs.defaultFS</span></tt>, and it needs to be set to a value that contains
+hbase-master services on a node with hostname <code class="docutils literal"><span class="pre">hadoop-dev-1001.local</span></code> and IP address <code class="docutils literal"><span class="pre">123.456.0.1</span></code>. It then decides to place
+the three Zookeeper services on their own nodes with hostnames <code class="docutils literal"><span class="pre">hadoop-dev-[1002-1004].local</span></code> with IP addresses <code class="docutils literal"><span class="pre">123.456.0.[2-4]</span></code>.
+One configuration setting each datanode needs is called <code class="docutils literal"><span class="pre">fs.defaultFS</span></code>, and it needs to be set to a value that contains
 the hostname of the namenode. This can be achieved with the following basic macro:</p>
 <div class="highlight-java"><div class="highlight"><pre><span class="s">&quot;fs.defaultFS&quot;</span><span class="o">:</span><span class="s">&quot;hdfs://%host.service.hadoop-hdfs-namenode%&quot;</span>
 </pre></div>
 </div>
-<p>Coopr will see the macro <tt class="docutils literal"><span class="pre">%host.service.hadoop-hdfs-namenode%</span></tt> and replace it with a comma separated list of all the hosts
-that contain the <tt class="docutils literal"><span class="pre">hadoop-hdfs-namenode</span></tt> service. Since the namenode service is only installed on one node, it will become:</p>
+<p>Coopr will see the macro <code class="docutils literal"><span class="pre">%host.service.hadoop-hdfs-namenode%</span></code> and replace it with a comma separated list of all the hosts
+that contain the <code class="docutils literal"><span class="pre">hadoop-hdfs-namenode</span></code> service. Since the namenode service is only installed on one node, it will become:</p>
 <div class="highlight-java"><div class="highlight"><pre><span class="s">&quot;fs.defaultFS&quot;</span><span class="o">:</span><span class="s">&quot;hdfs://hadoop-dev-1001.local&quot;</span>
 </pre></div>
 </div>
-<p>Similarly, if we had used the <tt class="docutils literal"><span class="pre">%ip.service.hadoop-hdfs-namenode%</span></tt> macro instead, it would resolve to:</p>
+<p>Similarly, if we had used the <code class="docutils literal"><span class="pre">%ip.service.hadoop-hdfs-namenode%</span></code> macro instead, it would resolve to:</p>
 <div class="highlight-java"><div class="highlight"><pre><span class="s">&quot;fs.defaultFS&quot;</span><span class="o">:</span><span class="s">&quot;hdfs://123.456.0.1&quot;</span>
 </pre></div>
 </div>
@@ -160,11 +160,11 @@ In this case, we want to end up with:</p>
 <div class="highlight-java"><div class="highlight"><pre><span class="n">hbase</span><span class="o">.</span><span class="na">zookeeper</span><span class="o">.</span><span class="na">quorum</span><span class="s">&quot;:&quot;</span><span class="n">hadoop</span><span class="o">-</span><span class="n">dev</span><span class="o">-</span><span class="mi">1002</span><span class="o">.</span><span class="na">local</span><span class="o">:</span><span class="mi">2181</span><span class="o">,</span><span class="n">hadoop</span><span class="o">-</span><span class="n">dev</span><span class="o">-</span><span class="mi">1003</span><span class="o">.</span><span class="na">local</span><span class="o">:</span><span class="mi">2181</span><span class="o">,</span><span class="n">hadoop</span><span class="o">-</span><span class="n">dev</span><span class="o">-</span><span class="mi">1004</span><span class="o">.</span><span class="na">local</span><span class="o">:</span><span class="mi">2181</span><span class="o">/</span><span class="n">namespace</span>
 </pre></div>
 </div>
-<p>This can be achieved with the <tt class="docutils literal"><span class="pre">join</span></tt> and <tt class="docutils literal"><span class="pre">map</span></tt> macro:</p>
+<p>This can be achieved with the <code class="docutils literal"><span class="pre">join</span></code> and <code class="docutils literal"><span class="pre">map</span></code> macro:</p>
 <div class="highlight-java"><div class="highlight"><pre>hbase.zookeeper.quorum&quot;:&quot;%join(map(host.service.zookeeper-server,&#39;$:2181&#39;),&#39;,&#39;)%/namespace
 </pre></div>
 </div>
-<p>Similarly, if we wanted IP addresses, we could have replaced <tt class="docutils literal"><span class="pre">host.service.zookeeper-server</span></tt> with <tt class="docutils literal"><span class="pre">ip.service.zookeeper-server</span></tt>.</p>
+<p>Similarly, if we wanted IP addresses, we could have replaced <code class="docutils literal"><span class="pre">host.service.zookeeper-server</span></code> with <code class="docutils literal"><span class="pre">ip.service.zookeeper-server</span></code>.</p>
 <p>Now, let&#8217;s look at the configuration for Zookeeper. Each Zookeeper configuration file needs the list of servers
 and their hostnames. To be more specific, part of each config file needs to contain:</p>
 <div class="highlight-java"><div class="highlight"><pre><span class="n">server</span><span class="o">.</span><span class="mi">1</span><span class="o">=</span><span class="n">hadoop</span><span class="o">-</span><span class="n">dev</span><span class="o">-</span><span class="mi">1002</span><span class="o">.</span><span class="na">local</span><span class="o">:</span><span class="mi">2888</span><span class="o">:</span><span class="mi">3888</span>
@@ -178,21 +178,21 @@ and their hostnames. To be more specific, part of each config file needs to cont
 <span class="s">&quot;server.3&quot;</span><span class="o">:</span><span class="s">&quot;%host.service.zookeeper-server[2]%:2888:3888&quot;</span>
 </pre></div>
 </div>
-<p>These macros work just like the <tt class="docutils literal"><span class="pre">%host.service.zookeeper-server%</span></tt> macro, but rather than being replaced by a
-comma-separated list of all hosts with the <tt class="docutils literal"><span class="pre">zookeeper-server</span></tt> service, it&#8217;s replaced by the hostname of the <em>i</em>&#8216;th
-node with <tt class="docutils literal"><span class="pre">zookeeper-server</span></tt>, where <em>i</em> is specified in the square brackets.</p>
-<p>Each Zookeeper service also needs to know its ID. Taking the above example, <tt class="docutils literal"><span class="pre">hadoop-dev-1002.local</span></tt> needs to know that
-its ID is 1 (matching the <tt class="docutils literal"><span class="pre">server.1</span></tt> setting), <tt class="docutils literal"><span class="pre">hadoop-dev-1003.local</span></tt> needs to know that its ID is 2 (again matching
-the <tt class="docutils literal"><span class="pre">server.2</span></tt> setting), and so on. To achieve this, we can use the self macro:</p>
+<p>These macros work just like the <code class="docutils literal"><span class="pre">%host.service.zookeeper-server%</span></code> macro, but rather than being replaced by a
+comma-separated list of all hosts with the <code class="docutils literal"><span class="pre">zookeeper-server</span></code> service, it&#8217;s replaced by the hostname of the <em>i</em>&#8216;th
+node with <code class="docutils literal"><span class="pre">zookeeper-server</span></code>, where <em>i</em> is specified in the square brackets.</p>
+<p>Each Zookeeper service also needs to know its ID. Taking the above example, <code class="docutils literal"><span class="pre">hadoop-dev-1002.local</span></code> needs to know that
+its ID is 1 (matching the <code class="docutils literal"><span class="pre">server.1</span></code> setting), <code class="docutils literal"><span class="pre">hadoop-dev-1003.local</span></code> needs to know that its ID is 2 (again matching
+the <code class="docutils literal"><span class="pre">server.2</span></code> setting), and so on. To achieve this, we can use the self macro:</p>
 <div class="highlight-java"><div class="highlight"><pre><span class="s">&quot;myId&quot;</span><span class="o">:</span><span class="s">&quot;%instance.self.service.zookeeper-server%&quot;</span>
 </pre></div>
 </div>
 <p>This variable will be replaced by the instance number of that service, beginning at 1. To be exact,
-<tt class="docutils literal"><span class="pre">hadoop-dev-1002.local</span></tt> will receive <tt class="docutils literal"><span class="pre">&quot;myId&quot;:&quot;1&quot;</span></tt>, <tt class="docutils literal"><span class="pre">hadoop-dev-1003.local</span></tt> will receive <tt class="docutils literal"><span class="pre">&quot;myId&quot;:&quot;2&quot;</span></tt>, and
-<tt class="docutils literal"><span class="pre">hadoop-dev-1004.local</span></tt> will receive <tt class="docutils literal"><span class="pre">&quot;myId:3&quot;</span></tt>. Similarly, if a node needs its own hostname or IP address, you can use
-<tt class="docutils literal"><span class="pre">%host.self.service.[service</span> <span class="pre">name]%</span></tt> and <tt class="docutils literal"><span class="pre">%ip.self.service.[service</span> <span class="pre">name]%</span></tt>, respectively. Finally, say if you need a
+<code class="docutils literal"><span class="pre">hadoop-dev-1002.local</span></code> will receive <code class="docutils literal"><span class="pre">&quot;myId&quot;:&quot;1&quot;</span></code>, <code class="docutils literal"><span class="pre">hadoop-dev-1003.local</span></code> will receive <code class="docutils literal"><span class="pre">&quot;myId&quot;:&quot;2&quot;</span></code>, and
+<code class="docutils literal"><span class="pre">hadoop-dev-1004.local</span></code> will receive <code class="docutils literal"><span class="pre">&quot;myId:3&quot;</span></code>. Similarly, if a node needs its own hostname or IP address, you can use
+<code class="docutils literal"><span class="pre">%host.self.service.[service</span> <span class="pre">name]%</span></code> and <code class="docutils literal"><span class="pre">%ip.self.service.[service</span> <span class="pre">name]%</span></code>, respectively. Finally, say if you need a
 configuration setting that needs to resolve to the number of zookeeper-servers running in your cluster. This
-can be achieved with the <tt class="docutils literal"><span class="pre">%num.service.zookeeper-server%</span></tt> macro.</p>
+can be achieved with the <code class="docutils literal"><span class="pre">%num.service.zookeeper-server%</span></code> macro.</p>
 </div>
 </div>
 
@@ -301,7 +301,7 @@ can be achieved with the <tt class="docutils literal"><span class="pre">%num.ser
     
     </th>
     <th class="tg-s6z2">
-        Copyright &copy; 2014-2015 Cask Data, Inc.
+        Copyright &copy; 2014-2016 Cask Data, Inc.
     
     </th>
     <th class="tg-0ord">&nbsp;&nbsp;Next Topic:

@@ -202,13 +202,13 @@ of the JSON results returned when running a general API node usage call every 60
 <h3>Time Ranges<a class="headerlink" href="#time-ranges" title="Permalink to this headline">¶</a></h3>
 <p>Start and end values are expressed in Unix time (a.k.a. seconds since epoch, or the beginning of Unix time:
 00:00:00 Coordinated Universal Time (UTC), Thursday, 1 January 1970).
-Unix time may be checked on most Unix systems by typing <tt class="docutils literal"><span class="pre">date</span> <span class="pre">+%s</span></tt> on the command line.</p>
+Unix time may be checked on most Unix systems by typing <code class="docutils literal"><span class="pre">date</span> <span class="pre">+%s</span></code> on the command line.</p>
 <p>With the general usage example, the JSON response to general node hour usage shows the start and end values returned.
 If the start is not specified, the start time is the exact date and time when the very first
 task (ever) completes. The end date, if not specified, is the current date and time.</p>
 <div class="section" id="start-time-only">
 <h4>Start Time Only<a class="headerlink" href="#start-time-only" title="Permalink to this headline">¶</a></h4>
-<p>To obtain node usage hours since a specific date and time, we would add <tt class="docutils literal"><span class="pre">start=x</span></tt> where x is a Unix time.</p>
+<p>To obtain node usage hours since a specific date and time, we would add <code class="docutils literal"><span class="pre">start=x</span></code> where x is a Unix time.</p>
 <div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>curl -H <span class="s1">&#39;Coopr-UserID:admin&#39;</span>
        -H <span class="s1">&#39;Coopr-ApiKey:&lt;apikey&gt;&#39;</span>
        -H <span class="s1">&#39;Coopr-TenantID:superadmin&#39;</span>
@@ -234,7 +234,7 @@ task (ever) completes. The end date, if not specified, is the current date and t
 <div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>curl -H <span class="s1">&#39;Coopr-UserID:admin&#39;</span>
        -H <span class="s1">&#39;Coopr-ApiKey:&lt;apikey&gt;&#39;</span>
        -H <span class="s1">&#39;Coopr-TenantID:superadmin&#39;</span>
-       http://&lt;server&gt;:&lt;port&gt;/&lt;version&gt;/metrics/nodes/usage?start<span class="o">=</span>1424481097&amp;end<span class="o">=</span>1424482780
+       http://&lt;server&gt;:&lt;port&gt;/&lt;version&gt;/metrics/nodes/usage?start<span class="o">=</span>1424481097<span class="p">&amp;</span><span class="nv">end</span><span class="o">=</span>1424482780
 
 <span class="nv">$ </span><span class="o">{</span><span class="s2">&quot;start&quot;</span>:1424481097,<span class="s2">&quot;end&quot;</span>:1424486196,<span class="s2">&quot;data&quot;</span>:<span class="o">[{</span><span class="s2">&quot;time&quot;</span>:1424481097,<span class="s2">&quot;value&quot;</span>:20396<span class="o">}]}</span>
 </pre></div>
@@ -244,13 +244,13 @@ task (ever) completes. The end date, if not specified, is the current date and t
 <div class="section" id="specifying-a-user">
 <h3>Specifying a User<a class="headerlink" href="#specifying-a-user" title="Permalink to this headline">¶</a></h3>
 <p>Non-superadmin tenants can retrieve node usage metrics for their users only. The superadmin tenant retrieves
-node usage metrics for all users. As an example, if there are users named <tt class="docutils literal"><span class="pre">george</span></tt> under both the superadmin
-and a non-superadmin tenant named <tt class="docutils literal"><span class="pre">mytenant</span></tt>, the <tt class="docutils literal"><span class="pre">mytenant</span></tt> admin user will only see node usage for their
-own <tt class="docutils literal"><span class="pre">george</span></tt> user, while the superadmin will retrieve combined total usage for all users named <tt class="docutils literal"><span class="pre">george</span></tt>
+node usage metrics for all users. As an example, if there are users named <code class="docutils literal"><span class="pre">george</span></code> under both the superadmin
+and a non-superadmin tenant named <code class="docutils literal"><span class="pre">mytenant</span></code>, the <code class="docutils literal"><span class="pre">mytenant</span></code> admin user will only see node usage for their
+own <code class="docutils literal"><span class="pre">george</span></code> user, while the superadmin will retrieve combined total usage for all users named <code class="docutils literal"><span class="pre">george</span></code>
 (under all tenants, including superadmin).</p>
 <p>The two scenarios in this example are illustrated here. Node usage metrics for:</p>
 <ol class="arabic">
-<li><p class="first">A user named <tt class="docutils literal"><span class="pre">george</span></tt> while we authenticate as <tt class="docutils literal"><span class="pre">user=admin</span></tt>, and the <tt class="docutils literal"><span class="pre">mytenant</span></tt> tenant.</p>
+<li><p class="first">A user named <code class="docutils literal"><span class="pre">george</span></code> while we authenticate as <code class="docutils literal"><span class="pre">user=admin</span></code>, and the <code class="docutils literal"><span class="pre">mytenant</span></code> tenant.</p>
 <div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>curl -H <span class="s1">&#39;Coopr-UserID:admin&#39;</span>
        -H <span class="s1">&#39;Coopr-ApiKey:&lt;apikey&gt;&#39;</span>
        -H <span class="s1">&#39;Coopr-TenantID:mytenant&#39;</span>
@@ -260,7 +260,7 @@ own <tt class="docutils literal"><span class="pre">george</span></tt> user, whil
 </pre></div>
 </div>
 </li>
-<li><p class="first">All users named <tt class="docutils literal"><span class="pre">george</span></tt> while we authenticate as <tt class="docutils literal"><span class="pre">user=admin</span></tt> and <tt class="docutils literal"><span class="pre">superadmin</span></tt> tenant.</p>
+<li><p class="first">All users named <code class="docutils literal"><span class="pre">george</span></code> while we authenticate as <code class="docutils literal"><span class="pre">user=admin</span></code> and <code class="docutils literal"><span class="pre">superadmin</span></code> tenant.</p>
 <div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>curl -H <span class="s1">&#39;Coopr-UserID:admin&#39;</span>
        -H <span class="s1">&#39;Coopr-ApiKey:&lt;apikey&gt;&#39;</span>
        -H <span class="s1">&#39;Coopr-TenantID:superadmin&#39;</span>
@@ -376,7 +376,7 @@ since this metric is not available for non-superadmin tenant users.</p>
     
     </th>
     <th class="tg-s6z2">
-        Copyright &copy; 2014-2015 Cask Data, Inc.
+        Copyright &copy; 2014-2016 Cask Data, Inc.
     
     </th>
     <th class="tg-0ord">

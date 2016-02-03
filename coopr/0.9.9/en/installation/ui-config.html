@@ -101,28 +101,28 @@
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">COOPR_UI_KEY_FILE</span></tt></td>
-<td><tt class="docutils literal"><span class="pre">COOPR_HOME/cert/server.key</span></tt></td>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">COOPR_UI_KEY_FILE</span></code></td>
+<td><code class="docutils literal"><span class="pre">COOPR_HOME/cert/server.key</span></code></td>
 <td>Key file location</td>
 </tr>
-<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">COOPR_UI_CERT_FILE</span></tt></td>
-<td><tt class="docutils literal"><span class="pre">COOPR_HOME/cert/server.crt</span></tt></td>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">COOPR_UI_CERT_FILE</span></code></td>
+<td><code class="docutils literal"><span class="pre">COOPR_HOME/cert/server.crt</span></code></td>
 <td>Certificate file location</td>
 </tr>
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">COOPR_SSL</span></tt></td>
-<td><tt class="docutils literal"><span class="pre">true</span></tt></td>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">COOPR_SSL</span></code></td>
+<td><code class="docutils literal"><span class="pre">true</span></code></td>
 <td>Use SSL for the UI</td>
 </tr>
-<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">COOPR_UI_SSL_PORT</span></tt></td>
-<td><tt class="docutils literal"><span class="pre">8443</span></tt></td>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">COOPR_UI_SSL_PORT</span></code></td>
+<td><code class="docutils literal"><span class="pre">8443</span></code></td>
 <td>Port the UI listens on for connections
 (<strong>optional</strong>)</td>
 </tr>
 </tbody>
 </table>
-<p>Create a file (example, <tt class="docutils literal"><span class="pre">/etc/profile.d/coopr-ui.sh</span></tt>) with appropriate entries,
+<p>Create a file (example, <code class="docutils literal"><span class="pre">/etc/profile.d/coopr-ui.sh</span></code>) with appropriate entries,
 modifying the values as needed to point to the location of your certificate file and key,
-and, optionally, a different port (<tt class="docutils literal"><span class="pre">28443</span></tt> is used here as an example):</p>
+and, optionally, a different port (<code class="docutils literal"><span class="pre">28443</span></code> is used here as an example):</p>
 <div class="highlight-console"><div class="highlight"><pre><span class="go">export COOPR_UI_KEY_FILE=/etc/pki/tls/private/ui-cert.key</span>
 <span class="go">export COOPR_UI_CERT_FILE=/etc/pki/tls/certs/ui-cert.crt</span>
 <span class="go">export COOPR_UI_SSL=true</span>
@@ -132,8 +132,8 @@ and, optionally, a different port (<tt class="docutils literal"><span class="pre
 </div>
 <div class="section" id="logging-into-the-ui-with-ssl-enabled">
 <h2>Logging into the UI with SSL Enabled<a class="headerlink" href="#logging-into-the-ui-with-ssl-enabled" title="Permalink to this headline">¶</a></h2>
-<p>When logging into the UI with SSL enabled, the default port is <tt class="docutils literal"><span class="pre">8443</span></tt>.
-You only need to set <tt class="docutils literal"><span class="pre">COOPR_UI_SSL_PORT</span></tt> if you wish to use a different port for your UI
+<p>When logging into the UI with SSL enabled, the default port is <code class="docutils literal"><span class="pre">8443</span></code>.
+You only need to set <code class="docutils literal"><span class="pre">COOPR_UI_SSL_PORT</span></code> if you wish to use a different port for your UI
 to listen on when using SSL.</p>
 </div>
 </div>
@@ -246,7 +246,7 @@ to listen on when using SSL.</p>
     
     </th>
     <th class="tg-s6z2">
-        Copyright &copy; 2014-2015 Cask Data, Inc.
+        Copyright &copy; 2014-2016 Cask Data, Inc.
     
     </th>
     <th class="tg-0ord">&nbsp;&nbsp;Next Topic:

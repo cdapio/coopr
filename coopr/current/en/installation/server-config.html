@@ -86,7 +86,7 @@ are not automatically reread.</p>
 <div class="section" id="zookeeper">
 <h2>Zookeeper<a class="headerlink" href="#zookeeper" title="Permalink to this headline">¶</a></h2>
 <p>The zookeeper quorum, a collection of nodes running instances of Zookeeper, is specified
-as a comma-delimited list of <tt class="docutils literal"><span class="pre">&lt;host&gt;:&lt;port&gt;</span></tt>:</p>
+as a comma-delimited list of <code class="docutils literal"><span class="pre">&lt;host&gt;:&lt;port&gt;</span></code>:</p>
 <div class="highlight-xml"><div class="highlight"><pre>server1:2181,server2:2181,server3:2181
 </pre></div>
 </div>
@@ -152,7 +152,7 @@ setting to your config.</p>
 <span class="nt">&lt;/property&gt;</span>
 </pre></div>
 </div>
-<p>If you are using an alternate distributed file store, you must provide a class that implements the <tt class="docutils literal"><span class="pre">PluginStore</span></tt> interface.
+<p>If you are using an alternate distributed file store, you must provide a class that implements the <code class="docutils literal"><span class="pre">PluginStore</span></code> interface.
 See the <a class="reference internal" href="../javadocs/index.html"><em>javadocs</em></a> for more information about the interface. Once you have implemented the interface,
 you must build a jar and include it in the lib directory for the server, and edit the following config setting in your config.</p>
 <div class="highlight-xml"><div class="highlight"><pre><span class="nt">&lt;property&gt;</span>
@@ -203,11 +203,11 @@ separated list of operations in the configuration. An example of configuration s
 </pre></div>
 </div>
 <p>With the configuration above, a HTTP Post request will be sent to
-<tt class="docutils literal"><span class="pre">http://host:port/start/path</span></tt> before the start of every <tt class="docutils literal"><span class="pre">CLUSTER_CREATE</span></tt>,
-<tt class="docutils literal"><span class="pre">RESTART_SERVICES</span></tt>, <tt class="docutils literal"><span class="pre">STOP_SERVICES</span></tt>, and <tt class="docutils literal"><span class="pre">CLUSTER_CONFIGURE_WITH_RESTART</span></tt> operation.
+<code class="docutils literal"><span class="pre">http://host:port/start/path</span></code> before the start of every <code class="docutils literal"><span class="pre">CLUSTER_CREATE</span></code>,
+<code class="docutils literal"><span class="pre">RESTART_SERVICES</span></code>, <code class="docutils literal"><span class="pre">STOP_SERVICES</span></code>, and <code class="docutils literal"><span class="pre">CLUSTER_CONFIGURE_WITH_RESTART</span></code> operation.
 If no triggers are given, the request is sent before the start of every cluster operation.
 Similarly, a HTTP POST request will be sent to <a class="reference external" href="http://host:port/failure/path">http://host:port/failure/path</a> if a
-<tt class="docutils literal"><span class="pre">CLUSTER_CREATE</span></tt> operation fails. Since no success url is given, no request is sent when
+<code class="docutils literal"><span class="pre">CLUSTER_CREATE</span></code> operation fails. Since no success url is given, no request is sent when
 cluster operations complete successfully. The full list of cluster operations are:</p>
 <div class="highlight-xml"><div class="highlight"><pre>CLUSTER_CREATE
 CLUSTER_DELETE
@@ -230,9 +230,9 @@ ADD_SERVICES
 </ul>
 <div class="section" id="ssl-configuration">
 <h3>SSL Configuration<a class="headerlink" href="#ssl-configuration" title="Permalink to this headline">¶</a></h3>
-<p>To enable running a server with SSL, add this property to <tt class="docutils literal"><span class="pre">coopr-site.xml</span></tt> (while the
-configuration file path is set in <tt class="docutils literal"><span class="pre">/etc/alternatives/...</span></tt>, the default directory is
-<tt class="docutils literal"><span class="pre">/etc/coopr/conf</span></tt> and the configuration files are typically located there):</p>
+<p>To enable running a server with SSL, add this property to <code class="docutils literal"><span class="pre">coopr-site.xml</span></code> (while the
+configuration file path is set in <code class="docutils literal"><span class="pre">/etc/alternatives/...</span></code>, the default directory is
+<code class="docutils literal"><span class="pre">/etc/coopr/conf</span></code> and the configuration files are typically located there):</p>
 <div class="highlight-xml"><div class="highlight"><pre><span class="nt">&lt;property&gt;</span>
   <span class="nt">&lt;name&gt;</span>server.ssl.enabled<span class="nt">&lt;/name&gt;</span>
   <span class="nt">&lt;value&gt;</span>true<span class="nt">&lt;/value&gt;</span>
@@ -240,7 +240,7 @@ configuration file path is set in <tt class="docutils literal"><span class="pre"
 <span class="nt">&lt;/property&gt;</span>
 </pre></div>
 </div>
-<p>Set the following properties in <tt class="docutils literal"><span class="pre">coopr-site.xml</span></tt> for the keystore paths:</p>
+<p>Set the following properties in <code class="docutils literal"><span class="pre">coopr-site.xml</span></code> for the keystore paths:</p>
 <div class="highlight-xml"><div class="highlight"><pre><span class="c">&lt;!-- Keystore path for external API SSL (server.ssl.enabled) --&gt;</span>
 <span class="nt">&lt;property&gt;</span>
   <span class="nt">&lt;name&gt;</span>server.ssl.keystore.path<span class="nt">&lt;/name&gt;</span>
@@ -257,7 +257,7 @@ configuration file path is set in <tt class="docutils literal"><span class="pre"
 </pre></div>
 </div>
 <p>Modify the values shown above to reflect the paths of your relevant keystores.</p>
-<p>Add these properties to <tt class="docutils literal"><span class="pre">coopr-security.xml</span></tt>:</p>
+<p>Add these properties to <code class="docutils literal"><span class="pre">coopr-security.xml</span></code>:</p>
 <div class="highlight-xml"><div class="highlight"><pre><span class="c">&lt;!-- keystore info for external API SSL (server.ssl.enabled) --&gt;</span>
 <span class="nt">&lt;property&gt;</span>
   <span class="nt">&lt;name&gt;</span>server.ssl.keystore.password<span class="nt">&lt;/name&gt;</span>
@@ -287,8 +287,8 @@ configuration file path is set in <tt class="docutils literal"><span class="pre"
 <ul class="simple">
 <li>The keystore needs to be created before configuring SSL in Coopr. The keystore&#8217;s passwords
 and information should be gathered accordingly, in preparation for that.</li>
-<li>The keystore path (<tt class="docutils literal"><span class="pre">server.ssl.keystore.path</span></tt>) is not a directory, but rather the full
-path of the keystore file itself, such as <tt class="docutils literal"><span class="pre">/etc/pki/java/mykeystore</span></tt>.</li>
+<li>The keystore path (<code class="docutils literal"><span class="pre">server.ssl.keystore.path</span></code>) is not a directory, but rather the full
+path of the keystore file itself, such as <code class="docutils literal"><span class="pre">/etc/pki/java/mykeystore</span></code>.</li>
 <li>For the keystore configuration, update the <em>Keystore path</em> and replace <em>Keystore password</em>
 and <em>Keystore key password</em> with the actual file path of the keystore, the keystore
 password and the key password respectively that were used in generating the keystore.</li>
@@ -312,20 +312,20 @@ password and the key password respectively that were used in generating the keys
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td><div class="first last line-block">
-<div class="line"><tt class="docutils literal"><span class="pre">server.callback.class</span></tt></div>
+<div class="line"><code class="docutils literal"><span class="pre">server.callback.class</span></code></div>
 </div>
 </td>
 <td><div class="first last line-block">
-<div class="line"><tt class="docutils literal"><span class="pre">co.cask.coopr.</span></tt></div>
-<div class="line"><tt class="docutils literal"><span class="pre">scheduler.callback.</span></tt></div>
-<div class="line"><tt class="docutils literal"><span class="pre">HttpPostClusterCallback</span></tt></div>
+<div class="line"><code class="docutils literal"><span class="pre">co.cask.coopr.</span></code></div>
+<div class="line"><code class="docutils literal"><span class="pre">scheduler.callback.</span></code></div>
+<div class="line"><code class="docutils literal"><span class="pre">HttpPostClusterCallback</span></code></div>
 </div>
 </td>
 <td>Class to use for executing cluster callbacks</td>
 </tr>
 <tr class="row-odd"><td><div class="first last line-block">
-<div class="line"><tt class="docutils literal"><span class="pre">server.callback.</span></tt></div>
-<div class="line"><tt class="docutils literal"><span class="pre">http.failure.triggers</span></tt></div>
+<div class="line"><code class="docutils literal"><span class="pre">server.callback.</span></code></div>
+<div class="line"><code class="docutils literal"><span class="pre">http.failure.triggers</span></code></div>
 </div>
 </td>
 <td>all operations</td>
@@ -333,34 +333,34 @@ password and the key password respectively that were used in generating the keys
 to be sent after the operation fails</td>
 </tr>
 <tr class="row-even"><td><div class="first last line-block">
-<div class="line"><tt class="docutils literal"><span class="pre">server.callback.</span></tt></div>
-<div class="line"><tt class="docutils literal"><span class="pre">http.failure.url</span></tt></div>
+<div class="line"><code class="docutils literal"><span class="pre">server.callback.</span></code></div>
+<div class="line"><code class="docutils literal"><span class="pre">http.failure.url</span></code></div>
 </div>
 </td>
 <td>&nbsp;</td>
-<td>If <tt class="docutils literal"><span class="pre">HttpPostClusterCallback</span></tt> is in use, URL to send cluster and job information
+<td>If <code class="docutils literal"><span class="pre">HttpPostClusterCallback</span></code> is in use, URL to send cluster and job information
 to after cluster operations fail; leave unset if no request should be sent</td>
 </tr>
 <tr class="row-odd"><td><div class="first last line-block">
-<div class="line"><tt class="docutils literal"><span class="pre">server.callback.</span></tt></div>
-<div class="line"><tt class="docutils literal"><span class="pre">http.max.connections</span></tt></div>
+<div class="line"><code class="docutils literal"><span class="pre">server.callback.</span></code></div>
+<div class="line"><code class="docutils literal"><span class="pre">http.max.connections</span></code></div>
 </div>
 </td>
-<td><tt class="docutils literal"><span class="pre">100</span></tt></td>
+<td><code class="docutils literal"><span class="pre">100</span></code></td>
 <td>Maximum number of concurrent http connections for callbacks; if the max is reached, the
 next callback to try and send a request blocks until an open connection frees up</td>
 </tr>
 <tr class="row-even"><td><div class="first last line-block">
-<div class="line"><tt class="docutils literal"><span class="pre">server.callback.</span></tt></div>
-<div class="line"><tt class="docutils literal"><span class="pre">http.socket.timeout</span></tt></div>
+<div class="line"><code class="docutils literal"><span class="pre">server.callback.</span></code></div>
+<div class="line"><code class="docutils literal"><span class="pre">http.socket.timeout</span></code></div>
 </div>
 </td>
-<td><tt class="docutils literal"><span class="pre">10000</span></tt></td>
+<td><code class="docutils literal"><span class="pre">10000</span></code></td>
 <td>Socket timeout in milliseconds for HTTP callbacks</td>
 </tr>
 <tr class="row-odd"><td><div class="first last line-block">
-<div class="line"><tt class="docutils literal"><span class="pre">server.callback.</span></tt></div>
-<div class="line"><tt class="docutils literal"><span class="pre">http.start.triggers</span></tt></div>
+<div class="line"><code class="docutils literal"><span class="pre">server.callback.</span></code></div>
+<div class="line"><code class="docutils literal"><span class="pre">http.start.triggers</span></code></div>
 </div>
 </td>
 <td>all operations</td>
@@ -368,17 +368,17 @@ next callback to try and send a request blocks until an open connection frees up
 to be sent before start of the operation</td>
 </tr>
 <tr class="row-even"><td><div class="first last line-block">
-<div class="line"><tt class="docutils literal"><span class="pre">server.callback.</span></tt></div>
-<div class="line"><tt class="docutils literal"><span class="pre">http.start.url</span></tt></div>
+<div class="line"><code class="docutils literal"><span class="pre">server.callback.</span></code></div>
+<div class="line"><code class="docutils literal"><span class="pre">http.start.url</span></code></div>
 </div>
 </td>
 <td>&nbsp;</td>
-<td>If <tt class="docutils literal"><span class="pre">HttpPostClusterCallback</span></tt> is in use, URL to send cluster and job information
+<td>If <code class="docutils literal"><span class="pre">HttpPostClusterCallback</span></code> is in use, URL to send cluster and job information
 to before cluster operations start; leave unset if no request should be sent</td>
 </tr>
 <tr class="row-odd"><td><div class="first last line-block">
-<div class="line"><tt class="docutils literal"><span class="pre">server.callback.</span></tt></div>
-<div class="line"><tt class="docutils literal"><span class="pre">http.success.triggers</span></tt></div>
+<div class="line"><code class="docutils literal"><span class="pre">server.callback.</span></code></div>
+<div class="line"><code class="docutils literal"><span class="pre">http.success.triggers</span></code></div>
 </div>
 </td>
 <td>all operations</td>
@@ -386,276 +386,276 @@ to before cluster operations start; leave unset if no request should be sent</td
 to be sent after the operation completes successfully</td>
 </tr>
 <tr class="row-even"><td><div class="first last line-block">
-<div class="line"><tt class="docutils literal"><span class="pre">server.callback.</span></tt></div>
-<div class="line"><tt class="docutils literal"><span class="pre">http.success.url</span></tt></div>
+<div class="line"><code class="docutils literal"><span class="pre">server.callback.</span></code></div>
+<div class="line"><code class="docutils literal"><span class="pre">http.success.url</span></code></div>
 </div>
 </td>
 <td>&nbsp;</td>
-<td>If <tt class="docutils literal"><span class="pre">HttpPostClusterCallback</span></tt> is in use, URL to send cluster and job information
+<td>If <code class="docutils literal"><span class="pre">HttpPostClusterCallback</span></code> is in use, URL to send cluster and job information
 to after cluster operations complete successfully; leave unset if no request should
 be sent</td>
 </tr>
 <tr class="row-odd"><td><div class="first last line-block">
-<div class="line"><tt class="docutils literal"><span class="pre">server.cluster.</span></tt></div>
-<div class="line"><tt class="docutils literal"><span class="pre">cleanup.seconds</span></tt></div>
+<div class="line"><code class="docutils literal"><span class="pre">server.cluster.</span></code></div>
+<div class="line"><code class="docutils literal"><span class="pre">cleanup.seconds</span></code></div>
 </div>
 </td>
-<td><tt class="docutils literal"><span class="pre">180</span></tt></td>
+<td><code class="docutils literal"><span class="pre">180</span></code></td>
 <td>Interval, in seconds, between server housekeeping runs; housekeeping such as timing
 out tasks and expiring clusters</td>
 </tr>
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">server.db.password</span></tt></td>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">server.db.password</span></code></td>
 <td>&nbsp;</td>
 <td>Database password</td>
 </tr>
-<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">server.db.user</span></tt></td>
-<td><tt class="docutils literal"><span class="pre">coopr</span></tt></td>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">server.db.user</span></code></td>
+<td><code class="docutils literal"><span class="pre">coopr</span></code></td>
 <td>Database user</td>
 </tr>
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">server.host</span></tt></td>
-<td><tt class="docutils literal"><span class="pre">localhost</span></tt></td>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">server.host</span></code></td>
+<td><code class="docutils literal"><span class="pre">localhost</span></code></td>
 <td>Hostname/IP address for the server to bind to</td>
 </tr>
 <tr class="row-odd"><td><div class="first last line-block">
-<div class="line"><tt class="docutils literal"><span class="pre">server.ids.increment.by</span></tt></div>
+<div class="line"><code class="docutils literal"><span class="pre">server.ids.increment.by</span></code></div>
 </div>
 </td>
-<td><tt class="docutils literal"><span class="pre">1</span></tt></td>
-<td>Along with <tt class="docutils literal"><span class="pre">server.ids.start.num</span></tt>, this setting is used to partition the ID space
+<td><code class="docutils literal"><span class="pre">1</span></code></td>
+<td>Along with <code class="docutils literal"><span class="pre">server.ids.start.num</span></code>, this setting is used to partition the ID space
 for <a class="reference internal" href="../guide/bcp/multi-data-center-bcp.html"><em>Multi-Datacenter High Availability</em></a>. The
 IDs will increment by this number in a datacenter. All datacenters have to share the
-same value of <tt class="docutils literal"><span class="pre">server.ids.increment.by</span></tt> to prevent overlapping of IDs. This number
+same value of <code class="docutils literal"><span class="pre">server.ids.increment.by</span></code> to prevent overlapping of IDs. This number
 has to be large enough to enable future datacenter expansion.</td>
 </tr>
 <tr class="row-even"><td><div class="first last line-block">
-<div class="line"><tt class="docutils literal"><span class="pre">server.ids.start.num</span></tt></div>
+<div class="line"><code class="docutils literal"><span class="pre">server.ids.start.num</span></code></div>
 </div>
 </td>
-<td><tt class="docutils literal"><span class="pre">1</span></tt></td>
-<td>Along with <tt class="docutils literal"><span class="pre">server.ids.increment.by</span></tt>, this setting is used to partition the ID
+<td><code class="docutils literal"><span class="pre">1</span></code></td>
+<td>Along with <code class="docutils literal"><span class="pre">server.ids.increment.by</span></code>, this setting is used to partition the ID
 space for <a class="reference internal" href="../guide/bcp/multi-data-center-bcp.html"><em>Multi-Datacenter High Availability</em></a>. The ID generation in a datacenter will start
 from this number. Each datacenter will need to have a different start number so that
 the IDs do not overlap. All Coopr Servers in a datacenter should share the same value
-of <tt class="docutils literal"><span class="pre">server.ids.start.num</span></tt>.</td>
+of <code class="docutils literal"><span class="pre">server.ids.start.num</span></code>.</td>
 </tr>
 <tr class="row-odd"><td><div class="first last line-block">
-<div class="line"><tt class="docutils literal"><span class="pre">server.jdbc.</span></tt></div>
-<div class="line"><tt class="docutils literal"><span class="pre">connection.string</span></tt></div>
+<div class="line"><code class="docutils literal"><span class="pre">server.jdbc.</span></code></div>
+<div class="line"><code class="docutils literal"><span class="pre">connection.string</span></code></div>
 </div>
 </td>
 <td><div class="first last line-block">
-<div class="line"><tt class="docutils literal"><span class="pre">jdbc:derby:</span></tt></div>
-<div class="line"><tt class="docutils literal"><span class="pre">/var/coopr/data/db/coopr;</span></tt></div>
-<div class="line"><tt class="docutils literal"><span class="pre">create=true</span></tt></div>
+<div class="line"><code class="docutils literal"><span class="pre">jdbc:derby:</span></code></div>
+<div class="line"><code class="docutils literal"><span class="pre">/var/coopr/data/db/coopr;</span></code></div>
+<div class="line"><code class="docutils literal"><span class="pre">create=true</span></code></div>
 </div>
 </td>
 <td>JDBC connection string to user for database operations</td>
 </tr>
 <tr class="row-even"><td><div class="first last line-block">
-<div class="line"><tt class="docutils literal"><span class="pre">server.jdbc.driver</span></tt></div>
+<div class="line"><code class="docutils literal"><span class="pre">server.jdbc.driver</span></code></div>
 </div>
 </td>
 <td><div class="first last line-block">
-<div class="line"><tt class="docutils literal"><span class="pre">org.apache.derby.</span></tt></div>
-<div class="line"><tt class="docutils literal"><span class="pre">jdbc.EmbeddedDriver</span></tt></div>
+<div class="line"><code class="docutils literal"><span class="pre">org.apache.derby.</span></code></div>
+<div class="line"><code class="docutils literal"><span class="pre">jdbc.EmbeddedDriver</span></code></div>
 </div>
 </td>
 <td>JDBC driver to use for database operations</td>
 </tr>
 <tr class="row-odd"><td><div class="first last line-block">
-<div class="line"><tt class="docutils literal"><span class="pre">server.jdbc.</span></tt></div>
-<div class="line"><tt class="docutils literal"><span class="pre">max.active.connections</span></tt></div>
+<div class="line"><code class="docutils literal"><span class="pre">server.jdbc.</span></code></div>
+<div class="line"><code class="docutils literal"><span class="pre">max.active.connections</span></code></div>
 </div>
 </td>
-<td><tt class="docutils literal"><span class="pre">100</span></tt></td>
+<td><code class="docutils literal"><span class="pre">100</span></code></td>
 <td>Maximum active JDBC connections</td>
 </tr>
 <tr class="row-even"><td><div class="first last line-block">
-<div class="line"><tt class="docutils literal"><span class="pre">server.jdbc.</span></tt></div>
-<div class="line"><tt class="docutils literal"><span class="pre">validation.query</span></tt></div>
+<div class="line"><code class="docutils literal"><span class="pre">server.jdbc.</span></code></div>
+<div class="line"><code class="docutils literal"><span class="pre">validation.query</span></code></div>
 </div>
 </td>
-<td><tt class="docutils literal"><span class="pre">&quot;VALUES</span> <span class="pre">1&quot;</span></tt> when using default for <tt class="docutils literal"><span class="pre">server.jdbc.driver</span></tt> (Derby); <tt class="docutils literal"><span class="pre">&quot;null&quot;</span></tt> otherwise</td>
+<td><code class="docutils literal"><span class="pre">&quot;VALUES</span> <span class="pre">1&quot;</span></code> when using default for <code class="docutils literal"><span class="pre">server.jdbc.driver</span></code> (Derby); <code class="docutils literal"><span class="pre">&quot;null&quot;</span></code> otherwise</td>
 <td>Validation query used by JDBC connection pool to validate new DB connections;
-MySQL, PostgreSQL, and Microsoft SQL Server can use <tt class="docutils literal"><span class="pre">&quot;select</span> <span class="pre">1&quot;</span></tt>; Oracle can use
-<tt class="docutils literal"><span class="pre">&quot;select</span> <span class="pre">1</span> <span class="pre">from</span> <span class="pre">dual&quot;</span></tt></td>
+MySQL, PostgreSQL, and Microsoft SQL Server can use <code class="docutils literal"><span class="pre">&quot;select</span> <span class="pre">1&quot;</span></code>; Oracle can use
+<code class="docutils literal"><span class="pre">&quot;select</span> <span class="pre">1</span> <span class="pre">from</span> <span class="pre">dual&quot;</span></code></td>
 </tr>
 <tr class="row-odd"><td><div class="first last line-block">
-<div class="line"><tt class="docutils literal"><span class="pre">server.local.data.dir</span></tt></div>
+<div class="line"><code class="docutils literal"><span class="pre">server.local.data.dir</span></code></div>
 </div>
 </td>
-<td><tt class="docutils literal"><span class="pre">/var/coopr/data</span></tt></td>
+<td><code class="docutils literal"><span class="pre">/var/coopr/data</span></code></td>
 <td>Local data directory that default in-memory Zookeeper and embedded Derby will use</td>
 </tr>
 <tr class="row-even"><td><div class="first last line-block">
-<div class="line"><tt class="docutils literal"><span class="pre">server.metrics.</span></tt></div>
-<div class="line"><tt class="docutils literal"><span class="pre">queue.cache.seconds</span></tt></div>
+<div class="line"><code class="docutils literal"><span class="pre">server.metrics.</span></code></div>
+<div class="line"><code class="docutils literal"><span class="pre">queue.cache.seconds</span></code></div>
 </div>
 </td>
-<td><tt class="docutils literal"><span class="pre">10</span></tt></td>
+<td><code class="docutils literal"><span class="pre">10</span></code></td>
 <td>Seconds to cache queue metrics in memory before recalculating; queue metrics
 require walking through the queue and are therefore expensive to compute</td>
 </tr>
 <tr class="row-odd"><td><div class="first last line-block">
-<div class="line"><tt class="docutils literal"><span class="pre">server.netty.</span></tt></div>
-<div class="line"><tt class="docutils literal"><span class="pre">exec.num.threads</span></tt></div>
+<div class="line"><code class="docutils literal"><span class="pre">server.netty.</span></code></div>
+<div class="line"><code class="docutils literal"><span class="pre">exec.num.threads</span></code></div>
 </div>
 </td>
-<td><tt class="docutils literal"><span class="pre">50</span></tt></td>
+<td><code class="docutils literal"><span class="pre">50</span></code></td>
 <td>Number of execution threads for the server</td>
 </tr>
 <tr class="row-even"><td><div class="first last line-block">
-<div class="line"><tt class="docutils literal"><span class="pre">server.netty.</span></tt></div>
-<div class="line"><tt class="docutils literal"><span class="pre">worker.num.threads</span></tt></div>
+<div class="line"><code class="docutils literal"><span class="pre">server.netty.</span></code></div>
+<div class="line"><code class="docutils literal"><span class="pre">worker.num.threads</span></code></div>
 </div>
 </td>
-<td><tt class="docutils literal"><span class="pre">20</span></tt></td>
+<td><code class="docutils literal"><span class="pre">20</span></code></td>
 <td>Number of worker threads for the server</td>
 </tr>
 <tr class="row-odd"><td><div class="first last line-block">
-<div class="line"><tt class="docutils literal"><span class="pre">server.node.max.log.length</span></tt></div>
+<div class="line"><code class="docutils literal"><span class="pre">server.node.max.log.length</span></code></div>
 </div>
 </td>
-<td><tt class="docutils literal"><span class="pre">2048</span></tt></td>
+<td><code class="docutils literal"><span class="pre">2048</span></code></td>
 <td>Maximum log size in bytes for capturing stdout and stderr for actions performed on
 cluster nodes; logs longer than set limit will be trimmed from the head of the file</td>
 </tr>
 <tr class="row-even"><td><div class="first last line-block">
-<div class="line"><tt class="docutils literal"><span class="pre">server.node.max.num.actions</span></tt></div>
+<div class="line"><code class="docutils literal"><span class="pre">server.node.max.num.actions</span></code></div>
 </div>
 </td>
-<td><tt class="docutils literal"><span class="pre">200</span></tt></td>
+<td><code class="docutils literal"><span class="pre">200</span></code></td>
 <td>Maximum number of actions saved for a node; oldest action will be removed when
 actions exceeding this limit are performed on a node</td>
 </tr>
 <tr class="row-odd"><td><div class="first last line-block">
-<div class="line"><tt class="docutils literal"><span class="pre">server.max.action.retries</span></tt></div>
+<div class="line"><code class="docutils literal"><span class="pre">server.max.action.retries</span></code></div>
 </div>
 </td>
-<td><tt class="docutils literal"><span class="pre">3</span></tt></td>
+<td><code class="docutils literal"><span class="pre">3</span></code></td>
 <td>Maximum number of times a task gets retried when it fails</td>
 </tr>
 <tr class="row-even"><td><div class="first last line-block">
-<div class="line"><tt class="docutils literal"><span class="pre">server.max.cluster.size</span></tt></div>
+<div class="line"><code class="docutils literal"><span class="pre">server.max.cluster.size</span></code></div>
 </div>
 </td>
-<td><tt class="docutils literal"><span class="pre">10000</span></tt></td>
+<td><code class="docutils literal"><span class="pre">10000</span></code></td>
 <td>Maximum number of nodes that a given cluster can be created with</td>
 </tr>
 <tr class="row-odd"><td><div class="first last line-block">
-<div class="line"><tt class="docutils literal"><span class="pre">server.plugin.store.class</span></tt></div>
+<div class="line"><code class="docutils literal"><span class="pre">server.plugin.store.class</span></code></div>
 </div>
 </td>
 <td><div class="first last line-block">
-<div class="line"><tt class="docutils literal"><span class="pre">co.cask.coopr.</span></tt></div>
-<div class="line"><tt class="docutils literal"><span class="pre">store.provisioner.</span></tt></div>
-<div class="line"><tt class="docutils literal"><span class="pre">LocalFilePluginStore</span></tt></div>
+<div class="line"><code class="docutils literal"><span class="pre">co.cask.coopr.</span></code></div>
+<div class="line"><code class="docutils literal"><span class="pre">store.provisioner.</span></code></div>
+<div class="line"><code class="docutils literal"><span class="pre">LocalFilePluginStore</span></code></div>
 </div>
 </td>
 <td>Class to use to store plugin resources</td>
 </tr>
 <tr class="row-even"><td><div class="first last line-block">
-<div class="line"><tt class="docutils literal"><span class="pre">server.plugin.</span></tt></div>
-<div class="line"><tt class="docutils literal"><span class="pre">store.localfilestore.</span></tt></div>
-<div class="line"><tt class="docutils literal"><span class="pre">data.dir</span></tt></div>
+<div class="line"><code class="docutils literal"><span class="pre">server.plugin.</span></code></div>
+<div class="line"><code class="docutils literal"><span class="pre">store.localfilestore.</span></code></div>
+<div class="line"><code class="docutils literal"><span class="pre">data.dir</span></code></div>
 </div>
 </td>
 <td><div class="first last line-block">
-<div class="line"><tt class="docutils literal"><span class="pre">/var/coopr/data/</span></tt></div>
-<div class="line"><tt class="docutils literal"><span class="pre">plugins/resources</span></tt></div>
+<div class="line"><code class="docutils literal"><span class="pre">/var/coopr/data/</span></code></div>
+<div class="line"><code class="docutils literal"><span class="pre">plugins/resources</span></code></div>
 </div>
 </td>
 <td>Data directory to store plugin resources when using the local file plugin store</td>
 </tr>
-<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">server.port</span></tt></td>
-<td><tt class="docutils literal"><span class="pre">55054</span></tt></td>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">server.port</span></code></td>
+<td><code class="docutils literal"><span class="pre">55054</span></code></td>
 <td>Port for the server</td>
 </tr>
 <tr class="row-even"><td><div class="first last line-block">
-<div class="line"><tt class="docutils literal"><span class="pre">server.provisioner.</span></tt></div>
-<div class="line"><tt class="docutils literal"><span class="pre">request.max.retries</span></tt></div>
+<div class="line"><code class="docutils literal"><span class="pre">server.provisioner.</span></code></div>
+<div class="line"><code class="docutils literal"><span class="pre">request.max.retries</span></code></div>
 </div>
 </td>
-<td><tt class="docutils literal"><span class="pre">2</span></tt></td>
+<td><code class="docutils literal"><span class="pre">2</span></code></td>
 <td>Maximum number of times to retry a failed request to a provisioner before reassigning
 its workers and deleting it</td>
 </tr>
 <tr class="row-odd"><td><div class="first last line-block">
-<div class="line"><tt class="docutils literal"><span class="pre">server.provisioner.</span></tt></div>
-<div class="line"><tt class="docutils literal"><span class="pre">request.ms.between.retries</span></tt></div>
+<div class="line"><code class="docutils literal"><span class="pre">server.provisioner.</span></code></div>
+<div class="line"><code class="docutils literal"><span class="pre">request.ms.between.retries</span></code></div>
 </div>
 </td>
-<td><tt class="docutils literal"><span class="pre">500</span></tt></td>
+<td><code class="docutils literal"><span class="pre">500</span></code></td>
 <td>Milliseconds to wait before retrying a failed request to a provisioner</td>
 </tr>
 <tr class="row-even"><td><div class="first last line-block">
-<div class="line"><tt class="docutils literal"><span class="pre">server.provisioner.</span></tt></div>
-<div class="line"><tt class="docutils literal"><span class="pre">request.socket.timeout.ms</span></tt></div>
+<div class="line"><code class="docutils literal"><span class="pre">server.provisioner.</span></code></div>
+<div class="line"><code class="docutils literal"><span class="pre">request.socket.timeout.ms</span></code></div>
 </div>
 </td>
-<td><tt class="docutils literal"><span class="pre">10000</span></tt></td>
+<td><code class="docutils literal"><span class="pre">10000</span></code></td>
 <td>Socket timeout in milliseconds to use when making requests to provisioners</td>
 </tr>
 <tr class="row-odd"><td><div class="first last line-block">
-<div class="line"><tt class="docutils literal"><span class="pre">server.provisioner.</span></tt></div>
-<div class="line"><tt class="docutils literal"><span class="pre">timeout.check.interval.secs</span></tt></div>
+<div class="line"><code class="docutils literal"><span class="pre">server.provisioner.</span></code></div>
+<div class="line"><code class="docutils literal"><span class="pre">timeout.check.interval.secs</span></code></div>
 </div>
 </td>
-<td><tt class="docutils literal"><span class="pre">60</span></tt></td>
+<td><code class="docutils literal"><span class="pre">60</span></code></td>
 <td>Seconds between checks for timed out provisioners</td>
 </tr>
 <tr class="row-even"><td><div class="first last line-block">
-<div class="line"><tt class="docutils literal"><span class="pre">server.provisioner.</span></tt></div>
-<div class="line"><tt class="docutils literal"><span class="pre">timeout.secs</span></tt></div>
+<div class="line"><code class="docutils literal"><span class="pre">server.provisioner.</span></code></div>
+<div class="line"><code class="docutils literal"><span class="pre">timeout.secs</span></code></div>
 </div>
 </td>
-<td><tt class="docutils literal"><span class="pre">120</span></tt></td>
+<td><code class="docutils literal"><span class="pre">120</span></code></td>
 <td>Seconds to wait for a provisioner heartbeat before moving its workers and deleting it</td>
 </tr>
 <tr class="row-odd"><td><div class="first last line-block">
-<div class="line"><tt class="docutils literal"><span class="pre">server.scheduler.</span></tt></div>
-<div class="line"><tt class="docutils literal"><span class="pre">run.interval.seconds</span></tt></div>
+<div class="line"><code class="docutils literal"><span class="pre">server.scheduler.</span></code></div>
+<div class="line"><code class="docutils literal"><span class="pre">run.interval.seconds</span></code></div>
 </div>
 </td>
-<td><tt class="docutils literal"><span class="pre">1</span></tt></td>
+<td><code class="docutils literal"><span class="pre">1</span></code></td>
 <td>Interval, in seconds, various runs are scheduled on the server</td>
 </tr>
 <tr class="row-even"><td><div class="first last line-block">
-<div class="line"><tt class="docutils literal"><span class="pre">server.solver.num.threads</span></tt></div>
+<div class="line"><code class="docutils literal"><span class="pre">server.solver.num.threads</span></code></div>
 </div>
 </td>
-<td><tt class="docutils literal"><span class="pre">20</span></tt></td>
+<td><code class="docutils literal"><span class="pre">20</span></code></td>
 <td>Number of threads used for solving cluster layout</td>
 </tr>
-<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">server.ssl.enabled</span></tt></td>
-<td><tt class="docutils literal"><span class="pre">false</span></tt></td>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">server.ssl.enabled</span></code></td>
+<td><code class="docutils literal"><span class="pre">false</span></code></td>
 <td>Enable running server with SSL</td>
 </tr>
 <tr class="row-even"><td><div class="first last line-block">
-<div class="line"><tt class="docutils literal"><span class="pre">server.task.</span></tt></div>
-<div class="line"><tt class="docutils literal"><span class="pre">timeout.seconds</span></tt></div>
+<div class="line"><code class="docutils literal"><span class="pre">server.task.</span></code></div>
+<div class="line"><code class="docutils literal"><span class="pre">timeout.seconds</span></code></div>
 </div>
 </td>
-<td><tt class="docutils literal"><span class="pre">1800</span></tt></td>
+<td><code class="docutils literal"><span class="pre">1800</span></code></td>
 <td>Number of seconds the server will wait before timing out a provisioner task and marking it as failed</td>
 </tr>
 <tr class="row-odd"><td><div class="first last line-block">
-<div class="line"><tt class="docutils literal"><span class="pre">server.zookeeper.namespace</span></tt></div>
+<div class="line"><code class="docutils literal"><span class="pre">server.zookeeper.namespace</span></code></div>
 </div>
 </td>
-<td><tt class="docutils literal"><span class="pre">/coopr</span></tt></td>
+<td><code class="docutils literal"><span class="pre">/coopr</span></code></td>
 <td>Namespace to use in Zookeeper</td>
 </tr>
 <tr class="row-even"><td><div class="first last line-block">
-<div class="line"><tt class="docutils literal"><span class="pre">server.zookeeper.</span></tt></div>
-<div class="line"><tt class="docutils literal"><span class="pre">session.timeout.millis</span></tt></div>
+<div class="line"><code class="docutils literal"><span class="pre">server.zookeeper.</span></code></div>
+<div class="line"><code class="docutils literal"><span class="pre">session.timeout.millis</span></code></div>
 </div>
 </td>
-<td><tt class="docutils literal"><span class="pre">40000</span></tt></td>
+<td><code class="docutils literal"><span class="pre">40000</span></code></td>
 <td>Zookeeper session timeout value in milliseconds</td>
 </tr>
 <tr class="row-odd"><td><div class="first last line-block">
-<div class="line"><tt class="docutils literal"><span class="pre">server.zookeeper.quorum</span></tt></div>
+<div class="line"><code class="docutils literal"><span class="pre">server.zookeeper.quorum</span></code></div>
 </div>
 </td>
 <td>A local value determined by an in-memory Zookeeper</td>
@@ -780,7 +780,7 @@ its workers and deleting it</td>
     
     </th>
     <th class="tg-s6z2">
-        Copyright &copy; 2014-2015 Cask Data, Inc.
+        Copyright &copy; 2014-2016 Cask Data, Inc.
     
     </th>
     <th class="tg-0ord">&nbsp;&nbsp;Next Topic:

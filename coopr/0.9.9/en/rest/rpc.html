@@ -86,10 +86,10 @@ properties from a cluster, make a POST HTTP request to URI:</p>
 <div class="highlight-java"><div class="highlight"><pre><span class="o">/</span><span class="n">getNodeProperties</span>
 </pre></div>
 </div>
-<p>The POST body must contain the <tt class="docutils literal"><span class="pre">clusterId</span></tt>. Optionally it can include an array of
-<tt class="docutils literal"><span class="pre">properties</span></tt>, containing a list of properties to return. Properties include
-<tt class="docutils literal"><span class="pre">hostname</span></tt>, <tt class="docutils literal"><span class="pre">ipaddress</span></tt> as well as anything else the Provisioners place there.
-Optionally the POST body can also contain an array of <tt class="docutils literal"><span class="pre">services</span></tt>. Doing so will
+<p>The POST body must contain the <code class="docutils literal"><span class="pre">clusterId</span></code>. Optionally it can include an array of
+<code class="docutils literal"><span class="pre">properties</span></code>, containing a list of properties to return. Properties include
+<code class="docutils literal"><span class="pre">hostname</span></code>, <code class="docutils literal"><span class="pre">ipaddress</span></code> as well as anything else the Provisioners place there.
+Optionally the POST body can also contain an array of <code class="docutils literal"><span class="pre">services</span></code>. Doing so will
 restrict the result to only contain properties from nodes that have all services
 in the list. The response is a JSON Object mapping node id to its properties.</p>
 <div class="section" id="post-parameters">
@@ -136,7 +136,7 @@ or nonexistant entry will return all nodes.</td>
 <td>If update was successful</td>
 </tr>
 <tr class="row-odd"><td>400 (BAD REQUEST)</td>
-<td>If the request POST body is malformed or does not contain <tt class="docutils literal"><span class="pre">clusterId</span></tt>.</td>
+<td>If the request POST body is malformed or does not contain <code class="docutils literal"><span class="pre">clusterId</span></code>.</td>
 </tr>
 </tbody>
 </table>
@@ -255,7 +255,7 @@ or nonexistant entry will return all nodes.</td>
     
     </th>
     <th class="tg-s6z2">
-        Copyright &copy; 2014-2015 Cask Data, Inc.
+        Copyright &copy; 2014-2016 Cask Data, Inc.
     
     </th>
     <th class="tg-0ord">

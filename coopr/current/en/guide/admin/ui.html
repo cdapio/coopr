@@ -78,7 +78,7 @@
 <p>Each screen in the administration interface provides ways to create and edit settings for cluster provisioning.</p>
 <div class="section" id="login-as-an-administrator">
 <h2>Login as an Administrator<a class="headerlink" href="#login-as-an-administrator" title="Permalink to this headline">¶</a></h2>
-<p>The Admin UI can be accessed at <tt class="docutils literal"><span class="pre">http://&lt;coopr-host&gt;:&lt;coopr-ui-port&gt;/</span></tt>. Login using the admin credentials to access the administrator interface.</p>
+<p>The Admin UI can be accessed at <code class="docutils literal"><span class="pre">http://&lt;coopr-host&gt;:&lt;coopr-ui-port&gt;/</span></code>. Login using the admin credentials to access the administrator interface.</p>
 <div class="align-center figure">
 <a class="reference internal image-reference" href="../../_images/ui_login.png"><img alt="Admin login screen" src="../../_images/ui_login.png" style="width: 800px;" /></a>
 </div>
@@ -371,7 +371,7 @@ types of dependencies by going through example. In this example we have a servic
 </div>
 <div class="section" id="provides">
 <h4>Provides<a class="headerlink" href="#provides" title="Permalink to this headline">¶</a></h4>
-<p>The <tt class="docutils literal"><span class="pre">Provides</span></tt> field defines an extra level of indirection when specifying dependencies.
+<p>The <code class="docutils literal"><span class="pre">Provides</span></code> field defines an extra level of indirection when specifying dependencies.
 In this example, the &#8220;myapp-2.0&#8221; service provides the &#8220;myapp&#8221; service. This means that
 other services can put &#8220;myapp&#8221; in their runtime or install dependencies, and &#8220;myapp-2.0&#8221;
 will satisfy that dependency.</p>
@@ -383,21 +383,21 @@ and &#8220;mysql-server&#8221; services.</p>
 </div>
 <div class="section" id="conflicts">
 <h4>Conflicts<a class="headerlink" href="#conflicts" title="Permalink to this headline">¶</a></h4>
-<p>The <tt class="docutils literal"><span class="pre">Conflicts</span></tt> field specifies a list of services that cannot be placed on a cluster with the given service.
+<p>The <code class="docutils literal"><span class="pre">Conflicts</span></code> field specifies a list of services that cannot be placed on a cluster with the given service.
 In this example, that means that &#8220;myapp-2.0&#8221; cannot be placed on a cluster with &#8220;docker&#8221;.</p>
 </div>
 <div class="section" id="install-time">
 <h4>Install time<a class="headerlink" href="#install-time" title="Permalink to this headline">¶</a></h4>
 <p>Install dependencies are dependencies that take effect for the INSTALL and REMOVE service
-actions. The <tt class="docutils literal"><span class="pre">Install</span> <span class="pre">Requires</span></tt> field specifies a list of services that the given
+actions. The <code class="docutils literal"><span class="pre">Install</span> <span class="pre">Requires</span></code> field specifies a list of services that the given
 service requires for its installation.</p>
 <p>In this example, &#8220;myapp-2.0&#8221; <em>requires</em> the &#8220;base&#8221; service at install time. This means
 that the installation of the &#8220;base&#8221; service will occur before the install of the
 &#8220;myapp-2.0&#8221; service. Similarly, the removal of the &#8220;myapp-2.0&#8221; service will occur before
 the removal of the &#8220;base&#8221; service. This also means that the &#8220;myapp-2.0&#8221; service cannot be
 placed on a cluster without the &#8220;base&#8221; service also being placed on the cluster.</p>
-<p>The <tt class="docutils literal"><span class="pre">Install</span> <span class="pre">Uses</span></tt> key is like the <tt class="docutils literal"><span class="pre">Install</span> <span class="pre">Requires</span></tt> key in that it enforces the same
-ordering of service actions. However, <tt class="docutils literal"><span class="pre">Install</span> <span class="pre">Uses</span></tt> will not enforce the presence of
+<p>The <code class="docutils literal"><span class="pre">Install</span> <span class="pre">Uses</span></code> key is like the <code class="docutils literal"><span class="pre">Install</span> <span class="pre">Requires</span></code> key in that it enforces the same
+ordering of service actions. However, <code class="docutils literal"><span class="pre">Install</span> <span class="pre">Uses</span></code> will not enforce the presence of
 the dependent service. In this example, &#8220;myapp-2.0&#8221; <em>uses</em> the &#8220;nodejs&#8221; service at install
 time. This means that if the &#8220;ntp&#8221; service is also on the cluster, the installation of
 &#8220;nodejs&#8221; will occur before the installation of &#8220;myapp-2.0&#8221;. However, &#8220;nodejs&#8221; does not
@@ -416,7 +416,7 @@ also means the start of &#8220;myapp-2.0&#8221; will occur after the start of &#
 the stop of &#8220;myapp-2.0&#8221; will occur before the stop of &#8220;mysql-server&#8221;.</p>
 <p>Similarly, because &#8220;myapp-2.0&#8221; <em>uses</em> &#8220;node-modules&#8221;, initialization and start of
 &#8220;myapp-2.0&#8221; will occur after the start of &#8220;node-modules&#8221;. Similarly, the stop of
-&#8220;myapp-2.0&#8221; will occur before the stop of &#8220;node-modules&#8221;. Since it is in <tt class="docutils literal"><span class="pre">uses</span></tt>,
+&#8220;myapp-2.0&#8221; will occur before the stop of &#8220;node-modules&#8221;. Since it is in <code class="docutils literal"><span class="pre">uses</span></code>,
 enforcement of this ordering only applies if &#8220;node-modules&#8221; is present on the same cluster
 as &#8220;myapp-2.0&#8221;. The &#8220;myapp-2.0&#8221; service can be placed on a cluster without the
 &#8220;node-modules&#8221; service.</p>
@@ -603,7 +603,7 @@ page.</p>
     
     </th>
     <th class="tg-s6z2">
-        Copyright &copy; 2014-2015 Cask Data, Inc.
+        Copyright &copy; 2014-2016 Cask Data, Inc.
     
     </th>
     <th class="tg-0ord">&nbsp;&nbsp;Next Topic:

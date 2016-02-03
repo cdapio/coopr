@@ -171,7 +171,7 @@ requests. This allows for different providers to have different values.</p>
 <p>Currently, a plugin must be written in Ruby and extend from the Coopr base plugin classes.</p>
 <div class="section" id="writing-a-provider-plugin">
 <h3>Writing a Provider plugin<a class="headerlink" href="#writing-a-provider-plugin" title="Permalink to this headline">¶</a></h3>
-<p>A provider plugin must extend from the base <tt class="docutils literal"><span class="pre">Coopr::Plugin::Provider</span></tt> class and implement three methods: <tt class="docutils literal"><span class="pre">create</span></tt>, <tt class="docutils literal"><span class="pre">confirm</span></tt>, and <tt class="docutils literal"><span class="pre">delete</span></tt>. Each of these methods are called with a hash of key-value pairs. This hash is pre-populated with useful attributes such as <tt class="docutils literal"><span class="pre">hostname</span></tt> or <tt class="docutils literal"><span class="pre">providerid</span></tt>. The <tt class="docutils literal"><span class="pre">fields</span></tt> attribute will always be present and contains a hash of the custom fields that are defined by each plugin (more on this below). Note that your implementation can also refer to the <tt class="docutils literal"><span class="pre">&#64;task</span></tt> instance variable, which contains the entire
+<p>A provider plugin must extend from the base <code class="docutils literal"><span class="pre">Coopr::Plugin::Provider</span></code> class and implement three methods: <code class="docutils literal"><span class="pre">create</span></code>, <code class="docutils literal"><span class="pre">confirm</span></code>, and <code class="docutils literal"><span class="pre">delete</span></code>. Each of these methods are called with a hash of key-value pairs. This hash is pre-populated with useful attributes such as <code class="docutils literal"><span class="pre">hostname</span></code> or <code class="docutils literal"><span class="pre">providerid</span></code>. The <code class="docutils literal"><span class="pre">fields</span></code> attribute will always be present and contains a hash of the custom fields that are defined by each plugin (more on this below). Note that your implementation can also refer to the <code class="docutils literal"><span class="pre">&#64;task</span></code> instance variable, which contains the entire
 input for this task.</p>
 <p>Below is a skeleton for a provider plugin:</p>
 <div class="highlight-java"><div class="highlight"><pre>#!/usr/bin/env ruby
@@ -209,8 +209,8 @@ class MyProvider &lt; Coopr::Plugin::Provider
   end
 </pre></div>
 </div>
-<p>When the task is complete, your implementation should simply write the results back to the <tt class="docutils literal"><span class="pre">&#64;result</span></tt> instance variable.
-The only required return value is <tt class="docutils literal"><span class="pre">status</span></tt>, where <tt class="docutils literal"><span class="pre">'status':</span> <span class="pre">0</span></tt> represents success and any other value returned
+<p>When the task is complete, your implementation should simply write the results back to the <code class="docutils literal"><span class="pre">&#64;result</span></code> instance variable.
+The only required return value is <code class="docutils literal"><span class="pre">status</span></code>, where <code class="docutils literal"><span class="pre">'status':</span> <span class="pre">0</span></code> represents success and any other value returned
 represents failure. A raised exception will also result in failure.</p>
 <p>Additionally, your provider plugin will likely need to return information such as a machine&#8217;s ID, SSH credentials and
 public IP, so that it can be used in subsequent tasks. Special facilities exist for reporting the machine&#8217;s hostname and
@@ -223,11 +223,11 @@ IP addresses, populate the following fields:</p>
 }
 </pre></div>
 </div>
-<p>where <tt class="docutils literal"><span class="pre">access_v4</span></tt> is the machine&#8217;s publicly routable IP address and <tt class="docutils literal"><span class="pre">bind_v4</span></tt> is the machine&#8217;s private, internal
+<p>where <code class="docutils literal"><span class="pre">access_v4</span></code> is the machine&#8217;s publicly routable IP address and <code class="docutils literal"><span class="pre">bind_v4</span></code> is the machine&#8217;s private, internal
 interface. Adding these entries is optional.</p>
 <p>For any other arbitrary data which should be stored for use by subsequent tasks, simply write the results as key-value pairs following
-the line <tt class="docutils literal"><span class="pre">&#64;result['result']['key']</span> <span class="pre">=</span> <span class="pre">'value'</span></tt>. Subsequent tasks will then contain this information in <tt class="docutils literal"><span class="pre">config</span></tt>, for
-example <tt class="docutils literal"><span class="pre">&#64;task['config']['key']</span> <span class="pre">=</span> <span class="pre">'value'</span></tt>. By convention, most plugins should reuse the following fields:</p>
+the line <code class="docutils literal"><span class="pre">&#64;result['result']['key']</span> <span class="pre">=</span> <span class="pre">'value'</span></code>. Subsequent tasks will then contain this information in <code class="docutils literal"><span class="pre">config</span></code>, for
+example <code class="docutils literal"><span class="pre">&#64;task['config']['key']</span> <span class="pre">=</span> <span class="pre">'value'</span></code>. By convention, most plugins should reuse the following fields:</p>
 <div class="highlight-java"><div class="highlight"><pre>@result[&#39;result&#39;][&#39;providerid&#39;]
 @result[&#39;result&#39;][&#39;ssh-auth&#39;][&#39;user&#39;]
 @result[&#39;result&#39;][&#39;ssh-auth&#39;][&#39;password&#39;]
@@ -236,7 +236,7 @@ example <tt class="docutils literal"><span class="pre">&#64;task['config']['key'
 </div>
 <div class="section" id="writing-an-automator-plugin">
 <h3>Writing an Automator plugin<a class="headerlink" href="#writing-an-automator-plugin" title="Permalink to this headline">¶</a></h3>
-<p>An automator plugin must extend from the base <tt class="docutils literal"><span class="pre">Coopr::Plugin::Automator</span></tt> class and implement seven methods: <tt class="docutils literal"><span class="pre">bootstrap</span></tt>, <tt class="docutils literal"><span class="pre">install</span></tt>, <tt class="docutils literal"><span class="pre">configure</span></tt>, <tt class="docutils literal"><span class="pre">init</span></tt>, <tt class="docutils literal"><span class="pre">start</span></tt>, <tt class="docutils literal"><span class="pre">stop</span></tt>, and <tt class="docutils literal"><span class="pre">remove</span></tt>. Each of these methods are called with a hash of key-value pairs. This hash is pre-populated with useful attributes such as <tt class="docutils literal"><span class="pre">hostname</span></tt>, <tt class="docutils literal"><span class="pre">ipaddress</span></tt>, and a hash of SSH credentials. Additionally, the <tt class="docutils literal"><span class="pre">fields</span></tt> attribute will contain a hash of the custom fields that are defined by each plugin (more on this below). Note that your implementation can also refer to the <tt class="docutils literal"><span class="pre">&#64;task</span></tt> instance variable, which contains the entire input for this task.</p>
+<p>An automator plugin must extend from the base <code class="docutils literal"><span class="pre">Coopr::Plugin::Automator</span></code> class and implement seven methods: <code class="docutils literal"><span class="pre">bootstrap</span></code>, <code class="docutils literal"><span class="pre">install</span></code>, <code class="docutils literal"><span class="pre">configure</span></code>, <code class="docutils literal"><span class="pre">init</span></code>, <code class="docutils literal"><span class="pre">start</span></code>, <code class="docutils literal"><span class="pre">stop</span></code>, and <code class="docutils literal"><span class="pre">remove</span></code>. Each of these methods are called with a hash of key-value pairs. This hash is pre-populated with useful attributes such as <code class="docutils literal"><span class="pre">hostname</span></code>, <code class="docutils literal"><span class="pre">ipaddress</span></code>, and a hash of SSH credentials. Additionally, the <code class="docutils literal"><span class="pre">fields</span></code> attribute will contain a hash of the custom fields that are defined by each plugin (more on this below). Note that your implementation can also refer to the <code class="docutils literal"><span class="pre">&#64;task</span></code> instance variable, which contains the entire input for this task.</p>
 <p>Below is a skeleton for an automator plugin:</p>
 <div class="highlight-java"><div class="highlight"><pre>#!/usr/bin/env ruby
 
@@ -330,7 +330,7 @@ class MyAutomator &lt; Coopr::Plugin::Automator
 <span class="n">log</span><span class="o">.</span><span class="na">error</span> <span class="s">&quot;my error message&quot;</span>
 </pre></div>
 </div>
-<p>Additionally, each task can return strings representing <tt class="docutils literal"><span class="pre">stdout</span></tt> and <tt class="docutils literal"><span class="pre">stderr</span></tt> to be displayed on the Coopr UI. Simply return the values:</p>
+<p>Additionally, each task can return strings representing <code class="docutils literal"><span class="pre">stdout</span></code> and <code class="docutils literal"><span class="pre">stderr</span></code> to be displayed on the Coopr UI. Simply return the values:</p>
 <div class="highlight-java"><div class="highlight"><pre>@result[&#39;stdout&#39;] = &quot;my captured stdout message&quot;
 @result[&#39;stderr&#39;] = &quot;my captured stderr message&quot;
 </pre></div>
@@ -405,18 +405,18 @@ class MyAutomator &lt; Coopr::Plugin::Automator
 <dt>This JSON defines a single plugin which contains a single providertype named &#8220;rackspace&#8221;. The implementing ruby class for this &#8220;rackspace&#8221; providertype is &#8220;RackspaceProvider&#8221;. Additionally, it defines three custom fields which can be set by a Coopr administrator: &#8220;rackspace_username&#8221;, &#8220;rackspace_api_key&#8221;, and &#8220;rackspace_region&#8221;. In this example, they are defined within an &#8220;admin&#8221; block, which indicates these fields can be set only by a Coopr administrator. Alternatively, defining fields within a &#8220;user&#8221; block indicates a Coopr user can set them when creating a cluster. Each field has additional elements to specify behavior and describe how the field should be presented to the user on the Coopr UI:</dt>
 <dd><ul class="first last simple">
 <li>field name: will be used as the key in the hash sent to the provisioner plugin.</li>
-<li><tt class="docutils literal"><span class="pre">label</span></tt>: the user-friendly label presented in the Coopr UI.</li>
-<li><tt class="docutils literal"><span class="pre">type</span></tt>: any of the HTTP input field types such as <tt class="docutils literal"><span class="pre">text</span></tt> or <tt class="docutils literal"><span class="pre">password</span></tt>, or &#8220;select&#8221; for a drop-down menu.</li>
-<li><tt class="docutils literal"><span class="pre">tip</span></tt>: the text hint displayed as the value before the user enters anything</li>
-<li><tt class="docutils literal"><span class="pre">options</span></tt>: (specific to type &#8220;select&#8221;), the drop-down menu options</li>
-<li><tt class="docutils literal"><span class="pre">default</span></tt>: (specific to type &#8220;select&#8221;), the default option.</li>
-<li><tt class="docutils literal"><span class="pre">override</span></tt>: specifies whether or not a field defined in an admin block can be overridden by the user during cluster creation. default: false</li>
+<li><code class="docutils literal"><span class="pre">label</span></code>: the user-friendly label presented in the Coopr UI.</li>
+<li><code class="docutils literal"><span class="pre">type</span></code>: any of the HTTP input field types such as <code class="docutils literal"><span class="pre">text</span></code> or <code class="docutils literal"><span class="pre">password</span></code>, or &#8220;select&#8221; for a drop-down menu.</li>
+<li><code class="docutils literal"><span class="pre">tip</span></code>: the text hint displayed as the value before the user enters anything</li>
+<li><code class="docutils literal"><span class="pre">options</span></code>: (specific to type &#8220;select&#8221;), the drop-down menu options</li>
+<li><code class="docutils literal"><span class="pre">default</span></code>: (specific to type &#8220;select&#8221;), the default option.</li>
+<li><code class="docutils literal"><span class="pre">override</span></code>: specifies whether or not a field defined in an admin block can be overridden by the user during cluster creation. default: false</li>
 </ul>
 </dd>
 </dl>
-<p>Note that a single plugin may contain multiple providertypes and automatortypes. The top-level <tt class="docutils literal"><span class="pre">providertypes</span></tt> and <tt class="docutils literal"><span class="pre">automatortypes</span></tt> arrays
+<p>Note that a single plugin may contain multiple providertypes and automatortypes. The top-level <code class="docutils literal"><span class="pre">providertypes</span></code> and <code class="docutils literal"><span class="pre">automatortypes</span></code> arrays
 should list them all, with each having a corresponding JSON element where the classname and custom fields are defined. Coopr ships with several
-provider plugins bundled together into a single <tt class="docutils literal"><span class="pre">FogProvider</span></tt> plugin. Its definition looks like the following:</p>
+provider plugins bundled together into a single <code class="docutils literal"><span class="pre">FogProvider</span></code> plugin. Its definition looks like the following:</p>
 <div class="highlight-java"><div class="highlight"><pre><span class="o">{</span>
     <span class="s">&quot;name&quot;</span><span class="o">:</span> <span class="s">&quot;fog&quot;</span><span class="o">,</span>
     <span class="s">&quot;description&quot;</span><span class="o">:</span> <span class="s">&quot;Multi-cloud fog-based provider (AWS, Google, Openstack, Rackspace, Joyent)&quot;</span><span class="o">,</span>
@@ -475,7 +475,7 @@ provider plugins bundled together into a single <tt class="docutils literal"><sp
 </div>
 <div class="section" id="registering-your-plugin">
 <h3>Registering Your Plugin<a class="headerlink" href="#registering-your-plugin" title="Permalink to this headline">¶</a></h3>
-<p>The Coopr Server needs to be aware of the installed provisioner plugins and their collective list of providertypes and automatortypes. This can currently be done by starting a provisioner with the <tt class="docutils literal"><span class="pre">--register</span></tt> argument. For example:</p>
+<p>The Coopr Server needs to be aware of the installed provisioner plugins and their collective list of providertypes and automatortypes. This can currently be done by starting a provisioner with the <code class="docutils literal"><span class="pre">--register</span></code> argument. For example:</p>
 <div class="highlight-java"><div class="highlight"><pre><span class="n">$COOPR_HOME</span><span class="o">/</span><span class="n">provisioner</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">provisioner</span><span class="o">.</span><span class="na">sh</span> <span class="o">--</span><span class="n">register</span>
 </pre></div>
 </div>
@@ -527,12 +527,12 @@ means that if a cookbook named &#8216;my-service&#8217; is uploaded, it is expec
 <h3>Plugin Resource Storage<a class="headerlink" href="#plugin-resource-storage" title="Permalink to this headline">¶</a></h3>
 <p>By default, plugin resources uploaded to the Server are simply stored as local files. If you are running multiple servers for HA
 purposes, you will have to configure the servers to write to a distributed system such as NFS so that all servers have access
-to the resources. This can be achieved by configuring the <tt class="docutils literal"><span class="pre">server.plugin.store.localfilestore.data.dir</span></tt> setting in the server
-config. If you wish to use a different system for persistently storing the plugin resources, you can implement the <tt class="docutils literal"><span class="pre">PluginStore</span></tt>
-interface, add your jar to the lib directory for the server, and change the <tt class="docutils literal"><span class="pre">server.plugin.store.class</span></tt> setting to be the
+to the resources. This can be achieved by configuring the <code class="docutils literal"><span class="pre">server.plugin.store.localfilestore.data.dir</span></code> setting in the server
+config. If you wish to use a different system for persistently storing the plugin resources, you can implement the <code class="docutils literal"><span class="pre">PluginStore</span></code>
+interface, add your jar to the lib directory for the server, and change the <code class="docutils literal"><span class="pre">server.plugin.store.class</span></code> setting to be the
 fully qualified class name of your implementation. The interface provides methods for getting input and output streams for reading
 and writing plugin resources. This allows you to swap in any persistent storage implementation needed. You can see more details
-about the interface and default <tt class="docutils literal"><span class="pre">LocalFilePluginStore</span></tt> class by viewing the <a class="reference internal" href="../../javadocs/index.html"><em>javadocs</em></a></p>
+about the interface and default <code class="docutils literal"><span class="pre">LocalFilePluginStore</span></code> class by viewing the <a class="reference internal" href="../../javadocs/index.html"><em>javadocs</em></a></p>
 </div>
 </div>
 </div>
@@ -666,7 +666,7 @@ about the interface and default <tt class="docutils literal"><span class="pre">L
     
     </th>
     <th class="tg-s6z2">
-        Copyright &copy; 2014-2015 Cask Data, Inc.
+        Copyright &copy; 2014-2016 Cask Data, Inc.
     
     </th>
     <th class="tg-0ord">&nbsp;&nbsp;Next Topic:

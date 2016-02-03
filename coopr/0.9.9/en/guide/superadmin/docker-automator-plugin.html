@@ -118,10 +118,10 @@ and manage containers of these images.</p>
 </pre></div>
 </div>
 <p>This defines a service named &#8220;cdap-standalone&#8221; which has three defined actions, install, start, and stop.  When each
-action is invoked for this service, the <tt class="docutils literal"><span class="pre">type</span></tt> field indicates to the provisioner to use the Docker Automator plugin
-to manage the action.  The Docker Automator defines two custom fields: a required <tt class="docutils literal"><span class="pre">image_name</span></tt> and an optional
-<tt class="docutils literal"><span class="pre">publish_ports</span></tt>.  The <tt class="docutils literal"><span class="pre">image_name</span></tt> field is the image or repository to pull from Docker Hub.  Note that the image
-must be a public image, hosted on Docker Hub.  The <tt class="docutils literal"><span class="pre">publish_ports</span></tt> field is optional, and is a comma-separated list
+action is invoked for this service, the <code class="docutils literal"><span class="pre">type</span></code> field indicates to the provisioner to use the Docker Automator plugin
+to manage the action.  The Docker Automator defines two custom fields: a required <code class="docutils literal"><span class="pre">image_name</span></code> and an optional
+<code class="docutils literal"><span class="pre">publish_ports</span></code>.  The <code class="docutils literal"><span class="pre">image_name</span></code> field is the image or repository to pull from Docker Hub.  Note that the image
+must be a public image, hosted on Docker Hub.  The <code class="docutils literal"><span class="pre">publish_ports</span></code> field is optional, and is a comma-separated list
 of exposed container ports to publish on the Docker host.</p>
 <p>In this example, when the install action is invoked for this service, the Docker Automator will connect to the remote
 host(s), then effectively invoke the following command on them:</p>
@@ -130,7 +130,7 @@ host(s), then effectively invoke the following command on them:</p>
 </div>
 <p>When the start action is invoked for this service, the Docker Automator will connect to the remote host(s), then effectively
 invoke the following command on them:</p>
-<div class="highlight-java"><div class="highlight"><pre><span class="n">docker</span> <span class="n">run</span> <span class="o">-</span><span class="n">d</span> <span class="o">-</span><span class="nl">p9999:</span><span class="mi">9999</span> <span class="o">-</span><span class="nl">p10000:</span><span class="mi">10000</span> <span class="n">caskdata</span><span class="o">/</span><span class="n">cdap</span><span class="o">-</span><span class="n">standalone</span>
+<div class="highlight-java"><div class="highlight"><pre><span class="n">docker</span> <span class="n">run</span> <span class="o">-</span><span class="n">d</span> <span class="o">-</span><span class="n">p9999</span><span class="o">:</span><span class="mi">9999</span> <span class="o">-</span><span class="n">p10000</span><span class="o">:</span><span class="mi">10000</span> <span class="n">caskdata</span><span class="o">/</span><span class="n">cdap</span><span class="o">-</span><span class="n">standalone</span>
 </pre></div>
 </div>
 <p>Note that this example is a real service included with Coopr, which can be used to launch a container with the Cask Data Application
@@ -144,7 +144,7 @@ Platform (CDAP) SDK services running!</p>
 <li><dl class="first docutils">
 <dt>During the &#8220;bootstrap&#8221; action:</dt>
 <dd><ol class="first last loweralpha simple">
-<li>The plugin verifies that <tt class="docutils literal"><span class="pre">docker</span></tt> is available on the host(s)</li>
+<li>The plugin verifies that <code class="docutils literal"><span class="pre">docker</span></code> is available on the host(s)</li>
 </ol>
 </dd>
 </dl>
@@ -176,7 +176,7 @@ Platform (CDAP) SDK services running!</p>
 <p>Each Coopr Automator plugin is responsible for implementing a bootstrap method in which it performs any actions it needs
 to be able to carry out further tasks. The Docker Automator plugin performs the following actions for a bootstrap task:</p>
 <blockquote>
-<div>Verify that the <tt class="docutils literal"><span class="pre">docker</span></tt> command is installed and in the PATH</div></blockquote>
+<div>Verify that the <code class="docutils literal"><span class="pre">docker</span></code> command is installed and in the PATH</div></blockquote>
 </div>
 </div>
 
@@ -298,7 +298,7 @@ to be able to carry out further tasks. The Docker Automator plugin performs the 
     
     </th>
     <th class="tg-s6z2">
-        Copyright &copy; 2014-2015 Cask Data, Inc.
+        Copyright &copy; 2014-2016 Cask Data, Inc.
     
     </th>
     <th class="tg-0ord">&nbsp;&nbsp;Next Topic:

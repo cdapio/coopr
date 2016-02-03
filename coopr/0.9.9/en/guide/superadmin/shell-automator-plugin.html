@@ -101,14 +101,14 @@ remote host, and run remotely.  Coopr also provides some additional data and uti
 </pre></div>
 </div>
 <p>This defines a service named &#8220;cask-chef-bootstrap&#8221; which has one defined action for &#8220;install&#8221;.  When the
-install action is invoked for this service, the <tt class="docutils literal"><span class="pre">type</span></tt> field indicates to the provisioner to use the Shell Automator
-plugin to manage this action.  The Shell Automator defines two custom fields: a required <tt class="docutils literal"><span class="pre">script</span></tt> and optional
-<tt class="docutils literal"><span class="pre">args</span></tt>.  The <tt class="docutils literal"><span class="pre">script</span></tt> field can be a standard shell command, or a custom script.  Note that <tt class="docutils literal"><span class="pre">script</span></tt> can either
+install action is invoked for this service, the <code class="docutils literal"><span class="pre">type</span></code> field indicates to the provisioner to use the Shell Automator
+plugin to manage this action.  The Shell Automator defines two custom fields: a required <code class="docutils literal"><span class="pre">script</span></code> and optional
+<code class="docutils literal"><span class="pre">args</span></code>.  The <code class="docutils literal"><span class="pre">script</span></code> field can be a standard shell command, or a custom script.  Note that <code class="docutils literal"><span class="pre">script</span></code> can either
 be a full path to a known executable, or a relative path to a script bundled with the Shell Automator plugin (more on
-this below).  The <tt class="docutils literal"><span class="pre">args</span></tt> field is optional.  In this example, when the install action is invoked for this
+this below).  The <code class="docutils literal"><span class="pre">args</span></code> field is optional.  In this example, when the install action is invoked for this
 service, the Shell automator will first ensure this script is transferred to the remote host(s), then effectively
 invoke the following command on them:</p>
-<div class="highlight-java"><div class="highlight"><pre><span class="n">chef_client_bootstrap</span><span class="o">.</span><span class="na">sh</span> <span class="nl">https:</span><span class="c1">//mychefserver:443 &quot;role[base]&quot;</span>
+<div class="highlight-java"><div class="highlight"><pre><span class="n">chef_client_bootstrap</span><span class="o">.</span><span class="na">sh</span> <span class="n">https</span><span class="o">:</span><span class="c1">//mychefserver:443 &quot;role[base]&quot;</span>
 </pre></div>
 </div>
 <p>Note that this example is a real script included with the Shell Automator, which can be used to bootstrap a Coopr host to an existing Chef server!</p>
@@ -122,7 +122,7 @@ invoke the following command on them:</p>
 <dt>During the &#8220;bootstrap&#8221; action:</dt>
 <dd><ol class="first last loweralpha simple">
 <li>These scripts are bundled and scp&#8217;d to the remote host</li>
-<li>The scripts are extracted on the remote host, by default to <tt class="docutils literal"><span class="pre">/var/cache/coopr/scripts</span></tt></li>
+<li>The scripts are extracted on the remote host, by default to <code class="docutils literal"><span class="pre">/var/cache/coopr/scripts</span></code></li>
 </ol>
 </dd>
 </dl>
@@ -158,10 +158,10 @@ invoke the following command on them:</p>
 to be able to carry out further tasks. The Shell Automator plugin performs the following actions for a bootstrap task:</p>
 <blockquote>
 <div><ol class="arabic simple">
-<li>Bundle its local copy of the scripts directory into a tarball, <tt class="docutils literal"><span class="pre">scripts.tar.gz</span></tt>, unless the tarball exists already and was created in the last 10 minutes.</li>
-<li>Logs into the remote box and creates the Coopr cache diretory <tt class="docutils literal"><span class="pre">/var/cache/coopr</span></tt>.</li>
+<li>Bundle its local copy of the scripts directory into a tarball, <code class="docutils literal"><span class="pre">scripts.tar.gz</span></code>, unless the tarball exists already and was created in the last 10 minutes.</li>
+<li>Logs into the remote box and creates the Coopr cache diretory <code class="docutils literal"><span class="pre">/var/cache/coopr</span></code>.</li>
 <li>SCP the local tarball to the remote Coopr cache directory.</li>
-<li>Extracts the tarball on the remote host in the coopr cache directory, creating <tt class="docutils literal"><span class="pre">/var/cache/coopr/scripts</span></tt>.</li>
+<li>Extracts the tarball on the remote host in the coopr cache directory, creating <code class="docutils literal"><span class="pre">/var/cache/coopr/scripts</span></code>.</li>
 </ol>
 </div></blockquote>
 <p>The most important thing to note is that upon adding any new script to the resources collection, the tarball will be
@@ -172,8 +172,8 @@ regenerated within 10 minutes and used by all running provisioners.</p>
 <p>The Shell Automator has limited support for looking up values in the Coopr cluster metadata.  This should be considered
 an advanced feature and used with caution!  The current implementation uses json.sh: <a class="reference external" href="https://github.com/rcrowley/json.sh">https://github.com/rcrowley/json.sh</a>.</p>
 <p>For every invocation of a user&#8217;s defined script, the Shell Automator actually invokes a wrapper script which then
-sources the user&#8217;s script.  The wrapper script provides the <tt class="docutils literal"><span class="pre">coopr_lookup_key</span></tt> function.  This function takes a
-&#8216;/&#8217;-delimited key as an argument, for example <tt class="docutils literal"><span class="pre">config/automators</span></tt>.  It will look up the corresponding key in the
+sources the user&#8217;s script.  The wrapper script provides the <code class="docutils literal"><span class="pre">coopr_lookup_key</span></code> function.  This function takes a
+&#8216;/&#8217;-delimited key as an argument, for example <code class="docutils literal"><span class="pre">config/automators</span></code>.  It will look up the corresponding key in the
 task json, and return the value.  If the value is an array, it will return the values space-delimited.  Example usage:</p>
 <div class="highlight-java"><div class="highlight"><pre>task_id=`coopr_lookup_key taskId 2&gt;&amp;1`
 echo &quot;json root key \&quot;taskId\&quot; has value: $task_id&quot;
@@ -182,7 +182,7 @@ echo &quot;automators in use for this cluster:&quot;
 for i in $automators ; do echo $i ; done
 </pre></div>
 </div>
-<p>The wrapper script and implementation of coopr_lookup_key is in the <tt class="docutils literal"><span class="pre">scripts/.lib</span></tt> directory.  Those interested in
+<p>The wrapper script and implementation of coopr_lookup_key is in the <code class="docutils literal"><span class="pre">scripts/.lib</span></code> directory.  Those interested in
 this functionality should familiarize themselves with the code and be aware of the potential pitfalls (duplicate
 key names, etc).</p>
 </div>
@@ -344,7 +344,7 @@ definition with the following parameters:</p>
     
     </th>
     <th class="tg-s6z2">
-        Copyright &copy; 2014-2015 Cask Data, Inc.
+        Copyright &copy; 2014-2016 Cask Data, Inc.
     
     </th>
     <th class="tg-0ord">&nbsp;&nbsp;Next Topic:

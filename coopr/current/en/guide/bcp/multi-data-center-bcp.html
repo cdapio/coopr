@@ -81,7 +81,7 @@ for setting up Coopr for HA across multiple datacenters. Together with <a class=
 <p>A couple of things need to be considered when configuring Coopr to run across multiple datacenters for HA-</p>
 <ul class="simple">
 <li>As discussed in the previous section, all components of Coopr, except for database, either deal with local data or are stateless. The most important part of the HA setup is to share the data across datacenters in a consistent manner. HA configuration setup for multi-datacenter mostly depends on how the database is setup as discussed in the next sections.</li>
-<li>Since Coopr Servers across all datacenters run in Hot-Hot mode, we have to make sure that they do not conflict while creating cluster IDs. The ID space needs to be partitioned amongst the Coopr Servers. This can be done using <tt class="docutils literal"><span class="pre">server.ids.start.num</span></tt> and <tt class="docutils literal"><span class="pre">server.ids.increment.by</span></tt> server config parameters. For more information on the config parameters see <a class="reference internal" href="../../installation/server-config.html"><em>Server Configuration</em></a> section. Also note that Coopr Servers in a datacenter can share the same ID space.</li>
+<li>Since Coopr Servers across all datacenters run in Hot-Hot mode, we have to make sure that they do not conflict while creating cluster IDs. The ID space needs to be partitioned amongst the Coopr Servers. This can be done using <code class="docutils literal"><span class="pre">server.ids.start.num</span></code> and <code class="docutils literal"><span class="pre">server.ids.increment.by</span></code> server config parameters. For more information on the config parameters see <a class="reference internal" href="../../installation/server-config.html"><em>Server Configuration</em></a> section. Also note that Coopr Servers in a datacenter can share the same ID space.</li>
 </ul>
 <p>We discuss two possible multi-datacenter HA configurations for Coopr in the next sections.
 Note that the second option - HA with Custom Replication, is still work in progress.</p>
@@ -210,7 +210,7 @@ Note that the second option - HA with Custom Replication, is still work in progr
     
     </th>
     <th class="tg-s6z2">
-        Copyright &copy; 2014-2015 Cask Data, Inc.
+        Copyright &copy; 2014-2016 Cask Data, Inc.
     
     </th>
     <th class="tg-0ord">&nbsp;&nbsp;Next Topic:

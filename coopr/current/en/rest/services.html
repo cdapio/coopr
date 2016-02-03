@@ -96,11 +96,11 @@ For that service, the administrator would need to add 2 actions for the service,
 and choose which automator type will be used to carry out that action. Depending
 on the automator type, different fields may need to be provided. Required fields
 are defined by the automator type, which is given by the plugin itself.</p>
-<p>The provisioner section itself is a JSON object with <tt class="docutils literal"><span class="pre">actions</span></tt> as a key, and a
+<p>The provisioner section itself is a JSON object with <code class="docutils literal"><span class="pre">actions</span></code> as a key, and a
 JSON object as its value.  The value contains a mapping of service action
 (one of install, configure, initialize, start, stop, and remove) to
-automator details. The automator details is a JSON object containing a <tt class="docutils literal"><span class="pre">type</span></tt>,
-which defines which automator type to use for that action, and <tt class="docutils literal"><span class="pre">fields</span></tt>. Fields
+automator details. The automator details is a JSON object containing a <code class="docutils literal"><span class="pre">type</span></code>,
+which defines which automator type to use for that action, and <code class="docutils literal"><span class="pre">fields</span></code>. Fields
 contains another JSON object which is a set of key-value pairs required by the
 automator plugin.</p>
 <p>This example is taken from an example Hadoop namenode service. It uses chef-solo as the
@@ -166,26 +166,26 @@ types of dependencies by going through example. In this example we have a servic
 </div>
 <div class="section" id="conflicts">
 <h2>Conflicts<a class="headerlink" href="#conflicts" title="Permalink to this headline">¶</a></h2>
-<p>The <tt class="docutils literal"><span class="pre">conflicts</span></tt> key specifies an array of services that cannot be placed on a cluster with the given service.
+<p>The <code class="docutils literal"><span class="pre">conflicts</span></code> key specifies an array of services that cannot be placed on a cluster with the given service.
 In this example, that means that &#8220;myapp-2.0&#8221; cannot be placed on a cluster with &#8220;myapp-1.0&#8221; or &#8220;myapp-1.5&#8221;.</p>
 </div>
 <div class="section" id="install">
 <h2>Install<a class="headerlink" href="#install" title="Permalink to this headline">¶</a></h2>
 <p>Install defines install time dependencies. Install time dependencies take effect for the INSTALL and REMOVE
-service actions. It contains a <tt class="docutils literal"><span class="pre">requires</span></tt> key which specifies an array of services that the given services
+service actions. It contains a <code class="docutils literal"><span class="pre">requires</span></code> key which specifies an array of services that the given services
 requires for its installation. In this example, &#8220;myapp-2.0&#8221; <em>requires</em> the &#8220;base&#8221; service at install time. This
 means that the installation of the &#8220;base&#8221; service will occur before the install of the &#8220;myapp-2.0&#8221; service. Similarly,
 the removal of the &#8220;myapp-2.0&#8221; service will occur before the removal of the &#8220;base&#8221; service. This also means that
 the &#8220;myapp-2.0&#8221; service cannot be placed on a cluster without the &#8220;base&#8221; service also being placed on the cluster.
-The <tt class="docutils literal"><span class="pre">uses</span></tt> key is like the <tt class="docutils literal"><span class="pre">requires</span></tt> key in that it enforces the same ordering of service actions. However,
-<tt class="docutils literal"><span class="pre">uses</span></tt> will not enforce the presence of the dependent service. In this example, &#8220;myapp-2.0&#8221; <em>uses</em> the &#8220;ntp&#8221; service
+The <code class="docutils literal"><span class="pre">uses</span></code> key is like the <code class="docutils literal"><span class="pre">requires</span></code> key in that it enforces the same ordering of service actions. However,
+<code class="docutils literal"><span class="pre">uses</span></code> will not enforce the presence of the dependent service. In this example, &#8220;myapp-2.0&#8221; <em>uses</em> the &#8220;ntp&#8221; service
 at install time. This means that if the &#8220;ntp&#8221; service is also on the cluster, the installation of &#8220;ntp&#8221; will occur
 before the installation of &#8220;myapp-2.0&#8221;. However, &#8220;ntp&#8221; does not have to be placed on the cluster in order for &#8220;myapp-2.0&#8221;
 to be placed on the cluster.</p>
 </div>
 <div class="section" id="runtime">
 <h2>Runtime<a class="headerlink" href="#runtime" title="Permalink to this headline">¶</a></h2>
-<p>Runtime defines run time dependencies. It also contains <tt class="docutils literal"><span class="pre">requires</span></tt> and <tt class="docutils literal"><span class="pre">uses</span></tt> keys that are analagous to those
+<p>Runtime defines run time dependencies. It also contains <code class="docutils literal"><span class="pre">requires</span></code> and <code class="docutils literal"><span class="pre">uses</span></code> keys that are analagous to those
 in the install section. The only difference is the service actions that they apply to. Install dependencies affect
 the INSTALL and REMOVE service actions, whereas runtime dependencies affect the INITIALIZE, START, and STOP service actions.
 In this example, &#8220;myapp-2.0&#8221; <em>requires</em> the &#8220;sql-db&#8221; service. This means that &#8220;myapp-2.0&#8221; cannot be placed on a cluster
@@ -193,7 +193,7 @@ without a &#8220;sql-db&#8221; service. It also means that the initialization of
 It also means the start of &#8220;myapp-2.0&#8221; will occur after the start of &#8220;sql-db&#8221; and that the stop of &#8220;myapp-2.0&#8221;
 will occur before the stop of &#8220;sql-db&#8221;. Similarly, because &#8220;myapp-2.0&#8221; <em>uses</em> &#8220;load-balancer&#8221;, initialization and start of
 &#8220;myapp-2.0&#8221; will occur after the start of &#8220;load-balancer&#8221;. Similarly, the stop of &#8220;myapp-2.0&#8221; will occur before the stop
-of &#8220;load-balancer&#8221;. Since it is in <tt class="docutils literal"><span class="pre">uses</span></tt>, enforcement of this ordering only applies if &#8220;load-balancer&#8221; is present on the
+of &#8220;load-balancer&#8221;. Since it is in <code class="docutils literal"><span class="pre">uses</span></code>, enforcement of this ordering only applies if &#8220;load-balancer&#8221; is present on the
 same cluster as &#8220;myapp-2.0&#8221;. The &#8220;myapp-2.0&#8221; service can be placed on a cluster without the &#8220;load-balancer&#8221; service.</p>
 </div>
 <div class="section" id="provides">
@@ -210,10 +210,10 @@ services.</p>
 <div class="highlight-java"><div class="highlight"><pre><span class="o">/</span><span class="n">services</span>
 </pre></div>
 </div>
-<p>The POST body must contain a unique <tt class="docutils literal"><span class="pre">name</span></tt>, and a <tt class="docutils literal"><span class="pre">provisioner</span></tt> section
+<p>The POST body must contain a unique <code class="docutils literal"><span class="pre">name</span></code>, and a <code class="docutils literal"><span class="pre">provisioner</span></code> section
 describing how provisioner automators should carry out service actions.
-Optionally, a <tt class="docutils literal"><span class="pre">description</span></tt> can be given describing the service, and a
-<tt class="docutils literal"><span class="pre">dependencies</span></tt> section can be given, describing other services that the
+Optionally, a <code class="docutils literal"><span class="pre">description</span></code> can be given describing the service, and a
+<code class="docutils literal"><span class="pre">dependencies</span></code> section can be given, describing other services that the
 service depends on.</p>
 </div>
 </div>
@@ -645,7 +645,7 @@ It&#8217;s currently a map of map.</td>
     
     </th>
     <th class="tg-s6z2">
-        Copyright &copy; 2014-2015 Cask Data, Inc.
+        Copyright &copy; 2014-2016 Cask Data, Inc.
     
     </th>
     <th class="tg-0ord">

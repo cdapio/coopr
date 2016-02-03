@@ -125,15 +125,15 @@ nodes using the &#8220;apache2&#8221; community cookbook. We define a Coopr serv
 <span class="o">}</span>
 </pre></div>
 </div>
-<p>For each action, we define the <tt class="docutils literal"><span class="pre">type</span></tt>, and the custom fields <tt class="docutils literal"><span class="pre">run_list</span></tt> and <tt class="docutils literal"><span class="pre">json_attributes</span></tt>. (defaults to empty string if not specified). The <tt class="docutils literal"><span class="pre">type</span></tt>
-field indicates to the provisioner to use the Chef Solo Automator plugin to manage this action. The <tt class="docutils literal"><span class="pre">run_list</span></tt> field specifies
-the run-list to use. The <tt class="docutils literal"><span class="pre">json_attributes</span></tt> field is any additional JSON data we wish to include in the Chef run (more on this
+<p>For each action, we define the <code class="docutils literal"><span class="pre">type</span></code>, and the custom fields <code class="docutils literal"><span class="pre">run_list</span></code> and <code class="docutils literal"><span class="pre">json_attributes</span></code>. (defaults to empty string if not specified). The <code class="docutils literal"><span class="pre">type</span></code>
+field indicates to the provisioner to use the Chef Solo Automator plugin to manage this action. The <code class="docutils literal"><span class="pre">run_list</span></code> field specifies
+the run-list to use. The <code class="docutils literal"><span class="pre">json_attributes</span></code> field is any additional JSON data we wish to include in the Chef run (more on this
 later). When the Chef Solo Automator plugin executes any of these actions for the apache-httpd service, it performs
 the following actions:</p>
 <blockquote>
 <div><ol class="arabic simple">
 <li>generate a task-specific JSON file containing any attributes defined in the json_attributes field, as well as base cluster attributes defined elsewhere in Coopr.</li>
-<li>invoke chef-solo using the <tt class="docutils literal"><span class="pre">run_list</span></tt> field as the run-list as follows:  <tt class="docutils literal"><span class="pre">chef-solo</span> <span class="pre">-o</span> <span class="pre">[run_list]</span> <span class="pre">-j</span> <span class="pre">[task-specific</span> <span class="pre">json]</span></tt></li>
+<li>invoke chef-solo using the <code class="docutils literal"><span class="pre">run_list</span></code> field as the run-list as follows:  <code class="docutils literal"><span class="pre">chef-solo</span> <span class="pre">-o</span> <span class="pre">[run_list]</span> <span class="pre">-j</span> <span class="pre">[task-specific</span> <span class="pre">json]</span></code></li>
 </ol>
 </div></blockquote>
 <p>In this example, to execute an &#8220;install&#8221; task for the apache-httpd service, the provisioner will simply run the default
@@ -144,9 +144,9 @@ cookbook, the installation and configuration are done in the same recipe, which 
 one may wonder why we need both &#8216;install&#8217; and &#8216;configure&#8217; when they perform identical actions. It is best practice to
 keep them both, since configure may be run many times throughout the lifecycle of the cluster, and install is needed
 to satisfy dependencies.</p>
-<p>The &#8220;start&#8221; and &#8220;stop&#8221; tasks introduce a couple of features. They make use of the <tt class="docutils literal"><span class="pre">json_attributes</span></tt> field to specify custom JSON
-attributes. Note that the format is an escaped JSON string. The <tt class="docutils literal"><span class="pre">run_list</span></tt> field also contains an additional recipe,
-<tt class="docutils literal"><span class="pre">coopr_service_manager::default</span></tt>. More on this later, but essentially this is a helper cookbook that can operate on
+<p>The &#8220;start&#8221; and &#8220;stop&#8221; tasks introduce a couple of features. They make use of the <code class="docutils literal"><span class="pre">json_attributes</span></code> field to specify custom JSON
+attributes. Note that the format is an escaped JSON string. The <code class="docutils literal"><span class="pre">run_list</span></code> field also contains an additional recipe,
+<code class="docutils literal"><span class="pre">coopr_service_manager::default</span></code>. More on this later, but essentially this is a helper cookbook that can operate on
 any Chef service resource. It looks for any service names listed in node[&#8216;coopr&#8217;][&#8216;node&#8217;][&#8216;services&#8217;], finds the
 corresponding Chef service resource, and invokes the specified action.</p>
 </div>
@@ -162,10 +162,10 @@ corresponding Chef service resource, and invokes the specified action.</p>
 </dd>
 </dl>
 <p>The Chef Solo Automator plugin automatically merges this data into a single JSON file, which is then passed to chef-solo via
-the <tt class="docutils literal"><span class="pre">--json-attributes</span> <span class="pre">argument</span></tt>. Any custom cookbooks that want to make use of this Coopr data need to be familiar
+the <code class="docutils literal"><span class="pre">--json-attributes</span> <span class="pre">argument</span></code>. Any custom cookbooks that want to make use of this Coopr data need to be familiar
 with the JSON layout of the Coopr data. In brief, cluster-wide configuration defined in cluster templates and
 service-level action data are deep-merged together, with service-level action data taking precedence. This data is
-preserved at the top level, and also merged in under <tt class="docutils literal"><span class="pre">coopr/*</span></tt>. For example:</p>
+preserved at the top level, and also merged in under <code class="docutils literal"><span class="pre">coopr/*</span></code>. For example:</p>
 <div class="highlight-java"><div class="highlight"><pre><span class="o">{</span>
     <span class="c1">// cluster config attributes defined in clustertemplates are preserved here at top-level</span>
     <span class="c1">// service-level action data string converted to json and deep-merged here at top-level</span>
@@ -187,8 +187,8 @@ preserved at the top level, and also merged in under <tt class="docutils literal
 <dl class="docutils">
 <dt>Consider the following rules of thumb:</dt>
 <dd><ul class="first last simple">
-<li>When using community cookbooks, attributes can be specified in Coopr templates exactly as the cookbook expects (at the top level). If separate services require the same recipe with different attributes, these attributes can be specified in the service <tt class="docutils literal"><span class="pre">json_attributes</span></tt> field</li>
-<li>When writing cookbooks specifically utilizing Coopr metadata (cluster node data for example), recipes can access the metadata at <tt class="docutils literal"><span class="pre">node['coopr']['cluster']...</span></tt></li>
+<li>When using community cookbooks, attributes can be specified in Coopr templates exactly as the cookbook expects (at the top level). If separate services require the same recipe with different attributes, these attributes can be specified in the service <code class="docutils literal"><span class="pre">json_attributes</span></code> field</li>
+<li>When writing cookbooks specifically utilizing Coopr metadata (cluster node data for example), recipes can access the metadata at <code class="docutils literal"><span class="pre">node['coopr']['cluster']...</span></code></li>
 </ul>
 </dd>
 </dl>
@@ -199,7 +199,7 @@ preserved at the top level, and also merged in under <tt class="docutils literal
 <dt>Each Coopr Automator plugin is responsible for implementing a bootstrap method in which it performs any action it needs to be able to carry out further tasks. The Chef Solo Automator plugin performs the following actions for a bootstrap task:</dt>
 <dd><ol class="first last arabic">
 <li><dl class="first docutils">
-<dt>Bundle its local copy of the cookbooks/roles/data_bags directories into three tarballs, <tt class="docutils literal"><span class="pre">cookbooks.tar.gz</span></tt>, <tt class="docutils literal"><span class="pre">roles.tar.gz</span></tt>, <tt class="docutils literal"><span class="pre">data_bags.tar.gz</span></tt></dt>
+<dt>Bundle its local copy of the cookbooks/roles/data_bags directories into three tarballs, <code class="docutils literal"><span class="pre">cookbooks.tar.gz</span></code>, <code class="docutils literal"><span class="pre">roles.tar.gz</span></code>, <code class="docutils literal"><span class="pre">data_bags.tar.gz</span></code></dt>
 <dd><ul class="first last simple">
 <li>This only happens if prior versions of the tarballs were not created in the past 10 minutes</li>
 </ul>
@@ -209,18 +209,18 @@ preserved at the top level, and also merged in under <tt class="docutils literal
 <li><dl class="first docutils">
 <dt>Logs into the remote box and installs chef in one of three ways in this order:</dt>
 <dd><ol class="first last loweralpha simple">
-<li>via <tt class="docutils literal"><span class="pre">yum</span> <span class="pre">install</span></tt> to leverage any internal yum repositories preconfigured on the remote host</li>
-<li>via <tt class="docutils literal"><span class="pre">apt-get</span> <span class="pre">install</span></tt> to leverage any internal apt repositories preconfigured on the remote host</li>
-<li>via the Opscode Omnibus installer (<tt class="docutils literal"><span class="pre">curl</span> <span class="pre">-L</span> <span class="pre">https://www.opscode.com/chef/install.sh</span> <span class="pre">|</span> <span class="pre">bash</span></tt>). This requires internet access on the remote host</li>
+<li>via <code class="docutils literal"><span class="pre">yum</span> <span class="pre">install</span></code> to leverage any internal yum repositories preconfigured on the remote host</li>
+<li>via <code class="docutils literal"><span class="pre">apt-get</span> <span class="pre">install</span></code> to leverage any internal apt repositories preconfigured on the remote host</li>
+<li>via the Opscode Omnibus installer (<code class="docutils literal"><span class="pre">curl</span> <span class="pre">-L</span> <span class="pre">https://www.opscode.com/chef/install.sh</span> <span class="pre">|</span> <span class="pre">bash</span></code>). This requires internet access on the remote host</li>
 </ol>
 </dd>
 </dl>
 </li>
-<li><p class="first">Creates the remote coopr cache directory <tt class="docutils literal"><span class="pre">/var/cache/coopr</span></tt></p>
+<li><p class="first">Creates the remote coopr cache directory <code class="docutils literal"><span class="pre">/var/cache/coopr</span></code></p>
 </li>
 <li><p class="first">SCPs the local tarballs to the remote Coopr cache directory</p>
 </li>
-<li><p class="first">Extracts the tarballs on the remote host to the default chef directory <tt class="docutils literal"><span class="pre">/var/chef</span></tt></p>
+<li><p class="first">Extracts the tarballs on the remote host to the default chef directory <code class="docutils literal"><span class="pre">/var/chef</span></code></p>
 </li>
 </ol>
 </dd>
@@ -287,21 +287,21 @@ definition with the following parameters:</p>
 <p>Coopr ships with several helper cookbooks. These are provided as convenience and are completely optional. This section provides a brief overview of each.</p>
 <div class="section" id="coopr-base">
 <h3><strong>coopr_base</strong><a class="headerlink" href="#coopr-base" title="Permalink to this headline">¶</a></h3>
-<p>This is a convenience cookbook which is intended to provide base functionality for all hosts provisioned by Coopr. The default <tt class="docutils literal"><span class="pre">base</span></tt> service definition runs
-the <tt class="docutils literal"><span class="pre">coopr_base::default</span></tt> recipe, which may include additional helper cookbooks. It currently does the following:</p>
+<p>This is a convenience cookbook which is intended to provide base functionality for all hosts provisioned by Coopr. The default <code class="docutils literal"><span class="pre">base</span></code> service definition runs
+the <code class="docutils literal"><span class="pre">coopr_base::default</span></code> recipe, which may include additional helper cookbooks. It currently does the following:</p>
 <blockquote>
 <div><ul class="simple">
-<li>run <tt class="docutils literal"><span class="pre">apt-get</span> <span class="pre">update</span></tt> (on Ubuntu hosts)</li>
-<li>optionally configure the Yum <tt class="docutils literal"><span class="pre">epel</span></tt> repository (on Rhel hosts)</li>
-<li>optionally include <tt class="docutils literal"><span class="pre">coopr_dns::default</span></tt> (discussed below)</li>
-<li>optionally include <tt class="docutils literal"><span class="pre">coopr_firewall::default</span></tt> (discussed below)</li>
-<li>optionally include <tt class="docutils literal"><span class="pre">coopr_hosts::default</span></tt> (discussed below)</li>
-<li>optionally include <tt class="docutils literal"><span class="pre">coopr_packages::default</span></tt> (discussed below)</li>
-<li>include <tt class="docutils literal"><span class="pre">ulimit::default</span></tt> to enable user-defined ulimits</li>
-<li>optionally runs the <tt class="docutils literal"><span class="pre">users</span></tt> and <tt class="docutils literal"><span class="pre">sudo</span></tt> cookbooks to add any users if a <tt class="docutils literal"><span class="pre">users</span></tt> data_bag resource is present</li>
+<li>run <code class="docutils literal"><span class="pre">apt-get</span> <span class="pre">update</span></code> (on Ubuntu hosts)</li>
+<li>optionally configure the Yum <code class="docutils literal"><span class="pre">epel</span></code> repository (on Rhel hosts)</li>
+<li>optionally include <code class="docutils literal"><span class="pre">coopr_dns::default</span></code> (discussed below)</li>
+<li>optionally include <code class="docutils literal"><span class="pre">coopr_firewall::default</span></code> (discussed below)</li>
+<li>optionally include <code class="docutils literal"><span class="pre">coopr_hosts::default</span></code> (discussed below)</li>
+<li>optionally include <code class="docutils literal"><span class="pre">coopr_packages::default</span></code> (discussed below)</li>
+<li>include <code class="docutils literal"><span class="pre">ulimit::default</span></code> to enable user-defined ulimits</li>
+<li>optionally runs the <code class="docutils literal"><span class="pre">users</span></code> and <code class="docutils literal"><span class="pre">sudo</span></code> cookbooks to add any users if a <code class="docutils literal"><span class="pre">users</span></code> data_bag resource is present</li>
 </ul>
 </div></blockquote>
-<p>To disable the configuring of the Yum <tt class="docutils literal"><span class="pre">epel</span></tt> repository on Rhel hosts, set the <tt class="docutils literal"><span class="pre">node['base']['use_epel']</span></tt> attribute to <tt class="docutils literal"><span class="pre">false</span></tt>.</p>
+<p>To disable the configuring of the Yum <code class="docutils literal"><span class="pre">epel</span></code> repository on Rhel hosts, set the <code class="docutils literal"><span class="pre">node['base']['use_epel']</span></code> attribute to <code class="docutils literal"><span class="pre">false</span></code>.</p>
 <p>To disable the inclusion of the remaining helper cookbooks, set the following attributes. Note, though, that these cookbooks are designed to not take action unless
 specific attributes are added to your Coopr templates:</p>
 <div class="highlight-java"><div class="highlight"><pre>node[&#39;base&#39;][&#39;no_dns&#39;] = &#39;true&#39;
@@ -311,13 +311,13 @@ node[&#39;base&#39;][&#39;no_packages&#39;] = &#39;true&#39;
 </pre></div>
 </div>
 <p class="rubric">User Management</p>
-<p>The <tt class="docutils literal"><span class="pre">coopr_base</span></tt> cookbook provides a simple method for user management, utilizing the Chef community <a class="reference external" href="https://supermarket.chef.io/cookbooks/users">users</a> and
-<a class="reference external" href="https://supermarket.chef.io/cookbooks/sudo">sudo</a> cookbooks.  To take advantage of this, simply upload a data_bag resource named <tt class="docutils literal"><span class="pre">users</span></tt> to the Coopr
+<p>The <code class="docutils literal"><span class="pre">coopr_base</span></code> cookbook provides a simple method for user management, utilizing the Chef community <a class="reference external" href="https://supermarket.chef.io/cookbooks/users">users</a> and
+<a class="reference external" href="https://supermarket.chef.io/cookbooks/sudo">sudo</a> cookbooks.  To take advantage of this, simply upload a data_bag resource named <code class="docutils literal"><span class="pre">users</span></code> to the Coopr
 Server.  As with cookbooks, you can use the data-uploader utility to do this, for example:</p>
 <pre class="literal-block">
 /opt/coopr/provisioner/embedded/bin/ruby /opt/coopr/provisioner/bin/data-uploader.rb -u http://localhost:55054 -t superadmin -U admin sync ./my/local/data_bags/users automatortypes/chef-solo/data_bags/users
 </pre>
-<p>where <tt class="docutils literal"><span class="pre">./my/local/data_bags/users</span></tt> is the data_bag to be used by the <tt class="docutils literal"><span class="pre">users</span></tt> cookbook. It should be a directory containing data_bag_items (JSON files) of the form:</p>
+<p>where <code class="docutils literal"><span class="pre">./my/local/data_bags/users</span></code> is the data_bag to be used by the <code class="docutils literal"><span class="pre">users</span></code> cookbook. It should be a directory containing data_bag_items (JSON files) of the form:</p>
 <div class="highlight-java"><div class="highlight"><pre><span class="o">{</span>
     <span class="s">&quot;id&quot;</span><span class="o">:</span> <span class="s">&quot;bob&quot;</span><span class="o">,</span>
     <span class="s">&quot;Full Name&quot;</span><span class="o">:</span> <span class="s">&quot;Bob User&quot;</span><span class="o">,</span>
@@ -327,12 +327,12 @@ Server.  As with cookbooks, you can use the data-uploader utility to do this, fo
 <span class="o">}</span>
 </pre></div>
 </div>
-<p>If no <tt class="docutils literal"><span class="pre">users</span></tt> data_bag resource is present, no action is taken.  To explicitly disable this functionality, simply set the <tt class="docutils literal"><span class="pre">node['base']['no_users']</span></tt> attribute to <tt class="docutils literal"><span class="pre">true</span></tt></p>
+<p>If no <code class="docutils literal"><span class="pre">users</span></code> data_bag resource is present, no action is taken.  To explicitly disable this functionality, simply set the <code class="docutils literal"><span class="pre">node['base']['no_users']</span></code> attribute to <code class="docutils literal"><span class="pre">true</span></code></p>
 </div>
 <div class="section" id="coopr-dns">
 <h3><strong>coopr_dns</strong><a class="headerlink" href="#coopr-dns" title="Permalink to this headline">¶</a></h3>
 <p>This cookbook provides a hook to run any user-specific DNS cookbooks.  Currently, the DNSimple provider is included as a reference. To use, set the following
-attributes in the included <tt class="docutils literal"><span class="pre">base</span></tt> service&#8217;s <tt class="docutils literal"><span class="pre">install</span></tt> action JSON attributes field:</p>
+attributes in the included <code class="docutils literal"><span class="pre">base</span></code> service&#8217;s <code class="docutils literal"><span class="pre">install</span></code> action JSON attributes field:</p>
 <div class="highlight-java"><div class="highlight"><pre><span class="o">{</span>
     <span class="s">&quot;coopr_dns&quot;</span><span class="o">:</span> <span class="o">{</span>
         <span class="s">&quot;provider&quot;</span><span class="o">:</span> <span class="s">&quot;dnsimple&quot;</span><span class="o">,</span>
@@ -344,21 +344,21 @@ attributes in the included <tt class="docutils literal"><span class="pre">base</
 <span class="o">}</span>
 </pre></div>
 </div>
-<p>The <tt class="docutils literal"><span class="pre">provider</span></tt> attribute is simply the name of a recipe that must be implemented.  The <tt class="docutils literal"><span class="pre">subdomain_whitelist</span></tt> is an optional safety mechanism to only allow
-DNS records to be created for certain domains.  In this example, as part of the <tt class="docutils literal"><span class="pre">base</span></tt> service the <tt class="docutils literal"><span class="pre">coopr_dns::dnsimple</span></tt> recipe will be run, which includes
+<p>The <code class="docutils literal"><span class="pre">provider</span></code> attribute is simply the name of a recipe that must be implemented.  The <code class="docutils literal"><span class="pre">subdomain_whitelist</span></code> is an optional safety mechanism to only allow
+DNS records to be created for certain domains.  In this example, as part of the <code class="docutils literal"><span class="pre">base</span></code> service the <code class="docutils literal"><span class="pre">coopr_dns::dnsimple</span></code> recipe will be run, which includes
 DNSimple&#8217;s cookbook and its LWRPs to create &#8220;A&#8221; records for each cluster host.</p>
 </div>
 <div class="section" id="coopr-hosts">
 <h3><strong>coopr_hosts</strong><a class="headerlink" href="#coopr-hosts" title="Permalink to this headline">¶</a></h3>
-<p>This simple cookbook&#8217;s only purpose is to populate <tt class="docutils literal"><span class="pre">/etc/hosts</span></tt> with the hostnames and IP addresses of the cluster.
-It achieves this by accessing the <tt class="docutils literal"><span class="pre">coopr-populated</span></tt> attributes at <tt class="docutils literal"><span class="pre">node['coopr']['cluster']['nodes']</span></tt> to get a list of
+<p>This simple cookbook&#8217;s only purpose is to populate <code class="docutils literal"><span class="pre">/etc/hosts</span></code> with the hostnames and IP addresses of the cluster.
+It achieves this by accessing the <code class="docutils literal"><span class="pre">coopr-populated</span></code> attributes at <code class="docutils literal"><span class="pre">node['coopr']['cluster']['nodes']</span></code> to get a list of
 all the nodes in the cluster. It then simply utilizes the community &#8220;hostsfile&#8221; cookbook&#8217;s LWRP to write entries for
 each node.</p>
 <p>The example coopr service definition invoking this cookbook is called &#8220;base&#8221;. It simply sets up a &#8220;configure&#8221; service
-action of type &#8220;chef-solo&#8221; and run_list <tt class="docutils literal"><span class="pre">recipe[coopr_base::default]</span></tt> (which includes <tt class="docutils literal"><span class="pre">recipe[coopr_hosts::default]</span></tt>).
+action of type &#8220;chef-solo&#8221; and run_list <code class="docutils literal"><span class="pre">recipe[coopr_base::default]</span></code> (which includes <code class="docutils literal"><span class="pre">recipe[coopr_hosts::default]</span></code>).
 Note that the community &#8220;hostsfile&#8221; cookbook is not needed in the run-list since it is declared in coopr_hosts&#8217;s metadata.</p>
-<p>By default, it will create an <tt class="docutils literal"><span class="pre">/etc/hosts</span></tt> entry for each node of the cluster, using its private <tt class="docutils literal"><span class="pre">bind_v4</span></tt> IP.  It is possible to modify this behavior
-using the <tt class="docutils literal"><span class="pre">node['coopr_hosts']['address_types']</span></tt> attribute array. See <a class="reference internal" href="../admin/macros.html"><em>Macros</em></a> for more information on the available address types.</p>
+<p>By default, it will create an <code class="docutils literal"><span class="pre">/etc/hosts</span></code> entry for each node of the cluster, using its private <code class="docutils literal"><span class="pre">bind_v4</span></code> IP.  It is possible to modify this behavior
+using the <code class="docutils literal"><span class="pre">node['coopr_hosts']['address_types']</span></code> attribute array. See <a class="reference internal" href="../admin/macros.html"><em>Macros</em></a> for more information on the available address types.</p>
 </div>
 <div class="section" id="coopr-service-manager">
 <h3><strong>coopr_service_manager</strong><a class="headerlink" href="#coopr-service-manager" title="Permalink to this headline">¶</a></h3>
@@ -388,7 +388,7 @@ node[&#39;coopr_firewall&#39;][&#39;open_udp_ports&#39;] = [ array ]
 </div>
 <div class="section" id="coopr-packages">
 <h3><strong>coopr_packages</strong><a class="headerlink" href="#coopr-packages" title="Permalink to this headline">¶</a></h3>
-<p>This cookbook provides a convenient way to install, upgrade, or remove any number of Yum or Apt packages as part of your <tt class="docutils literal"><span class="pre">base</span></tt> service.  Simply populate
+<p>This cookbook provides a convenient way to install, upgrade, or remove any number of Yum or Apt packages as part of your <code class="docutils literal"><span class="pre">base</span></code> service.  Simply populate
 any of the following (default) attributes:</p>
 <div class="highlight-java"><div class="highlight"><pre>node[&#39;coopr_packages&#39;][&#39;debian&#39;][&#39;install&#39;] = []
 node[&#39;coopr_packages&#39;][&#39;debian&#39;][&#39;upgrade&#39;] = []
@@ -541,7 +541,7 @@ node[&#39;coopr_packages&#39;][&#39;rhel&#39;][&#39;remove&#39;] = [&#39;yum-cro
     
     </th>
     <th class="tg-s6z2">
-        Copyright &copy; 2014-2015 Cask Data, Inc.
+        Copyright &copy; 2014-2016 Cask Data, Inc.
     
     </th>
     <th class="tg-0ord">&nbsp;&nbsp;Next Topic:

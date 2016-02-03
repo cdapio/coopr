@@ -86,7 +86,7 @@ parsing script and integrating with Nagios are relatively easy.</p>
 <div class="section" id="coopr-server">
 <h3>Coopr Server<a class="headerlink" href="#coopr-server" title="Permalink to this headline">¶</a></h3>
 <p>The Coopr Server runs as a Java process. Similar to the UI, we recommend a standard http monitoring check on the
-<tt class="docutils literal"><span class="pre">/status</span></tt> endpoint</p>
+<code class="docutils literal"><span class="pre">/status</span></code> endpoint</p>
 <div class="highlight-java"><div class="highlight"><pre><span class="nl">http:</span><span class="c1">//&lt;coopr-host&gt;:&lt;coopr-server-port&gt;/status</span>
 </pre></div>
 </div>
@@ -128,7 +128,7 @@ Alternatively, any standard process presence monitoring can check for the proces
 <p>Coopr provides a number of cluster provisioning metrics through the use of
 <a class="reference external" href="http://docs.oracle.com/javase/7/docs/technotes/guides/jmx/">Java Management Extensions (JMX)</a>.</p>
 <p>By default, JMX support is disabled. To enable JMX, the administrator will need to uncomment out the following line in
-<tt class="docutils literal"><span class="pre">/etc/default/coopr-server</span></tt> and can customize any of the options:</p>
+<code class="docutils literal"><span class="pre">/etc/default/coopr-server</span></code> and can customize any of the options:</p>
 <div class="highlight-java"><div class="highlight"><pre><span class="n">export</span> <span class="n">COOPR_JAVA_OPTS</span><span class="o">=</span><span class="s">&quot;-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9010</span>
 <span class="s">            -Dcom.sun.management.jmxremote.local.only=false</span>
 <span class="s">            -Dcom.sun.management.jmxremote.authenticate=false</span>
@@ -191,8 +191,8 @@ settings according to their needs. For more information on how to setup secure m
 described below.</p>
 <div class="section" id="provisioner-metrics">
 <h4>Provisioner Metrics<a class="headerlink" href="#provisioner-metrics" title="Permalink to this headline">¶</a></h4>
-<p>Below is a description of the metrics found in provisioner metrics, namely <tt class="docutils literal"><span class="pre">ProvisionerStats</span></tt>,
-<tt class="docutils literal"><span class="pre">FailedProvisionerStats</span></tt> and <tt class="docutils literal"><span class="pre">SuccessfulProvisionerStats</span></tt>:</p>
+<p>Below is a description of the metrics found in provisioner metrics, namely <code class="docutils literal"><span class="pre">ProvisionerStats</span></code>,
+<code class="docutils literal"><span class="pre">FailedProvisionerStats</span></code> and <code class="docutils literal"><span class="pre">SuccessfulProvisionerStats</span></code>:</p>
 <table border="1" class="docutils">
 <colgroup>
 <col width="17%" />
@@ -240,7 +240,7 @@ described below.</p>
 <div class="section" id="cluster-metrics">
 <h4>Cluster Metrics<a class="headerlink" href="#cluster-metrics" title="Permalink to this headline">¶</a></h4>
 <p>Below is a description of the metrics found in cluster metrics, namely
-<tt class="docutils literal"><span class="pre">ClusterStats</span></tt>, <tt class="docutils literal"><span class="pre">FailedClusterStats</span></tt> and <tt class="docutils literal"><span class="pre">SuccessfulClusterStats</span></tt>:</p>
+<code class="docutils literal"><span class="pre">ClusterStats</span></code>, <code class="docutils literal"><span class="pre">FailedClusterStats</span></code> and <code class="docutils literal"><span class="pre">SuccessfulClusterStats</span></code>:</p>
 <table border="1" class="docutils">
 <colgroup>
 <col width="17%" />
@@ -268,8 +268,8 @@ described below.</p>
 </div>
 <div class="section" id="log-output">
 <h2>Log Output<a class="headerlink" href="#log-output" title="Permalink to this headline">¶</a></h2>
-<p>By default, the log files in Coopr are written to <tt class="docutils literal"><span class="pre">/var/log/coopr</span></tt>. The output directory can be configured using the
-<tt class="docutils literal"><span class="pre">COOPR_LOG_DIR</span></tt> environment variable for each of the Coopr services (for more information, see
+<p>By default, the log files in Coopr are written to <code class="docutils literal"><span class="pre">/var/log/coopr</span></code>. The output directory can be configured using the
+<code class="docutils literal"><span class="pre">COOPR_LOG_DIR</span></code> environment variable for each of the Coopr services (for more information, see
 <a class="reference internal" href="../../installation/index.html"><em>Installation Guide</em></a>).</p>
 </div>
 </div>
@@ -393,7 +393,7 @@ described below.</p>
     
     </th>
     <th class="tg-s6z2">
-        Copyright &copy; 2014-2015 Cask Data, Inc.
+        Copyright &copy; 2014-2016 Cask Data, Inc.
     
     </th>
     <th class="tg-0ord">&nbsp;&nbsp;Next Topic:

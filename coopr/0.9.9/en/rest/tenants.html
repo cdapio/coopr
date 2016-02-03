@@ -86,12 +86,12 @@ Only the superadmin is allowed to access the tenant APIs.</p>
 <div class="highlight-java"><div class="highlight"><pre><span class="o">/</span><span class="n">tenants</span>
 </pre></div>
 </div>
-<p>The POST body is a JSON Object that must contain a <tt class="docutils literal"><span class="pre">tenant</span></tt>, whose value is another JSON Object
-describing the tenant to create. It must contain <tt class="docutils literal"><span class="pre">name</span></tt> and <tt class="docutils literal"><span class="pre">workers</span></tt> as keys specifying
+<p>The POST body is a JSON Object that must contain a <code class="docutils literal"><span class="pre">tenant</span></code>, whose value is another JSON Object
+describing the tenant to create. It must contain <code class="docutils literal"><span class="pre">name</span></code> and <code class="docutils literal"><span class="pre">workers</span></code> as keys specifying
 the name of the tenant and the number of workers assigned to the tenant. Other key-value pairs
 can be added to specify other tenant specific settings, such as quotas on the maximum number
 of clusters and nodes allowed within the tenant.</p>
-<p>The POST body can optionally contain a <tt class="docutils literal"><span class="pre">bootstrap</span></tt> key whose value is a boolean indicating
+<p>The POST body can optionally contain a <code class="docutils literal"><span class="pre">bootstrap</span></code> key whose value is a boolean indicating
 whether or not to bootstrap the new tenant. Bootstrapping a tenant copies all providers,
 hardware types, image types, services, cluster templates, and plugin resources from the superadmin
 tenant into the new created tenant.</p>
@@ -187,7 +187,7 @@ alphanumeric, dash(-), dot(.), or underscore(_) characters</td>
 <div class="section" id="id1">
 <h3>HTTP Responses<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
 <p>The response is a JSON Object representing the tenant. It contains
-<tt class="docutils literal"><span class="pre">name</span></tt>, <tt class="docutils literal"><span class="pre">workers</span></tt>, <tt class="docutils literal"><span class="pre">maxClusters</span></tt>, and <tt class="docutils literal"><span class="pre">maxNodes</span></tt>.</p>
+<code class="docutils literal"><span class="pre">name</span></code>, <code class="docutils literal"><span class="pre">workers</span></code>, <code class="docutils literal"><span class="pre">maxClusters</span></code>, and <code class="docutils literal"><span class="pre">maxNodes</span></code>.</p>
 <table border="1" class="docutils">
 <colgroup>
 <col width="60%" />
@@ -498,7 +498,7 @@ the comprehensive set of tenants within the system.</p>
     
     </th>
     <th class="tg-s6z2">
-        Copyright &copy; 2014-2015 Cask Data, Inc.
+        Copyright &copy; 2014-2016 Cask Data, Inc.
     
     </th>
     <th class="tg-0ord">

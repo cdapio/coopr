@@ -120,7 +120,7 @@
 <td>Optional provider to use to create nodes. Overrides default in the given cluster template.</td>
 </tr>
 <tr class="row-odd"><td>providerFields</td>
-<td>JSON Object containing key-values to be used by the provider plugin when provisioning nodes. See the section on <a class="reference internal" href="#cluster-provider-fields"><em>Provider Fields</em></a> for more information.</td>
+<td>JSON Object containing key-values to be used by the provider plugin when provisioning nodes. See the section on <a class="reference internal" href="#cluster-provider-fields"><span>Provider Fields</span></a> for more information.</td>
 </tr>
 <tr class="row-even"><td>services</td>
 <td>Optional array of services to place on the cluster.  Overrides default in the given cluster template.  Must be a subset of compatible services specified in cluster template.</td>
@@ -141,7 +141,7 @@
 <h3>HTTP Responses<a class="headerlink" href="#http-responses" title="Permalink to this headline">¶</a></h3>
 <p>The server will respond with the id of the cluster added if the create request was successful. If there were
 required fields missing in the request, it will respond with details about the missing fields. See the section on
-<a class="reference internal" href="#cluster-provider-fields"><em>Provider Fields</em></a> for more information.</p>
+<a class="reference internal" href="#cluster-provider-fields"><span>Provider Fields</span></a> for more information.</p>
 <table border="1" class="docutils">
 <colgroup>
 <col width="60%" />
@@ -195,7 +195,7 @@ The progress field contains the progress of the last job performed on the cluste
 currently being performed on the cluster. It contains an action, actionstatus, stepstotal, and stepscompleted.</p>
 <p>The call may optionally contain a status http parameter which will filter the clusters to only include clusters
 that match the given status. The value for the status parameter is a comma separated list of cluster statuses,
-where a status is one of <tt class="docutils literal"><span class="pre">pending</span></tt>, <tt class="docutils literal"><span class="pre">active</span></tt>, <tt class="docutils literal"><span class="pre">incomplete</span></tt>, <tt class="docutils literal"><span class="pre">inconsistent</span></tt>, or <tt class="docutils literal"><span class="pre">terminated</span></tt>. A cluster
+where a status is one of <code class="docutils literal"><span class="pre">pending</span></code>, <code class="docutils literal"><span class="pre">active</span></code>, <code class="docutils literal"><span class="pre">incomplete</span></code>, <code class="docutils literal"><span class="pre">inconsistent</span></code>, or <code class="docutils literal"><span class="pre">terminated</span></code>. A cluster
 is pending if there is currently an action being performed on the cluster. For example, a cluster that is in
 the process of being created will be in the pending state. A cluster is active if it has been created and the
 last action performed on it was successful. For example, a cluster will transition from pending to active active
@@ -385,7 +385,7 @@ that have been performed on the node.</p>
 </div>
 <p>This resource request represents an individual cluster for deletion.</p>
 <p>The request may require a JSON Object as its body if the provider used to create the cluster requires it.
-See the section on <a class="reference internal" href="#cluster-provider-fields"><em>Provider Fields</em></a> for more information.</p>
+See the section on <a class="reference internal" href="#cluster-provider-fields"><span>Provider Fields</span></a> for more information.</p>
 <div class="section" id="id5">
 <h3>HTTP Responses<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
 <table border="1" class="docutils">
@@ -720,18 +720,18 @@ that have been performed or are being performed on a cluster.</p>
 <div class="highlight-java"><div class="highlight"><pre><span class="o">/</span><span class="n">clusters</span><span class="o">/{</span><span class="n">cluster</span><span class="o">-</span><span class="n">id</span><span class="o">}/</span><span class="n">config</span>
 </pre></div>
 </div>
-<p>The request body must be a JSON Object that includes a <tt class="docutils literal"><span class="pre">config</span></tt> key whose value is a
+<p>The request body must be a JSON Object that includes a <code class="docutils literal"><span class="pre">config</span></code> key whose value is a
 JSON Object that will replace the current cluster configuration. It may contain a
-<tt class="docutils literal"><span class="pre">restart</span></tt> key whose value is true or false, indicating whether or not cluster services should
-be restarted along with the configuration change. If the <tt class="docutils literal"><span class="pre">restart</span></tt> key is not present, the
+<code class="docutils literal"><span class="pre">restart</span></code> key whose value is true or false, indicating whether or not cluster services should
+be restarted along with the configuration change. If the <code class="docutils literal"><span class="pre">restart</span></code> key is not present, the
 value defaults to true. The order of service restarts is derived from
 service dependencies, ensuring that if service A depends on service B, service A will be stopped
 before service B is stopped, and service B will be started before service A is started. After the
 request is made, status calls can be made to check on the status of the cluster configure job.
 If the configure operation fails, the cluster is placed in an inconsistent state where the cluster
 can be configured again or deleted.</p>
-<p>The request body may require a <tt class="docutils literal"><span class="pre">providerFields</span></tt> entry if the provider used to create the cluster requires it.
-See the section on <a class="reference internal" href="#cluster-provider-fields"><em>Provider Fields</em></a> for more information.</p>
+<p>The request body may require a <code class="docutils literal"><span class="pre">providerFields</span></code> entry if the provider used to create the cluster requires it.
+See the section on <a class="reference internal" href="#cluster-provider-fields"><span>Provider Fields</span></a> for more information.</p>
 <div class="section" id="id16">
 <h3>HTTP Responses<a class="headerlink" href="#id16" title="Permalink to this headline">¶</a></h3>
 <table border="1" class="docutils">
@@ -858,12 +858,12 @@ See the section on <a class="reference internal" href="#cluster-provider-fields"
 <div class="highlight-java"><div class="highlight"><pre><span class="o">/</span><span class="n">clusters</span><span class="o">/{</span><span class="n">cluster</span><span class="o">-</span><span class="n">id</span><span class="o">}/</span><span class="n">services</span>
 </pre></div>
 </div>
-<p>The POST body must be a JSON Object containing a <tt class="docutils literal"><span class="pre">services</span></tt> key whose value is a JSON Array
+<p>The POST body must be a JSON Object containing a <code class="docutils literal"><span class="pre">services</span></code> key whose value is a JSON Array
 of services to add to the cluster. The services must be compatible with the cluster template
 used to create the cluster. After the request is made, status calls can be made to check on
 the status of the add services cluster operation.</p>
-<p>The request body may require a <tt class="docutils literal"><span class="pre">providerFields</span></tt> entry if the provider used to create the cluster requires it.
-See the section on <a class="reference internal" href="#cluster-provider-fields"><em>Provider Fields</em></a> for more information.</p>
+<p>The request body may require a <code class="docutils literal"><span class="pre">providerFields</span></code> entry if the provider used to create the cluster requires it.
+See the section on <a class="reference internal" href="#cluster-provider-fields"><span>Provider Fields</span></a> for more information.</p>
 <div class="section" id="id20">
 <h3>HTTP Responses<a class="headerlink" href="#id20" title="Permalink to this headline">¶</a></h3>
 <table border="1" class="docutils">
@@ -920,7 +920,7 @@ service B. After the request is made, a status call can be made to check on the 
 the service stop operation. A cluster must be in the ACTIVE state in order for the stop
 operation to be allowed.</p>
 <p>The request may require a JSON Object as its body if the provider used to create the cluster requires it.
-See the section on <a class="reference internal" href="#cluster-provider-fields"><em>Provider Fields</em></a> for more information.</p>
+See the section on <a class="reference internal" href="#cluster-provider-fields"><span>Provider Fields</span></a> for more information.</p>
 <div class="section" id="id22">
 <h3>HTTP Responses<a class="headerlink" href="#id22" title="Permalink to this headline">¶</a></h3>
 <table border="1" class="docutils">
@@ -976,7 +976,7 @@ After the request is made, a status call can be made to check on the status of
 the service start operation. A cluster must be in the ACTIVE state in order for the stop
 operation to be allowed.</p>
 <p>The request may require a JSON Object as its body if the provider used to create the cluster requires it.
-See the section on <a class="reference internal" href="#cluster-provider-fields"><em>Provider Fields</em></a> for more information.</p>
+See the section on <a class="reference internal" href="#cluster-provider-fields"><span>Provider Fields</span></a> for more information.</p>
 <div class="section" id="id24">
 <h3>HTTP Responses<a class="headerlink" href="#id24" title="Permalink to this headline">¶</a></h3>
 <table border="1" class="docutils">
@@ -1031,7 +1031,7 @@ service A. After the request is made, a status call can be made to check on the 
 the service stop operation. A cluster must be in the ACTIVE state in order for the start
 operation to be allowed.</p>
 <p>The request may require a JSON Object as its body if the provider used to create the cluster requires it.
-See the section on <a class="reference internal" href="#cluster-provider-fields"><em>Provider Fields</em></a> for more information.</p>
+See the section on <a class="reference internal" href="#cluster-provider-fields"><span>Provider Fields</span></a> for more information.</p>
 <div class="section" id="id26">
 <h3>HTTP Responses<a class="headerlink" href="#id26" title="Permalink to this headline">¶</a></h3>
 <table border="1" class="docutils">
@@ -1087,7 +1087,7 @@ After the request is made, a status call can be made to check on the status of
 the service start operation. A cluster must be in the ACTIVE state in order for the start
 operation to be allowed.</p>
 <p>The request may require a JSON Object as its body if the provider used to create the cluster requires it.
-See the section on <a class="reference internal" href="#cluster-provider-fields"><em>Provider Fields</em></a> for more information.</p>
+See the section on <a class="reference internal" href="#cluster-provider-fields"><span>Provider Fields</span></a> for more information.</p>
 <div class="section" id="id28">
 <h3>HTTP Responses<a class="headerlink" href="#id28" title="Permalink to this headline">¶</a></h3>
 <table border="1" class="docutils">
@@ -1144,7 +1144,7 @@ After the request is made, a status call can be made to check on the status of
 the service restart operation. A cluster must be in the ACTIVE state in order for the restart
 operation to be allowed.</p>
 <p>The request may require a request body if the provider used to create the cluster requires it.
-See the section on <a class="reference internal" href="#cluster-provider-fields"><em>Provider Fields</em></a> for more information.</p>
+See the section on <a class="reference internal" href="#cluster-provider-fields"><span>Provider Fields</span></a> for more information.</p>
 <div class="section" id="id30">
 <h3>HTTP Responses<a class="headerlink" href="#id30" title="Permalink to this headline">¶</a></h3>
 <table border="1" class="docutils">
@@ -1202,7 +1202,7 @@ After the request is made, a status call can be made to check on the status of
 the service restart operation. A cluster must be in the ACTIVE state in order for the restart
 operation to be allowed.</p>
 <p>The request may require a JSON Object as its body if the provider used to create the cluster requires it.
-See the section on <a class="reference internal" href="#cluster-provider-fields"><em>Provider Fields</em></a> for more information.</p>
+See the section on <a class="reference internal" href="#cluster-provider-fields"><span>Provider Fields</span></a> for more information.</p>
 <div class="section" id="id32">
 <h3>HTTP Responses<a class="headerlink" href="#id32" title="Permalink to this headline">¶</a></h3>
 <table border="1" class="docutils">
@@ -1363,7 +1363,7 @@ template, the new timestamp cannot be greater than the create time plus the max 
 </div>
 <div class="section" id="provider-fields-in-cluster-requests">
 <span id="cluster-provider-fields"></span><h2>Provider Fields in Cluster Requests<a class="headerlink" href="#provider-fields-in-cluster-requests" title="Permalink to this headline">¶</a></h2>
-<p>Requests to perform cluster operations can include in their request body a <tt class="docutils literal"><span class="pre">providerFields</span></tt> entry.
+<p>Requests to perform cluster operations can include in their request body a <code class="docutils literal"><span class="pre">providerFields</span></code> entry.
 The value is a JSON Object containing key-value pairs of fields a provider may use when performing tasks.
 Usually, these fields are supplied when creating a cluster and are stored for the lifetime of the cluster.
 However, providers can specify that certain fields are sensitive. Sensitive fields usually contain private
@@ -1376,7 +1376,7 @@ cluster nodes in order to execute tasks. Cluster create, delete, and configure r
 provider fields. Service add, stop, start, and restart requests may also include provider fields.</p>
 <p>If there are some required provider fields missing, the relevant API will return a 400 error code along with
 a JSON Object describing the fields that are missing. The response will
-contain a <tt class="docutils literal"><span class="pre">missingFields</span></tt> key which will be an array of JSON Objects containing the missing field as the
+contain a <code class="docutils literal"><span class="pre">missingFields</span></code> key which will be an array of JSON Objects containing the missing field as the
 key and the schema of the field as the value. It is an array of objects because there can be multiple sets
 of required fields. For example, it is possible that a provider may require both field1 and field2, or it may
 require field3 and field4. If only field2 is given in the request, then either field1 is missing, or both field3
@@ -1607,7 +1607,7 @@ the request succeeds and returns a 200.</p>
     
     </th>
     <th class="tg-s6z2">
-        Copyright &copy; 2014-2015 Cask Data, Inc.
+        Copyright &copy; 2014-2016 Cask Data, Inc.
     
     </th>
     <th class="tg-0ord">

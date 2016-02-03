@@ -159,7 +159,7 @@ Lastly, the config is a JSON Object that gets passed straight through to provisi
             <span class="s2">&quot;hbase_site&quot;</span>: <span class="o">{</span>
                 <span class="s2">&quot;hbase.rootdir&quot;</span>: <span class="s2">&quot;hdfs://%host.service.hadoop-hdfs-namenode%/hbase&quot;</span>,
                 <span class="s2">&quot;hbase.cluster.distributed&quot;</span>: <span class="s2">&quot;true&quot;</span>,
-                <span class="s2">&quot;hbase.zookeeper.quorum&quot;</span>: <span class="s2">&quot;%join(map(host.service.zookeeper-server,&#39;$:2181&#39;),&#39;,&#39;)%&quot;</span>
+                <span class="s2">&quot;hbase.zookeeper.quorum&quot;</span>: <span class="s2">&quot;%join(map(host.service.zookeeper-server,&#39;</span><span class="nv">$:</span><span class="s2">2181&#39;),&#39;,&#39;)%&quot;</span>
             <span class="o">}</span>
         <span class="o">}</span>
     <span class="o">}</span>
@@ -499,7 +499,7 @@ in the system.</td>
                   <span class="s2">&quot;hbase_site&quot;</span>: <span class="o">{</span>
                       <span class="s2">&quot;hbase.rootdir&quot;</span>: <span class="s2">&quot;hdfs://%host.service.hadoop-hdfs-namenode%/hbase&quot;</span>,
                       <span class="s2">&quot;hbase.cluster.distributed&quot;</span>: <span class="s2">&quot;true&quot;</span>,
-                      <span class="s2">&quot;hbase.zookeeper.quorum&quot;</span>: <span class="s2">&quot;%join(map(host.service.zookeeper-server,&#39;$:2181&#39;),&#39;,&#39;)%&quot;</span>
+                      <span class="s2">&quot;hbase.zookeeper.quorum&quot;</span>: <span class="s2">&quot;%join(map(host.service.zookeeper-server,&#39;</span><span class="nv">$:</span><span class="s2">2181&#39;),&#39;,&#39;)%&quot;</span>
                   <span class="o">}</span>
               <span class="o">}</span>
          <span class="o">}</span>
@@ -879,7 +879,7 @@ in the request body.</p>
     
     </th>
     <th class="tg-s6z2">
-        Copyright &copy; 2014-2015 Cask Data, Inc.
+        Copyright &copy; 2014-2016 Cask Data, Inc.
     
     </th>
     <th class="tg-0ord">

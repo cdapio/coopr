@@ -83,7 +83,7 @@ periodically sends a heartbeat to the server to tell the system it is alive. Liv
 get requests from the server to add or remove workers for different tenants.</p>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
-<p>Shown below is an example configuration (<tt class="docutils literal"><span class="pre">provisioner-site.xml</span></tt>) with some of the optional settings:</p>
+<p>Shown below is an example configuration (<code class="docutils literal"><span class="pre">provisioner-site.xml</span></code>) with some of the optional settings:</p>
 <div class="highlight-xml"><div class="highlight"><pre><span class="nt">&lt;configuration&gt;</span>
   <span class="nt">&lt;property&gt;</span>
     <span class="nt">&lt;name&gt;</span>provisioner.capacity<span class="nt">&lt;/name&gt;</span>
@@ -113,13 +113,13 @@ get requests from the server to add or remove workers for different tenants.</p>
 <span class="nt">&lt;/configuration&gt;</span>
 </pre></div>
 </div>
-<p><strong>Notes:</strong> Changes to the <tt class="docutils literal"><span class="pre">provisioner-site.xml</span></tt> file require a restart of the provisioner.
-The provisioner will run with no properties set (an empty <tt class="docutils literal"><span class="pre">provisioner-site.xml</span></tt> file)
+<p><strong>Notes:</strong> Changes to the <code class="docutils literal"><span class="pre">provisioner-site.xml</span></code> file require a restart of the provisioner.
+The provisioner will run with no properties set (an empty <code class="docutils literal"><span class="pre">provisioner-site.xml</span></code> file)
 as all properties have defaults set.</p>
 </div>
 <div class="section" id="running-provisioner-with-ssl">
 <h2>Running Provisioner with SSL<a class="headerlink" href="#running-provisioner-with-ssl" title="Permalink to this headline">¶</a></h2>
-<p>To configure the provisioner to support server with SSL, add or update this property in <tt class="docutils literal"><span class="pre">provisioner-site.xml</span></tt>:</p>
+<p>To configure the provisioner to support server with SSL, add or update this property in <code class="docutils literal"><span class="pre">provisioner-site.xml</span></code>:</p>
 <div class="highlight-xml"><div class="highlight"><pre><span class="nt">&lt;property&gt;</span>
   <span class="nt">&lt;name&gt;</span>provisioner.server.uri<span class="nt">&lt;/name&gt;</span>
   <span class="nt">&lt;value&gt;</span>https://localhost:55055<span class="nt">&lt;/value&gt;</span>
@@ -144,57 +144,57 @@ as all properties have defaults set.</p>
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">provisioner.server.uri</span></tt></td>
-<td><tt class="docutils literal"><span class="pre">http://localhost:55055</span></tt></td>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">provisioner.server.uri</span></code></td>
+<td><code class="docutils literal"><span class="pre">http://localhost:55055</span></code></td>
 <td>URI of server to connect to</td>
 </tr>
-<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">provisioner.bind.ip</span></tt></td>
-<td><tt class="docutils literal"><span class="pre">0.0.0.0</span></tt></td>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">provisioner.bind.ip</span></code></td>
+<td><code class="docutils literal"><span class="pre">0.0.0.0</span></code></td>
 <td>Local IP provisioner should listen on</td>
 </tr>
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">provisioner.bind.port</span></tt></td>
-<td><tt class="docutils literal"><span class="pre">55056</span></tt></td>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">provisioner.bind.port</span></code></td>
+<td><code class="docutils literal"><span class="pre">55056</span></code></td>
 <td>Local Port provisioner should listen on</td>
 </tr>
-<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">provisioner.register.ip</span></tt></td>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">provisioner.register.ip</span></code></td>
 <td>&nbsp;</td>
 <td>Routable IP for the server to call back to this provisioner&#8217;s API; if left empty,
 the provisioner will attempt to auto-detect</td>
 </tr>
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">provisioner.daemonize</span></tt></td>
-<td><tt class="docutils literal"><span class="pre">false</span></tt></td>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">provisioner.daemonize</span></code></td>
+<td><code class="docutils literal"><span class="pre">false</span></code></td>
 <td>Run provisioner as a daemon. Ensure you also specify a log directory</td>
 </tr>
-<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">provisioner.data.dir</span></tt></td>
-<td><tt class="docutils literal"><span class="pre">/var/coopr/data/provisioner/data</span></tt></td>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">provisioner.data.dir</span></code></td>
+<td><code class="docutils literal"><span class="pre">/var/coopr/data/provisioner/data</span></code></td>
 <td>Provisioner storage directory for plugin data resources</td>
 </tr>
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">provisioner.work.dir</span></tt></td>
-<td><tt class="docutils literal"><span class="pre">/var/coopr/data/provisioner/work</span></tt></td>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">provisioner.work.dir</span></code></td>
+<td><code class="docutils literal"><span class="pre">/var/coopr/data/provisioner/work</span></code></td>
 <td>Provisioner working directory</td>
 </tr>
-<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">provisioner.capacity</span></tt></td>
-<td><tt class="docutils literal"><span class="pre">10</span></tt></td>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">provisioner.capacity</span></code></td>
+<td><code class="docutils literal"><span class="pre">10</span></code></td>
 <td>Max number of running workers for this provisioner; assume each worker takes 256mb of memory</td>
 </tr>
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">provisioner.heartbeat.interval</span></tt></td>
-<td><tt class="docutils literal"><span class="pre">10</span></tt></td>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">provisioner.heartbeat.interval</span></code></td>
+<td><code class="docutils literal"><span class="pre">10</span></code></td>
 <td>Interval in seconds to send heartbeat to server</td>
 </tr>
-<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">provisioner.log.dir</span></tt></td>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">provisioner.log.dir</span></code></td>
 <td>&nbsp;</td>
 <td>Provisioner log directory</td>
 </tr>
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">provisioner.log.rotation.shift.age</span></tt></td>
-<td><tt class="docutils literal"><span class="pre">7</span></tt></td>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">provisioner.log.rotation.shift.age</span></code></td>
+<td><code class="docutils literal"><span class="pre">7</span></code></td>
 <td>number of old log files to keep, or frequency of rotation (daily, weekly, or monthly)</td>
 </tr>
-<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">provisioner.log.rotation.shift.size</span></tt></td>
-<td><tt class="docutils literal"><span class="pre">10485760</span></tt></td>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">provisioner.log.rotation.shift.size</span></code></td>
+<td><code class="docutils literal"><span class="pre">10485760</span></code></td>
 <td>maximum logfile size. only applies when shift.age is a number</td>
 </tr>
-<tr class="row-even"><td><tt class="docutils literal"><span class="pre">provisioner.log.level</span></tt></td>
-<td><tt class="docutils literal"><span class="pre">info</span></tt></td>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">provisioner.log.level</span></code></td>
+<td><code class="docutils literal"><span class="pre">info</span></code></td>
 <td>log level; one of: debug, info, warn, error, fatal</td>
 </tr>
 </tbody>
@@ -310,7 +310,7 @@ the provisioner will attempt to auto-detect</td>
     
     </th>
     <th class="tg-s6z2">
-        Copyright &copy; 2014-2015 Cask Data, Inc.
+        Copyright &copy; 2014-2016 Cask Data, Inc.
     
     </th>
     <th class="tg-0ord">&nbsp;&nbsp;Next Topic:

@@ -80,7 +80,7 @@ with the authentication server through this configured backend. Once authenticat
 representing their identity.</p>
 <div class="section" id="enabling-security">
 <h2>Enabling Security<a class="headerlink" href="#enabling-security" title="Permalink to this headline">¶</a></h2>
-<p>To enable security in COOPR Server, add these properties to <tt class="docutils literal"><span class="pre">coopr-site.xml</span></tt>:</p>
+<p>To enable security in COOPR Server, add these properties to <code class="docutils literal"><span class="pre">coopr-site.xml</span></code>:</p>
 <table border="1" class="docutils">
 <colgroup>
 <col width="60%" />
@@ -111,7 +111,7 @@ representing their identity.</p>
 </div>
 <div class="section" id="configuring-ssl-for-the-authentication-server">
 <h2>Configuring SSL for the Authentication Server<a class="headerlink" href="#configuring-ssl-for-the-authentication-server" title="Permalink to this headline">¶</a></h2>
-<p>To configure the granting of <tt class="docutils literal"><span class="pre">AccessToken</span></tt>s via SSL, add these properties to <tt class="docutils literal"><span class="pre">coopr-security.xml</span></tt>:</p>
+<p>To configure the granting of <code class="docutils literal"><span class="pre">AccessToken</span></code>s via SSL, add these properties to <code class="docutils literal"><span class="pre">coopr-security.xml</span></code>:</p>
 <table border="1" class="docutils">
 <colgroup>
 <col width="42%" />
@@ -152,7 +152,7 @@ COOPR user</td>
 <div class="section" id="basic-authentication">
 <h3>Basic Authentication<a class="headerlink" href="#basic-authentication" title="Permalink to this headline">¶</a></h3>
 <p>The simplest way to identity a user is to authenticate against a realm file.
-To configure basic authentication add the following properties to <tt class="docutils literal"><span class="pre">coopr-site.xml</span></tt>:</p>
+To configure basic authentication add the following properties to <code class="docutils literal"><span class="pre">coopr-site.xml</span></code>:</p>
 <table border="1" class="docutils">
 <colgroup>
 <col width="43%" />
@@ -182,7 +182,7 @@ other methods described below.</p>
 <div class="section" id="ldap-authentication">
 <h3>LDAP Authentication<a class="headerlink" href="#ldap-authentication" title="Permalink to this headline">¶</a></h3>
 <p>You can configure COOPR to authenticate against an LDAP instance by adding these
-properties to <tt class="docutils literal"><span class="pre">coopr-site.xml</span></tt>:</p>
+properties to <code class="docutils literal"><span class="pre">coopr-site.xml</span></code>:</p>
 <table border="1" class="docutils">
 <colgroup>
 <col width="46%" />
@@ -261,7 +261,7 @@ properties to <tt class="docutils literal"><span class="pre">coopr-site.xml</spa
 </div>
 <div class="section" id="java-authentication-service-provider-interface-jaspi-authentication">
 <h3>Java Authentication Service Provider Interface (JASPI) Authentication<a class="headerlink" href="#java-authentication-service-provider-interface-jaspi-authentication" title="Permalink to this headline">¶</a></h3>
-<p>To authenticate a user using JASPI add the following properties to <tt class="docutils literal"><span class="pre">coopr-site.xml</span></tt>:</p>
+<p>To authenticate a user using JASPI add the following properties to <code class="docutils literal"><span class="pre">coopr-site.xml</span></code>:</p>
 <table border="1" class="docutils">
 <colgroup>
 <col width="46%" />
@@ -281,15 +281,15 @@ properties to <tt class="docutils literal"><span class="pre">coopr-site.xml</spa
 </tr>
 </tbody>
 </table>
-<p>In addition, any properties with the prefix <tt class="docutils literal"><span class="pre">security.authentication.handler.</span></tt>,
-such as <tt class="docutils literal"><span class="pre">security.authentication.handler.hostname</span></tt>, will also be used by the handler.
-These properties, without the prefix, will be used to instantiate the <tt class="docutils literal"><span class="pre">javax.security.auth.login.Configuration</span></tt> used
-by the <tt class="docutils literal"><span class="pre">LoginModule</span></tt>.</p>
+<p>In addition, any properties with the prefix <code class="docutils literal"><span class="pre">security.authentication.handler.</span></code>,
+such as <code class="docutils literal"><span class="pre">security.authentication.handler.hostname</span></code>, will also be used by the handler.
+These properties, without the prefix, will be used to instantiate the <code class="docutils literal"><span class="pre">javax.security.auth.login.Configuration</span></code> used
+by the <code class="docutils literal"><span class="pre">LoginModule</span></code>.</p>
 </div>
 <div class="section" id="custom-authentication">
 <h3>Custom Authentication<a class="headerlink" href="#custom-authentication" title="Permalink to this headline">¶</a></h3>
-<p>To provide a custom authentication mechanism you may create your own <tt class="docutils literal"><span class="pre">AuthenticationHandler</span></tt> by overriding
-<tt class="docutils literal"><span class="pre">AbstractAuthenticationHandler</span></tt> and implementing the abstract methods</p>
+<p>To provide a custom authentication mechanism you may create your own <code class="docutils literal"><span class="pre">AuthenticationHandler</span></code> by overriding
+<code class="docutils literal"><span class="pre">AbstractAuthenticationHandler</span></code> and implementing the abstract methods</p>
 <div class="highlight-java"><div class="highlight"><pre><span class="kd">public</span> <span class="kd">class</span> <span class="nc">CustomAuthenticationHandler</span> <span class="kd">extends</span> <span class="n">AbstractAuthenticationHandler</span> <span class="o">{</span>
 
   <span class="nd">@Inject</span>
@@ -333,9 +333,9 @@ by the <tt class="docutils literal"><span class="pre">LoginModule</span></tt>.</
 <div class="highlight-console"><div class="highlight"><pre><span class="go">http://&lt;host&gt;:&lt;auth-port&gt;</span>
 </pre></div>
 </div>
-<p>where <tt class="docutils literal"><span class="pre">&lt;host&gt;</span></tt> is the host name of the COOPR server, <tt class="docutils literal"><span class="pre">&lt;port&gt;</span></tt> is the port that is set as the <tt class="docutils literal"><span class="pre">server.port</span></tt>
-in <tt class="docutils literal"><span class="pre">coopr-site.xml</span></tt> (default: <tt class="docutils literal"><span class="pre">55054</span></tt>), and <tt class="docutils literal"><span class="pre">&lt;auth-port&gt;</span></tt> is the port that is set as the
-<tt class="docutils literal"><span class="pre">security.auth.server.bind.port</span></tt> (default: <tt class="docutils literal"><span class="pre">55059</span></tt>).</p>
+<p>where <code class="docutils literal"><span class="pre">&lt;host&gt;</span></code> is the host name of the COOPR server, <code class="docutils literal"><span class="pre">&lt;port&gt;</span></code> is the port that is set as the <code class="docutils literal"><span class="pre">server.port</span></code>
+in <code class="docutils literal"><span class="pre">coopr-site.xml</span></code> (default: <code class="docutils literal"><span class="pre">55054</span></code>), and <code class="docutils literal"><span class="pre">&lt;auth-port&gt;</span></code> is the port that is set as the
+<code class="docutils literal"><span class="pre">security.auth.server.bind.port</span></code> (default: <code class="docutils literal"><span class="pre">55059</span></code>).</p>
 <p>To ensure that you&#8217;ve configured security correctly, run these simple tests to verify that the
 security components are working as expected:</p>
 <ul>
@@ -344,13 +344,13 @@ security components are working as expected:</p>
 </pre></div>
 </div>
 </li>
-<li><p class="first">This should return a 401 Unauthorized response. Submit a username and password to obtain an <tt class="docutils literal"><span class="pre">AccessToken</span></tt>:</p>
+<li><p class="first">This should return a 401 Unauthorized response. Submit a username and password to obtain an <code class="docutils literal"><span class="pre">AccessToken</span></code>:</p>
 <div class="highlight-console"><div class="highlight"><pre><span class="go">curl -u username:password &lt;base-auth-url&gt;/token</span>
 </pre></div>
 </div>
 </li>
-<li><p class="first">This should return a 200 OK response with the <tt class="docutils literal"><span class="pre">AccessToken</span></tt> string in the response body.
-Reattempt the first command, but this time include the <tt class="docutils literal"><span class="pre">AccessToken</span></tt> as a header in the command:</p>
+<li><p class="first">This should return a 200 OK response with the <code class="docutils literal"><span class="pre">AccessToken</span></code> string in the response body.
+Reattempt the first command, but this time include the <code class="docutils literal"><span class="pre">AccessToken</span></code> as a header in the command:</p>
 <div class="highlight-console"><div class="highlight"><pre><span class="go">curl -H &quot;Authorization: Bearer &lt;AccessToken&gt;&quot; &lt;base-url&gt;/status</span>
 </pre></div>
 </div>
@@ -366,25 +366,25 @@ Reattempt the first command, but this time include the <tt class="docutils liter
 </pre></div>
 </div>
 <p>The required header and request parameters may vary according to the external authentication mechanism
-that has been configured.  For username and password based mechanisms, the <tt class="docutils literal"><span class="pre">Authorization</span></tt> header may be used:</p>
+that has been configured.  For username and password based mechanisms, the <code class="docutils literal"><span class="pre">Authorization</span></code> header may be used:</p>
 <div class="highlight-console"><div class="highlight"><pre><span class="go">Authorization: Basic czZCaGRSa3F0MzpnWDFmQmF0M2JW</span>
 </pre></div>
 </div>
 <div class="section" id="http-responses">
 <h4>HTTP Responses<a class="headerlink" href="#http-responses" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
-<li><tt class="docutils literal"><span class="pre">200</span> <span class="pre">OK</span></tt> - Authentication was successful and an access token will be returned</li>
-<li><tt class="docutils literal"><span class="pre">401</span> <span class="pre">Unauthorized</span></tt> - Authentication failed</li>
+<li><code class="docutils literal"><span class="pre">200</span> <span class="pre">OK</span></code> - Authentication was successful and an access token will be returned</li>
+<li><code class="docutils literal"><span class="pre">401</span> <span class="pre">Unauthorized</span></code> - Authentication failed</li>
 </ul>
 </div>
 <div class="section" id="success-response-fields">
 <h4>Success Response Fields<a class="headerlink" href="#success-response-fields" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
-<li><tt class="docutils literal"><span class="pre">access_token</span></tt> - The Access Token issued for the client. The serialized token contents are base-64 encoded
+<li><code class="docutils literal"><span class="pre">access_token</span></code> - The Access Token issued for the client. The serialized token contents are base-64 encoded
 for safe transport over HTTP.</li>
-<li><tt class="docutils literal"><span class="pre">token_type</span></tt> - In order to conform with the OAuth 2.0 Bearer Token Usage specification (<a class="reference external" href="http://tools.ietf.org/html/rfc6750">RFC 6750</a>), this
+<li><code class="docutils literal"><span class="pre">token_type</span></code> - In order to conform with the OAuth 2.0 Bearer Token Usage specification (<a class="reference external" href="http://tools.ietf.org/html/rfc6750">RFC 6750</a>), this
 value must be &#8220;Bearer&#8221;.</li>
-<li><tt class="docutils literal"><span class="pre">expires_in</span></tt> - Token validity lifetime in seconds.</li>
+<li><code class="docutils literal"><span class="pre">expires_in</span></code> - Token validity lifetime in seconds.</li>
 </ul>
 </div>
 <div class="section" id="example">
@@ -412,7 +412,7 @@ value must be &#8220;Bearer&#8221;.</li>
 </div>
 <div class="section" id="comments">
 <h3>Comments<a class="headerlink" href="#comments" title="Permalink to this headline">¶</a></h3>
-<p><strong>Note:</strong> Only <tt class="docutils literal"><span class="pre">Bearer</span></tt> tokens (<a class="reference external" href="http://tools.ietf.org/html/rfc6750">RFC 6750</a>) are currently supported.</p>
+<p><strong>Note:</strong> Only <code class="docutils literal"><span class="pre">Bearer</span></code> tokens (<a class="reference external" href="http://tools.ietf.org/html/rfc6750">RFC 6750</a>) are currently supported.</p>
 </div>
 </div>
 </div>
@@ -539,7 +539,7 @@ value must be &#8220;Bearer&#8221;.</li>
     
     </th>
     <th class="tg-s6z2">
-        Copyright &copy; 2014-2015 Cask Data, Inc.
+        Copyright &copy; 2014-2016 Cask Data, Inc.
     
     </th>
     <th class="tg-0ord">&nbsp;&nbsp;Next Topic:
