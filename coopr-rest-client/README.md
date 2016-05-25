@@ -24,7 +24,7 @@ The Rest Client Java API is for managing Coopr from Java applications.
  <dependency>
   <groupId>co.cask</groupId>
   <artifactId>coopr-rest-client</artifactId>
-  <version>0.9.9</version>
+  <version>0.9.10-SNAPSHOT</version>
  </dependency>
             
 ## Example

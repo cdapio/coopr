@@ -2,7 +2,7 @@
 
 REM #################################################################################
 REM ##
-REM ## Copyright © 2012-2014 Cask Data, Inc.
+REM ## Copyright © 2012-2016 Cask Data, Inc.
 REM ##
 REM ## Licensed under the Apache License, Version 2.0 (the "License");
 REM ## you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ SET COOPR_HOME=%~dp0
 SET COOPR_HOME=%COOPR_HOME:~0,-5%
 SET JAVACMD=%JAVA_HOME%\bin\java.exe
 
-SET CLASSPATH=%COOPR_HOME%\lib\coopr-cli-0.9.9.jar
+SET CLASSPATH=%COOPR_HOME%\lib\coopr-cli-0.9.10-SNAPSHOT.jar
 
 REM Check for 64-bit version of OS. Currently not supporting 32-bit Windows
 IF NOT EXIST "%PROGRAMFILES(X86)%" (
