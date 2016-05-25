@@ -13,7 +13,7 @@ mvn clean package assembly:single -DskipTests
 
 ## Install
 
-Unpack Coopr Standalone ZIP onto your system and enter it's directory.
+Unpack Coopr Standalone ZIP onto your system and enter its directory.
 
 Next, install the appropriate Ruby Gems on the system.
 ```
@@ -26,7 +26,7 @@ bundle install --gemfile provisioner/Gemfile
 bin/coopr.sh start
 ```
 
-   * Login at http://localhost:8100 with tenant 'superadmin', username 'admin', and password 'admin'
+   * Login at http://localhost:8100 with tenant `superadmin`, username `admin`, and password `admin`
 
 ## Stop
 ```
