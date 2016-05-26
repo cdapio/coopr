@@ -9,7 +9,7 @@ function ($scope, $state, $q, $alert, CrudFormBase, myApi, caskFocusManager, myH
 
   var id = $state.params.id;
 
-  $scope.model = new myApi.Cluster({id:id, clusterTemplate:'base', numMachines:1});
+  $scope.model = new myApi.Cluster({id:id, clusterTemplate:'', numMachines:1});
 
   $scope.showAdvanced = false;
   $scope.showConfig = !!id;
