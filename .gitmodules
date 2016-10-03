@@ -1,6 +1,8 @@
 [submodule "coopr-templates"]
 	path = coopr-templates
 	url = https://github.com/caskdata/coopr-templates.git
+	branch = develop
 [submodule "coopr-provisioner"]
 	path = coopr-provisioner
 	url = https://github.com/caskdata/coopr-provisioner.git
+	branch = develop
