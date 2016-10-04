@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Copyright © 2012-2015 Cask Data, Inc.
+# Copyright © 2012-2016 Cask Data, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -115,13 +115,6 @@ else
 
 Please set the JAVA_HOME variable in your environment to match the
 location of your Java installation."
-fi
-
-# java version check
-JAVA_VERSION=`${JAVACMD} -version 2>&1 | grep "java version" | awk '{print $3}' | awk -F '.' '{print $2}'`
-if [ ${JAVA_VERSION} -ne 6 ] && [ ${JAVA_VERSION} -ne 7 ]; then
-  die "ERROR: Java version not supported
-Please install Java 6 or 7 - other versions of Java are not yet supported."
 fi
 
 # Check node installation
