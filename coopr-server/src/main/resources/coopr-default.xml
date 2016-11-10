@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
 <!--
-  Copyright © 2012-2014 Cask Data, Inc.
+  Copyright © 2012-2016 Cask Data, Inc.
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@
 
     <property>
         <name>server.host</name>
-        <value>localhost</value>
+        <value>0.0.0.0</value>
         <description>Specifies the address to bind to</description>
     </property>
 
