@@ -38,9 +38,9 @@ APP_NAME="coopr-standalone"
 
 program_is_installed ( ) { type ${1} >/dev/null 2>&1; }
 
-warn ( ) { echo "WARN: ${*}"; }
+warn ( ) { echo "$(date) WARN: ${*}"; }
 
-die ( ) { echo ; echo "ERROR: ${*}" ; echo ; exit 1; }
+die ( ) { echo ; echo "$(date) ERROR: ${*}" ; echo ; exit 1; }
 
 # Attempt to set APP_HOME
 # Resolve links: $0 may be a link
@@ -212,10 +212,10 @@ load_defaults () {
   # We've already been loaded, do nothing and return 0
   [ -f ${COOPR_DATA_DIR}/.load_defaults ] && return 0
 
-  echo "Waiting for server to start before loading default configuration..."
+  echo "$(date) Waiting for server to start before loading default configuration ..."
   wait_for_server
 
-  echo "Loading default configuration..."
+  echo "$(date) Loading default configuration ..."
   ${COOPR_HOME}/server/templates/bin/load-templates.sh && touch ${COOPR_DATA_DIR}/.load_defaults || die "Couldn't upload templates"
 
   # load the initial plugin bundled data
@@ -229,18 +229,18 @@ load_defaults () {
 }
 
 stage_default_data () {
-  echo "Waiting for plugins to be registered..."
+  echo "$(date) Waiting for plugins to be registered ..."
   wait_for_plugin_registration
 
   cd ${COOPR_PROVISIONER_PLUGIN_DIR}
-  echo "Loading initial data..."
+  echo "$(date) Loading initial data ..."
   for script in $(ls -1 */*/load-bundled-data.sh) ; do
     ${COOPR_PROVISIONER_PLUGIN_DIR}/${script}
   done
 }
 
 sync_default_data () {
-  echo "Syncing initial data..."
+  echo "$(date) Syncing initial data ..."
   curl ${CURL_PARAMETER} --silent --request POST \
     --header "Coopr-UserID:${COOPR_API_USER}" \
     --header "Coopr-TenantID:${COOPR_TENANT}" \
@@ -252,7 +252,7 @@ sync_default_data () {
 request_superadmin_workers () {
   [ "${COOPR_USE_DUMMY_PROVISIONER}" == "true" ] && sleep 5 || wait_for_provisioner
 
-  echo "Requesting ${COOPR_NUM_WORKERS} workers for default tenant..."
+  echo "$(date) Requesting ${COOPR_NUM_WORKERS} workers for default tenant ..."
   curl ${CURL_PARAMETER} --silent --request PUT \
     --header "Content-Type:application/json" \
     --header "Coopr-UserID:${COOPR_API_USER}" \
@@ -310,7 +310,7 @@ wait_for_provisioner () {
 
 provisioner () {
   if [ "$1" == "start" ] || [ "$1" == "register" ]; then
-    echo "Waiting for server to start before running provisioner..."
+    echo "$(date) Waiting for server to start before running provisioner ..."
     wait_for_server
     if [ "${COOPR_USE_DUMMY_PROVISIONER}" == "true" ]; then
       COOPR_SERVER_URI=http://127.0.0.1:55055 ${COOPR_HOME}/server/templates/mock/load-mock.sh
@@ -327,7 +327,7 @@ server () { ${COOPR_HOME}/server/bin/server.sh ${1}; }
 
 ui () {
   if [ "${COOPR_DISABLE_UI}" == "true" ]; then
-    echo "UI disabled... skipping..."
+    echo "$(date) UI disabled... skipping ..."
     return 0
   fi
   ${COOPR_HOME}/ui/bin/ui.sh ${1}
