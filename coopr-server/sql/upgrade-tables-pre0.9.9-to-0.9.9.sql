@@ -40,13 +40,6 @@ ALTER TABLE `services` ADD PRIMARY KEY (name, version, tenant_id);
 ALTER TABLE `clusterTemplates` DROP PRIMARY KEY;
 ALTER TABLE `clusterTemplates` ADD PRIMARY KEY (name, version, tenant_id);
 
-# Node hours API (COOPR-581)
-ALTER TABLE `tasks`
-    ADD type VARCHAR(64) AFTER status,
-    ADD cluster_template_name VARCHAR(255) AFTER type,
-    ADD user_id VARCHAR(255) AFTER cluster_template_name,
-    ADD tenant_id VARCHAR(64) AFTER user_id;
-
 # Partial Templates (COOPR-653)
 CREATE TABLE IF NOT EXISTS partialTemplates (
     name VARCHAR(255),
