@@ -1,5 +1,5 @@
 #
-# Copyright © 2012-2014 Cask Data, Inc.
+# Copyright © 2012-2016 Cask Data, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,13 +17,13 @@
 # mysql -u $user -p -h $hostname $dbname < upgrade-tables-pre0.9.9-to-0.9.9.sql
 
 # Resource versioning (COOPR-617)
-ALTER TABLE `providerTypes` ADD version BIGINT NOT NULL DEFAULT 1 AFTER name;
-ALTER TABLE `automatorTypes` ADD version BIGINT NOT NULL DEFAULT 1 AFTER name;
-ALTER TABLE `providers` ADD version BIGINT NOT NULL DEFAULT 1 AFTER name;
-ALTER TABLE `hardwareTypes` ADD version BIGINT NOT NULL DEFAULT 1 AFTER name;
-ALTER TABLE `imageTypes` ADD version BIGINT NOT NULL DEFAULT 1 AFTER name;
-ALTER TABLE `services` ADD version BIGINT NOT NULL DEFAULT 1 AFTER name;
-ALTER TABLE `clusterTemplates` ADD version BIGINT NOT NULL DEFAULT 1 AFTER name;
+ALTER TABLE `providerTypes` MODIFY version BIGINT NOT NULL DEFAULT 1 AFTER name;
+ALTER TABLE `automatorTypes` MODIFY version BIGINT NOT NULL DEFAULT 1 AFTER name;
+ALTER TABLE `providers` MODIFY version BIGINT NOT NULL DEFAULT 1 AFTER name;
+ALTER TABLE `hardwareTypes` MODIFY version BIGINT NOT NULL DEFAULT 1 AFTER name;
+ALTER TABLE `imageTypes` MODIFY version BIGINT NOT NULL DEFAULT 1 AFTER name;
+ALTER TABLE `services` MODIFY version BIGINT NOT NULL DEFAULT 1 AFTER name;
+ALTER TABLE `clusterTemplates` MODIFY version BIGINT NOT NULL DEFAULT 1 AFTER name;
 
 ALTER TABLE `providerTypes` DROP PRIMARY KEY;
 ALTER TABLE `providerTypes` ADD PRIMARY KEY (name, version, tenant_id);
@@ -39,13 +39,6 @@ ALTER TABLE `services` DROP PRIMARY KEY;
 ALTER TABLE `services` ADD PRIMARY KEY (name, version, tenant_id);
 ALTER TABLE `clusterTemplates` DROP PRIMARY KEY;
 ALTER TABLE `clusterTemplates` ADD PRIMARY KEY (name, version, tenant_id);
-
-# Node hours API (COOPR-581)
-ALTER TABLE `tasks`
-    ADD type VARCHAR(64) AFTER status,
-    ADD cluster_template_name VARCHAR(255) AFTER type,
-    ADD user_id VARCHAR(255) AFTER cluster_template_name,
-    ADD tenant_id VARCHAR(64) AFTER user_id;
 
 # Partial Templates (COOPR-653)
 CREATE TABLE IF NOT EXISTS partialTemplates (
