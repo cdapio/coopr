@@ -19,7 +19,9 @@ xdescribe('providers test', function () { // disabled, not reliable on CI.
       browser.getLocationAbsUrl()
     ).toMatch(/\/providers\/create$/);
 
-    browser.waitForAngular();
+    browser.driver.wait(function() {
+      return browser.driver.isElementPresent(by.cssContainingText('option', 'google'));
+    }, 9999);
 
     element(by.cssContainingText('option', 'google')).click();
     formfields = element.all(by.repeater('(name,fieldData) in config.fields'));
@@ -60,6 +62,10 @@ xdescribe('providers test', function () { // disabled, not reliable on CI.
 
   it('should edit a provider', function() {
 
+    browser.driver.wait(function() {
+      return browser.driver.isElementPresent(by.cssContainingText('tr', provider));
+    }, 9999);
+
     element(by.cssContainingText('tr', provider))
       .element(by.cssContainingText('.btn', 'Edit')).click();
 
@@ -79,8 +85,14 @@ xdescribe('providers test', function () { // disabled, not reliable on CI.
 
   it('should delete a provider', function() {
     browser.get('/providers');
+
+    browser.driver.wait(function() {
+      return browser.driver.isElementPresent(by.cssContainingText('tr', provider));
+    }, 9999);
+
     element(by.cssContainingText('tr', provider))
       .element(by.cssContainingText('.btn', 'Delete')).click();
+
     element(by.css('.modal-dialog .modal-footer .btn-primary')).click();
 
     expect(element(by.cssContainingText('tr', provider)).isPresent()).toBe(false);
