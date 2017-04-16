@@ -90,7 +90,12 @@ gulp.task('js:lib', function() {
       './bower_components/angular-moment/angular-moment.js',
 
       './bower_components/ngstorage/ngStorage.js',
-      './bower_components/angular-loading-bar/build/loading-bar.js'
+      './bower_components/angular-loading-bar/build/loading-bar.js',
+
+      './bower_components/cdap-auth-client/src/base64.js',
+      './bower_components/cdap-auth-client/src/promise.js',
+      './bower_components/cdap-auth-client/src/helper-browser.js',
+      './bower_components/cdap-auth-client/src/authmanager.js'
 
     ].concat([
       './bower_components/cask-angular-*/*/module.js'

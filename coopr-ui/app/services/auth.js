@@ -117,32 +117,49 @@ module.service('myAuth', function myAuthService (MYAUTH_EVENT, MyAuthUser, myAut
 
 
 
-module.factory('myAuthPromise', function myAuthPromiseFactory (MYAUTH_ROLE, $timeout, $q) {
-  return function myAuthPromise (c) {
+module.factory('myAuthPromise', function myAuthPromiseFactory (MY_CONFIG, MYAUTH_ROLE, $timeout, $q) {
+  var authManager = null,
+    serverInfo = document.createElement('a');
+  serverInfo.href = MY_CONFIG.COOPR_SERVER_URI;
+
+  return function myAuthPromise (credentials) {
     var deferred = $q.defer();
 
-
-
-    /*
-      fake login / replacement pending backend support
+    /**
+     * Done in the way CDAP authentication works.
      */
-    $timeout(function(){
-      if (!c.password || !c.tenant || !c.username) {
-        deferred.reject();
-      }
-      else {
-        var a = MYAUTH_ROLE.admin;
-        if (c.username===a && c.password!==a) {
+    if (!credentials.password || !credentials.tenant || !credentials.username) {
+      deferred.reject();
+    } else {
+      authManager = new CDAPAuth.Manager();
+      authManager.setConnectionInfo(serverInfo.hostname, serverInfo.port, -1 !== serverInfo.protocol.indexOf('https'));
+      authManager.configure({
+        username: credentials.username,
+        password: credentials.password
+      });
+
+      var authPromise = null,
+        tokenPromise = null;
+
+      authPromise = authManager.isAuthEnabled();
+      authPromise.then(function (isEnabled) {
+        if (isEnabled) {
+          tokenPromise = authManager.getToken();
+          tokenPromise.then(function (token) {
+            if (!token.type && !token.token) {
+              deferred.reject();
+            } else {
+              credentials.password = null;
+              credentials.authorization = token.type + ' ' + token.token;
+
+              deferred.resolve(credentials);
+            }
+          });
+        } else {
           deferred.reject();
         }
-        else {
-          delete c.password;
-          deferred.resolve(c);
-        }
-      }
-    }, 1500);
-
-
+      });
+    }
 
     return deferred.promise;
   };
