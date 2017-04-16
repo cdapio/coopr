@@ -530,19 +530,27 @@ public class PluginHandler extends AbstractAuthHandler {
     }
   }
 
+  private boolean checkAlreadyExists(Account account, ResourceType pluginResourceType,
+                                     String resourceName) throws IOException, MissingEntityException {
+    return !getResources(account, pluginResourceType, resourceName, ResourceStatus.INACTIVE).isEmpty();
+  }
+
   private BodyConsumer uploadResource(HttpResponder responder, Account account, PluginType type,
                                       String pluginName, String resourceType,
                                       String resourceName) {
     ResourceType pluginResourceType = new ResourceType(type, pluginName, resourceType);
     try {
-      validateTypeExists(account, pluginResourceType);
+      if (checkAlreadyExists(account, pluginResourceType, resourceName)) {
+        responder.sendString(HttpResponseStatus.BAD_REQUEST, "Resource already exists");
+        return null;
+      }
       return resourceService.createResourceBodyConsumer(account, pluginResourceType, resourceName, responder);
     } catch (IOException e) {
       LOG.error("Exception uploading resource.", e);
-      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error uploading resource");
+      responder.sendString(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error uploading resource");
       return null;
     } catch (MissingEntityException e) {
-      responder.sendError(HttpResponseStatus.NOT_FOUND, e.getMessage());
+      responder.sendString(HttpResponseStatus.NOT_FOUND, e.getMessage());
       return null;
     }
   }
@@ -607,20 +615,25 @@ public class PluginHandler extends AbstractAuthHandler {
                             PluginType type, String pluginName, String resourceType, String resourceName) {
     ResourceType pluginResourceType = new ResourceType(type, pluginName, resourceType);
     try {
-      validateTypeExists(account, pluginResourceType);
       ResourceStatus statusFilter = getStatusParam(request);
       responder.sendJson(HttpResponseStatus.OK,
-                         resourceService.getAll(account, pluginResourceType, resourceName, statusFilter),
+                         getResources(account, pluginResourceType, resourceName, statusFilter),
                          new TypeToken<Set<ResourceMeta>>() { }.getType(),
                          gson);
     } catch (IllegalArgumentException e) {
-      responder.sendError(HttpResponseStatus.BAD_REQUEST, "invalid status filter.");
+      responder.sendString(HttpResponseStatus.BAD_REQUEST, "invalid status filter.");
     } catch (IOException e) {
       LOG.error("Exception getting resources.", e);
-      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error getting resources.");
+      responder.sendString(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error getting resources.");
     } catch (MissingEntityException e) {
-      responder.sendError(HttpResponseStatus.NOT_FOUND, e.getMessage());
+      responder.sendString(HttpResponseStatus.NOT_FOUND, e.getMessage());
     }
+  }
+
+  private Set<ResourceMeta> getResources(Account account, ResourceType pluginResourceType, String resourceName,
+                                         ResourceStatus statusFilter) throws IOException, MissingEntityException {
+    validateTypeExists(account, pluginResourceType);
+    return resourceService.getAll(account, pluginResourceType, resourceName, statusFilter);
   }
 
   private void deleteResource(HttpResponder responder, Account account, PluginType type,
