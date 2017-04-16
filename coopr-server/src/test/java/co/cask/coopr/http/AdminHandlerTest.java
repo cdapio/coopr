@@ -27,12 +27,15 @@ import co.cask.coopr.spec.Tenant;
 import co.cask.coopr.spec.TenantSpecification;
 import co.cask.coopr.spec.service.Service;
 import co.cask.coopr.spec.template.ClusterTemplate;
+import co.cask.coopr.spec.template.MandatoryPartial;
 import co.cask.coopr.spec.template.PartialTemplate;
 import co.cask.coopr.store.entity.EntityStoreView;
 import com.google.common.base.Charsets;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.io.CharStreams;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -50,6 +53,7 @@ import org.junit.Test;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -108,6 +112,67 @@ public class AdminHandlerTest extends ServiceTestBase {
   public void testClusterTemplates() throws Exception {
     testRestAPIs("clustertemplates", gson.toJsonTree(Entities.ClusterTemplateExample.HDFS).getAsJsonObject(),
                  gson.toJsonTree(Entities.ClusterTemplateExample.REACTOR).getAsJsonObject());
+  }
+
+  @Test
+  public void testMandatoryPartials() throws Exception {
+    PartialTemplate example1 = Entities.PartialTemplateExample.TEST_PARTIAL1;
+    MandatoryPartial mandatoryPartial1 = new MandatoryPartial(example1.getName(), 1);
+
+    verifyHttpResponseCode(200, doPutExternalAPI(
+      "/" + AdminHandler.PARTIAL_TEMPLATES + "/" + mandatoryPartial1.getName(),
+      gson.toJson(example1), ADMIN_HEADERS));
+
+    PartialTemplate example2 = Entities.PartialTemplateExample.TEST_PARTIAL2;
+    MandatoryPartial mandatoryPartial2 = new MandatoryPartial(example2.getName(), 1);
+    verifyHttpResponseCode(200, doPutExternalAPI(
+      "/" + AdminHandler.PARTIAL_TEMPLATES + "/" + mandatoryPartial2.getName(),
+      gson.toJson(example2), ADMIN_HEADERS));
+
+    verifyHttpResponseCode(200, doPutExternalAPI(
+      "/" + AdminHandler.MANDATORY_PARTIALS,
+      gson.toJson(ImmutableList.of(mandatoryPartial1)), ADMIN_HEADERS));
+
+    {
+      HttpResponse listResponse = doGetExternalAPI("/" + AdminHandler.MANDATORY_PARTIALS, ADMIN_HEADERS);
+      verifyHttpResponseCode(200, listResponse);
+      String listResponseString = CharStreams.toString(new InputStreamReader(listResponse.getEntity().getContent()));
+      Collection<MandatoryPartial> listResponsePartials = gson.fromJson(
+        listResponseString,
+        new TypeToken<Collection<MandatoryPartial>>() { }.getType());
+      Assert.assertEquals(1, listResponsePartials.size());
+      Assert.assertEquals(mandatoryPartial1, listResponsePartials.iterator().next());
+    }
+
+    verifyHttpResponseCode(200, doDeleteExternalAPI(
+      "/" + AdminHandler.MANDATORY_PARTIALS + "/" + mandatoryPartial1.getName(), ADMIN_HEADERS));
+
+    {
+      HttpResponse listResponse = doGetExternalAPI("/" + AdminHandler.MANDATORY_PARTIALS, ADMIN_HEADERS);
+      verifyHttpResponseCode(200, listResponse);
+      Collection<MandatoryPartial> listResponsePartials = gson.fromJson(
+        new InputStreamReader(listResponse.getEntity().getContent()),
+        new TypeToken<Collection<MandatoryPartial>>() { }.getType());
+      Assert.assertEquals(0, listResponsePartials.size());
+    }
+
+    String requestJson = gson.toJson(ImmutableList.of(mandatoryPartial1, mandatoryPartial2));
+    verifyHttpResponseCode(200, doPutExternalAPI(
+      "/" + AdminHandler.MANDATORY_PARTIALS, requestJson, ADMIN_HEADERS));
+
+    {
+      HttpResponse listResponse = doGetExternalAPI("/" + AdminHandler.MANDATORY_PARTIALS, ADMIN_HEADERS);
+      verifyHttpResponseCode(200, listResponse);
+      Collection<MandatoryPartial> listResponsePartials = gson.fromJson(
+        new InputStreamReader(listResponse.getEntity().getContent()),
+        new TypeToken<Collection<MandatoryPartial>>() { }.getType());
+      Assert.assertEquals(2, listResponsePartials.size());
+      Assert.assertTrue(listResponsePartials.contains(mandatoryPartial1));
+      Assert.assertTrue(listResponsePartials.contains(mandatoryPartial2));
+    }
+
+    verifyHttpResponseCode(200, doDeleteExternalAPI(
+      "/" + AdminHandler.MANDATORY_PARTIALS + "/" + mandatoryPartial1.getName(), ADMIN_HEADERS));
   }
 
   @Test
@@ -255,6 +320,11 @@ public class AdminHandlerTest extends ServiceTestBase {
                                                    Entities.PartialTemplateExample.TEST_PARTIAL2),
                                 new TypeToken<List<PartialTemplate>>() {}.getType()));
 
+    import1.put(AdminHandler.MANDATORY_PARTIALS,
+                gson.toJsonTree(Lists.newArrayList(Entities.PartialTemplateExample.TEST_PARTIAL1,
+                                                   Entities.PartialTemplateExample.TEST_PARTIAL2),
+                                new TypeToken<List<PartialTemplate>>() {}.getType()));
+
 
     // Verify import worked by exporting
     runImportExportTest(import1);
@@ -351,6 +421,10 @@ public class AdminHandlerTest extends ServiceTestBase {
     provider.addProperty("name", "?");
     assertResponseStatus(doPostExternalAPI("/providers", provider.toString(), ADMIN_HEADERS),
                          HttpResponseStatus.BAD_REQUEST);
+  }
+  
+  private void verifyHttpResponseCode(int expectedCode, HttpResponse response) {
+    Assert.assertEquals(expectedCode, response.getStatusLine().getStatusCode());
   }
 
   private void testRestAPIsBumpVersion(String entityType, JsonObject entity) throws Exception {

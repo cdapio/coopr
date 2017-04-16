@@ -22,6 +22,7 @@ import co.cask.coopr.spec.plugin.AutomatorType;
 import co.cask.coopr.spec.plugin.ProviderType;
 import co.cask.coopr.spec.service.Service;
 import co.cask.coopr.spec.template.ClusterTemplate;
+import co.cask.coopr.spec.template.MandatoryPartial;
 import co.cask.coopr.spec.template.PartialTemplate;
 
 import java.io.IOException;
@@ -473,4 +474,63 @@ public interface EntityStoreView {
    * @throws Exception
    */
   void deleteAutomatorType(String automatorTypeName, int version) throws IOException, IllegalAccessException;
+
+  /**
+   * Gets the {@link PartialTemplate} backing a mandatory partial.
+   *
+   * @param mandatoryPartialName name of the {@link PartialTemplate} that is mandatory
+   * @return {@link PartialTemplate} backing the mandatory partial
+   * @throws IOException
+   */
+  MandatoryPartial getMandatoryPartial(String mandatoryPartialName) throws IOException;
+
+  /**
+   * Gets the {@link PartialTemplate} backing a mandatory partial.
+   *
+   * @param mandatoryPartialName name of the {@link PartialTemplate} that is mandatory
+   * @return {@link PartialTemplate} backing the mandatory partial
+   * @throws IOException
+   */
+  PartialTemplate getMandatoryPartialAsPartialTemplate(String mandatoryPartialName) throws IOException;
+
+  /**
+   * Deletes a mandatory partial. This only deletes the mandatory partial's entry in the list
+   * of mandatory partials. This does not delete the actual {@link PartialTemplate} backing the
+   * mandatory partial.
+   *
+   * @param mandatoryPartialName name of the {@link PartialTemplate} that is mandatory
+   * @throws IOException
+   * @throws IllegalAccessException
+   */
+  void deleteMandatoryPartial(String mandatoryPartialName) throws IOException, IllegalAccessException;
+
+  /**
+   * @return the {@link PartialTemplate}s that have been made mandatory
+   * @throws IOException
+   */
+  Collection<PartialTemplate> getAllMandatoryPartialsAsPartialTemplates() throws IOException;
+
+  /**
+   * @return the {@link MandatoryPartial}s
+   * @throws IOException
+   */
+  Collection<MandatoryPartial> getAllMandatoryPartials() throws IOException;
+
+  /**
+   * Makes a {@link PartialTemplate} mandatory. This adds the associated {@link PartialTemplate}
+   * to the list of mandatory partials.
+   *
+   * <p>
+   * For each named {@link PartialTemplate}, there can only be one version of the named {@link PartialTemplate}
+   * in the list of mandatory partials. Therefore, if there is already a {@link PartialTemplate} with a particular name
+   * and we try to turn the same {@link PartialTemplate} with a different version into a mandatory partial,
+   * then we will override the previous mandatory partial and change it to use the new specified version.
+   * </p>
+   *
+   * @param mandatoryPartial uniquely identifies a {@link PartialTemplate} at a specific version
+   * @throws IOException
+   * @throws IllegalAccessException
+   */
+  void writeMandatoryPartialTemplate(MandatoryPartial mandatoryPartial)
+    throws IOException, IllegalAccessException;
 }
