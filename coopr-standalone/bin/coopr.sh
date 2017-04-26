@@ -123,12 +123,15 @@ Please install Node.JS - the minimum version supported v0.10.26."
 
 # Check node version
 NODE_VERSION=`node -v 2>&1`
+NODE_VERSION_MAJOR=`echo ${NODE_VERSION} | awk -F '.' '{print $1}'`
 NODE_VERSION_MINOR=`echo ${NODE_VERSION} | awk -F '.' '{print $2}'`
 NODE_VERSION_PATCH=`echo ${NODE_VERSION} | awk -F '.' '{print $3}'`
-if [ ${NODE_VERSION_MINOR} -lt 10 ]; then
-  die "Node.JS version is not supported! The minimum version supported is v0.10.26."
-elif [ ${NODE_VERSION_MINOR} -eq 10 ] && [ ${NODE_VERSION_PATCH} -lt 26 ]; then
-  die "Node.JS version is not supported! The minimum version supported is v0.10.26."
+if [ ${NODE_VERSION_MAJOR#"v"} -lt 1 ]; then
+  if [ ${NODE_VERSION_MINOR} -lt 10 ]; then
+    die "Node.JS version is not supported! The minimum version supported is v0.10.26."
+  elif [ ${NODE_VERSION_MINOR} -eq 10 ] && [ ${NODE_VERSION_PATCH} -lt 26 ]; then
+    die "Node.JS version is not supported! The minimum version supported is v0.10.26."
+  fi
 fi
 
 # Check ruby installation
