@@ -20,31 +20,7 @@
 #
 FROM ubuntu:12.04
 MAINTAINER Cask Data <ops@cask.co>
-RUN apt-get update && \
-    apt-get install -y software-properties-common python-software-properties && \
-    add-apt-repository ppa:chris-lea/node.js && \
-    apt-get update && \
-    apt-get install -y --no-install-recommends openjdk-6-jdk && \
-    apt-get install -y \
-      build-essential \
-      zlib1g-dev \
-      curl \
-      git \
-      maven \
-      nodejs \
-      ruby1.9.3 \
-      unzip
 
-RUN gem install fog --version 1.36.0 --no-rdoc --no-ri && \
-    gem install sinatra --version 1.4.5 --no-rdoc --no-ri && \
-    gem install thin --version 1.6.2 --no-rdoc --no-ri && \
-    gem install rest_client --version 1.7.3 --no-rdoc --no-ri && \
-    gem install google-api-client --version 0.7.1 --no-rdoc --no-ri && \
-    gem install net-ssh --version 2.9.4 --no-rdoc --no-ri && \
-    gem install net-scp --version 1.2.1 --no-rdoc --no-ri && \
-    gem install logger --version 1.2.8 --no-rdoc --no-ri && \
-    gem install deep_merge --version 1.0.1 --no-rdoc --no-ri
- 
 # create Software directory
 RUN mkdir /Build /Software
 
@@ -59,8 +35,25 @@ COPY coopr-standalone /Build/coopr-standalone
 COPY coopr-templates /Build/coopr-templates
 COPY coopr-ui /Build/coopr-ui
 
+RUN apt-get update && \
+    apt-get install -y software-properties-common python-software-properties && \
+    add-apt-repository ppa:chris-lea/node.js && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends openjdk-7-jdk && \
+    apt-get install -y \
+      build-essential \
+      zlib1g-dev \
+      curl \
+      git \
+      maven \
+      nodejs \
+      ruby1.9.3 \
+      unzip
+
 # build coopr-standalone zip file, copy it to container and extract it
-RUN cd Build/coopr-standalone && \
+RUN gem install bundler --no-rdoc --no-ri && \
+    cd Build/coopr-provisioner && bundle install && \
+    cd ../coopr-standalone && \
     MAVEN_OPTS="-Xmx512m" mvn package assembly:single -DskipTests && \
     unzip target/coopr-[0-9]*.[0-9]*.[0-9]*-standalone.zip -d /Software && \
     cd /Software && \
@@ -68,8 +61,7 @@ RUN cd Build/coopr-standalone && \
     /usr/share/locale/{a,b,c,d,e{l,o,s,t,u},f,g,h,i,j,k,lt,lv,m,n,o,p,r,s,t,u,v,w,x,z}*
 
 # Expose Ports (8100 for UI, 55054 for API)
-EXPOSE 8100
-EXPOSE 55054
+EXPOSE 8100 55054
 
 # Clean UP (reduce space usage of container as much as possible)
 RUN apt-get purge -y \
@@ -81,7 +73,7 @@ RUN apt-get purge -y \
     apt-get autoclean && \
     apt-get -y autoremove 
 
-ENV JAVA_HOME /usr/lib/jvm/java-6-openjdk-amd64
+ENV JAVA_HOME /usr/lib/jvm/java-7-openjdk-amd64
 
 # start COOPR in the background and tail in the foreground
 ENTRYPOINT /Software/coopr-[0-9]*.[0-9]*.[0-9]*-standalone/bin/coopr.sh start && \
