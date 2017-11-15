@@ -1,4 +1,4 @@
-# Copyright © 2012-2014 Cask Data, Inc.
+# Copyright © 2012-2017 Cask Data, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,11 +13,12 @@
 # limitations under the License.
 #
 # Cask is a trademark of Cask Data, Inc. All rights reserved.
+
 ###############################################################################################
 # Please visit Docker.com and follow instructions to download Docker SW in your environment.
 # This Dockerfile will build a Coopr image from scratch utilizing ubuntu 12.04 as a base image.
 # The assumption is that you are running this from the root of the coopr directory structure.
-#
+
 FROM ubuntu:12.04
 MAINTAINER Cask Data <ops@cask.co>
 
@@ -52,7 +53,8 @@ RUN apt-get update && \
 
 # build coopr-standalone zip file, copy it to container and extract it
 RUN gem install bundler --no-rdoc --no-ri && \
-    cd Build/coopr-provisioner && bundle install && \
+    cd Build/coopr-provisioner && \
+    bundle install --without test && \
     cd ../coopr-standalone && \
     MAVEN_OPTS="-Xmx512m" mvn package assembly:single -DskipTests && \
     unzip target/coopr-[0-9]*.[0-9]*.[0-9]*-standalone.zip -d /Software && \
