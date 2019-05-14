@@ -23,7 +23,7 @@
 ===================
 
 Welcome to the Coopr 0.9.9 release. Release notes with links to issue details can be seen
-from the github project at https://github.com/caskdata/coopr/releases.
+from the github project at https://github.com/cdapio/coopr/releases.
 
 Release Highlights
 ------------------

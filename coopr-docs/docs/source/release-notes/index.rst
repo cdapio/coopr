@@ -20,7 +20,7 @@ Release Notes
 =============
 
 Below are release notes for current and previous releases of Coopr. 
-Release notes with links to issue details can be seen from the github project at https://github.com/caskdata/coopr/releases.
+Release notes with links to issue details can be seen from the github project at https://github.com/cdapio/coopr/releases.
 
 .. toctree::
    :maxdepth: 1

@@ -22,7 +22,7 @@ while utilizing common SCM tools (Chef and scripts).
 
 You can build a standalone version of Coopr that will run on your machine. It requires Java 6 or Java 7 to run the server, Node v0.10.26 or higher for the UI, and Ruby 1.9.0p0 or higher for the provisioner.
 ```
-  > git clone https://github.com/caskdata/coopr.git
+  > git clone https://github.com/cdapio/coopr.git
   > cd coopr/coopr-standalone
   > git submodule init
   > git submodule update
@@ -51,9 +51,9 @@ suggesting improvements to something that's already there, here's how you can co
  * Fork Coopr into your own GitHub repository
  * Create a topic branch with an appropriate name
  * Work on your favorite feature to your content
- * Once you are satisifed, create a pull request by going to the caskdata/coopr project.
+ * Once you are satisifed, create a pull request by going to the cdapio/coopr project.
  * Address all the review comments
- * Once addressed, the changes will be committed to the caskdata/coopr repository.
+ * Once addressed, the changes will be committed to the cdapio/coopr repository.
 
 Bugs and suggestions should be made by filing a Jira at https://issues.cask.co/browse/COOPR.
 

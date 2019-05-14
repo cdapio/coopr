@@ -4,7 +4,7 @@
   "description": "End to end testing for Coopr",
   "repository": {
     "type": "git",
-    "url": "http://github.com/caskdata/coopr.git"
+    "url": "http://github.com/cdapio/coopr.git"
   },
   "scripts": {
     "build": "npm install",
